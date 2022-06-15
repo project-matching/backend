@@ -30,8 +30,8 @@ pipeline {
         stage('backend dockerizing') {
             steps {
                 sh "pwd"
-                sh "gradle clean"
-                sh "gradle bootJar"
+                sh "gradlew clean"
+                sh "gradlew bootJar"
 
                 sh "docker build -t backend ."
 
