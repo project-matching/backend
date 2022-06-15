@@ -33,7 +33,7 @@ pipeline {
                 sh "gradle clean"
                 sh "gradle bootJar"
 
-                sh "docker build -t ./ ."
+                sh "docker build -t backend ."
 
             }
         }
@@ -41,7 +41,7 @@ pipeline {
         stage('deploy') {
             steps {
                 sh '''
-                  docker run -d -p 8080:8080 todo/backend
+                  docker run -d -p 9090:9090 backend
                 '''
             }
         }
