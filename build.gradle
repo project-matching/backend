@@ -36,3 +36,9 @@ dependencies {
 tasks.named('test') {
 	useJUnitPlatform()
 }
+
+bootJar{
+	archivesBaseName = 'project-matching'
+	archiveFileName = 'project-matching.jar'
+	archiveVersion = "0.0.1"
+}
