@@ -75,6 +75,16 @@ public class ProjectController {
     }
     
     // 프로젝트 참가 허가
-    
+    @PostMapping("/participate/permit")
+    @ApiOperation(value = "프로젝트 참가 허가")
+    public ResponseEntity projectParticipatePermit(ProjectParticipatePermitRequestDto projectParticipatePermitRequestDto) {
+        return new ResponseEntity(HttpStatus.OK);
+    }
+
     // 프로젝트 참가 거부
+    @PostMapping("/participate/refusal")
+    @ApiOperation(value = "프로젝트 참가 거부")
+    public ResponseEntity projectParticipatePermit(ProjectParticipateRefusalRequestDto projectParticipatePermitRequestDto) {
+        return new ResponseEntity(HttpStatus.OK);
+    }
 }
