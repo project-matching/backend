@@ -3,11 +3,9 @@ pipeline {
 //     options {
 //         timeout(time: 1, unit: 'HOURS')
 //     }
-//     environment {
-//         SOURCECODE_JENKINS_CREDENTIAL_ID = 'ci_cd'
-//         SOURCE_CODE_URL = 'https://github.com/project-matching/project-matching-backend.git'
-//         RELEASE_BRANCH = 'main'
-//     }
+    environment {
+        dockerhub = credentials('dockerhub')
+    }
     stages {
         stage('Init') {
             steps {
@@ -34,16 +32,18 @@ pipeline {
                 sh "./gradlew clean"
                 sh "./gradlew bootJar"
 
-                sh "docker build -t backend ."
+                sh "docker build -t wkemrm12/backend ."
 
             }
         }
 
-        stage('deploy') {
+        stage('pushing to dockerhub') {
             steps {
-                sh '''
-                  docker run -d -p 9090:9090 backend
-                '''
+                sh "echo $dockerhub_PSW | docker login -u $dockerhub_USR --password-stdin"
+                sh "docker push wkemrm12/backend"
+//                 sh '''
+//                   docker run -d -p 9090:9090 backend
+//                 '''
             }
         }
     }
