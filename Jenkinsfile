@@ -7,10 +7,6 @@ pipeline {
     }
 
     stages {
-        stage("init") {
-
-        }
-
         stage('backend dockerizing') {
             steps {
                 sh "pwd"
