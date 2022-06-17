@@ -4,7 +4,7 @@ pipeline {
     environment {
         dockerhub = credentials('dockerhub')
         AWS_ACCESS_KEY_ID = credentials('awsAccessKeyId')
-        AWS_SECRET_ACCESS_KEY_ID = credentials('awsSecretAccessKeyId')
+        AWS_SECRET_ACCESS_KEY_ID = credentials('awsSecretAccessKey')
     }
 
     stages {
