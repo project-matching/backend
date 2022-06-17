@@ -1,30 +1,14 @@
 pipeline {
     agent any
-//     options {
-//         timeout(time: 1, unit: 'HOURS')
-//     }
+
     environment {
         dockerhub = credentials('dockerhub')
+        AWS_ACCESS_KEY_ID = credentials('jenkins-aws-access-key-id')
+        AWS_SECRET_ACCESS_KEY = credentials('jenkins-aws-secret-key-id')
+        AWS_DEFAULT_REGION = 'ap-northeast-2'
     }
+
     stages {
-        stage('Init') {
-            steps {
-                echo 'clear'
-//                 sh 'docker stop $(docker ps -aq)'
-//                 sh 'docker rm $(docker ps -aq)'
-//                 deleteDir()
-            }
-        }
-
-//         stage('clone') {
-//             steps {
-//                 git url: "$SOURCE_CODE_URL",
-//                     branch: "$RELEASE_BRANCH",
-//                     credentialsId: "$SOURCECODE_JENKINS_CREDENTIAL_ID"
-//                 sh "ls -al"
-//             }
-//         }
-
         stage('backend dockerizing') {
             steps {
                 sh "pwd"
@@ -41,10 +25,17 @@ pipeline {
             steps {
                 sh "echo $dockerhub_PSW | docker login -u $dockerhub_USR --password-stdin"
                 sh "docker push wkemrm12/backend"
-//                 sh '''
-//                   docker run -d -p 9090:9090 backend
-//                 '''
             }
         }
+
+        stage('upload') {
+            steps {
+                   withAWS(credentials:'awsKey') {
+                    sh 'echo "hello Jenkins">hello.txt'
+                    s3Upload(file:'project-matching.jar', bucket:'elasticbeanstalk-ap-northeast-2-406669924561', path:'/var/jenkins_home/workspace/jenkins-ci-cd/build/libs/project-matching.jar')
+                   }
+            }
+        }
+
     }
 }
