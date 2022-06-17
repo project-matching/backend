@@ -37,9 +37,7 @@ pipeline {
                             versionLabel: "my-application-1.0.0",
                             s3Bucket: "elasticbeanstalk-ap-northeast-2-406669924561",
                             s3Key: "my-application.jar",
-                            description: "My first application version",
-                            AWS_ACCESS_KEY_ID: "$AWS_ACCESS_KEY_ID",
-                            AWS_SECRET_ACCESS_KEY: "$AWS_SECRET_ACCESS_KEY"
+                            description: "My first application version"
                         )
                     }
             }
