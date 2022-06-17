@@ -29,7 +29,14 @@ pipeline {
             steps {
                    withAWS(credentials:'AwsCredentials') {
                     sh 'echo "hello Jenkins">hello.txt'
-                    s3Upload(file:'/var/lib/jenkins/workspace/jenkins-ci-cd/build/libs/project-matching.jar', bucket:'elasticbeanstalk-ap-northeast-2-406669924561', path:'/var/lib/jenkins/workspace/jenkins-ci-cd/build/libs/project-matching.jar')
+//                     s3Upload(file:'/var/lib/jenkins/workspace/jenkins-ci-cd/build/libs/project-matching.jar', bucket:'elasticbeanstalk-ap-northeast-2-406669924561', path:'/var/lib/jenkins/workspace/jenkins-ci-cd/build/libs/project-matching.jar')
+                        ebCreateApplicationVersion(
+                            applicationName: "project-matching-service-dev",
+                            versionLabel: "my-application-1.0.0",
+                            s3Bucket: "elasticbeanstalk-ap-northeast-2-406669924561",
+                            s3Key: "my-application.jar",
+                            description: "My first application version"
+                        )
                    }
             }
         }
