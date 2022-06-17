@@ -36,11 +36,10 @@ pipeline {
                     sh """
                         ssh -o StrictHostKeyChecking=no ${TARGET_HOST} '
                             hostname
-                            docker pull leeworld9/backend
-                            docker run -d -p 8080:8080 -it leeworld9/backend:latest
+                            docker pull wkemrm12/backend
+                            docker run -d -p 8080:8080 -it wkemrm12/backend:latest
                         '
                     """
-                    }
                 }
             }
         }
