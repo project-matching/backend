@@ -3,11 +3,14 @@ pipeline {
 
     environment {
         dockerhub = credentials('dockerhub')
-        AWS_ACCESS_KEY_ID = credentials('awsAccessKeyId')
-        AWS_SECRET_ACCESS_KEY = credentials('awsSecretAccessKey')
+        TARGET_HOST = credentials('target_back')
     }
 
     stages {
+        stage("init") {
+
+        }
+
         stage('backend dockerizing') {
             steps {
                 sh "pwd"
@@ -27,19 +30,18 @@ pipeline {
             }
         }
 
-        stage('upload') {
+        stage('deploy') {
             steps {
-                    withAWS(region:'ap-northeast-2', credentials:'AwsCredentials') {
-                    sh 'echo "hello Jenkins">hello.txt'
-                    s3Upload(file:'/var/lib/jenkins/workspace/jenkins-ci-cd/build/libs/project-matching.jar', bucket:'elasticbeanstalk-ap-northeast-2-406669924561', path:'my-application.jar')
-                        ebCreateApplicationVersion(
-                            applicationName: "project-matching-service-dev",
-                            versionLabel: "my-application-1.0.0",
-                            s3Bucket: "elasticbeanstalk-ap-northeast-2-406669924561",
-                            s3Key: "my-application.jar",
-                            description: "My first application version"
-                        )
+                sshagent (credentials: ['matching_backend_ssh']) {
+                    sh """
+                        ssh -o StrictHostKeyChecking=no ${TARGET_HOST} '
+                            hostname
+                            docker pull leeworld9/backend
+                            docker run -d -p 8080:8080 -it leeworld9/backend:latest
+                        '
+                    """
                     }
+                }
             }
         }
     }
