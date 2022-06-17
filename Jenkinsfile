@@ -3,6 +3,8 @@ pipeline {
 
     environment {
         dockerhub = credentials('dockerhub')
+        AWS_ACCESS_KEY_ID = credentials('awsAccessKeyId')
+        AWS_SECRET_ACCESS_KEY_ID = credentials('awsSecretAccessKeyId')
     }
 
     stages {
@@ -27,7 +29,7 @@ pipeline {
 
         stage('upload') {
             steps {
-                   withAWS(credentials:'AwsCredentials') {
+//                    withAWS(credentials:'AwsCredentials') {
                     sh 'echo "hello Jenkins">hello.txt'
 //                     s3Upload(file:'/var/lib/jenkins/workspace/jenkins-ci-cd/build/libs/project-matching.jar', bucket:'elasticbeanstalk-ap-northeast-2-406669924561', path:'/var/lib/jenkins/workspace/jenkins-ci-cd/build/libs/project-matching.jar')
                         ebCreateApplicationVersion(
@@ -37,7 +39,7 @@ pipeline {
                             s3Key: "my-application.jar",
                             description: "My first application version"
                         )
-                   }
+//                    }
             }
         }
     }
