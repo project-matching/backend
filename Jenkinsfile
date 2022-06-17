@@ -29,7 +29,7 @@ pipeline {
             steps {
                    withAWS(credentials:'AwsCredentials') {
                     sh 'echo "hello Jenkins">hello.txt'
-                    s3Upload(file:'project-matching.jar', bucket:'elasticbeanstalk-ap-northeast-2-406669924561', path:'/var/jenkins_home/workspace/jenkins-ci-cd/build/libs/project-matching.jar')
+                    s3Upload(file:'project-matching.jar', bucket:'elasticbeanstalk-ap-northeast-2-406669924561', path:'/var/lib/jenkins/workspace/jenkins-ci-cd/build/libs/project-matching.jar')
                    }
             }
         }
