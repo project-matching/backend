@@ -4,6 +4,7 @@ pipeline {
     environment {
         dockerhub = credentials('dockerhub')
         TARGET_HOST = credentials('target_back')
+        docker_repository_name = credentials('docker_repository_name')
     }
     stages {
 
@@ -20,11 +21,7 @@ pipeline {
             steps {
 
                 sh '''
-                ID=$dockerhub_USR
-                PW=$dockerhub_PSW
-
-                echo $ID
-                DOCKER_REPOSITORY_NAME=backend
+                DOCKER_REPOSITORY_NAME=$docker_repository_name
 
                 TAG=$(docker images | awk -v DOCKER_REPOSITORY_NAME=$DOCKER_REPOSITORY_NAME '{if ($1 == DOCKER_REPOSITORY_NAME) print $2;}')
 
@@ -39,50 +36,63 @@ pipeline {
                 fi
 
                 docker build -t $DOCKER_REPOSITORY_NAME:$NEW_TAG_VER .
-
-                docker login -u $ID -p $PW
-
-                if [ $NEW_TAG_VER != "0.01" ]; then
-                    docker rmi $DOCKER_REPOSITORY_NAME:$TAG
-                fi
-
-                docker tag $DOCKER_REPOSITORY_NAME:$NEW_TAG_VER $ID/$DOCKER_REPOSITORY_NAME:$NEW_TAG_VER
-                docker push $ID/$DOCKER_REPOSITORY_NAME:$NEW_TAG_VER
-
-                docker tag $DOCKER_REPOSITORY_NAME:$NEW_TAG_VER $ID/$DOCKER_REPOSITORY_NAME:latest
-
-                docker push $ID/$DOCKER_REPOSITORY_NAME:latest
-
-
-                docker rmi $ID/$DOCKER_REPOSITORY_NAME:latest
-                docker rmi $ID/$DOCKER_REPOSITORY_NAME:$NEW_TAG_VER
                 '''
             }
         }
 
+        stage('before pushing to dockerhub') {
+            steps {
+                sh '''
+                    if [ $NEW_TAG_VER != "0.01" ]; then
+                        docker rmi $DOCKER_REPOSITORY_NAME:$TAG
+                    fi
+                '''
+            }
+        }
 
+        stage('pushing to dockerhub') {
+            steps {
+                sh '''
+                    ID=$dockerhub_USR
+                    PW=$dockerhub_PSW
+                    docker login -u $ID -p $PW
 
-//         stage('pushing to dockerhub') {
-//             steps {
-//                 sh "echo $dockerhub_PSW | docker login -u $dockerhub_USR --password-stdin"
-//                 sh "docker push wkemrm12/backend"
-//             }
-//         }
+                    docker tag $DOCKER_REPOSITORY_NAME:$NEW_TAG_VER $ID/$DOCKER_REPOSITORY_NAME:$NEW_TAG_VER
+                    docker push $ID/$DOCKER_REPOSITORY_NAME:$NEW_TAG_VER
 
-//         stage('deploy') {
-//             steps {
-//                 sshagent (credentials: ['matching_backend_ssh']) {
-//                     sh """
-//                         ssh -o StrictHostKeyChecking=no ${TARGET_HOST} '
-//                             hostname
-//                             docker stop $(docker ps -a -q)
-//                             docker rm $(docker ps -a -q)
-//                             docker pull wkemrm12/backend
-//                             docker run -d -p 8080:8080 -it wkemrm12/backend:latest
-//                         '
-//                     """
-//                 }
-//             }
-//         }
+                    docker tag $DOCKER_REPOSITORY_NAME:$NEW_TAG_VER $ID/$DOCKER_REPOSITORY_NAME:latest
+
+                    docker push $ID/$DOCKER_REPOSITORY_NAME:latest
+                '''
+            }
+        }
+
+        stage('after pushing to dockerhub') {
+            steps {
+                sh '''
+                    docker rmi $ID/$DOCKER_REPOSITORY_NAME:latest
+                    docker rmi $ID/$DOCKER_REPOSITORY_NAME:$NEW_TAG_VER
+                '''
+            }
+        }
+
+        stage('deploy') {
+            steps {
+                sshagent (credentials: ['matching_backend_ssh']) {
+                    sh """
+                        ssh -o StrictHostKeyChecking=no ${TARGET_HOST} '
+                            hostname
+                            ID=$dockerhub_USR
+                            DOCKER_REPOSITORY_NAME=$docker_repository_name
+                            docker stop $(docker ps -a -q)
+                            docker rm $(docker ps -a -q)
+                            docker rmi $(docker images -q)
+                            docker pull $ID/$DOCKER_REPOSITORY_NAME:latest
+                            docker run -d -p 8080:8080 -it $ID/$DOCKER_REPOSITORY_NAME:latest
+                        '
+                    """
+                }
+            }
+        }
     }
 }
