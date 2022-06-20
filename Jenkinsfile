@@ -7,8 +7,6 @@ pipeline {
         dockerhub = credentials('dockerhub')
         TARGET_HOST = credentials('target_back')
         DOCKER_REPOSITORY_NAME = 'backend'
-        TAG = "TAG"
-        NEW_TAG_VER = "NEW_TAG_VER"
     }
     stages {
 
@@ -46,7 +44,7 @@ pipeline {
         stage('before pushing to dockerhub') {
             steps {
                 sh '''
-                    if [ $NEW_TAG_VER != "0.01" ]; then
+                    if [ NEW_TAG_VER != "0.01" ]; then
                         echo ""
                         docker rmi $DOCKER_REPOSITORY_NAME:$TAG
                     fi
