@@ -14,11 +14,11 @@ pipeline {
                 sh "./gradlew bootJar"
 
                 sh """
-                ID = $dockerhub_USR
-                PW = $dockerhub_PSW
-                DOCKER_REPOSITORY_NAME = backend
+                ID=$dockerhub_USR
+                PW=$dockerhub_PSW
+                DOCKER_REPOSITORY_NAME=backend
 
-                TAG = $(docker images | awk -v DOCKER_REPOSITORY_NAME=$DOCKER_REPOSITORY_NAME '{if ($1 == DOCKER_REPOSITORY_NAME) print $2;}')
+                TAG=$(docker images | awk -v DOCKER_REPOSITORY_NAME=$DOCKER_REPOSITORY_NAME '{if ($1 == DOCKER_REPOSITORY_NAME) print $2;}')
 
                 # 만약 [0-9]\.[0-9]{1,2} 으로 버전이 관리된 기존의 이미지 일 경우
                 if [[ $TAG =~ [0-9]\.[0-9]{1,2} ]]; then
