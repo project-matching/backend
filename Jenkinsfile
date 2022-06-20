@@ -38,7 +38,7 @@ pipeline {
                 '''
 
                 sh "echo $TAG"
-                TAG = sh "echo $TAG"
+                TAG = sh(script: 'echo $TAG', returnStdout: true).trim()
                 sh "echo $TAG"
             }
         }
