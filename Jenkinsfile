@@ -36,6 +36,7 @@ pipeline {
                 fi
 
                 docker build -t $DOCKER_REPOSITORY_NAME:$NEW_TAG_VER .
+                echo before:$TAG
                 '''
                  sh "echo before:$TAG"
                  echo "before:$TAG"
