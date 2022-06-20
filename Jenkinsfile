@@ -16,6 +16,8 @@ pipeline {
                 sh """
                 ID=$dockerhub_USR
                 PW=$dockerhub_PSW
+
+                echo $ID
                 DOCKER_REPOSITORY_NAME=backend
 
                 TAG=$(docker images | awk -v DOCKER_REPOSITORY_NAME=$DOCKER_REPOSITORY_NAME '{if ($1 == DOCKER_REPOSITORY_NAME) print $2;}')
