@@ -38,7 +38,7 @@ pipeline {
 
                 docker build -t $DOCKER_REPOSITORY_NAME:$NEW_TAG_VER .
                 '''
-                r = sh script: 'echo $TAG', returnStatus: true
+                env.r = sh script: 'echo $TAG', returnStatus: true
 
                 echo r
             }
