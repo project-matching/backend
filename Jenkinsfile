@@ -1,4 +1,4 @@
-def GTAG
+GTAG
 pipeline {
     agent any
 
