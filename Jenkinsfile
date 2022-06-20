@@ -1,4 +1,4 @@
-pipeline {
+''pipeline {
     agent any
 
     environment {
@@ -13,7 +13,7 @@ pipeline {
                 sh "./gradlew clean"
                 sh "./gradlew bootJar"
 
-                sh """
+                sh '''
                 ID=$dockerhub_USR
                 PW=$dockerhub_PSW
 
@@ -53,7 +53,7 @@ pipeline {
                 # 버전 관리에 문제가 있어 latest를 삭제
                 docker rmi $ID/$DOCKER_REPOSITORY_NAME:latest
                 docker rmi $ID/$DOCKER_REPOSITORY_NAME:$NEW_TAG_VER
-                """
+                '''
             }
         }
 
