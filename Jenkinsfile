@@ -55,7 +55,7 @@ pipeline {
                     ID=$dockerhub_USR
                     PW=$dockerhub_PSW
                     docker login -u $ID -p $PW
-
+                    echo "$DOCKER_REPOSITORY_NAME"
                     docker tag $DOCKER_REPOSITORY_NAME:$NEW_TAG_VER $ID/$DOCKER_REPOSITORY_NAME:$NEW_TAG_VER
                     docker push $ID/$DOCKER_REPOSITORY_NAME:$NEW_TAG_VER
 
