@@ -6,7 +6,6 @@ pipeline {
         dockerhub = credentials('dockerhub')
         TARGET_HOST = credentials('target_back')
         DOCKER_REPOSITORY_NAME = 'backend'
-        r = ''
     }
     stages {
 
@@ -38,9 +37,7 @@ pipeline {
 
                 docker build -t $DOCKER_REPOSITORY_NAME:$NEW_TAG_VER .
                 '''
-                env.r = sh script: 'echo $TAG', returnStatus: true
-
-                echo r
+                echo sh script: 'echo $TAG', returnStatus: true
             }
         }
 
