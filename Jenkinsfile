@@ -1,4 +1,3 @@
-def GTAG
 pipeline {
     agent any
 
@@ -6,6 +5,7 @@ pipeline {
         dockerhub = credentials('dockerhub')
         TARGET_HOST = credentials('target_back')
         DOCKER_REPOSITORY_NAME = 'backend'
+        GTAG = ""
     }
     stages {
 
