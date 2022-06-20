@@ -38,7 +38,7 @@ pipeline {
                 docker build -t $DOCKER_REPOSITORY_NAME:$NEW_TAG_VER .
                 '''
                 script{
-                    sh "echo $TAG"
+                    sh "echo GIGIGIGIG:$TAG"
                     GTAG = sh (script: 'echo $TAG', returnStatus: true).trim();
                     echo "$GTAG"
                 }
