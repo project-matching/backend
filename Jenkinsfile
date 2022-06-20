@@ -1,3 +1,4 @@
+def TAG
 pipeline {
     agent any
 
