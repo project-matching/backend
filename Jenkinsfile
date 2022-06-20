@@ -1,5 +1,5 @@
-def TAG = NULL
-def NEW_TAG_VER = NULL
+def TAG = ""
+def NEW_TAG_VER = ""
 
 pipeline {
     agent any
