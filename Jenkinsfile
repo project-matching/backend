@@ -6,12 +6,18 @@
         TARGET_HOST = credentials('target_back')
     }
     stages {
-        stage('backend dockerizing') {
+
+        stage('backend build') {
             steps {
                 sh "pwd"
                 sh "chmod +x gradlew"
                 sh "./gradlew clean"
                 sh "./gradlew bootJar"
+            }
+        }
+
+        stage('backend dockerizing') {
+            steps {
 
                 sh '''
                 ID=$dockerhub_USR
@@ -27,13 +33,10 @@
                     NEW_TAG_VER=$(echo $TAG 0.01 | awk '{print $1+$2}')
                     echo "현재 버전은 $TAG 입니다."
                     echo "새로운 버전은 $NEW_TAG_VER 입니다"
-
-
                 else
-                    # echo "새롭게 만들어진 이미지 입니다."
+                    echo "새롭게 만들어진 이미지 입니다."
                     NEW_TAG_VER=0.01
                 fi
-
 
                 docker build -t $DOCKER_REPOSITORY_NAME:$NEW_TAG_VER .
 
