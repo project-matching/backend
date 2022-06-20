@@ -40,7 +40,7 @@ pipeline {
                 '''
 
                 sh "echo $TAG"
-                TAG = sh(script: 'echo $TAG', returnStdout: true).trim()
+                env.TAG = sh(script: 'echo $TAG', returnStdout: true).trim()
                 sh "echo $TAG"
             }
         }
