@@ -4,7 +4,7 @@ pipeline {
     environment {
         dockerhub = credentials('dockerhub')
         TARGET_HOST = credentials('target_back')
-        docker_repository_name = credentials('docker_repository_name')
+        DOCKER_REPOSITORY_NAME = credentials('docker_repository_name')
     }
     stages {
 
@@ -21,7 +21,6 @@ pipeline {
             steps {
 
                 sh '''
-                DOCKER_REPOSITORY_NAME=$docker_repository_name
 
                 TAG=$(docker images | awk -v DOCKER_REPOSITORY_NAME=$DOCKER_REPOSITORY_NAME '{if ($1 == DOCKER_REPOSITORY_NAME) print $2;}')
 
@@ -83,7 +82,6 @@ pipeline {
                         ssh -o StrictHostKeyChecking=no ${TARGET_HOST} '
                             hostname
                             ID=$dockerhub_USR
-                            DOCKER_REPOSITORY_NAME=$docker_repository_name
                             docker stop $(docker ps -a -q)
                             docker rm $(docker ps -a -q)
                             docker rmi $(docker images -q)
