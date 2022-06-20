@@ -1,3 +1,6 @@
+def TAG = NULL
+def NEW_TAG_VER = NULL
+
 pipeline {
     agent any
 
@@ -5,8 +8,6 @@ pipeline {
         dockerhub = credentials('dockerhub')
         TARGET_HOST = credentials('target_back')
         DOCKER_REPOSITORY_NAME = 'backend'
-        TAG = ''
-        NEW_TAG_VER = ''
     }
     stages {
 
