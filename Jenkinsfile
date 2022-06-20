@@ -41,7 +41,7 @@ pipeline {
                 script {
                     GTAG = sh(script: 'echo $TAG', returnStdout: true)
                 }
-                sh 'echo $GTAG'
+                sh """echo $GTAG"""
             }
         }
 
