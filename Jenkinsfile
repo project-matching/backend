@@ -79,7 +79,7 @@ pipeline {
         stage('deploy') {
             steps {
                 sshagent (credentials: ['matching_backend_ssh']) {
-                    sh """
+                    sh '''
                         ssh -o StrictHostKeyChecking=no ${TARGET_HOST} '
                             hostname
                             ID=$dockerhub_USR
@@ -90,7 +90,7 @@ pipeline {
                             docker pull $ID/$DOCKER_REPOSITORY_NAME:latest
                             docker run -d -p 8080:8080 -it $ID/$DOCKER_REPOSITORY_NAME:latest
                         '
-                    """
+                    '''
                 }
             }
         }
