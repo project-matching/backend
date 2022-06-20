@@ -1,6 +1,3 @@
-def TAG = ""
-def NEW_TAG_VER = ""
-
 pipeline {
     agent any
 
@@ -8,17 +5,19 @@ pipeline {
         dockerhub = credentials('dockerhub')
         TARGET_HOST = credentials('target_back')
         DOCKER_REPOSITORY_NAME = 'backend'
+        TAG = "none"
+        NEW_TAG_VER = "none"
     }
     stages {
 
-        stage('backend build') {
-            steps {
-                sh "pwd"
-                sh "chmod +x gradlew"
-                sh "./gradlew clean"
-                sh "./gradlew bootJar"
-            }
-        }
+//         stage('backend build') {
+//             steps {
+//                 sh "pwd"
+//                 sh "chmod +x gradlew"
+//                 sh "./gradlew clean"
+//                 sh "./gradlew bootJar"
+//             }
+//         }
 
         stage('backend dockerizing') {
             steps {
