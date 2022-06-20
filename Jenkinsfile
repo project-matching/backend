@@ -1,3 +1,4 @@
+def GTAG
 pipeline {
     agent any
 
@@ -5,7 +6,6 @@ pipeline {
         dockerhub = credentials('dockerhub')
         TARGET_HOST = credentials('target_back')
         DOCKER_REPOSITORY_NAME = 'backend'
-        GTAG = ""
     }
     stages {
 
@@ -38,8 +38,9 @@ pipeline {
                 docker build -t $DOCKER_REPOSITORY_NAME:$NEW_TAG_VER .
                 '''
                 script{
-                 GTAG = sh (script: 'echo $TAG', returnStatus: true).trim();
-                  echo "$GTAG"
+                    sh "echo $TAG"
+                    GTAG = sh (script: 'echo $TAG', returnStatus: true).trim();
+                    echo "$GTAG"
                 }
 
             }
