@@ -5,8 +5,8 @@ pipeline {
         dockerhub = credentials('dockerhub')
         TARGET_HOST = credentials('target_back')
         DOCKER_REPOSITORY_NAME = 'backend'
-        TAG
-        NEW_TAG_VER
+        TAG = ''
+        NEW_TAG_VER = ''
     }
     stages {
 
