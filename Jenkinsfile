@@ -23,7 +23,7 @@ pipeline {
 
 
 
-                TAG=sh(script: '$(docker images | awk -v DOCKER_REPOSITORY_NAME=$DOCKER_REPOSITORY_NAME '{if ($1 == DOCKER_REPOSITORY_NAME) print $2;}')', returnStdout: true)
+                TAG=sh(script: "$(docker images | awk -v DOCKER_REPOSITORY_NAME=$DOCKER_REPOSITORY_NAME '{if ($1 == DOCKER_REPOSITORY_NAME) print $2;}')", returnStdout: true)
 
 
                 sh '''
