@@ -4,7 +4,7 @@ pipeline {
     environment {
         dockerhub = credentials('dockerhub')
         TARGET_HOST = credentials('target_back')
-        DOCKER_REPOSITORY_NAME = credentials('docker_repository_name')
+        DOCKER_REPOSITORY_NAME = 'backend'
     }
     stages {
 
@@ -43,6 +43,7 @@ pipeline {
             steps {
                 sh '''
                     if [ $NEW_TAG_VER != "0.01" ]; then
+                        echo ""
                         docker rmi $DOCKER_REPOSITORY_NAME:$TAG
                     fi
                 '''
