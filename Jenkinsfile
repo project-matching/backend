@@ -21,7 +21,7 @@ pipeline {
         stage('backend dockerizing') {
             steps {
                 script {
-                myVar = sh(script: '$(docker images | awk -v DOCKER_REPOSITORY_NAME=$DOCKER_REPOSITORY_NAME "{if ($1 == DOCKER_REPOSITORY_NAME) print $2;}")', returnStdout: true).trim()
+                myVar = sh(script: '$(docker images | awk -v DOCKER_REPOSITORY_NAME=$DOCKER_REPOSITORY_NAME \'{if ($1 == DOCKER_REPOSITORY_NAME) print $2;}\')', returnStdout: true).trim()
 
                 }
                 sh '''
