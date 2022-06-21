@@ -24,24 +24,25 @@ pipeline {
                 myVar = sh(script: '$(docker images | awk -v DOCKER_REPOSITORY_NAME=$DOCKER_REPOSITORY_NAME \'{if ($1 == DOCKER_REPOSITORY_NAME) print $2;}\')', returnStdout: true).trim()
 
                 }
-                sh '''
-
-
-
-                if [[ $TAG =~ [0-9].[0-9]{1,2} ]]; then
-                    NEW_TAG_VER=$(echo $TAG 0.01 | awk '{print $1+$2}')
-                    echo "현재 버전은 $TAG 입니다."
-                    echo "새로운 버전은 $NEW_TAG_VER 입니다"
-                else
-                    echo "새롭게 만들어진 이미지 입니다."
-                    NEW_TAG_VER=0.01
-                fi
-
-                docker build -t $DOCKER_REPOSITORY_NAME:$NEW_TAG_VER .
-                echo before:$TAG
-                '''
+//                 sh '''
+//
+//
+//
+//                 if [[ $TAG =~ [0-9].[0-9]{1,2} ]]; then
+//                     NEW_TAG_VER=$(echo $TAG 0.01 | awk '{print $1+$2}')
+//                     echo "현재 버전은 $TAG 입니다."
+//                     echo "새로운 버전은 $NEW_TAG_VER 입니다"
+//                 else
+//                     echo "새롭게 만들어진 이미지 입니다."
+//                     NEW_TAG_VER=0.01
+//                 fi
+//
+//                 docker build -t $DOCKER_REPOSITORY_NAME:$NEW_TAG_VER .
+//                 echo before:$TAG
+//                 '''
 
                 echo "${myVar}"
+
             }
         }
 
