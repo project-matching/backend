@@ -5,7 +5,6 @@ pipeline {
         dockerhub = credentials('dockerhub')
         TARGET_HOST = credentials('target_back')
         DOCKER_REPOSITORY_NAME = 'backend'
-        AA='BB'
     }
     stages {
 
@@ -78,8 +77,11 @@ pipeline {
             steps {
                 sshagent (credentials: ['matching_backend_ssh']) {
                     sh '''
-                        ssh -o StrictHostKeyChecking=no ec2-3-39-48-25.ap-northeast-2.compute.amazonaws.com '
+                        ssh -o StrictHostKeyChecking=no ${TARGET_HOST} '
                             hostname
+                            docker stop $(docker ps -a -q)
+                            docker rm $(docker ps -a -q)
+                            docker rmi $(docker images -q)
                             docker pull $dockerhub_USR/$DOCKER_REPOSITORY_NAME:latest
                             docker run -d -p 8080:8080 -it $dockerhub_USR/$DOCKER_REPOSITORY_NAME:latest
                         '
