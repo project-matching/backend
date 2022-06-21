@@ -1,4 +1,3 @@
-GTAG
 pipeline {
     agent any
 
@@ -38,13 +37,8 @@ pipeline {
                 docker build -t $DOCKER_REPOSITORY_NAME:$NEW_TAG_VER .
                 echo before:$TAG
                 '''
-                 sh "echo before:$TAG"
-                 echo "before:$TAG"
-                script{
-                    GTAG = sh (script: 'echo $TAG', returnStatus: true).trim();
-                }
-                sh "echo after:$GTAG"
 
+                sh 'echo "aaaaaaa"'
             }
         }
 
