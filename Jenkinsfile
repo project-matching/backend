@@ -39,6 +39,7 @@ pipeline {
                 '''
 
                 sh 'A="ABC"'
+                sh 'export A'
                 sh 'echo $A'
             }
         }
