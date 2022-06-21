@@ -66,10 +66,10 @@ pipeline {
 
         stage('after pushing to dockerhub') {
             steps {
-                sh '''
-                    docker rmi $ID/$DOCKER_REPOSITORY_NAME:latest
-                    docker rmi $ID/$DOCKER_REPOSITORY_NAME:$NEW_TAG_VER
-                '''
+                sh """
+                    docker rmi $dockerhub_USR/$DOCKER_REPOSITORY_NAME:latest
+                    docker rmi $dockerhub_USR/$DOCKER_REPOSITORY_NAME:${NEW_TAG_VER}
+                """
             }
         }
 
@@ -79,12 +79,11 @@ pipeline {
                     sh '''
                         ssh -o StrictHostKeyChecking=no ${TARGET_HOST} '
                             hostname
-                            ID=$dockerhub_USR
                             docker stop $(docker ps -a -q)
                             docker rm $(docker ps -a -q)
                             docker rmi $(docker images -q)
-                            docker pull $ID/$DOCKER_REPOSITORY_NAME:latest
-                            docker run -d -p 8080:8080 -it $ID/$DOCKER_REPOSITORY_NAME:latest
+                            docker pull $dockerhub_USR/$DOCKER_REPOSITORY_NAME:latest
+                            docker run -d -p 8080:8080 -it $dockerhub_USR/$DOCKER_REPOSITORY_NAME:latest
                         '
                     '''
                 }
