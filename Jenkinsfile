@@ -22,7 +22,7 @@ pipeline {
                 script {
                     TAG = sh(script: 'echo $(docker images | awk -v DOCKER_REPOSITORY_NAME=$DOCKER_REPOSITORY_NAME \'{if ($1 == DOCKER_REPOSITORY_NAME) print $2;}\')', returnStdout: true).trim()
                     echo "${TAG}"
-                    if(TAG =~ /^[0-9][.][0-9]{1,2}$/) {
+                    if(TAG ==~ /^[0-9]?[.]?[0-9]?[0-9]$/) {
                         NEW_TAG_VER= sh(script: "echo \$(echo ${TAG} 0.01 | awk '{print \$1+\$2}')", returnStdout: true).trim()
                         echo "현재 버전은 ${TAG} 입니다"
                         echo "새로운 버전은 ${NEW_TAG_VER} 입니다"
@@ -82,8 +82,8 @@ pipeline {
                             docker stop $(docker ps -a -q)
                             docker rm $(docker ps -a -q)
                             docker rmi $(docker images -q)
-                            docker pull wkemrm12/backend:latest
-                            docker run -d -p 8080:8080 -it $dockerhub_USR/$DOCKER_REPOSITORY_NAME:latest
+                            docker pull ${dockerhub_USR}/${DOCKER_REPOSITORY_NAME}:latest
+                            docker run -d -p 8080:8080 -it ${dockerhub_USR}/${DOCKER_REPOSITORY_NAME}:latest
                         '
                     '''
                 }
