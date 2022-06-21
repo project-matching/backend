@@ -8,20 +8,21 @@ pipeline {
     }
     stages {
 
-//         stage('backend build') {
-//             steps {
-//                 sh "pwd"
-//                 sh "chmod +x gradlew"
-//                 sh "./gradlew clean"
-//                 sh "./gradlew bootJar"
-//             }
-//         }
+        stage('backend build') {
+            steps {
+                sh "pwd"
+                echo "빌드 실행 권한 추가"
+                sh "chmod +x gradlew"
+                sh "./gradlew clean"
+                echo "빌드"
+                sh "./gradlew bootJar"
+            }
+        }
 
         stage('backend dockerizing') {
             steps {
                 script {
                     TAG = sh(script: 'echo $(docker images | awk -v DOCKER_REPOSITORY_NAME=$DOCKER_REPOSITORY_NAME \'{if ($1 == DOCKER_REPOSITORY_NAME) print $2;}\')', returnStdout: true).trim()
-                    echo "${TAG}"
                     if(TAG ==~ /^[0-9]?[.]?[0-9]?[0-9]$/) {
                         NEW_TAG_VER= sh(script: "echo \$(echo ${TAG} 0.01 | awk '{print \$1+\$2}')", returnStdout: true).trim()
                         echo "현재 버전은 ${TAG} 입니다"
@@ -30,12 +31,10 @@ pipeline {
                         echo "새롭게 만들어진 이미지 입니다."
                         NEW_TAG_VER=0.01
                     }
-                    echo "before ${NEW_TAG_VER}"
                 }
-                echo "after ${NEW_TAG_VER}"
 
+                echo "${NEW_TAG_VER} 버전 도커 빌드"
                 sh "docker build -t $DOCKER_REPOSITORY_NAME:${NEW_TAG_VER} ."
-                sh "echo before:${TAG}"
             }
         }
 
@@ -43,6 +42,7 @@ pipeline {
             steps {
                 script {
                     if (NEW_TAG_VER != 0.01) {
+                        echo "기존 ${TAG} 버전 도커 이미지 삭제"
                         sh "docker rmi $DOCKER_REPOSITORY_NAME:${TAG}"
                     }
                 }
@@ -52,13 +52,19 @@ pipeline {
         stage('pushing to dockerhub') {
             steps {
                 sh """
+                    echo '도커 허브 로그인'
                     docker login -u $dockerhub_USR -p $dockerhub_PSW
-                    echo $DOCKER_REPOSITORY_NAME
+
+                    echo '${NEW_TAG_VER} 버전 도커 TAG 생성'
                     docker tag $DOCKER_REPOSITORY_NAME:${NEW_TAG_VER} $dockerhub_USR/$DOCKER_REPOSITORY_NAME:${NEW_TAG_VER}
+
+                    echo '${NEW_TAG_VER} 버전 도커 허브 푸시'
                     docker push $dockerhub_USR/$DOCKER_REPOSITORY_NAME:${NEW_TAG_VER}
 
+                    echo 'LATEST 버전 도커 TAG 생성'
                     docker tag $DOCKER_REPOSITORY_NAME:${NEW_TAG_VER} $dockerhub_USR/$DOCKER_REPOSITORY_NAME:latest
 
+                    echo 'LATEST 버전 도커 허브 푸시'
                     docker push $dockerhub_USR/$DOCKER_REPOSITORY_NAME:latest
                 """
             }
@@ -67,6 +73,7 @@ pipeline {
         stage('after pushing to dockerhub') {
             steps {
                 sh """
+                    echo '배포 서버에 남아 있는 도커 이미지 삭제'
                     docker rmi $dockerhub_USR/$DOCKER_REPOSITORY_NAME:latest
                     docker rmi $dockerhub_USR/$DOCKER_REPOSITORY_NAME:${NEW_TAG_VER}
                 """
@@ -79,15 +86,20 @@ pipeline {
                     sh """
                         ssh -o StrictHostKeyChecking=no $TARGET_HOST '
                             hostname
+                            echo '도커 컨테이너 존재시 기존 컨테이너 중지 및 삭제'
                             if [ \$(docker ps -a -q | wc -l) -gt 0 ] ; then
                                 docker stop \$(docker ps -a -q)
                                 docker rm \$(docker ps -a -q)
                             fi
+
+                            echo '도커 이미지 존재시 기존 이미지 삭제'
                             if [ \$(docker images -q | wc -l) -gt 0 ] ; then
                                 docker rmi \$(docker images -q)
                             fi
 
+                            echo '도커 허브에서 LATEST 버전 PULL'
                             docker pull $dockerhub_USR/$DOCKER_REPOSITORY_NAME:latest
+                            echo 'LATEST 버전 실행'
                             docker run -d -p 8080:8080 -it $dockerhub_USR/$DOCKER_REPOSITORY_NAME:latest
                         '
                     """
