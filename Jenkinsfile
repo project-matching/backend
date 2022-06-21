@@ -38,9 +38,8 @@ pipeline {
                 echo before:$TAG
                 '''
 
-                sh '''
-                    echo $TAG
-                '''
+                sh 'A="ABC"'
+                sh 'echo $A'
             }
         }
 
