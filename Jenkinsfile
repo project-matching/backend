@@ -79,11 +79,11 @@ pipeline {
                     sh """
                         ssh -o StrictHostKeyChecking=no $TARGET_HOST '
                             hostname
-                            if [ echo $(docker ps -a -q) -ne ""] ; then
+                            if [ -z $(docker ps -a -q) ] ; then
                                 docker stop \$(docker ps -a -q)
                                 docker rm \$(docker ps -a -q)
                             fi
-                            if [ echo $(docker images -q) -ne ""] ; then
+                            if [ -z $(docker images -q) ] ; then
                                 docker rmi \$(docker images -q)
                             fi
 
