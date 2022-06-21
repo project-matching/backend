@@ -40,7 +40,7 @@ pipeline {
                 '''
 
                 script {
-                    myVar = sh(script: 'echo "ASDF"', returnStdout: true).trim()
+                    myVar = sh(script: 'echo $TAG', returnStdout: true).trim()
                 }
                 echo "${myVar}"
             }
