@@ -41,7 +41,9 @@ pipeline {
                 sh '''
                     export A="ABC"
                 '''
-                sh 'echo $A'
+                sh '''
+                echo $A
+                '''
             }
         }
 
