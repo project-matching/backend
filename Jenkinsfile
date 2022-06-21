@@ -39,6 +39,7 @@ pipeline {
                 '''
 
                 sh 'echo "aaaaaaa"'
+                sh 'echo $TAG'
             }
         }
 
