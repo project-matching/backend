@@ -76,16 +76,16 @@ pipeline {
         stage('deploy') {
             steps {
                 sshagent (credentials: ['matching_backend_ssh']) {
-                    sh '''
+                    sh """
                         ssh -o StrictHostKeyChecking=no ec2-user@ec2-3-39-48-25.ap-northeast-2.compute.amazonaws.com '
                             hostname
-                            docker stop $(docker ps -a -q)
-                            docker rm $(docker ps -a -q)
-                            docker rmi $(docker images -q)
-                            docker pull ${dockerhub_USR}/${DOCKER_REPOSITORY_NAME}:latest
-                            docker run -d -p 8080:8080 -it ${dockerhub_USR}/${DOCKER_REPOSITORY_NAME}:latest
+                            docker stop \$(docker ps -a -q)
+                            docker rm \$(docker ps -a -q)
+                            docker rmi \$(docker images -q)
+                            docker pull \$dockerhub_USR/\$DOCKER_REPOSITORY_NAME:latest
+                            docker run -d -p 8080:8080 -it \$dockerhub_USR/\$DOCKER_REPOSITORY_NAME:latest
                         '
-                    '''
+                    """
                 }
             }
         }
