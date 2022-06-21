@@ -30,11 +30,10 @@ pipeline {
                         echo "새롭게 만들어진 이미지 입니다."
                         NEW_TAG_VER=0.01
                     }
-                    echo 'before ${NEW_TAG_VER}'
-                    sh 'echo before2 ${NEW_TAG_VER}'
+                    echo "before ${NEW_TAG_VER}"
                 }
-                echo 'after ${NEW_TAG_VER}'
-                sh 'echo after2 ${NEW_TAG_VER}'
+                echo "after ${NEW_TAG_VER}"
+
                 sh '''
                     docker build -t $DOCKER_REPOSITORY_NAME:${NEW_TAG_VER} .
                     echo before:${TAG}
