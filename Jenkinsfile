@@ -5,6 +5,7 @@ pipeline {
         dockerhub = credentials('dockerhub')
         TARGET_HOST = credentials('target_back')
         DOCKER_REPOSITORY_NAME = 'backend'
+        AA='BB'
     }
     stages {
 
@@ -39,10 +40,12 @@ pipeline {
                 '''
 
                 sh '''
-                    export A="ABC"
+                    echo $AA
+                    AA=CC
+                    echo $AA
                 '''
                 sh '''
-                echo $A
+                    echo $AA
                 '''
             }
         }
