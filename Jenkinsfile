@@ -22,7 +22,7 @@ pipeline {
             steps {
                 script {
                     TAG = sh(script: 'echo $(docker images | awk -v DOCKER_REPOSITORY_NAME=$DOCKER_REPOSITORY_NAME \'{if ($1 == DOCKER_REPOSITORY_NAME) print $2;}\')', returnStdout: true).trim()
-                    if(TAG == "0.01") {
+                    if(TAG ==? "0.01") {
                         NEW_TAG_VER= sh(script: 'echo $(echo $TAG 0.01 | awk \'{print $1+$2}\')', returnStdout: true).trim()
                         echo "현재 버전은 ${TAG} 입니다"
                         echo "새로운 버전은 ${NEW_TAG_VER} 입니다"
@@ -34,22 +34,18 @@ pipeline {
                 }
                 echo "after ${NEW_TAG_VER}"
 
-                sh '''
-                    docker build -t $DOCKER_REPOSITORY_NAME:${NEW_TAG_VER} .
-                    echo before:${TAG}
-                '''
-
+                sh "docker build -t $DOCKER_REPOSITORY_NAME:${NEW_TAG_VER} ."
+                sh "echo before:${TAG}"
             }
         }
 
         stage('before pushing to dockerhub') {
             steps {
-                sh '''
-                    if [ ${NEW_TAG_VER} != "0.01" ]; then
-                        echo ""
-                        docker rmi $DOCKER_REPOSITORY_NAME:${TAG}
-                    fi
-                '''
+                script {
+                    if (NEW_TAG_VER != "0.01") {
+                        sh "docker rmi $DOCKER_REPOSITORY_NAME:${TAG}"
+                    }
+                }
             }
         }
 
