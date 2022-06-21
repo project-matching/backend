@@ -77,7 +77,7 @@ pipeline {
             steps {
                 sshagent (credentials: ['matching_backend_ssh']) {
                     sh '''
-                        ssh -o StrictHostKeyChecking=no ${TARGET_HOST} '
+                        ssh -o StrictHostKeyChecking=no ec2-user@ec2-3-39-48-25.ap-northeast-2.compute.amazonaws.com '
                             hostname
                             docker stop $(docker ps -a -q)
                             docker rm $(docker ps -a -q)
