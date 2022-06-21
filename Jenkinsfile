@@ -20,10 +20,12 @@ pipeline {
 
         stage('backend dockerizing') {
             steps {
+                script {
+                myVar = sh(script: '$(docker images | awk -v DOCKER_REPOSITORY_NAME=$DOCKER_REPOSITORY_NAME '{if ($1 == DOCKER_REPOSITORY_NAME) print $2;}')', returnStdout: true).trim()
 
+                }
                 sh '''
 
-                TAG=$(docker images | awk -v DOCKER_REPOSITORY_NAME=$DOCKER_REPOSITORY_NAME '{if ($1 == DOCKER_REPOSITORY_NAME) print $2;}')
 
 
                 if [[ $TAG =~ [0-9].[0-9]{1,2} ]]; then
@@ -39,9 +41,6 @@ pipeline {
                 echo before:$TAG
                 '''
 
-                script {
-                    myVar = sh(script: 'echo $TAG', returnStdout: true).trim()
-                }
                 echo "${myVar}"
             }
         }
