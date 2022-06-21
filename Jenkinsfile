@@ -31,10 +31,10 @@ pipeline {
                         NEW_TAG_VER=0.01
                     }
                     echo 'before ${NEW_TAG_VER}'
-                    sh 'before2 ${NEW_TAG_VER}'
+                    sh 'echo before2 ${NEW_TAG_VER}'
                 }
                 echo 'after ${NEW_TAG_VER}'
-                sh 'after2 ${NEW_TAG_VER}'
+                sh 'echo after2 ${NEW_TAG_VER}'
                 sh '''
                     docker build -t $DOCKER_REPOSITORY_NAME:${NEW_TAG_VER} .
                     echo before:${TAG}
