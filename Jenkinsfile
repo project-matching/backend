@@ -82,8 +82,8 @@ pipeline {
                             docker stop \$(docker ps -a -q)
                             docker rm \$(docker ps -a -q)
                             docker rmi \$(docker images -q)
-                            docker pull \$dockerhub_USR/\$DOCKER_REPOSITORY_NAME:latest
-                            docker run -d -p 8080:8080 -it \$dockerhub_USR/\$DOCKER_REPOSITORY_NAME:latest
+                            docker pull $dockerhub_USR/$DOCKER_REPOSITORY_NAME:latest
+                            docker run -d -p 8080:8080 -it $dockerhub_USR/$DOCKER_REPOSITORY_NAME:latest
                         '
                     """
                 }
