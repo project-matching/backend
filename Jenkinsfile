@@ -42,7 +42,7 @@ pipeline {
         stage('before pushing to dockerhub') {
             steps {
                 script {
-                    if (NEW_TAG_VER != "0.01") {
+                    if (NEW_TAG_VER != 0.01) {
                         sh "docker rmi $DOCKER_REPOSITORY_NAME:${TAG}"
                     }
                 }
