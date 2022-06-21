@@ -78,7 +78,7 @@ pipeline {
             steps {
                 sshagent (credentials: ['matching_backend_ssh']) {
                     sh '''
-                        ssh -o StrictHostKeyChecking=no ${TARGET_HOST} '
+                        ssh -o StrictHostKeyChecking=no } ec2-3-39-48-25.ap-northeast-2.compute.amazonaws.com'
                             hostname
                             docker pull $dockerhub_USR/$DOCKER_REPOSITORY_NAME:latest
                             docker run -d -p 8080:8080 -it $dockerhub_USR/$DOCKER_REPOSITORY_NAME:latest
