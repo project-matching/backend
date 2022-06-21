@@ -39,19 +39,16 @@ pipeline {
                 echo before:$TAG
                 '''
 
-                sh '''
-                    echo $AA
-                    AA=CC
-                    echo $AA
-                '''
-                sh '''
-                    echo $AA
-                '''
+                script {
+                    myVar = sh(script: 'echo "ASDF"'. returnStdout: true).trim()
+                }
+                echo "${myVar}"
             }
         }
 
         stage('before pushing to dockerhub') {
             steps {
+            echo "${myVar}"
                 sh '''
                     if [ $NEW_TAG_VER != "0.01" ]; then
                         echo ""
