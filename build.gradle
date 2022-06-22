@@ -28,6 +28,7 @@ dependencies {
 	compileOnly 'org.projectlombok:lombok'
 	implementation 'com.h2database:h2'
 	implementation 'org.mariadb.jdbc:mariadb-java-client'
+	implementation 'com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.3'
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'

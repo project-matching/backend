@@ -2,9 +2,10 @@ pipeline {
     agent any
 
     environment {
-        dockerhub = credentials('dockerhub')
+        DOCKERHUB = credentials('dockerhub')
         TARGET_HOST = credentials('target_back')
         DOCKER_REPOSITORY_NAME = 'backend'
+        JASYPT_PASSWORD = credentials('jasypt_password')
     }
     stages {
 
@@ -53,19 +54,19 @@ pipeline {
             steps {
                 sh """
                     echo '도커 허브 로그인'
-                    docker login -u $dockerhub_USR -p $dockerhub_PSW
+                    docker login -u $DOCKERHUB_USR -p $DOCKERHUB_PSW
 
                     echo '${NEW_TAG_VER} 버전 도커 TAG 생성'
-                    docker tag $DOCKER_REPOSITORY_NAME:${NEW_TAG_VER} $dockerhub_USR/$DOCKER_REPOSITORY_NAME:${NEW_TAG_VER}
+                    docker tag $DOCKER_REPOSITORY_NAME:${NEW_TAG_VER} $DOCKERHUB_USR/$DOCKER_REPOSITORY_NAME:${NEW_TAG_VER}
 
                     echo '${NEW_TAG_VER} 버전 도커 허브 푸시'
-                    docker push $dockerhub_USR/$DOCKER_REPOSITORY_NAME:${NEW_TAG_VER}
+                    docker push $DOCKERHUB_USR/$DOCKER_REPOSITORY_NAME:${NEW_TAG_VER}
 
                     echo 'LATEST 버전 도커 TAG 생성'
-                    docker tag $DOCKER_REPOSITORY_NAME:${NEW_TAG_VER} $dockerhub_USR/$DOCKER_REPOSITORY_NAME:latest
+                    docker tag $DOCKER_REPOSITORY_NAME:${NEW_TAG_VER} $DOCKERHUB_USR/$DOCKER_REPOSITORY_NAME:latest
 
                     echo 'LATEST 버전 도커 허브 푸시'
-                    docker push $dockerhub_USR/$DOCKER_REPOSITORY_NAME:latest
+                    docker push $DOCKERHUB_USR/$DOCKER_REPOSITORY_NAME:latest
                 """
             }
         }
@@ -74,8 +75,8 @@ pipeline {
             steps {
                 sh """
                     echo '배포 서버에 남아 있는 도커 이미지 삭제'
-                    docker rmi $dockerhub_USR/$DOCKER_REPOSITORY_NAME:latest
-                    docker rmi $dockerhub_USR/$DOCKER_REPOSITORY_NAME:${NEW_TAG_VER}
+                    docker rmi $DOCKERHUB_USR/$DOCKER_REPOSITORY_NAME:latest
+                    docker rmi $DOCKERHUB_USR/$DOCKER_REPOSITORY_NAME:${NEW_TAG_VER}
                 """
             }
         }
@@ -98,9 +99,9 @@ pipeline {
                             fi
 
                             echo '도커 허브에서 LATEST 버전 PULL'
-                            docker pull $dockerhub_USR/$DOCKER_REPOSITORY_NAME:latest
+                            docker pull $DOCKERHUB_USR/$DOCKER_REPOSITORY_NAME:latest
                             echo 'LATEST 버전 실행'
-                            docker run -d -p 8080:8080 -it $dockerhub_USR/$DOCKER_REPOSITORY_NAME:latest
+                            docker run -d -p 8080:8080 -it -e JAVA_OPTS=-Djasypt.encryptor.password=$JASYPT_PASSWORD $DOCKERHUB_USR/$DOCKER_REPOSITORY_NAME:latest
                         '
                     """
                 }
