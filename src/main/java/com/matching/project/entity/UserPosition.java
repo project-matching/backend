@@ -1,7 +1,14 @@
 package com.matching.project.entity;
 
+import com.matching.project.dto.enumerate.Position;
+import lombok.*;
+
 import javax.persistence.*;
 
+@Builder
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 public class UserPosition {
     @Id @GeneratedValue

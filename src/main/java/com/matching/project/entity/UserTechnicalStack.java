@@ -1,7 +1,13 @@
 package com.matching.project.entity;
 
+import lombok.*;
+
 import javax.persistence.*;
 
+@Builder
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 public class UserTechnicalStack {
     @Id @GeneratedValue

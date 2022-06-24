@@ -2,9 +2,14 @@ package com.matching.project.entity;
 
 import com.matching.project.dto.enumerate.OAuth;
 import com.matching.project.dto.enumerate.Role;
+import lombok.*;
 
 import javax.persistence.*;
 
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
 @Entity
 public class User {
     @Id @GeneratedValue
