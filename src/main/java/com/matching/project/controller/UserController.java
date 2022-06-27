@@ -1,7 +1,11 @@
 package com.matching.project.controller;
 
+import com.matching.project.dto.ResponseDto;
 import com.matching.project.dto.user.*;
+import com.matching.project.entity.User;
+import com.matching.project.service.UserService;
 import io.swagger.annotations.ApiOperation;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -9,13 +13,31 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/v1/user")
 public class UserController {
+
+    private final UserService userService;
+
     @PostMapping
     @ApiOperation(value = "회원가입")
-    public ResponseEntity<String> signUp(SignUpRequestDto signUpRequestDto) {
-        return new ResponseEntity("회원가입 완료되었습니다.", HttpStatus.OK);
+    public ResponseEntity signUp(@RequestBody SignUpRequestDto signUpRequestDto) {
+        try {
+            User user = userService.userSignUp(signUpRequestDto);
+            // 클라이언트에서 dto 정보가 추가적으로 더 필요하면 수정 필요
+            SignUpResponseDto signUpResponseDto = SignUpResponseDto.builder()
+                    .no(user.getNo())
+                    .name(user.getName())
+                    .sex(user.getSex())
+                    .email(user.getEmail())
+                    .build();
+            return ResponseEntity.ok().body(signUpResponseDto);
+        } catch (Exception e) {
+            ResponseDto responseDto = ResponseDto.builder()
+                    .error(e.toString()).build();
+            return ResponseEntity.badRequest().body(responseDto);
+        }
     }
     
     @GetMapping("/{no}")
