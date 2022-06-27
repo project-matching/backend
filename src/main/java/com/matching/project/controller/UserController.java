@@ -22,7 +22,7 @@ public class UserController {
 
     @PostMapping
     @ApiOperation(value = "회원가입")
-    public ResponseEntity signUp(SignUpRequestDto signUpRequestDto) {
+    public ResponseEntity signUp(@RequestBody SignUpRequestDto signUpRequestDto) {
         try {
             User user = userService.userSignUp(signUpRequestDto);
             // 클라이언트에서 dto 정보가 추가적으로 더 필요하면 수정 필요
@@ -35,7 +35,7 @@ public class UserController {
             return ResponseEntity.ok().body(signUpResponseDto);
         } catch (Exception e) {
             ResponseDto responseDto = ResponseDto.builder()
-                    .error(e.getMessage()).build();
+                    .error(e.toString()).build();
             return ResponseEntity.badRequest().body(responseDto);
         }
     }

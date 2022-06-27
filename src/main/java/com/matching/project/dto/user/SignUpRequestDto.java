@@ -6,18 +6,19 @@ import com.matching.project.dto.enumerate.Role;
 import com.matching.project.entity.User;
 import com.matching.project.entity.UserPosition;
 import com.matching.project.entity.UserTechnicalStack;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Setter
 @Getter
 public class SignUpRequestDto {
     private String name;
-    private char sex;
+    private String sex;
     private String email;
     private String password;
     private Position position;
@@ -25,15 +26,19 @@ public class SignUpRequestDto {
     private String github;
     private String selfIntroduction;
 
+    public void setEncodePassword(String encodePassword) {
+        this.password = encodePassword;
+    }
+
     public static User toUserEntity(final SignUpRequestDto signUpRequestDto, final UserPosition userPosition) {
         return User.builder()
                 .name(signUpRequestDto.name)
-                .sex(signUpRequestDto.sex)
+                .sex(signUpRequestDto.sex.charAt(0))
                 .email(signUpRequestDto.email)
                 .password(signUpRequestDto.password)
                 .github(signUpRequestDto.github)
                 .selfIntroduction(signUpRequestDto.selfIntroduction)
-                .permission(Role.USER)
+                .permission(Role.ROLE_USER)
                 .oauthCategory(OAuth.NORMAL)
                 .block(false)
                 .userPosition(userPosition)

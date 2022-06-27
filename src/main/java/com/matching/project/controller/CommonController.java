@@ -1,33 +1,35 @@
 package com.matching.project.controller;
 
-import com.matching.project.dto.ResponseDto;
-import com.matching.project.dto.common.NormalLoginRequestDto;
 import com.matching.project.dto.common.PasswordReissueRequestDto;
-import com.matching.project.service.CommonService;
-import com.matching.project.service.UserService;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/v1/common")
 public class CommonController {
 
-    private final CommonService commonService;
-    
-    @PostMapping("/login")
-    @ApiOperation(value = "일반 로그인")
-    public ResponseEntity<Boolean> normalLogin(NormalLoginRequestDto normalLoginRequestDto) {
-        boolean res = commonService.UserNormalLogin(normalLoginRequestDto);
-        return ResponseEntity.ok().body(res);
+    private final UserDetailsService userDetailsService;
+
+    @GetMapping("/test")
+    public String test() {
+        return "test";
     }
-    
+
+    // TEST 용
+    @ApiOperation(value = "현재 접속한 사용자 확인")
+    @GetMapping("/info")
+    public String getUserInfo() {
+        return SecurityContextHolder.getContext().getAuthentication().toString();
+    }
+
+    // 일반 로그인 : spring security에서 처리하여 컨트롤러에서 처리할 필요가 없음.
+
     // 소셜 로그인
     
     @GetMapping("/logout")
