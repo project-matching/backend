@@ -1,5 +1,6 @@
 package com.matching.project.config;
 
+import com.matching.project.oauth.CustomOAuth2UserService;
 import com.matching.project.service.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -21,9 +22,7 @@ import java.util.Arrays;
 @RequiredArgsConstructor
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
-
-    final private CustomUserDetailsService customUserDetailsService;
-
+    private final CustomOAuth2UserService customOAuth2UserService;
     @Override
     protected void configure(HttpSecurity http) throws Exception {
 
@@ -34,13 +33,28 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .sessionManagement()
                     .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+          
                 .and()
                 .authorizeRequests()
-                    .antMatchers("/v1/common/info")
-                        .hasAnyRole("USER", "ADMIN")
-                    .antMatchers("/swagger-ui.html")
-                        .hasRole("ADMIN")
-                    .antMatchers("/*", "/v1/*", "/h2-console/*").permitAll();
+//                     .antMatchers("/v1/common/info")
+//                         .hasAnyRole("USER", "ADMIN")
+//                     .antMatchers("/swagger-ui.html")
+//                         .hasRole("ADMIN")
+//                     .antMatchers("/*", "/v1/*", "/h2-console/*").permitAll();
+                .anyRequest().authenticated()
+          
+                .and()
+                .logout()
+                .invalidateHttpSession(true)
+                .clearAuthentication(true)
+                .logoutSuccessUrl("/")
+                .deleteCookies("JSESSIONID")
+                .permitAll()
+
+                .and()
+                .oauth2Login()
+                .userInfoEndpoint()
+                .userService(customOAuth2UserService);
 
         // Spring Security 와 h2-console 를 함께 쓰기위한 옵션
         http.
