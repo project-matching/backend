@@ -25,24 +25,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final CustomOAuth2UserService customOAuth2UserService;
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-
         http
-                .csrf().disable();
-        http
-                .httpBasic()
-                .and()
-                .sessionManagement()
-                    .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
-          
-                .and()
+                .cors().disable()
+                .csrf().disable()
                 .authorizeRequests()
-//                     .antMatchers("/v1/common/info")
-//                         .hasAnyRole("USER", "ADMIN")
-//                     .antMatchers("/swagger-ui.html")
-//                         .hasRole("ADMIN")
-//                     .antMatchers("/*", "/v1/*", "/h2-console/*").permitAll();
-                .anyRequest().authenticated()
-          
+                .anyRequest().permitAll()
                 .and()
                 .logout()
                 .invalidateHttpSession(true)
