@@ -67,7 +67,7 @@ public class OAuthAttributes {
                 .email(email)
                 .password(password)
                 .oauthCategory(oauthCategory)
-                .permission(Role.USER)
+                .permission(Role.ROLE_USER)
                 .build();
     }
 }

@@ -34,7 +34,7 @@ public class UserServiceImpl implements UserService{
     {
         // 중복 체크 컨트롤러에 추가 필요
 
-        if (userRepository.findUserByEmail(email) != null)
+        if (userRepository.findByEmail(email).isPresent())
             return true;
         else
             return false;
