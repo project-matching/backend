@@ -4,22 +4,24 @@ logging:
 
 server:
   port: 8080
-
+jasypt:
+  encryptor:
+    password: test
 spring:
   security:
     oauth2:
       client:
         registration:
           google:
-            client-id: ENC(jj4TSLq5sRKYX6J6gev17ooKBaM+9ILcg4CA8IA7/yOVTe8eLPmRymyKSMxOD82qPNMi/X2sHwj0wZmHc6bSD3Io10o5mRwJ3cOPVXw21KOo8rL3qQ7AAg==)
-            client-secret: ENC(+XEqTDlh6OL/ySG9aPm6jtiaW4Ptu9ipjc1ExECS0HO/8oEMtuZZ7kcgDFim/MA+)
+            client-id: test
+            client-secret: test
             scope: profile, email
           github:
-            clientId: 6a66211ee57c12ed75fa
-            clientSecret: d6b0b4876f5d0d138ce0dc65bf97b33b75d53fea
+            clientId: test
+            clientSecret: test
   datasource:
     hikari:
-      jdbc-url: jdbc:h2:mem://localhost/~/localdb;MODE=MYSQL
+      jdbc-url: jdbc:h2:mem://localhost/~/testdb;MODE=MYSQL
   h2:
     console:
       enabled: true

@@ -1,7 +1,11 @@
 package com.matching.project.controller;
 
+import com.matching.project.dto.ResponseDto;
 import com.matching.project.dto.project.*;
+import com.matching.project.service.ProjectService;
 import io.swagger.annotations.ApiOperation;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,12 +15,17 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/v1/project")
+@RequiredArgsConstructor
 public class ProjectController {
+    @Autowired
+    private final ProjectService projectService;
+
     @PostMapping
     @ApiOperation(value = "프로젝트 등록")
-    public ResponseEntity projectRegister(ProjectRegisterRequestDto projectRegisterRequestDto) {
+    public ResponseEntity projectRegister(@RequestBody ProjectRegisterRequestDto projectRegisterRequestDto) throws Exception{
+        ProjectRegisterResponseDto projectRegisterResponseDto = projectService.projectRegister(projectRegisterRequestDto);
 
-        return new ResponseEntity(HttpStatus.OK);
+        return ResponseEntity.ok(new ResponseDto<>(null, projectRegisterResponseDto));
     }
 
     @GetMapping("/recruitment")

@@ -1,20 +1,22 @@
 package com.matching.project.dto.project;
 
-import lombok.Getter;
+import com.matching.project.entity.Project;
+import lombok.*;
 
-import javax.persistence.Column;
-import javax.persistence.Lob;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
-@Getter
+@Data
+@Builder
 public class ProjectRegisterRequestDto {
     private String name;
     private String profile;
     private LocalDateTime createDate;
-    private LocalDateTime startDate;
-    private LocalDateTime endDate;
+    private LocalDate startDate;
+    private LocalDate endDate;
     private String introduction;
     private Integer maxPeople;
-    private List<ProjectPositionDto> projectPosition;
+    private List<ProjectPositionDto> projectPosition = new ArrayList<>();
 }
