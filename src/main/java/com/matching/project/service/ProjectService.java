@@ -8,6 +8,4 @@ import java.util.List;
 
 public interface ProjectService {
     public ProjectRegisterResponseDto projectRegister(ProjectRegisterRequestDto projectRegisterRequestDto) throws Exception;
-
-    public List<ProjectSimpleDto> projectRecruitingList() throws Exception;
 }
