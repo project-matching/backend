@@ -1,11 +1,20 @@
 package com.matching.project.entity;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
 import javax.persistence.*;
 
 @Entity
+@Getter
+@NoArgsConstructor
+@Builder
+@AllArgsConstructor
 public class ProjectUser {
     @Id @GeneratedValue
-    private Long id;
+    private Long no;
 
     private boolean creator;
 
