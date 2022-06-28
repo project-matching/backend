@@ -153,9 +153,4 @@ class ProjectServiceImplTest {
         Assertions.assertEquals(projectRegisterResponseDto.getProjectPosition().get(0).getTechnicalStack().get(0), "SPRING");
         Assertions.assertEquals(projectRegisterResponseDto.getProjectPosition().get(0).getTechnicalStack().get(1), "JAVA");
     }
-
-    @Test
-    public void 프로젝트_목록_조회_성공_테스트() {
-
-    }
 }
