@@ -56,9 +56,4 @@ public class ProjectServiceImpl implements ProjectService {
         
         return ProjectRegisterResponseDto.of(returnProject);
     }
-
-    @Override
-    public List<ProjectSimpleDto> projectRecruitingList() throws Exception {
-        return null;
-    }
 }
