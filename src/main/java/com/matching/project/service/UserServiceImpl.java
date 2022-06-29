@@ -32,8 +32,6 @@ public class UserServiceImpl implements UserService{
 
     public boolean emailDupleCheck(String email)
     {
-        // 중복 체크 컨트롤러에 추가 필요
-
         if (userRepository.findByEmail(email).isPresent())
             return true;
         else
@@ -43,7 +41,6 @@ public class UserServiceImpl implements UserService{
 
     public boolean signUpValidCheck(SignUpRequestDto dto) {
         boolean result = false;
-
 
         if (emailDupleCheck(dto.getEmail()))
             log.error("Email is duplicated.");
@@ -61,7 +58,6 @@ public class UserServiceImpl implements UserService{
     }
 
     public User userSignUp(SignUpRequestDto dto){
-
 
         // Valid Check
         if (!signUpValidCheck(dto))

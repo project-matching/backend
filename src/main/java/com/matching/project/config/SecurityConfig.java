@@ -1,11 +1,10 @@
 package com.matching.project.config;
 
 import com.matching.project.oauth.CustomOAuth2UserService;
-import com.matching.project.service.CustomUserDetailsService;
+import com.matching.project.service.JwtTokenService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -22,16 +21,34 @@ import java.util.Arrays;
 @RequiredArgsConstructor
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
+    private final JwtTokenService jwtTokenService;
     private final CustomOAuth2UserService customOAuth2UserService;
-    private final CustomUserDetailsService customUserDetailsService;
 
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
     @Override
     protected void configure(HttpSecurity http) throws Exception {
+
         http
-                .cors().disable()
-                .csrf().disable()
+                .csrf().disable();
+        http
+                .httpBasic().disable()
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenService),
+                        UsernamePasswordAuthenticationFilter.class)
                 .authorizeRequests()
-                .anyRequest().permitAll()
+                //.antMatchers("/v1/common/info")
+                //  .hasAnyRole("USER", "ADMIN")
+//                     .antMatchers("/swagger-ui.html")
+//                         .hasRole("ADMIN")
+//                     .antMatchers("/*", "/v1/*", "/h2-console/*").permitAll();
+                .antMatchers("/*").permitAll()
+                //.anyRequest().authenticated();
+
                 .and()
                 .logout()
                 .invalidateHttpSession(true)
@@ -48,54 +65,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         // Spring Security 와 h2-console 를 함께 쓰기위한 옵션
         http.
                 headers()
-                    .addHeaderWriter(
-                            new XFrameOptionsHeaderWriter(
-                                    new WhiteListedAllowFromStrategy(Arrays.asList("localhost"))    // 여기!
-                            )
-                    )
-                    .frameOptions().sameOrigin();
-
-        // 새로 구현한 Filter를 UsernamePasswordAuthenticationFilter layer에 삽입
-        http.
-                formLogin().
-                disable().
-                addFilterAt(getAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
-    }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
-    @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(customUserDetailsService)
-                .passwordEncoder(passwordEncoder());
-
-        // 테스트 용 인메모리 사용자 저장
-        auth.inMemoryAuthentication()
-                .withUser("user@naver.com")
-                    .password(passwordEncoder().encode("user"))
-                    .roles("USER")
-                .and()
-                .withUser("admin@naver.com")
-                .password(passwordEncoder().encode("admin"))
-                    .roles("USER","ADMIN");
-
-    }
-
-    protected CustomUsernamePasswordAuthenticationFilter getAuthenticationFilter() {
-        CustomUsernamePasswordAuthenticationFilter authFilter = new CustomUsernamePasswordAuthenticationFilter();
-        try {
-            authFilter.setFilterProcessesUrl("/v1/common/login");
-            authFilter.setAuthenticationManager(this.authenticationManagerBean());
-            authFilter.setUsernameParameter("email");
-            authFilter.setPasswordParameter("password");
-            authFilter.setAuthenticationSuccessHandler(new CustomSuccessHandler());
-            authFilter.setAuthenticationFailureHandler(new CustomFailureHandler());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return authFilter;
+                .addHeaderWriter(
+                        new XFrameOptionsHeaderWriter(
+                                new WhiteListedAllowFromStrategy(Arrays.asList("localhost"))    // 여기!
+                        )
+                )
+                .frameOptions().sameOrigin();
     }
 }

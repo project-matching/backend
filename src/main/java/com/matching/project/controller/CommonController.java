@@ -1,11 +1,18 @@
 package com.matching.project.controller;
 
+import com.matching.project.dto.ResponseDto;
+import com.matching.project.dto.common.NormalLoginRequestDto;
 import com.matching.project.dto.common.PasswordReissueRequestDto;
+import com.matching.project.dto.common.TokenDto;
+import com.matching.project.entity.User;
+import com.matching.project.service.CommonService;
+import com.matching.project.service.JwtTokenService;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,7 +21,8 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/v1/common")
 public class CommonController {
 
-    private final UserDetailsService userDetailsService;
+    private final CommonService commonService;
+    private final JwtTokenService jwtTokenService;
 
     @GetMapping("/test")
     public String test() {
@@ -28,7 +36,25 @@ public class CommonController {
         return SecurityContextHolder.getContext().getAuthentication().toString();
     }
 
-    // 일반 로그인 : spring security에서 처리하여 컨트롤러에서 처리할 필요가 없음.
+    // 일반 로그인
+    @PostMapping("/login")
+    @ApiOperation(value = "일반 로그인")
+    public ResponseEntity normalLogin(@RequestBody NormalLoginRequestDto dto) {
+        try {
+            User user = commonService.normalLogin(dto);
+            TokenDto tokenDto = TokenDto.builder()
+                    .no(user.getNo())
+                    .email(user.getEmail())
+                    .build();
+            String jwtAccessToken = jwtTokenService.createToken(tokenDto, user.getPermission());
+            ResponseDto<String> response = ResponseDto.<String>builder().data(jwtAccessToken).build();
+            return ResponseEntity.ok().body(response);
+        } catch (Exception e) {
+            ResponseDto<String> response = ResponseDto.<String>builder().error(e.getMessage()).build();
+            return ResponseEntity.badRequest().body(response);
+        }
+    }
+
 
     // 소셜 로그인
     
