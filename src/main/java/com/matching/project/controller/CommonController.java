@@ -46,7 +46,7 @@ public class CommonController {
                     .no(user.getNo())
                     .email(user.getEmail())
                     .build();
-            String jwtAccessToken = jwtTokenService.createToken(tokenDto, user.getPermission());
+            String jwtAccessToken = jwtTokenService.createToken(tokenDto);
             ResponseDto<String> response = ResponseDto.<String>builder().data(jwtAccessToken).build();
             return ResponseEntity.ok().body(response);
         } catch (Exception e) {

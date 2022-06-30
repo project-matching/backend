@@ -5,7 +5,10 @@ import com.matching.project.dto.enumerate.Role;
 import com.matching.project.service.CustomUserDetailsService;
 import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -22,7 +25,8 @@ import java.util.*;
 public class JwtTokenService {
     private final CustomUserDetailsService customUserDetailsService;
 
-    private String secretKey = "UCoKZPZPSlMoAaVOW3kyZ9bkL4BCJYlIT31CFyANHy8mtm"; // 암호화해서 저장 필요
+    @Value("${key.jwt.secret}")
+    private String secretKey;
 
     // 토큰 유효시간 설정
     private long accessTokenPeriod = 1000L * 60L * 60L * 24L; // 1일
@@ -34,7 +38,7 @@ public class JwtTokenService {
     }
 
     // JWT 토큰 생성
-    public String createToken(TokenDto tokenDto, Role role) { //userpk를 dto로 변환 필요
+    public String createToken(TokenDto tokenDto) {
         //Header
         Map<String, Object> headers = new HashMap<>();
         headers.put("typ", "JWT");
@@ -46,7 +50,7 @@ public class JwtTokenService {
         claims.put("email", tokenDto.getEmail());
 
         Date now = new Date();
-        String jwtAccessToken = "Bearer " + Jwts.builder().setHeader(headers)
+        String jwtAccessToken = Jwts.builder().setHeader(headers)
                 .setClaims(claims)
                 .setSubject("user-auth")
                 .setIssuedAt(now)
@@ -56,7 +60,7 @@ public class JwtTokenService {
         return jwtAccessToken;
     }
 
-    // 토큰에서 인증 정보 조회
+    // 인증 성공시 SecurityContextHolder에 저장할 Authentication 객체 생성
     public Authentication getAuthentication(String token) {
         UserDetails userDetails = customUserDetailsService.loadUserByUsername(getUserEmail(token));
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());

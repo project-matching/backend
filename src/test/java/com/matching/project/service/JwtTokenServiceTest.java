@@ -34,10 +34,9 @@ class JwtTokenServiceTest {
                 .email(email)
                 .build();
 
-        String jwtToken = jwtTokenService.createToken(tokenDto, Role.ROLE_USER);
+        String token = jwtTokenService.createToken(tokenDto);
 
         //when
-        String token = jwtToken.replaceAll("^Bearer( )*", "");
         boolean result = jwtTokenService.verifyToken(token);
         Long userNo = jwtTokenService.getUserNo(token);
         String userEmail = jwtTokenService.getUserEmail(token);

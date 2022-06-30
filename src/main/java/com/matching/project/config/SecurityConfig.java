@@ -1,6 +1,7 @@
 package com.matching.project.config;
 
 import com.matching.project.oauth.CustomOAuth2UserService;
+import com.matching.project.oauth.OAathSuccessHandler;
 import com.matching.project.service.JwtTokenService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -23,6 +24,7 @@ import java.util.Arrays;
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final JwtTokenService jwtTokenService;
     private final CustomOAuth2UserService customOAuth2UserService;
+    private final OAathSuccessHandler oAathSuccessHandler;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -41,8 +43,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenService),
                         UsernamePasswordAuthenticationFilter.class)
                 .authorizeRequests()
-                //.antMatchers("/v1/common/info")
-                //  .hasAnyRole("USER", "ADMIN")
+                .antMatchers("/v1/common/info")
+                  .hasAnyRole("USER", "ADMIN")
 //                     .antMatchers("/swagger-ui.html")
 //                         .hasRole("ADMIN")
 //                     .antMatchers("/*", "/v1/*", "/h2-console/*").permitAll();
@@ -59,6 +61,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
                 .and()
                 .oauth2Login()
+                .successHandler(oAathSuccessHandler)
                 .userInfoEndpoint()
                 .userService(customOAuth2UserService);
 
