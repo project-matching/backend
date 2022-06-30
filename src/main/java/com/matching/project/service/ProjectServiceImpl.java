@@ -10,12 +10,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.orm.hibernate5.SpringSessionContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-
 import java.sql.SQLException;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.NoSuchElementException;
 
 @Service
 @RequiredArgsConstructor
@@ -24,9 +26,15 @@ public class ProjectServiceImpl implements ProjectService {
     private final ProjectPositionRepository projectPositionRepository;
     private final ProjectTechnicalStackRepository projectTechnicalStackRepository;
     private final BookMarkRepository bookMarkRepository;
+    private final UserRepository userRepository;
+    private final ProjectUserRepository projectUserRepository;
 
     @Override
     public ProjectRegisterResponseDto projectRegister(ProjectRegisterRequestDto projectRegisterRequestDto) throws Exception{
+        //TODO JWT 미구현으로 인한 임시 하드코딩
+        Long userNo = 1L;
+        User user = userRepository.findById(userNo).orElseThrow(() -> new NoSuchElementException());
+
         Project project = Project.of(projectRegisterRequestDto);
         Project returnProject = projectRepository.save(project);
 
@@ -42,7 +50,14 @@ public class ProjectServiceImpl implements ProjectService {
             }
         }
 
+        ProjectUser projectUser = ProjectUser.builder()
+                .userNo(user)
+                .projectNo(project)
+                .creator(true)
+                .build();
 
+        projectUserRepository.save(projectUser);
+        
         return ProjectRegisterResponseDto.of(returnProject);
     }
 
