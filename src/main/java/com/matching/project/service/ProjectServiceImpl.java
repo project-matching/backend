@@ -51,8 +51,8 @@ public class ProjectServiceImpl implements ProjectService {
         }
 
         ProjectUser projectUser = ProjectUser.builder()
-                .userNo(user)
-                .projectNo(project)
+                .user(user)
+                .project(project)
                 .creator(true)
                 .build();
 

@@ -28,6 +28,10 @@ public class JwtTokenService {
     @Value("${key.jwt.secret}")
     private String secretKey;
 
+    public void setSecretKeyForTest(String secretKey) {
+        this.secretKey = secretKey;
+    }
+
     // 토큰 유효시간 설정
     private long accessTokenPeriod = 1000L * 60L * 60L * 24L; // 1일
 

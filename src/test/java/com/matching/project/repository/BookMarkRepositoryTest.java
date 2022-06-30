@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -18,6 +19,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@Transactional
 class BookMarkRepositoryTest {
     @Autowired
     private UserRepository userRepository;
@@ -67,12 +69,14 @@ class BookMarkRepositoryTest {
 
         Project project1 = Project.builder()
                 .name("testName1")
+                .createUserName("testName1")
                 .createDate(createDate)
                 .startDate(startDate)
                 .endDate(endDate)
                 .state(true)
                 .introduction("testIntroduction1")
                 .maxPeople(10)
+                .currentPeople(4)
                 .delete(false)
                 .deleteReason(null)
                 .viewCount(10)
@@ -82,12 +86,14 @@ class BookMarkRepositoryTest {
 
         Project project2 = Project.builder()
                 .name("testName2")
+                .createUserName("testName1")
                 .createDate(createDate)
                 .startDate(startDate)
                 .endDate(endDate)
                 .state(false)
                 .introduction("testIntroduction2")
                 .maxPeople(10)
+                .currentPeople(4)
                 .delete(false)
                 .deleteReason(null)
                 .viewCount(10)
@@ -147,11 +153,13 @@ class BookMarkRepositoryTest {
 
         assertEquals(findBookMarkList.get(0).getProject().getNo(), saveProject1.getNo());
         assertEquals(findBookMarkList.get(0).getProject().getName(), saveProject1.getName());
+        assertEquals(findBookMarkList.get(0).getProject().getCreateUserName(), saveProject1.getCreateUserName());
         assertEquals(findBookMarkList.get(0).getProject().getStartDate(), saveProject1.getStartDate());
         assertEquals(findBookMarkList.get(0).getProject().getEndDate(), saveProject1.getEndDate());
         assertEquals(findBookMarkList.get(0).getProject().isState(), saveProject1.isState());
         assertEquals(findBookMarkList.get(0).getProject().getIntroduction(), saveProject1.getIntroduction());
         assertEquals(findBookMarkList.get(0).getProject().getMaxPeople(), saveProject1.getMaxPeople());
+        assertEquals(findBookMarkList.get(0).getProject().getCurrentPeople(), saveProject1.getCurrentPeople());
         assertEquals(findBookMarkList.get(0).getProject().isDelete(), saveProject1.isDelete());
         assertEquals(findBookMarkList.get(0).getProject().getDeleteReason(), saveProject1.getDeleteReason());
         assertEquals(findBookMarkList.get(0).getProject().getViewCount(), saveProject1.getViewCount());

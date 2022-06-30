@@ -2,6 +2,10 @@ logging:
   level:
     org.hibernate.type: trace
 
+key:
+  jwt:
+    secret: testfasdfasdfsdafasfasfdsafsadfsafsasfasfasfasfasfasfasfasfa
+
 server:
   port: 8080
 jasypt:

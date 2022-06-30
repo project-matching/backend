@@ -86,6 +86,7 @@ class ProjectServiceImplTest {
                 .no(1L)
                 .name(projectRegisterRequestDto.getName())
                 .createDate(projectRegisterRequestDto.getCreateDate())
+                .createUserName("user")
                 .startDate(projectRegisterRequestDto.getStartDate())
                 .endDate(projectRegisterRequestDto.getEndDate())
                 .state(true)
@@ -93,9 +94,11 @@ class ProjectServiceImplTest {
                 .maxPeople(projectRegisterRequestDto.getMaxPeople())
                 .delete(false)
                 .deleteReason(null)
-                .count(0)
+                .viewCount(10)
+                .commentCount(10)
                 .image(null)
                 .build();
+
         ProjectPosition projectPosition1 = ProjectPosition.of(projectRegisterRequestDto.getProjectPosition().get(0));
         ProjectTechnicalStack projectTechnicalStack1 = ProjectTechnicalStack.of(projectRegisterRequestDto.getProjectPosition().get(0).getTechnicalStack().get(0));
         ProjectTechnicalStack projectTechnicalStack2 = ProjectTechnicalStack.of(projectRegisterRequestDto.getProjectPosition().get(0).getTechnicalStack().get(1));
@@ -112,7 +115,7 @@ class ProjectServiceImplTest {
                 .github("testGithub")
                 .selfIntroduction("testSelfIntroduction")
                 .block(false)
-                .block_reason(null)
+                .blockReason(null)
                 .permission(Role.ROLE_USER)
                 .image(null)
                 .userPosition(null)
@@ -120,8 +123,8 @@ class ProjectServiceImplTest {
 
         ProjectUser projectUser = ProjectUser.builder()
                 .no(1L)
-                .projectNo(project)
-                .userNo(user)
+                .project(project)
+                .user(user)
                 .creator(true)
                 .build();
 
