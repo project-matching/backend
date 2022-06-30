@@ -1,9 +1,6 @@
 package com.matching.project.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 
@@ -12,6 +9,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Builder
 @AllArgsConstructor
+@ToString
 public class ProjectUser {
     @Id @GeneratedValue
     private Long no;
@@ -20,9 +18,9 @@ public class ProjectUser {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_no", nullable = false)
-    private User userNo;
+    private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "project_no", nullable = false)
-    private Project projectNo;
+    private Project project;
 }

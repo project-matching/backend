@@ -6,6 +6,9 @@ import com.matching.project.service.ProjectService;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -30,10 +33,9 @@ public class ProjectController {
 
     @GetMapping("/recruitment")
     @ApiOperation(value = "모집중인 프로젝트 목록 조회")
-    public ResponseEntity<List<ProjectSimpleDto>> projectRecruitingList() {
-        List<ProjectSimpleDto> projectDtoList = new ArrayList<>();
-
-        return new ResponseEntity(projectDtoList, HttpStatus.OK);
+    public ResponseEntity projectRecruitingList(@PageableDefault(size = 5, sort = "no", direction = Sort.Direction.DESC) Pageable pageable) throws Exception{
+        List<ProjectSimpleDto> projectSimpleDtoList = projectService.projectRecruitingList(pageable);
+        return ResponseEntity.ok(new ResponseDto<>(null, projectSimpleDtoList));
     }
 
     @GetMapping("/recruitment/complete")
