@@ -16,6 +16,7 @@ import java.util.Collection;
 @AllArgsConstructor
 @Getter
 @Entity
+@Table(name = "users")
 public class User implements UserDetails {
     private static final long serialVersionUID = 1L;
 
@@ -43,7 +44,7 @@ public class User implements UserDetails {
     private boolean block;
 
     @Column(length = 255)
-    private String block_reason;
+    private String blockReason;
 
     @Enumerated(EnumType.STRING)
     @Column(length = 20, nullable = false)

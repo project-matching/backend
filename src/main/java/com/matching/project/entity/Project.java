@@ -24,6 +24,9 @@ public class Project {
     @Column(length = 50, nullable = false)
     private String name;
 
+    @Column(length = 50, nullable = false)
+    private String createUserName;
+
     @Column(nullable = false)
     private LocalDateTime createDate;
 
@@ -43,6 +46,9 @@ public class Project {
     private Integer maxPeople;
 
     @Column(nullable = false)
+    private Integer currentPeople;
+
+    @Column(nullable = false, name = "delete_state")
     private boolean delete;
 
     @Column(length = 255)
@@ -50,7 +56,11 @@ public class Project {
 
     @Column(nullable = false)
     @ColumnDefault("0")
-    private Integer count;
+    private Integer viewCount;
+
+    @Column(nullable = false)
+    @ColumnDefault("0")
+    private Integer commentCount;
 
     @OneToOne
     @JoinColumn(name = "image_no")
@@ -60,19 +70,22 @@ public class Project {
     private List<ProjectPosition> projectPosition = new ArrayList<>();
 
     @Builder
-    public Project(Long no, String name, LocalDateTime createDate, LocalDate startDate, LocalDate endDate, boolean state, String introduction, Integer maxPeople, boolean delete, String deleteReason, Image image, Integer count) {
+    public Project(Long no, String name, String createUserName, LocalDateTime createDate, LocalDate startDate, LocalDate endDate, boolean state, String introduction, Integer maxPeople, Integer currentPeople, boolean delete, String deleteReason, Image image, Integer viewCount , Integer commentCount) {
         this.no = no;
         this.name = name;
+        this.createUserName = createUserName;
         this.createDate = createDate;
         this.startDate = startDate;
         this.endDate = endDate;
         this.state = state;
         this.introduction = introduction;
         this.maxPeople = maxPeople;
+        this.currentPeople = currentPeople;
         this.delete = delete;
         this.deleteReason = deleteReason;
         this.image = image;
-        this.count = count;
+        this.viewCount = viewCount;
+        this.commentCount = commentCount;
     }
 
     public static Project of(ProjectRegisterRequestDto projectRegisterRequestDto) {
@@ -86,7 +99,8 @@ public class Project {
                 .maxPeople(projectRegisterRequestDto.getMaxPeople())
                 .delete(false)
                 .deleteReason(null)
-                .count(0)
+                .viewCount(0)
+                .commentCount(0)
                 .image(null)
                 .build();
     }
