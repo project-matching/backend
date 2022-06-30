@@ -5,6 +5,10 @@ logging:
 server:
   port: 8080
 
+key:
+  jwt:
+    secret: ENC(s7eFrh2X8Zllu4Q7M0FqvwDmVaX46+DEEhMFrWn2Jm8X126mKs498wX6Yoy2ie7FsuN25BsPZuo=)
+
 spring:
   security:
     oauth2:

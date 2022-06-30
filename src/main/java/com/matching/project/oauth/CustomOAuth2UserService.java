@@ -1,7 +1,9 @@
 package com.matching.project.oauth;
 
+import com.matching.project.dto.common.TokenDto;
 import com.matching.project.entity.User;
 import com.matching.project.repository.UserRepository;
+import com.matching.project.service.JwtTokenService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -21,7 +23,6 @@ import java.util.Collections;
 @Slf4j
 public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
     private final UserRepository userRepository;
-    private final HttpSession httpSession;
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
@@ -37,8 +38,6 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         OAuthAttributes attributes = OAuthAttributes.of(registrationId, nameAttributeKey, oAuth2User.getAttributes());
 
         User user = saveOrUpdate(attributes);
-
-        httpSession.setAttribute("user", new UserSessionDto(user));
 
         return new DefaultOAuth2User(
                 Collections.singleton(new SimpleGrantedAuthority(user.getPermission().toString())),
