@@ -2,18 +2,15 @@ package com.matching.project.service;
 
 import com.matching.project.dto.common.NormalLoginRequestDto;
 import com.matching.project.entity.User;
-import com.matching.project.repository.UserRepository;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
@@ -21,7 +18,7 @@ import static org.mockito.BDDMockito.given;
 class CommonServiceImplTest {
 
     @Mock
-    private UserRepository userRepository;
+    private CustomUserDetailsService customUserDetailsService;
 
     @Mock
     private PasswordEncoder passwordEncoder;
@@ -29,7 +26,7 @@ class CommonServiceImplTest {
     @InjectMocks
     private CommonServiceImpl commonService;
 
-    @DisplayName("아이디가 존재하지 않는 경우의 로그인 테스트")
+    @DisplayName("이메일 인증을 받지 않은 로그인 테스트")
     @Test
     void normalLoginFail1() {
         //given
@@ -41,7 +38,14 @@ class CommonServiceImplTest {
                 .password(password)
                 .build();
 
-        given(userRepository.findByEmail(email)).willReturn(Optional.empty());
+        User mockUser = User.builder()
+                .email(email)
+                .password(passwordEncoder.encode(password))
+                .email_auth(false)
+                .build();
+
+        given((User) customUserDetailsService.loadUserByUsername(email)).willReturn(mockUser);
+        given(passwordEncoder.matches(any(), any())).willReturn(true);
 
         //when
         Exception e = Assertions.assertThrows(IllegalArgumentException.class, () -> {
@@ -49,10 +53,10 @@ class CommonServiceImplTest {
         });
 
         //then
-        assertThat(e.getMessage()).isEqualTo("가입되지 않은 E-MAIL 입니다.");
+        assertThat(e.getMessage()).isEqualTo("This is an unsigned email");
     }
 
-    @DisplayName("패스워드가 틀린 경우의 경우의 로그인 테스트")
+    @DisplayName("아이디가 존재하지 않는 경우의 로그인 테스트")
     @Test
     void normalLoginFail2() {
         //given
@@ -64,12 +68,35 @@ class CommonServiceImplTest {
                 .password(password)
                 .build();
 
-        Optional<User> optionalUser = Optional.of(User.builder()
+        given((User) customUserDetailsService.loadUserByUsername(email)).willThrow(new UsernameNotFoundException("This is not a registered email"));
+
+        //when
+        Exception e = Assertions.assertThrows(UsernameNotFoundException.class, () -> {
+            User user = commonService.normalLogin(dto);
+        });
+
+        //then
+        assertThat(e.getMessage()).isEqualTo("This is not a registered email");
+    }
+
+    @DisplayName("패스워드가 틀린 경우의 경우의 로그인 테스트")
+    @Test
+    void normalLoginFail3() {
+        //given
+        String email = "test@naver.com";
+        String password = "test";
+
+        NormalLoginRequestDto dto = NormalLoginRequestDto.builder()
+                .email(email)
+                .password(password)
+                .build();
+
+        User mockUser = User.builder()
                 .email(email)
                 .password(passwordEncoder.encode(password))
-                .build()
-        );
-        given(userRepository.findByEmail(email)).willReturn(optionalUser);
+                .email_auth(true)
+                .build();
+        given((User) customUserDetailsService.loadUserByUsername(email)).willReturn(mockUser);
         given(passwordEncoder.matches(any(), any())).willReturn(false);
 
         //when
@@ -78,7 +105,7 @@ class CommonServiceImplTest {
         });
 
         //then
-        assertThat(e.getMessage()).isEqualTo("잘못된 비밀번호입니다.");
+        assertThat(e.getMessage()).isEqualTo("This is an incorrect password.");
 
     }
 
@@ -94,13 +121,14 @@ class CommonServiceImplTest {
                 .password(password)
                 .build();
 
-        Optional<User> optionalUser = Optional.of(User.builder()
+        User mockUser = User.builder()
                 .email(email)
                 .password(passwordEncoder.encode(password))
-                .build()
-        );
-        given(userRepository.findByEmail(email)).willReturn(optionalUser);
-        given(passwordEncoder.matches(dto.getPassword(), optionalUser.get().getPassword())).willReturn(true);
+                .email_auth(true)
+                .build();
+
+        given((User) customUserDetailsService.loadUserByUsername(email)).willReturn(mockUser);
+        given(passwordEncoder.matches(dto.getPassword(), mockUser.getPassword())).willReturn(true);
 
         //when
         User user = commonService.normalLogin(dto);

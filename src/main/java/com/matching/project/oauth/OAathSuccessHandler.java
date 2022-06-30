@@ -23,7 +23,6 @@ import java.util.Map;
 @RequiredArgsConstructor
 @Component
 public class OAathSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
-    private final UserRepository userRepository;
     private final JwtTokenService jwtTokenService;
 
     @Override
@@ -33,23 +32,15 @@ public class OAathSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
         Map<String, Object> attributes = oAuth2User.getAttributes();
         log.info("OAuth Attributes : {}", attributes);
 
-        /*
-            현재 CustomOAuth2UserService의 method 함수에서 이미 한번 user 조회가 완료되었음(saveOrUpdate)
-            다만, OAathSuccessHandler 핸들러로 조회된 값(User 객체)을 가져오지 못하여 한번 더 조회를 하고 있음. ("no" 가 필요)
-            "no" 가 필요 없는 경우 그냥 attributes에서 이메일 가져와서 조회하는 과정을 생략 가능하다.
-         */
-        User user = null;
-        if (attributes.containsKey("sub")) {
-            //Google
-            user = userRepository.findByEmail((String)attributes.get("email")).get();
-        } else {
-            //Git
-            user = userRepository.findByEmail(Integer.toString((Integer)attributes.get("id"))).get();
-        }
+        String email = null;
+        if (attributes.containsKey("sub"))
+            email = (String)attributes.get("email"); //Google
+        else
+            email = Integer.toString((Integer)attributes.get("id")); //Git
+
 
         TokenDto tokenDto = TokenDto.builder()
-                .no(user.getNo())
-                .email(user.getEmail())
+                .email(email)
                 .build();
 
         log.info("OAuth JWT Token Create");

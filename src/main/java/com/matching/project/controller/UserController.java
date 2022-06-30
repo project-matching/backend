@@ -2,7 +2,9 @@ package com.matching.project.controller;
 
 import com.matching.project.dto.ResponseDto;
 import com.matching.project.dto.user.*;
+import com.matching.project.entity.EmailAuth;
 import com.matching.project.entity.User;
+import com.matching.project.service.EmailServiceImpl;
 import com.matching.project.service.UserService;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @RequiredArgsConstructor
 @RestController
@@ -19,6 +22,7 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
+    private final EmailServiceImpl emailService;
 
     @PostMapping
     @ApiOperation(value = "회원가입")
@@ -32,10 +36,42 @@ public class UserController {
                     .sex(user.getSex())
                     .email(user.getEmail())
                     .build();
+            EmailAuth emailAuth = emailService.emailAuthSave(user.getEmail());
+            emailService.sendConfirmEmail(user.getEmail(), emailAuth.getAuthToken());
             return ResponseEntity.ok().body(signUpResponseDto);
         } catch (Exception e) {
             ResponseDto responseDto = ResponseDto.builder()
-                    .error(e.toString()).build();
+                    .error(e.getMessage()).build();
+            return ResponseEntity.badRequest().body(responseDto);
+        }
+    }
+
+    @ApiOperation(value = "이메일 인증")
+    @GetMapping("/confirm")
+    public ResponseEntity confirmEmail(EmailAuthRequestDto requestDto) {
+        try {
+            emailService.confirmEmail(requestDto);
+            ResponseDto responseDto = ResponseDto.builder()
+                    .data("Email Authentication Completed").build();
+            return ResponseEntity.ok().body(responseDto);
+        } catch (Exception e) {
+            ResponseDto responseDto = ResponseDto.builder()
+                    .error(e.getMessage()).build();
+            return ResponseEntity.badRequest().body(responseDto);
+        }
+    }
+
+    @ApiOperation(value = "이메일 인증 코드 재발송")
+    @PostMapping("/reissue")
+    public ResponseEntity reSendEmailAuth(@RequestBody Map<String, String> req) {
+        try {
+            emailService.emailAuthReSend(req.get("email"));
+            ResponseDto responseDto = ResponseDto.builder()
+                    .data("Email Authentication Code Resend").build();
+            return ResponseEntity.ok().body(responseDto);
+        } catch (Exception e) {
+            ResponseDto responseDto = ResponseDto.builder()
+                    .error(e.getMessage()).build();
             return ResponseEntity.badRequest().body(responseDto);
         }
     }

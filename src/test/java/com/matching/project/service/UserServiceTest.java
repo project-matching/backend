@@ -106,7 +106,7 @@ class UserServiceTest {
         });
 
         //then
-        assertThat(e.getMessage()).isEqualTo("signUpValidCheck fail");
+        assertThat(e.getMessage()).isEqualTo("Email is duplicated.");
     }
 
     @DisplayName("패스워드(필수 입력 값) 공백 에러 테스트")
@@ -131,15 +131,13 @@ class UserServiceTest {
                 .position(position)
                 .build();
 
-        given(userRepository.findByEmail(dto.getEmail())).willReturn(Optional.empty());
-
         //when
         Exception e = Assertions.assertThrows(RuntimeException.class, () -> {
             userService.userSignUp(dto);
         });
 
         //then
-        assertThat(e.getMessage()).isEqualTo("signUpValidCheck fail");
+        assertThat(e.getMessage()).isEqualTo("Password value is blanked");
     }
 
     @DisplayName("성별 값이 비정상적으로 들어왔을 경우 에러 테스트")
@@ -164,15 +162,13 @@ class UserServiceTest {
                 .position(position)
                 .build();
 
-        given(userRepository.findByEmail(dto.getEmail())).willReturn(Optional.empty());
-
         //when
         Exception e = Assertions.assertThrows(RuntimeException.class, () -> {
             userService.userSignUp(dto);
         });
 
         //then
-        assertThat(e.getMessage()).isEqualTo("signUpValidCheck fail");
+        assertThat(e.getMessage()).isEqualTo("Sex value is blanked OR Invalid");
     }
 
     @DisplayName("정상 회원가입 성공")

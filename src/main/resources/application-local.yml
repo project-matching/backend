@@ -10,6 +10,21 @@ key:
     secret: ENC(s7eFrh2X8Zllu4Q7M0FqvwDmVaX46+DEEhMFrWn2Jm8X126mKs498wX6Yoy2ie7FsuN25BsPZuo=)
 
 spring:
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: promatch2022@gmail.com
+    password: ENC(hKwE5NS4+4x7MxPTuqbgQ5G88gJ7R3Tn8OwDx/u5zp4=)
+    properties:
+      mail:
+        smtp:
+          starttls:
+            enable: true
+            required: true
+          auth: true
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
   security:
     oauth2:
       client:
