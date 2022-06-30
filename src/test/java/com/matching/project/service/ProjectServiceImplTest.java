@@ -1,15 +1,12 @@
 package com.matching.project.service;
 
 import com.matching.project.dto.enumerate.Position;
+import com.matching.project.dto.enumerate.Role;
 import com.matching.project.dto.project.ProjectPositionDto;
 import com.matching.project.dto.project.ProjectRegisterRequestDto;
 import com.matching.project.dto.project.ProjectRegisterResponseDto;
-import com.matching.project.entity.Project;
-import com.matching.project.entity.ProjectPosition;
-import com.matching.project.entity.ProjectTechnicalStack;
-import com.matching.project.repository.ProjectPositionRepository;
-import com.matching.project.repository.ProjectRepository;
-import com.matching.project.repository.ProjectTechnicalStackRepository;
+import com.matching.project.entity.*;
+import com.matching.project.repository.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,6 +18,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -36,6 +34,12 @@ class ProjectServiceImplTest {
 
     @Mock
     ProjectRepository projectRepository;
+
+    @Mock
+    ProjectUserRepository projectUserRepository;
+
+    @Mock
+    UserRepository userRepository;
 
     @InjectMocks
     ProjectServiceImpl projectService;
@@ -71,7 +75,20 @@ class ProjectServiceImplTest {
                 .projectPosition(projectPositionDtoList)
                 .build();
 
-        Project project = Project.of(projectRegisterRequestDto);
+        Project project = Project.builder()
+                .no(1L)
+                .name(projectRegisterRequestDto.getName())
+                .createDate(projectRegisterRequestDto.getCreateDate())
+                .startDate(projectRegisterRequestDto.getStartDate())
+                .endDate(projectRegisterRequestDto.getEndDate())
+                .state(true)
+                .introduction(projectRegisterRequestDto.getIntroduction())
+                .maxPeople(projectRegisterRequestDto.getMaxPeople())
+                .delete(false)
+                .deleteReason(null)
+                .count(0)
+                .image(null)
+                .build();
         ProjectPosition projectPosition1 = ProjectPosition.of(projectRegisterRequestDto.getProjectPosition().get(0));
         ProjectTechnicalStack projectTechnicalStack1 = ProjectTechnicalStack.of(projectRegisterRequestDto.getProjectPosition().get(0).getTechnicalStack().get(0));
         ProjectTechnicalStack projectTechnicalStack2 = ProjectTechnicalStack.of(projectRegisterRequestDto.getProjectPosition().get(0).getTechnicalStack().get(1));
@@ -80,9 +97,33 @@ class ProjectServiceImplTest {
         projectPosition1.getProjectTechnicalStack().add(projectTechnicalStack2);
         project.getProjectPosition().add(projectPosition1);
 
+        User user = User.builder()
+                .no(1L)
+                .name("testName")
+                .sex('M')
+                .email("testEmail")
+                .github("testGithub")
+                .selfIntroduction("testSelfIntroduction")
+                .block(false)
+                .block_reason(null)
+                .permission(Role.ROLE_USER)
+                .image(null)
+                .userPosition(null)
+                .build();
+
+        ProjectUser projectUser = ProjectUser.builder()
+                .no(1L)
+                .projectNo(project)
+                .userNo(user)
+                .creator(true)
+                .build();
+
         given(projectRepository.save(any(Project.class))).willReturn(project);
         given(projectPositionRepository.save(any(ProjectPosition.class))).willReturn(projectPosition1);
         given(projectTechnicalStackRepository.save(any(ProjectTechnicalStack.class))).willReturn(projectTechnicalStack1);
+
+        given(userRepository.findById(any(Long.class))).willReturn(Optional.of(user));
+        given(projectUserRepository.save(any(ProjectUser.class))).willReturn(projectUser);
 
         ProjectRegisterResponseDto projectRegisterResponseDto = null;
 
@@ -94,9 +135,12 @@ class ProjectServiceImplTest {
         }
 
         // then
+        verify(userRepository).findById(any());
         verify(projectRepository).save(any());
         verify(projectPositionRepository).save(any());
         verify(projectTechnicalStackRepository, times(2)).save(any());
+        verify(projectUserRepository).save(any());
+
 
         Assertions.assertEquals(projectRegisterResponseDto.getName(), testName);
         Assertions.assertEquals(projectRegisterResponseDto.getCreateDate(), createDate);
