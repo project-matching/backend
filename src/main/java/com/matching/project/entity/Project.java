@@ -2,10 +2,7 @@ package com.matching.project.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.matching.project.dto.project.ProjectRegisterRequestDto;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 
 import javax.persistence.*;
@@ -105,5 +102,25 @@ public class Project {
                 .commentCount(0)
                 .image(null)
                 .build();
+    }
+
+    @Override
+    public String toString() {
+        return "Project{" +
+                "no=" + no +
+                ", name='" + name + '\'' +
+                ", createUserName='" + createUserName + '\'' +
+                ", createDate=" + createDate +
+                ", startDate=" + startDate +
+                ", endDate=" + endDate +
+                ", state=" + state +
+                ", introduction='" + introduction + '\'' +
+                ", maxPeople=" + maxPeople +
+                ", currentPeople=" + currentPeople +
+                ", delete=" + delete +
+                ", deleteReason='" + deleteReason + '\'' +
+                ", viewCount=" + viewCount +
+                ", commentCount=" + commentCount +
+                '}';
     }
 }

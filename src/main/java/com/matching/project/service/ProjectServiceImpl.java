@@ -1,25 +1,18 @@
 package com.matching.project.service;
 
-import com.matching.project.dto.project.ProjectPositionDto;
-import com.matching.project.dto.project.ProjectRegisterRequestDto;
-import com.matching.project.dto.project.ProjectRegisterResponseDto;
-import com.matching.project.dto.project.ProjectSimpleDto;
+import com.matching.project.dto.project.*;
 import com.matching.project.entity.*;
 import com.matching.project.repository.*;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.orm.hibernate5.SpringSessionContext;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
-import java.sql.SQLException;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import java.util.NoSuchElementException;
 
 @Service
 @RequiredArgsConstructor
@@ -33,7 +26,6 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public ProjectRegisterResponseDto projectRegister(ProjectRegisterRequestDto projectRegisterRequestDto) throws Exception{
-        //TODO JWT 미구현으로 인한 임시 하드코딩
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) authentication.getPrincipal();
 
@@ -64,18 +56,37 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public List<ProjectSimpleDto> projectRecruitingList(Pageable pageable) throws Exception {
-        //TODO JWT 미구현으로 인한 하드 코딩
-        Long userNo = 1L;
-        List<Long> projectBookMarkList = bookMarkRepository.findByUserNo(userNo).stream().map(bookMark -> bookMark.getProject().getNo()).collect(Collectors.toList());
+    public List<NoneLoginProjectSimpleDto> NoneLoginProjectRecruitingList(Pageable pageable) throws Exception {
         Page<Project> projectPage = projectRepository.findByStateProjectPage(true, false, pageable);
-        List<ProjectSimpleDto> projectSimpleDtoList = projectPage.map(project -> ProjectSimpleDto.builder()
+
+        List<NoneLoginProjectSimpleDto> projectSimpleDtoList = projectPage.map(project -> NoneLoginProjectSimpleDto.builder()
                 .no(project.getNo())
                 .name(project.getName())
                 .profile(null)
-                .bookmark(projectBookMarkList.contains(project.getNo()) ? true : false)
                 .maxPeople(project.getMaxPeople())
                 .currentPeople(project.getCurrentPeople())
+                .viewCount(project.getViewCount())
+                .commentCount(project.getCommentCount())
+                .register(project.getCreateUserName())
+                .build()).toList();
+
+        return projectSimpleDtoList;
+    }
+
+    @Override
+    public List<LoginProjectSimpleDto> LoginProjectRecruitingList(Pageable pageable) throws Exception {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        List<Long> projectBookMarkList = bookMarkRepository.findByUserNo(user.getNo()).stream().map(bookMark -> bookMark.getProject().getNo()).collect(Collectors.toList());
+        Page<Project> projectPage = projectRepository.findByStateProjectPage(true, false, pageable);
+
+        List<LoginProjectSimpleDto> projectSimpleDtoList = projectPage.map(project -> LoginProjectSimpleDto.builder()
+                .no(project.getNo())
+                .name(project.getName())
+                .profile(null)
+                .maxPeople(project.getMaxPeople())
+                .currentPeople(project.getCurrentPeople())
+                .bookMark(projectBookMarkList.contains(project.getNo()) ? true : false)
                 .viewCount(project.getViewCount())
                 .commentCount(project.getCommentCount())
                 .register(project.getCreateUserName())
