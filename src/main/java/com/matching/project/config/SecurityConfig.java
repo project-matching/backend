@@ -48,6 +48,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 //                     .antMatchers("/swagger-ui.html")
 //                         .hasRole("ADMIN")
 //                     .antMatchers("/*", "/v1/*", "/h2-console/*").permitAll();
+                .antMatchers("/v1/project").hasRole("USER")
                 .antMatchers("/*").permitAll()
                 //.anyRequest().authenticated();
 

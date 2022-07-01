@@ -3,13 +3,19 @@ package com.matching.project.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.matching.project.config.SecurityConfig;
+import com.matching.project.dto.common.TokenDto;
+import com.matching.project.dto.enumerate.OAuth;
 import com.matching.project.dto.enumerate.Position;
+import com.matching.project.dto.enumerate.Role;
 import com.matching.project.dto.project.ProjectPositionDto;
 import com.matching.project.dto.project.ProjectRegisterRequestDto;
 import com.matching.project.dto.project.ProjectRegisterResponseDto;
 import com.matching.project.entity.Project;
+import com.matching.project.entity.User;
 import com.matching.project.oauth.CustomOAuth2UserService;
 import com.matching.project.repository.ProjectRepository;
+import com.matching.project.repository.UserRepository;
+import com.matching.project.service.JwtTokenService;
 import com.matching.project.service.ProjectService;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -62,6 +68,12 @@ class ProjectControllerTest {
     @Autowired
     ProjectRepository projectRepository;
 
+    @Autowired
+    JwtTokenService jwtTokenService;
+
+    @Autowired
+    UserRepository userRepository;
+
     // 프로젝트 저장
     void saveProject(){
         LocalDateTime createDate = LocalDateTime.of(2022, 06, 24, 10, 10, 10);
@@ -106,7 +118,26 @@ class ProjectControllerTest {
 
     @Test
     void 프로젝트_등록_테스트() throws Exception {
+        User user1 = User.builder()
+                .name("userName1")
+                .sex('M')
+                .email("wkemrm12@naver.com")
+                .password("testPassword")
+                .github("testGithub")
+                .selfIntroduction("testSelfIntroduction")
+                .block(false)
+                .blockReason(null)
+                .oauthCategory(OAuth.NORMAL)
+                .permission(Role.ROLE_USER)
+                .image(null)
+                .userPosition(null)
+                .build();
+
+        userRepository.save(user1);
+        String token = jwtTokenService.createToken(new TokenDto(1L, "wkemrm12@naver.com"));
+
         // given
+
         LocalDateTime createDate = LocalDateTime.of(2022, 06, 24, 10, 10, 10);
         LocalDate startDate = LocalDate.of(2022, 06, 24);
         LocalDate endDate = LocalDate.of(2022, 06, 28);
@@ -131,11 +162,13 @@ class ProjectControllerTest {
 
         // then
         mvc.perform(post("/v1/project").contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", "Bearer " + token)
                         .content(new ObjectMapper().registerModule(new JavaTimeModule()).writeValueAsString(content)))
                 .andDo(print())
                 .andExpect(header().string("Content-type", "application/json"))
                 .andExpect(jsonPath("$.error").isEmpty())
                 .andExpect(jsonPath("$.data.name").value("testName"))
+                .andExpect(jsonPath("$.data.createUser").value("userName1"))
                 .andExpect(jsonPath("$.data.profile").isEmpty())
                 .andExpect(jsonPath("$.data.createDate").value(createDate.toString()))
                 .andExpect(jsonPath("$.data.startDate").value(startDate.toString()))
@@ -143,6 +176,7 @@ class ProjectControllerTest {
                 .andExpect(jsonPath("$.data.state").value(true))
                 .andExpect(jsonPath("$.data.introduction").value("testIntroduction"))
                 .andExpect(jsonPath("$.data.maxPeople").value(10))
+                .andExpect(jsonPath("$.data.currentPeople").value(1))
                 .andExpect(jsonPath("$.data.projectPosition[0].position").value(Position.BACKEND.toString()))
                 .andExpect(jsonPath("$.data.projectPosition[0].technicalStack[0]").value("SPRING"))
                 .andExpect(jsonPath("$.data.projectPosition[0].technicalStack[1]").value("JAVA"))
