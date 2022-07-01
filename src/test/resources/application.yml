@@ -12,6 +12,21 @@ jasypt:
   encryptor:
     password: test
 spring:
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: test
+    password: test
+    properties:
+      mail:
+        smtp:
+          starttls:
+            enable: true
+            required: true
+          auth: true
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
   security:
     oauth2:
       client:
