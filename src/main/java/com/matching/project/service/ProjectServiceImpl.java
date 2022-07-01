@@ -11,7 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.orm.hibernate5.SpringSessionContext;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import java.sql.SQLException;
 import java.util.List;
@@ -32,10 +34,10 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public ProjectRegisterResponseDto projectRegister(ProjectRegisterRequestDto projectRegisterRequestDto) throws Exception{
         //TODO JWT 미구현으로 인한 임시 하드코딩
-        Long userNo = 1L;
-        User user = userRepository.findById(userNo).orElseThrow(() -> new NoSuchElementException());
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user = (User) authentication.getPrincipal();
 
-        Project project = Project.of(projectRegisterRequestDto);
+        Project project = Project.of(projectRegisterRequestDto, user);
         Project returnProject = projectRepository.save(project);
 
         for (ProjectPositionDto projectPositionDto : projectRegisterRequestDto.getProjectPosition()) {

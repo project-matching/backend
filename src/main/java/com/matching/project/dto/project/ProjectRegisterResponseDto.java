@@ -18,6 +18,7 @@ import java.util.List;
 public class ProjectRegisterResponseDto {
     private Long no;
     private String name;
+    private String createUser;
     private String profile;
     private LocalDateTime createDate;
     private LocalDate startDate;
@@ -25,12 +26,14 @@ public class ProjectRegisterResponseDto {
     private boolean state;
     private String introduction;
     private Integer maxPeople;
+    private Integer currentPeople;
     private List<ProjectPositionDto> projectPosition = new ArrayList<>();
 
     @Builder
-    public ProjectRegisterResponseDto(Long no, String name, String profile, LocalDateTime createDate, LocalDate startDate, LocalDate endDate, boolean state, String introduction, Integer maxPeople) {
+    public ProjectRegisterResponseDto(Long no, String name, String createUser, String profile, LocalDateTime createDate, LocalDate startDate, LocalDate endDate, boolean state, String introduction, Integer maxPeople, Integer currentPeople) {
         this.no = no;
         this.name = name;
+        this.createUser = createUser;
         this.profile = profile;
         this.createDate = createDate;
         this.startDate = startDate;
@@ -38,12 +41,14 @@ public class ProjectRegisterResponseDto {
         this.state = state;
         this.introduction = introduction;
         this.maxPeople = maxPeople;
+        this.currentPeople = currentPeople;
     }
 
     public static ProjectRegisterResponseDto of (Project project) {
         ProjectRegisterResponseDto projectRegisterResponseDto = ProjectRegisterResponseDto.builder()
                 .no(project.getNo())
                 .name(project.getName())
+                .createUser(project.getCreateUserName())
                 .profile(null)
                 .createDate(project.getCreateDate())
                 .startDate(project.getStartDate())
@@ -51,6 +56,7 @@ public class ProjectRegisterResponseDto {
                 .state(project.isState())
                 .introduction(project.getIntroduction())
                 .maxPeople(project.getMaxPeople())
+                .currentPeople(project.getCurrentPeople())
                 .build();
 
         List<ProjectPosition> projectPosition = project.getProjectPosition();
