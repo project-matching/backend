@@ -55,6 +55,8 @@ public class User implements UserDetails {
     @Column(length = 10, nullable = false)
     private OAuth oauthCategory;
 
+    private boolean email_auth;
+
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "image_no")
     private Image image;
@@ -91,5 +93,9 @@ public class User implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    public void emailVerifiedSuccess() {
+        this.email_auth = true;
     }
 }

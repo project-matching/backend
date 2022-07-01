@@ -1,14 +1,10 @@
 package com.matching.project.service;
 
 import com.matching.project.dto.common.TokenDto;
-import com.matching.project.dto.enumerate.Role;
-import com.matching.project.service.CustomUserDetailsService;
 import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,7 +12,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.Base64Utils;
 
 import javax.annotation.PostConstruct;
-import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
 @Slf4j
@@ -50,7 +45,6 @@ public class JwtTokenService {
 
         //Claims(=payload)
         Claims claims = Jwts.claims();
-        claims.put("no", tokenDto.getNo());
         claims.put("email", tokenDto.getEmail());
 
         Date now = new Date();
@@ -73,11 +67,6 @@ public class JwtTokenService {
     // 토큰에 claims 추출
     public Claims getClaims(String token) {
         return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
-    }
-
-    // 토큰에서 회원번호 추출
-    public Long getUserNo(String token) {
-        return getClaims(token).get("no", Long.class);
     }
 
     // 토큰에서 이메일 추출

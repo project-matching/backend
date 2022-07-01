@@ -57,7 +57,6 @@ public class CommonController {
 
 
     // 소셜 로그인
-    
     @GetMapping("/logout")
     @ApiOperation(value = "로그아웃")
     public ResponseEntity<String> logout() {

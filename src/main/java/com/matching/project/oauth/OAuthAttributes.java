@@ -68,6 +68,7 @@ public class OAuthAttributes {
                 .password(password)
                 .oauthCategory(oauthCategory)
                 .permission(Role.ROLE_USER)
+                .email_auth(true)
                 .build();
     }
 }

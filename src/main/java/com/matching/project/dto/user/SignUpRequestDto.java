@@ -42,13 +42,14 @@ public class SignUpRequestDto {
                 .oauthCategory(OAuth.NORMAL)
                 .block(false)
                 .userPosition(userPosition)
+                .email_auth(false)
                 .build();
 
     }
 
     public static UserPosition toPositionEntity(final Position position) {
         return UserPosition.builder()
-                .name(position.toString()) // enum 이여야 하는거 아닌가?
+                .name(position.toString())
                 .build();
 
     }
