@@ -103,24 +103,4 @@ public class Project {
                 .image(null)
                 .build();
     }
-
-    @Override
-    public String toString() {
-        return "Project{" +
-                "no=" + no +
-                ", name='" + name + '\'' +
-                ", createUserName='" + createUserName + '\'' +
-                ", createDate=" + createDate +
-                ", startDate=" + startDate +
-                ", endDate=" + endDate +
-                ", state=" + state +
-                ", introduction='" + introduction + '\'' +
-                ", maxPeople=" + maxPeople +
-                ", currentPeople=" + currentPeople +
-                ", delete=" + delete +
-                ", deleteReason='" + deleteReason + '\'' +
-                ", viewCount=" + viewCount +
-                ", commentCount=" + commentCount +
-                '}';
-    }
 }
