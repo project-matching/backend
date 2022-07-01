@@ -30,38 +30,25 @@ public class UserServiceImpl implements UserService{
     private final UserTechnicalStackRepository userTechnicalStackRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public boolean emailDupleCheck(String email)
-    {
-        if (userRepository.findByEmail(email).isPresent())
-            return true;
-        else
-            return false;
-    }
+    public void signUpValidCheck(SignUpRequestDto dto) {
 
-
-    public boolean signUpValidCheck(SignUpRequestDto dto) {
-        boolean result = false;
-
-        if (emailDupleCheck(dto.getEmail()))
-            log.error("Email is duplicated.");
-        else if (dto.getName().equals("") || dto.getName() == null)
-            log.error("Name value is blanked");
-        else if (dto.getSex() == "" || dto.getSex() == null || dto.getSex().length() > 1 || !dto.getSex().matches("[mMwWoO]"))
-            log.error("Sex value is blanked OR Invalid");
+        if (dto.getName().equals("") || dto.getName() == null)
+            throw new RuntimeException("Name value is blanked");
+        else if (dto.getSex().equals("") || dto.getSex() == null || dto.getSex().length() > 1 || !dto.getSex().matches("[mMwWoO]"))
+            throw new RuntimeException("Sex value is blanked OR Invalid");
         else if (dto.getEmail().equals("") || dto.getEmail() == null)
-            log.error("Email value is blanked");
+            throw new RuntimeException("Email value is blanked");
         else if (dto.getPassword().equals("") || dto.getPassword() == null)
-            log.error("Password value is blanked");
-        else
-            result = true;
-        return result;
+            throw new RuntimeException("Password value is blanked");
+        else if (userRepository.findByEmail(dto.getEmail()).isPresent())
+            throw new RuntimeException("Email is duplicated.");
     }
 
+    @Override
     public User userSignUp(SignUpRequestDto dto){
 
         // Valid Check
-        if (!signUpValidCheck(dto))
-            throw new RuntimeException("signUpValidCheck fail");
+        signUpValidCheck(dto);
 
         // Password Encode
         dto.setEncodePassword(passwordEncoder.encode(dto.getPassword()));
