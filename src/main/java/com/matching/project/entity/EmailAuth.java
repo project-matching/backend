@@ -1,5 +1,6 @@
 package com.matching.project.entity;
 
+import com.matching.project.dto.enumerate.EmailAuthPurpose;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -23,19 +24,15 @@ public class EmailAuth {
 
     private String email;
     private String authToken;
-    private Boolean expired;
+    private EmailAuthPurpose purpose;
     private LocalDateTime expireDate;
 
     @Builder
-    public EmailAuth(String email, String authToken, Boolean expired) {
+    public EmailAuth(String email, String authToken, EmailAuthPurpose purpose) {
         this.email = email;
         this.authToken = authToken;
-        this.expired = expired;
+        this.purpose = purpose;
         this.expireDate = LocalDateTime.now().plusMinutes(MAX_EXPIRE_TIME);
-    }
-
-    public void useToken() {
-        this.expired = true;
     }
 
     public void setExpireTimeForTest(LocalDateTime time){

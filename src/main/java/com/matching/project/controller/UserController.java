@@ -1,15 +1,20 @@
 package com.matching.project.controller;
 
 import com.matching.project.dto.ResponseDto;
+import com.matching.project.dto.enumerate.EmailAuthPurpose;
 import com.matching.project.dto.user.*;
 import com.matching.project.entity.EmailAuth;
 import com.matching.project.entity.User;
+import com.matching.project.repository.EmailAuthRepository;
+import com.matching.project.service.EmailService;
 import com.matching.project.service.EmailServiceImpl;
 import com.matching.project.service.UserService;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -22,7 +27,27 @@ import java.util.Map;
 public class UserController {
 
     private final UserService userService;
-    private final EmailServiceImpl emailService;
+    private final EmailService emailService;
+
+    @ApiOperation(value = "현재 접속한 사용자 확인")
+    @GetMapping("/info")
+    public ResponseEntity getUserInfo() {
+        try {
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            User user = (User)auth.getPrincipal();
+            UserSimpleInfoDto dto = UserSimpleInfoDto.builder()
+                    .no(user.getNo())
+                    .name(user.getName())
+                    .profile(null)
+                    .build();
+            ResponseDto<UserSimpleInfoDto> response = ResponseDto.<UserSimpleInfoDto>builder().data(dto).build();
+            return ResponseEntity.ok().body(response);
+        } catch (Exception e) {
+            ResponseDto<String> response = ResponseDto.<String>builder().error(e.getMessage()).build();
+            return ResponseEntity.badRequest().body(response);
+        }
+
+    }
 
     @PostMapping
     @ApiOperation(value = "회원가입")
@@ -36,7 +61,10 @@ public class UserController {
                     .sex(user.getSex())
                     .email(user.getEmail())
                     .build();
-            EmailAuth emailAuth = emailService.emailAuthSave(user.getEmail());
+
+            // Valid Authentication Token Save
+            EmailAuth emailAuth = emailService.emailAuthTokenSave(signUpResponseDto.getEmail(), EmailAuthPurpose.EMAIL_AUTHENTICATION);
+            // Send Email
             emailService.sendConfirmEmail(user.getEmail(), emailAuth.getAuthToken());
             return ResponseEntity.ok().body(signUpResponseDto);
         } catch (Exception e) {
@@ -48,9 +76,10 @@ public class UserController {
 
     @ApiOperation(value = "이메일 인증")
     @GetMapping("/confirm")
-    public ResponseEntity confirmEmail(EmailAuthRequestDto requestDto) {
+    public ResponseEntity confirmEmail(EmailAuthRequestDto dto) {
         try {
-            emailService.confirmEmail(requestDto);
+            dto.setPurpose(EmailAuthPurpose.EMAIL_AUTHENTICATION);
+            emailService.CheckConfirmEmail(dto);
             ResponseDto responseDto = ResponseDto.builder()
                     .data("Email Authentication Completed").build();
             return ResponseEntity.ok().body(responseDto);
@@ -63,9 +92,13 @@ public class UserController {
 
     @ApiOperation(value = "이메일 인증 코드 재발송")
     @PostMapping("/reissue")
-    public ResponseEntity reSendEmailAuth(@RequestBody Map<String, String> req) {
+    public ResponseEntity reSendEmailAuth(@RequestBody EmailAuthReSendRequestDto dto) {
         try {
-            emailService.emailAuthReSend(req.get("email"));
+            dto.setPurpose(EmailAuthPurpose.EMAIL_AUTHENTICATION);
+
+            EmailAuth emailAuth = emailService.beforeSendWork(dto.getEmail(), dto.getPurpose());
+            emailService.sendConfirmEmail(dto.getEmail(), emailAuth.getAuthToken());
+
             ResponseDto responseDto = ResponseDto.builder()
                     .data("Email Authentication Code Resend").build();
             return ResponseEntity.ok().body(responseDto);

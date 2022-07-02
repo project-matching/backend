@@ -69,6 +69,10 @@ public class User implements UserDetails {
         return Arrays.asList(new SimpleGrantedAuthority(permission.toString()));
     }
 
+    public void passwordReIssue(String password) {
+        this.password = password;
+    }
+
     @Override
     public String getUsername() {
         return email;
