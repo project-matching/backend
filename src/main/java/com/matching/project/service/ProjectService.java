@@ -10,6 +10,6 @@ import java.util.List;
 public interface ProjectService {
     public ProjectRegisterResponseDto projectRegister(ProjectRegisterRequestDto projectRegisterRequestDto) throws Exception;
 
-    public List<NoneLoginProjectSimpleDto> NoneLoginProjectRecruitingList(Pageable pageable) throws Exception;
-    public List<LoginProjectSimpleDto> LoginProjectRecruitingList(Pageable pageable) throws Exception;
+    public List<NoneLoginProjectSimpleDto> NoneLoginProjectRecruitingList(Pageable pageable, boolean state) throws Exception;
+    public List<LoginProjectSimpleDto> LoginProjectRecruitingList(Pageable pageable, boolean state) throws Exception;
 }

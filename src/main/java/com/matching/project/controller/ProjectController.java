@@ -34,23 +34,29 @@ public class ProjectController {
     @GetMapping("/recruitment")
     @ApiOperation(value = "비로그인 : 모집중인 프로젝트 목록 조회")
     public ResponseEntity noneLoginProjectRecruitingList(@PageableDefault(size = 5, sort = "no", direction = Sort.Direction.DESC) Pageable pageable) throws Exception{
-        List<NoneLoginProjectSimpleDto> projectSimpleDtoList = projectService.NoneLoginProjectRecruitingList(pageable);
+        List<NoneLoginProjectSimpleDto> projectSimpleDtoList = projectService.NoneLoginProjectRecruitingList(pageable, true);
         return ResponseEntity.ok(new ResponseDto<>(null, projectSimpleDtoList));
     }
 
     @GetMapping("/login/recruitment")
     @ApiOperation(value = "로그인 : 모집중인 프로젝트 목록 조회")
     public ResponseEntity LoginProjectRecruitingList(@PageableDefault(size = 5, sort = "no", direction = Sort.Direction.DESC) Pageable pageable) throws Exception{
-        List<LoginProjectSimpleDto> projectSimpleDtoList = projectService.LoginProjectRecruitingList(pageable);
+        List<LoginProjectSimpleDto> projectSimpleDtoList = projectService.LoginProjectRecruitingList(pageable, true);
         return ResponseEntity.ok(new ResponseDto<>(null, projectSimpleDtoList));
     }
 
     @GetMapping("/recruitment/complete")
     @ApiOperation(value = "비로그인 : 모집 완료된 프로젝트 목록 조회")
-    public ResponseEntity projectRecruitingCompleteList() {
-        List<LoginProjectSimpleDto> projectDtoList = new ArrayList<>();
+    public ResponseEntity noneLoginProjectRecruitingCompleteList(@PageableDefault(size = 5, sort = "no", direction = Sort.Direction.DESC) Pageable pageable) throws Exception{
+        List<NoneLoginProjectSimpleDto> projectSimpleDtoList = projectService.NoneLoginProjectRecruitingList(pageable, false);
+        return ResponseEntity.ok(new ResponseDto<>(null, projectSimpleDtoList));
+    }
 
-        return new ResponseEntity(projectDtoList, HttpStatus.OK);
+    @GetMapping("/login/recruitment/complete")
+    @ApiOperation(value = "로그인 : 모집 완료된 프로젝트 목록 조회")
+    public ResponseEntity LoginProjectRecruitingCompleteList(@PageableDefault(size = 5, sort = "no", direction = Sort.Direction.DESC) Pageable pageable) throws Exception{
+        List<NoneLoginProjectSimpleDto> projectSimpleDtoList = projectService.NoneLoginProjectRecruitingList(pageable, false);
+        return ResponseEntity.ok(new ResponseDto<>(null, projectSimpleDtoList));
     }
 
 

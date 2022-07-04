@@ -56,8 +56,8 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public List<NoneLoginProjectSimpleDto> NoneLoginProjectRecruitingList(Pageable pageable) throws Exception {
-        Page<Project> projectPage = projectRepository.findByStateProjectPage(true, false, pageable);
+    public List<NoneLoginProjectSimpleDto> NoneLoginProjectRecruitingList(Pageable pageable, boolean state) throws Exception {
+        Page<Project> projectPage = projectRepository.findByStateProjectPage(state, false, pageable);
 
         List<NoneLoginProjectSimpleDto> projectSimpleDtoList = projectPage.map(project -> NoneLoginProjectSimpleDto.builder()
                 .no(project.getNo())
@@ -74,11 +74,11 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public List<LoginProjectSimpleDto> LoginProjectRecruitingList(Pageable pageable) throws Exception {
+    public List<LoginProjectSimpleDto> LoginProjectRecruitingList(Pageable pageable, boolean state) throws Exception {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         List<Long> projectBookMarkList = bookMarkRepository.findByUserNo(user.getNo()).stream().map(bookMark -> bookMark.getProject().getNo()).collect(Collectors.toList());
-        Page<Project> projectPage = projectRepository.findByStateProjectPage(true, false, pageable);
+        Page<Project> projectPage = projectRepository.findByStateProjectPage(state, false, pageable);
 
         List<LoginProjectSimpleDto> projectSimpleDtoList = projectPage.map(project -> LoginProjectSimpleDto.builder()
                 .no(project.getNo())
