@@ -9,4 +9,5 @@ public class UserSimpleInfoDto {
     private Long no;
     private String profile;
     private String name;
+    private boolean creator;
 }

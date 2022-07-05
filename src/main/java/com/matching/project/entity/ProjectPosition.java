@@ -30,10 +30,11 @@ public class ProjectPosition {
     private List<ProjectTechnicalStack> projectTechnicalStack = new ArrayList<>();
 
     @Builder
-    public ProjectPosition(Long no, String name, boolean state) {
+    public ProjectPosition(Long no, String name, boolean state, Project project) {
         this.no = no;
         this.name = name;
         this.state = state;
+        this.project = project;
     }
 
     public void setProject(Project project) {
