@@ -219,7 +219,7 @@ class ProjectServiceImplTest {
         List<NoneLoginProjectSimpleDto> projectSimpleDtoList = null;
 
         try {
-            projectSimpleDtoList = projectService.NoneLoginProjectRecruitingList(pageable, true);
+            projectSimpleDtoList = projectService.noneLoginProjectRecruitingList(pageable, true);
         } catch (Exception e) {
 
         }
@@ -338,7 +338,7 @@ class ProjectServiceImplTest {
         List<LoginProjectSimpleDto> projectSimpleDtoList = null;
 
         try {
-            projectSimpleDtoList = projectService.LoginProjectRecruitingList(pageable, true);
+            projectSimpleDtoList = projectService.loginProjectRecruitingList(pageable, true);
         } catch (Exception e) {
 
         }
@@ -408,7 +408,7 @@ class ProjectServiceImplTest {
         List<NoneLoginProjectSimpleDto> projectSimpleDtoList = null;
 
         try {
-            projectSimpleDtoList = projectService.NoneLoginProjectRecruitingList(pageable, false);
+            projectSimpleDtoList = projectService.noneLoginProjectRecruitingList(pageable, false);
         } catch (Exception e) {
 
         }
@@ -517,7 +517,7 @@ class ProjectServiceImplTest {
         List<LoginProjectSimpleDto> projectSimpleDtoList = null;
 
         try {
-            projectSimpleDtoList = projectService.LoginProjectRecruitingList(pageable, false);
+            projectSimpleDtoList = projectService.loginProjectRecruitingList(pageable, false);
         } catch (Exception e) {
 
         }
