@@ -62,7 +62,7 @@ public class ProjectCustomRepositoryImpl implements ProjectCustomRepository {
     // projectPositionQueryDto 찾는 메소드
     private List<ProjectPositionQueryDto> findProjectPositionQueryDtoList(Long projectNo) {
         List<ProjectPositionQueryDto> projectPositionQueryDtoList = em.createQuery(
-                        "select new com.matching.project.dto.project.ProjectPositionQueryDto(pp.no, pp.name, pp.state)" +
+                        "select new com.matching.project.dto.project.ProjectPositionQueryDto(pp.no, pp.position, pp.state)" +
                                 " from ProjectPosition pp" +
                                 " where pp.project.no in :projectNo", ProjectPositionQueryDto.class)
                 .setParameter("projectNo", projectNo)

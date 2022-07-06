@@ -1,5 +1,6 @@
 package com.matching.project.repository;
 
+import com.matching.project.dto.enumerate.Position;
 import com.matching.project.dto.project.ProjectQueryDto;
 import com.matching.project.entity.Project;
 import com.matching.project.entity.ProjectPosition;
@@ -165,14 +166,14 @@ class ProjectRepositoryTest {
 
         // 프로젝트 포지션 저장
         ProjectPosition projectPosition1 = ProjectPosition.builder()
-                .name("frontPositionName")
+                .position(Position.FRONTEND)
                 .state(true)
                 .build();
         projectPosition1.setProject(project);
         projectPosition1 = projectPositionRepository.save(projectPosition1);
 
         ProjectPosition projectPosition2 = ProjectPosition.builder()
-                .name("backPositionName")
+                .position(Position.BACKEND)
                 .state(true)
                 .build();
         projectPosition2.setProject(project);
@@ -227,11 +228,11 @@ class ProjectRepositoryTest {
         
         // 프로젝트 포지션 값 검증
         assertEquals(detailProject.getProjectPositionList().get(0).getNo(), projectPosition1.getNo());
-        assertEquals(detailProject.getProjectPositionList().get(0).getName(), projectPosition1.getName());
+        assertEquals(detailProject.getProjectPositionList().get(0).getPosition(), projectPosition1.getPosition());
         assertEquals(detailProject.getProjectPositionList().get(0).isState(), projectPosition1.isState());
 
         assertEquals(detailProject.getProjectPositionList().get(1).getNo(), projectPosition2.getNo());
-        assertEquals(detailProject.getProjectPositionList().get(1).getName(), projectPosition2.getName());
+        assertEquals(detailProject.getProjectPositionList().get(1).getPosition(), projectPosition2.getPosition());
         assertEquals(detailProject.getProjectPositionList().get(1).isState(), projectPosition2.isState());
 
         // 프로젝트 기술 스택 검증

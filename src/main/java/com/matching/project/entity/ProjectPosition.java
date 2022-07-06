@@ -6,6 +6,7 @@ import com.matching.project.dto.project.ProjectRegisterRequestDto;
 import lombok.*;
 
 import javax.persistence.*;
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,7 +19,8 @@ public class ProjectPosition {
     private Long no;
 
     @Column(length = 20, nullable = false)
-    private String name;
+    @Enumerated(EnumType.STRING)
+    private Position position;
 
     private boolean state;
 
@@ -30,9 +32,9 @@ public class ProjectPosition {
     private List<ProjectTechnicalStack> projectTechnicalStack = new ArrayList<>();
 
     @Builder
-    public ProjectPosition(Long no, String name, boolean state, Project project) {
+    public ProjectPosition(Long no, Position position, boolean state, Project project) {
         this.no = no;
-        this.name = name;
+        this.position = position;
         this.state = state;
         this.project = project;
     }
@@ -44,7 +46,7 @@ public class ProjectPosition {
 
     public static ProjectPosition of(ProjectPositionDto projectPositionDto) {
         return ProjectPosition.builder()
-                .name(projectPositionDto.getPosition().toString())
+                .position(projectPositionDto.getPosition())
                 .state(false)
                 .build();
     }
