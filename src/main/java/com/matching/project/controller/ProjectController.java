@@ -60,8 +60,9 @@ public class ProjectController {
     @GetMapping("/{projectNo}")
     @ApiOperation(value = "프로젝트 상세 조회")
     public ResponseEntity projectInfo(@PathVariable Long projectNo) {
-        ProjectDto projectDto = new ProjectDto();
-        return ResponseEntity.ok(new ResponseDto<>(null, projectDto));
+        ProjectDto projectDetail = projectService.getProjectDetail(projectNo);
+
+        return ResponseEntity.ok(new ResponseDto<>(null, projectDetail));
     }
 
     @PostMapping("/search")
