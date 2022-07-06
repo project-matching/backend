@@ -1,6 +1,7 @@
 package com.matching.project.repository;
 
 import com.matching.project.dto.enumerate.OAuth;
+import com.matching.project.dto.enumerate.Position;
 import com.matching.project.dto.enumerate.Role;
 import com.matching.project.entity.Project;
 import com.matching.project.entity.ProjectUser;
@@ -109,18 +110,21 @@ class ProjectUserRepositoryTest {
 
         ProjectUser projectUser1 = ProjectUser.builder()
                 .creator(true)
+                .projectPosition(Position.BACKEND)
                 .user(userSave1)
                 .project(projectSave1)
                 .build();
 
         ProjectUser projectUser2 = ProjectUser.builder()
                 .creator(false)
+                .projectPosition(Position.FRONTEND)
                 .user(userSave2)
                 .project(projectSave1)
                 .build();
 
         ProjectUser projectUser3 = ProjectUser.builder()
                 .creator(true)
+                .projectPosition(Position.FRONTEND)
                 .user(userSave2)
                 .project(projectSave2)
                 .build();
@@ -138,11 +142,13 @@ class ProjectUserRepositoryTest {
         assertEquals(projectUserList.size(), 2);
         assertEquals(projectUserList.get(0).getNo(), projectUserSave1.getNo());
         assertEquals(projectUserList.get(0).isCreator(), projectUserSave1.isCreator());
+        assertEquals(projectUserList.get(0).getProjectPosition(), projectUserSave1.getProjectPosition());
         assertEquals(projectUserList.get(0).getUser(), projectUserSave1.getUser());
         assertEquals(projectUserList.get(0).getProject(), projectUserSave1.getProject());
 
         assertEquals(projectUserList.get(1).getNo(), projectUserSave2.getNo());
         assertEquals(projectUserList.get(1).isCreator(), projectUserSave2.isCreator());
+        assertEquals(projectUserList.get(1).getProjectPosition(), projectUserSave2.getProjectPosition());
         assertEquals(projectUserList.get(1).getUser(), projectUserSave2.getUser());
         assertEquals(projectUserList.get(1).getProject(), projectUserSave2.getProject());
     }
