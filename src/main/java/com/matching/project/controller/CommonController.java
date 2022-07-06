@@ -28,11 +28,6 @@ public class CommonController {
     private final JwtTokenService jwtTokenService;
     private final EmailService emailService;
 
-    @GetMapping("/test")
-    public String test() {
-        return "test";
-    }
-
     // 일반 로그인
     @PostMapping("/login")
     @ApiOperation(value = "일반 로그인")

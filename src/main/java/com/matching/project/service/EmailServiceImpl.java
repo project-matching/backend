@@ -97,13 +97,13 @@ public class EmailServiceImpl implements EmailService {
     @Async
     @Override
     public void sendConfirmEmail(String email, String authToken) {
-        SimpleMailMessage smm = new SimpleMailMessage();
-        smm.setTo(email);
-        smm.setSubject("회원가입 이메일 인증");
-        smm.setText("http://localhost:8080/v1/user/confirm?email="+email+"&authToken="+authToken);
-
-        javaMailSender.send(smm);
-        log.info("회원 가입 이메일 전송 to {}", email);
+//        SimpleMailMessage smm = new SimpleMailMessage();
+//        smm.setTo(email);
+//        smm.setSubject("회원가입 이메일 인증");
+//        smm.setText("http://localhost:8080/v1/user/confirm?email="+email+"&authToken="+authToken);
+//
+//        javaMailSender.send(smm);
+//        log.info("회원 가입 이메일 전송 to {}", email);
     }
 
     @Transactional
