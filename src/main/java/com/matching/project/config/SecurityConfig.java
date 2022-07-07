@@ -43,15 +43,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenService),
                         UsernamePasswordAuthenticationFilter.class)
                 .authorizeRequests()
-                .antMatchers("/v1/common/info")
-                  .hasAnyRole("USER", "ADMIN")
-//                     .antMatchers("/swagger-ui.html")
-//                         .hasRole("ADMIN")
-//                     .antMatchers("/*", "/v1/*", "/h2-console/*").permitAll();
-                .antMatchers("/v1/project").hasRole("USER")
-                .antMatchers("/v1/project/login/*").hasRole("USER")
-                .antMatchers("/v1/project/test").hasAnyRole("USER", "ADMIN","ANONYMOUS")
-                .antMatchers("/*").permitAll()
+                    .antMatchers("/*").permitAll()
+                    .antMatchers("/v1/user/info")
+                      .hasAnyRole("USER", "ADMIN", "ANONYMOUS")
                 //.anyRequest().authenticated();
 
                 .and()

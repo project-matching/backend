@@ -1,4 +1,4 @@
-package com.matching.project.dto.common;
+package com.matching.project.dto.user;
 
 import com.matching.project.dto.enumerate.EmailAuthPurpose;
 import lombok.*;
@@ -8,8 +8,7 @@ import lombok.*;
 @AllArgsConstructor
 @Setter
 @Getter
-public class PasswordReissueRequestDto {
+public class EmailAuthReSendRequestDto {
     String email;
-    String authToken;
     EmailAuthPurpose purpose;
 }

@@ -8,8 +8,7 @@ import lombok.*;
 @AllArgsConstructor
 @Setter
 @Getter
-public class PasswordReissueRequestDto {
+public class PasswordReissueCallRequestDto {
     String email;
-    String authToken;
     EmailAuthPurpose purpose;
 }

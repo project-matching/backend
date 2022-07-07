@@ -1,6 +1,9 @@
 package com.matching.project.service;
 
+import com.matching.project.dto.common.PasswordReissueRequestDto;
+import com.matching.project.dto.enumerate.EmailAuthPurpose;
 import com.matching.project.dto.enumerate.OAuth;
+import com.matching.project.dto.user.EmailAuthReSendRequestDto;
 import com.matching.project.dto.user.EmailAuthRequestDto;
 import com.matching.project.entity.EmailAuth;
 import com.matching.project.entity.User;
@@ -14,6 +17,7 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -29,6 +33,9 @@ public class EmailServiceImplTest {
     @Spy
     private JavaMailSender javaMailSender;
 
+    @Spy
+    private PasswordEncoder passwordEncoder;
+
     @Mock
     private EmailAuthRepository emailAuthRepository;
 
@@ -38,60 +45,80 @@ public class EmailServiceImplTest {
     @InjectMocks
     private EmailServiceImpl emailService;
 
+    @DisplayName("패스워드 재발급 성공")
+    @Test
+    public void passwordReissueSuccess(){
+        //given
+        String email = "test9@naver.com";
+        String authToken = UUID.randomUUID().toString();
+        EmailAuthPurpose purpose = EmailAuthPurpose.PASSWORD_REISSUE;
+
+        PasswordReissueRequestDto dto = PasswordReissueRequestDto.builder()
+                .email(email)
+                .authToken(authToken)
+                .purpose(purpose)
+                .build();
+
+        Optional<User> user = Optional.ofNullable(User.builder()
+                .email(email)
+                .oauthCategory(OAuth.NORMAL)
+                .email_auth(true)
+                .build()
+        );
+
+        Optional<EmailAuth> emailAuth = Optional.ofNullable(EmailAuth.builder()
+                .email(email)
+                .purpose(purpose)
+                .authToken(authToken)
+                .build()
+        );
+
+        given(customUserDetailsService.loadUserByUsername(email)).willReturn(user.get());
+        given(emailAuthRepository.findByEmailAndAndAuthTokenAndPurpose(dto.getEmail(), dto.getAuthToken(), dto.getPurpose())).willReturn(emailAuth);
+
+
+        //when
+        String newPassword = emailService.CheckPasswordReissueEmail(dto);
+
+        //then
+        assertThat(newPassword).isNotEmpty();
+    }
+
     @DisplayName("인증 이메일 토큰 기한 초과")
     @Test
     public void emailAuthFail1() {
         //given
         String email = "test9@naver.com";
         String authToken = UUID.randomUUID().toString();
+        EmailAuthPurpose purpose = EmailAuthPurpose.EMAIL_AUTHENTICATION;
+
+        Optional<User> user = Optional.ofNullable(User.builder()
+                .email(email)
+                .oauthCategory(OAuth.NORMAL)
+                .email_auth(false)
+                .build()
+        );
+
+        Optional<EmailAuth> emailAuth = Optional.ofNullable(EmailAuth.builder()
+                .email(email)
+                .purpose(purpose)
+                .build()
+        );
+        emailAuth.get().setExpireTimeForTest(LocalDateTime.now().minusMinutes(10));
 
         EmailAuthRequestDto dto = EmailAuthRequestDto.builder()
                 .email(email)
                 .authToken(authToken)
+                .purpose(purpose)
                 .build();
 
-        Optional<EmailAuth> emailAuth = Optional.of(EmailAuth.builder()
-                .email(email)
-                .authToken(authToken)
-                .expired(false)
-                .build()
-        );
-        emailAuth.get().setExpireTimeForTest(LocalDateTime.now().minusMinutes(10));
-        given(emailAuthRepository.findByEmailAndAndAuthToken(dto.getEmail(), dto.getAuthToken())).willReturn(emailAuth);
+
+        given(customUserDetailsService.loadUserByUsername(email)).willReturn(user.get());
+        given(emailAuthRepository.findByEmailAndAndAuthTokenAndPurpose(dto.getEmail(), dto.getAuthToken(), dto.getPurpose())).willReturn(emailAuth);
 
         //when
         Exception e = Assertions.assertThrows(RuntimeException.class, () -> {
-            emailService.confirmEmail(dto);
-        });
-
-        //then
-        assertThat(e.getMessage()).isEqualTo("Email AuthToken Expired");
-    }
-
-    @DisplayName("인증 이메일 토큰 기한 초과")
-    @Test
-    public void emailAuthFail() {
-        //given
-        String email = "test9@naver.com";
-        String authToken = UUID.randomUUID().toString();
-
-        EmailAuthRequestDto dto = EmailAuthRequestDto.builder()
-                .email(email)
-                .authToken(authToken)
-                .build();
-
-        Optional<EmailAuth> emailAuth = Optional.of(EmailAuth.builder()
-                .email(email)
-                .authToken(authToken)
-                .expired(false)
-                .build()
-        );
-        emailAuth.get().setExpireTimeForTest(LocalDateTime.now().minusMinutes(10));
-        given(emailAuthRepository.findByEmailAndAndAuthToken(dto.getEmail(), dto.getAuthToken())).willReturn(emailAuth);
-
-        //when
-        Exception e = Assertions.assertThrows(RuntimeException.class, () -> {
-            emailService.confirmEmail(dto);
+            emailService.CheckConfirmEmail(dto);
         });
 
         //then
@@ -104,30 +131,26 @@ public class EmailServiceImplTest {
         //given
         String email = "test9@naver.com";
         String authToken = UUID.randomUUID().toString();
+        EmailAuthPurpose purpose = EmailAuthPurpose.EMAIL_AUTHENTICATION;
+
+        Optional<User> user = Optional.ofNullable(User.builder()
+                .email(email)
+                .oauthCategory(OAuth.NORMAL)
+                .email_auth(true)
+                .build()
+        );
 
         EmailAuthRequestDto dto = EmailAuthRequestDto.builder()
                 .email(email)
                 .authToken(authToken)
+                .purpose(purpose)
                 .build();
 
-        Optional<EmailAuth> emailAuth = Optional.of(EmailAuth.builder()
-                .email(email)
-                .authToken(authToken)
-                .expired(false)
-                .build()
-        );
-        given(emailAuthRepository.findByEmailAndAndAuthToken(dto.getEmail(), dto.getAuthToken())).willReturn(emailAuth);
-
-
-        User user = User.builder()
-                .email(email)
-                .email_auth(true)
-                .build();
-        given((User) customUserDetailsService.loadUserByUsername(emailAuth.get().getEmail())).willReturn(user);
+        given(customUserDetailsService.loadUserByUsername(email)).willReturn(user.get());
 
         //when
         Exception e = Assertions.assertThrows(RuntimeException.class, () -> {
-            emailService.confirmEmail(dto);
+            emailService.CheckConfirmEmail(dto);
         });
 
         //then
@@ -139,16 +162,27 @@ public class EmailServiceImplTest {
     public void emailAuthFail3() {
         //given
         String email = "test9@naver.com";
+        String authToken = UUID.randomUUID().toString();
+        EmailAuthPurpose purpose = EmailAuthPurpose.EMAIL_AUTHENTICATION;
 
-        User user = User.builder()
+        Optional<User> user = Optional.ofNullable(User.builder()
                 .email(email)
-                .oauthCategory(OAuth.GITHUB)
+                .oauthCategory(OAuth.GOOGLE)
+                .email_auth(true)
+                .build()
+        );
+
+        EmailAuthRequestDto dto = EmailAuthRequestDto.builder()
+                .email(email)
+                .authToken(authToken)
+                .purpose(purpose)
                 .build();
-        given((User) customUserDetailsService.loadUserByUsername(email)).willReturn(user);
+
+        given(customUserDetailsService.loadUserByUsername(email)).willReturn(user.get());
 
         //when
         Exception e = Assertions.assertThrows(RuntimeException.class, () -> {
-            emailService.emailAuthReSend(email);
+            emailService.CheckConfirmEmail(dto);
         });
 
         //then
@@ -161,32 +195,35 @@ public class EmailServiceImplTest {
         //given
         String email = "test9@naver.com";
         String authToken = UUID.randomUUID().toString();
+        EmailAuthPurpose purpose = EmailAuthPurpose.EMAIL_AUTHENTICATION;
+
+        Optional<User> user = Optional.ofNullable(User.builder()
+                .email(email)
+                .oauthCategory(OAuth.NORMAL)
+                .email_auth(false)
+                .build()
+        );
+
+        Optional<EmailAuth> emailAuth = Optional.ofNullable(EmailAuth.builder()
+                .email(email)
+                .purpose(purpose)
+                .build()
+        );
 
         EmailAuthRequestDto dto = EmailAuthRequestDto.builder()
                 .email(email)
                 .authToken(authToken)
+                .purpose(purpose)
                 .build();
 
-        Optional<EmailAuth> emailAuth = Optional.of(EmailAuth.builder()
-                .email(email)
-                .authToken(authToken)
-                .expired(false)
-                .build()
-        );
-        given(emailAuthRepository.findByEmailAndAndAuthToken(dto.getEmail(), dto.getAuthToken())).willReturn(emailAuth);
-
-        User user = User.builder()
-                .email(email)
-                .email_auth(false)
-                .build();
-        given((User) customUserDetailsService.loadUserByUsername(emailAuth.get().getEmail())).willReturn(user);
+        given(customUserDetailsService.loadUserByUsername(email)).willReturn(user.get());
+        given(emailAuthRepository.findByEmailAndAndAuthTokenAndPurpose(dto.getEmail(), dto.getAuthToken(), dto.getPurpose())).willReturn(emailAuth);
 
         //when
-        User resUser = emailService.confirmEmail(dto);
+        User resUser = emailService.CheckConfirmEmail(dto);
 
         //then
         assertThat(resUser.isEmail_auth()).isTrue();
-
     }
 
 
