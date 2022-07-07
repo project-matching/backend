@@ -2,10 +2,7 @@ package com.matching.project.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.matching.project.dto.project.ProjectRegisterRequestDto;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 
 import javax.persistence.*;
@@ -88,15 +85,17 @@ public class Project {
         this.commentCount = commentCount;
     }
 
-    public static Project of(ProjectRegisterRequestDto projectRegisterRequestDto) {
+    public static Project of(ProjectRegisterRequestDto projectRegisterRequestDto, User user) {
         return Project.builder()
                 .name(projectRegisterRequestDto.getName())
+                .createUserName(user.getName())
                 .createDate(projectRegisterRequestDto.getCreateDate())
                 .startDate(projectRegisterRequestDto.getStartDate())
                 .endDate(projectRegisterRequestDto.getEndDate())
                 .state(true)
                 .introduction(projectRegisterRequestDto.getIntroduction())
                 .maxPeople(projectRegisterRequestDto.getMaxPeople())
+                .currentPeople(1)
                 .delete(false)
                 .deleteReason(null)
                 .viewCount(0)

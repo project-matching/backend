@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-public interface ProjectRepository extends JpaRepository<Project, Long> {
+public interface ProjectRepository extends JpaRepository<Project, Long>, ProjectCustomRepository {
 
     @Query("select p from Project p where p.state = :state and p.delete = :delete")
     Page<Project> findByStateProjectPage(@Param("state") boolean state, @Param("delete") boolean delete, Pageable pageable);
