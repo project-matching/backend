@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -38,7 +39,7 @@ class BookMarkRepositoryTest {
         LocalDate endDate = LocalDate.of(2022, 06, 28);
 
         User user1 = User.builder()
-                .name("testName1")
+                .name("testUserName1")
                 .sex('M')
                 .email("testEmail1")
                 .password("testPassword")
@@ -53,7 +54,7 @@ class BookMarkRepositoryTest {
                 .build();
 
         User user2 = User.builder()
-                .name("testName2")
+                .name("testUserName2")
                 .sex('M')
                 .email("testEmail2")
                 .password("testPassword")
@@ -68,7 +69,7 @@ class BookMarkRepositoryTest {
                 .build();
 
         Project project1 = Project.builder()
-                .name("testName1")
+                .name("testProjectName1")
                 .createUserName("testName1")
                 .createDate(createDate)
                 .startDate(startDate)
@@ -85,7 +86,7 @@ class BookMarkRepositoryTest {
                 .build();
 
         Project project2 = Project.builder()
-                .name("testName2")
+                .name("testProjectName2")
                 .createUserName("testName1")
                 .createDate(createDate)
                 .startDate(startDate)
@@ -165,5 +166,61 @@ class BookMarkRepositoryTest {
         assertEquals(findBookMarkList.get(0).getProject().getViewCount(), saveProject1.getViewCount());
         assertEquals(findBookMarkList.get(0).getProject().getCommentCount(), saveProject1.getCommentCount());
         assertEquals(findBookMarkList.get(0).getProject().getImage(), saveProject1.getImage());
+    }
+
+    @Test
+    public void 북마크_존재_확인() {
+        // given
+        LocalDateTime createDate = LocalDateTime.of(2022, 06, 24, 10, 10, 10);
+        LocalDate startDate = LocalDate.of(2022, 06, 24);
+        LocalDate endDate = LocalDate.of(2022, 06, 28);
+
+        User user1 = User.builder()
+                .name("testUserName1")
+                .sex('M')
+                .email("testEmail1")
+                .password("testPassword")
+                .github("testGithub")
+                .selfIntroduction("testSelfIntroduction")
+                .block(false)
+                .blockReason(null)
+                .oauthCategory(OAuth.NORMAL)
+                .permission(Role.ROLE_USER)
+                .image(null)
+                .userPosition(null)
+                .build();
+
+        Project project1 = Project.builder()
+                .name("testProjectName1")
+                .createUserName("testName1")
+                .createDate(createDate)
+                .startDate(startDate)
+                .endDate(endDate)
+                .state(true)
+                .introduction("testIntroduction1")
+                .maxPeople(10)
+                .currentPeople(4)
+                .delete(false)
+                .deleteReason(null)
+                .viewCount(10)
+                .commentCount(10)
+                .image(null)
+                .build();
+
+        User userSave1 = userRepository.save(user1);
+        Project projectSave1 = projectRepository.save(project1);
+
+        BookMark bookMark = BookMark.builder()
+                .user(userSave1)
+                .project(projectSave1)
+                .build();
+
+        bookMarkRepository.save(bookMark);
+
+        // when
+        boolean existBookMark = bookMarkRepository.existBookMark(userSave1.getNo(), projectSave1.getNo());
+
+        // then
+        assertEquals(existBookMark, true);
     }
 }

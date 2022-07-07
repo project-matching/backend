@@ -22,10 +22,12 @@ public class ProjectTechnicalStack {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "project_position_no")
     private ProjectPosition projectPosition;
+
     @Builder
-    public ProjectTechnicalStack(Long no, String name) {
+    public ProjectTechnicalStack(Long no, String name, ProjectPosition projectPosition) {
         this.no = no;
         this.name = name;
+        this.projectPosition = projectPosition;
     }
 
     public void setProjectPosition(ProjectPosition projectPosition) {

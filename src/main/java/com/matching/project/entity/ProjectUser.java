@@ -1,5 +1,6 @@
 package com.matching.project.entity;
 
+import com.matching.project.dto.enumerate.Position;
 import lombok.*;
 
 import javax.persistence.*;
@@ -15,6 +16,9 @@ public class ProjectUser {
     private Long no;
 
     private boolean creator;
+
+    @Enumerated(EnumType.STRING)
+    private Position projectPosition;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_no", nullable = false)

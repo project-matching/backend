@@ -11,6 +11,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -57,7 +60,9 @@ public class ProjectController {
     @GetMapping("/{projectNo}")
     @ApiOperation(value = "프로젝트 상세 조회")
     public ResponseEntity projectInfo(@PathVariable Long projectNo) {
-        return new ResponseEntity(new ProjectDto(), HttpStatus.OK);
+        ProjectDto projectDetail = projectService.getProjectDetail(projectNo);
+
+        return ResponseEntity.ok(new ResponseDto<>(null, projectDetail));
     }
 
     @PostMapping("/search")

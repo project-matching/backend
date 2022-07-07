@@ -62,7 +62,7 @@ public class ProjectRegisterResponseDto {
         List<ProjectPosition> projectPosition = project.getProjectPosition();
         for (ProjectPosition position : projectPosition) {
             ProjectPositionDto projectPositionDto = new ProjectPositionDto();
-            projectPositionDto.setPosition(Position.valueOf(position.getName()));
+            projectPositionDto.setPosition(position.getPosition());
             List<String> technicalStack = new ArrayList<>();
             for (ProjectTechnicalStack projectTechnicalStack : position.getProjectTechnicalStack()) {
                 technicalStack.add(projectTechnicalStack.getName());
