@@ -18,18 +18,21 @@ public class ProjectPosition {
     @GeneratedValue
     private Long no;
 
-    @Column(length = 20, nullable = false)
-    @Enumerated(EnumType.STRING)
-    private Position position;
-
     private boolean state;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "project_no")
     private Project project;
 
-    @OneToMany(mappedBy = "projectPosition")
-    private List<ProjectTechnicalStack> projectTechnicalStack = new ArrayList<>();
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "position_no")
+    private Position position;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_no")
+    private User user;
+
+    private boolean creator;
 
     @Builder
     public ProjectPosition(Long no, Position position, boolean state, Project project) {

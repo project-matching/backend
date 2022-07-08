@@ -51,6 +51,9 @@ public class Project {
     @Column(length = 255)
     private String deleteReason;
 
+    @Column(nullable = true)
+    private Long imageNo;
+
     @Column(nullable = false)
     @ColumnDefault("0")
     private Integer viewCount;
@@ -58,10 +61,6 @@ public class Project {
     @Column(nullable = false)
     @ColumnDefault("0")
     private Integer commentCount;
-
-    @OneToOne
-    @JoinColumn(name = "image_no")
-    private Image image;
 
     @OneToMany(mappedBy = "project")
     private List<ProjectPosition> projectPosition = new ArrayList<>();

@@ -60,13 +60,12 @@ public class User implements UserDetails {
 
     private boolean email_auth;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "image_no")
-    private Image image;
+    @Column(nullable = true)
+    private Long imageNo;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_position_no")
-    private UserPosition userPosition;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "position_no")
+    private Position position;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

@@ -16,12 +16,13 @@ public class ProjectTechnicalStack {
     @GeneratedValue
     private Long no;
 
-    @Column(length = 20, nullable = false)
-    private String name;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "technical_stack_no")
+    private TechnicalStack technicalStack;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "project_position_no")
-    private ProjectPosition projectPosition;
+    @JoinColumn(name = "project_no")
+    private Project project;
 
     @Builder
     public ProjectTechnicalStack(Long no, String name, ProjectPosition projectPosition) {
