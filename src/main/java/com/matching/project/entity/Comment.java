@@ -1,8 +1,13 @@
 package com.matching.project.entity;
 
+import lombok.Builder;
+import lombok.Getter;
+
 import javax.persistence.*;
 
 @Entity
+@Builder
+@Getter
 public class Comment {
     @Id @GeneratedValue
     private Long no;

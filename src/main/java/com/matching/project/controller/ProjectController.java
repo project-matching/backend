@@ -11,6 +11,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -32,30 +35,40 @@ public class ProjectController {
     }
 
     @GetMapping("/recruitment")
-    @ApiOperation(value = "모집중인 프로젝트 목록 조회")
-    public ResponseEntity projectRecruitingList(@PageableDefault(size = 5, sort = "no", direction = Sort.Direction.DESC) Pageable pageable) throws Exception{
-        List<ProjectSimpleDto> projectSimpleDtoList = projectService.projectRecruitingList(pageable);
+    @ApiOperation(value = "비로그인 : 모집중인 프로젝트 목록 조회")
+    public ResponseEntity noneLoginProjectRecruitingList(@PageableDefault(size = 5, sort = "no", direction = Sort.Direction.DESC) Pageable pageable) throws Exception{
+        List<NoneLoginProjectSimpleDto> projectSimpleDtoList = projectService.NoneLoginProjectRecruitingList(pageable);
+        return ResponseEntity.ok(new ResponseDto<>(null, projectSimpleDtoList));
+    }
+
+    @GetMapping("/login/recruitment")
+    @ApiOperation(value = "로그인 : 모집중인 프로젝트 목록 조회")
+    public ResponseEntity LoginProjectRecruitingList(@PageableDefault(size = 5, sort = "no", direction = Sort.Direction.DESC) Pageable pageable) throws Exception{
+        List<LoginProjectSimpleDto> projectSimpleDtoList = projectService.LoginProjectRecruitingList(pageable);
         return ResponseEntity.ok(new ResponseDto<>(null, projectSimpleDtoList));
     }
 
     @GetMapping("/recruitment/complete")
-    @ApiOperation(value = "모집 완료된 프로젝트 목록 조회")
+    @ApiOperation(value = "비로그인 : 모집 완료된 프로젝트 목록 조회")
     public ResponseEntity projectRecruitingCompleteList() {
-        List<ProjectSimpleDto> projectDtoList = new ArrayList<>();
+        List<LoginProjectSimpleDto> projectDtoList = new ArrayList<>();
 
         return new ResponseEntity(projectDtoList, HttpStatus.OK);
     }
 
+
     @GetMapping("/{projectNo}")
     @ApiOperation(value = "프로젝트 상세 조회")
     public ResponseEntity projectInfo(@PathVariable Long projectNo) {
-        return new ResponseEntity(new ProjectDto(), HttpStatus.OK);
+        ProjectDto projectDetail = projectService.getProjectDetail(projectNo);
+
+        return ResponseEntity.ok(new ResponseDto<>(null, projectDetail));
     }
 
     @PostMapping("/search")
     @ApiOperation(value = "프로젝트 검색")
     public ResponseEntity projectSearch(ProjectSearchRequestDto projectSearchRequestDto) {
-        List<ProjectSimpleDto> projectDtoList = new ArrayList<>();
+        List<NoneLoginProjectSimpleDto> projectDtoList = new ArrayList<>();
 
         return new ResponseEntity(projectDtoList, HttpStatus.OK);
     }

@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 
 @Builder
+@AllArgsConstructor
 @Getter
 public class UserSimpleInfoDto {
     private Long no;

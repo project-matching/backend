@@ -13,7 +13,7 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 587
-    username: promatch2022@gmail.com
+    username: ENC(YQBtOWS4evW8WsSuEeXUmac1FJ5mPCkvT+0G6/XXMxo=)
     password: ENC(hKwE5NS4+4x7MxPTuqbgQ5G88gJ7R3Tn8OwDx/u5zp4=)
     properties:
       mail:
@@ -34,8 +34,8 @@ spring:
             client-secret: ENC(+XEqTDlh6OL/ySG9aPm6jtiaW4Ptu9ipjc1ExECS0HO/8oEMtuZZ7kcgDFim/MA+)
             scope: profile, email
           github:
-            clientId: 6a66211ee57c12ed75fa
-            clientSecret: d6b0b4876f5d0d138ce0dc65bf97b33b75d53fea
+            clientId: ENC(/pAslyQ1X78t4+UDgReoDR9eKMsxkwLWHz3epY1TzMU=)
+            clientSecret: ENC(kUbxD1ogPQYKZFf+gfwzgbdxa93O2WJzChRYN4XExZyP2DAGRuRNBChdcgl9EGiThYZq5uqpmG4=)
   datasource:
     hikari:
       jdbc-url: jdbc:h2:mem://localhost/~/localdb;MODE=MYSQL
