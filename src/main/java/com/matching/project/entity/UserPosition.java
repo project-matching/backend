@@ -16,4 +16,9 @@ public class UserPosition {
 
     @Column(length = 20, nullable = false)
     private String name;
+
+    public UserPosition updatePosition(final Position position) {
+        this.name = position.toString();
+        return this;
+    }
 }

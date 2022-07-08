@@ -42,9 +42,8 @@ public class SignUpRequestDto {
                 .oauthCategory(OAuth.NORMAL)
                 .block(false)
                 .userPosition(userPosition)
-                .email_auth(false)
+                .email_auth(true) // 임시
                 .build();
-
     }
 
     public static UserPosition toPositionEntity(final Position position) {

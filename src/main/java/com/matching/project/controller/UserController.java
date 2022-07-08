@@ -5,14 +5,19 @@ import com.matching.project.dto.enumerate.EmailAuthPurpose;
 import com.matching.project.dto.user.*;
 import com.matching.project.entity.EmailAuth;
 import com.matching.project.entity.User;
+import com.matching.project.entity.UserPosition;
+import com.matching.project.entity.UserTechnicalStack;
 import com.matching.project.repository.EmailAuthRepository;
 import com.matching.project.service.EmailService;
 import com.matching.project.service.EmailServiceImpl;
 import com.matching.project.service.UserService;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +25,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @RestController
@@ -34,14 +40,20 @@ public class UserController {
     public ResponseEntity getUserInfo() {
         try {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            User user = (User)auth.getPrincipal();
-            UserSimpleInfoDto dto = UserSimpleInfoDto.builder()
+            if (!(auth instanceof AnonymousAuthenticationToken)) {
+                User user = (User)auth.getPrincipal();
+                            UserSimpleInfoDto dto = UserSimpleInfoDto.builder()
                     .no(user.getNo())
                     .name(user.getName())
                     .profile(null)
                     .build();
-            ResponseDto<UserSimpleInfoDto> response = ResponseDto.<UserSimpleInfoDto>builder().data(dto).build();
-            return ResponseEntity.ok().body(response);
+                ResponseDto<UserSimpleInfoDto> response = ResponseDto.<UserSimpleInfoDto>builder().data(dto).build();
+                return ResponseEntity.ok().body(response);
+            }
+            else {
+                ResponseDto<String> response = ResponseDto.<String>builder().data(auth.getPrincipal().toString()).build();
+                return ResponseEntity.ok().body(response);
+            }
         } catch (Exception e) {
             ResponseDto<String> response = ResponseDto.<String>builder().error(e.getMessage()).build();
             return ResponseEntity.badRequest().body(response);
@@ -111,23 +123,42 @@ public class UserController {
     
     @GetMapping("/{no}")
     @ApiOperation(value = "회원 정보 조회")
-    public ResponseEntity<UserInfoResponseDto> userInfo(@PathVariable Long no) {
+    public ResponseEntity userInfo(@PathVariable Long no) {
+        try {
+            UserInfoResponseDto userInfoResponseDto = userService.userInfo(no);
 
-        return new ResponseEntity(new UserInfoResponseDto(), HttpStatus.OK);
+            ResponseDto responseDto = ResponseDto.builder()
+                    .data(userInfoResponseDto).build();
+            return ResponseEntity.ok().body(responseDto);
+        } catch (Exception e) {
+            ResponseDto responseDto = ResponseDto.builder()
+                    .error(e.getMessage()).build();
+            return ResponseEntity.badRequest().body(responseDto);
+        }
     }
     
     @GetMapping
     @ApiOperation(value = "회원 목록 조회")
-    public ResponseEntity<List<UserSimpleInfoDto>> userInfoList() {
-        List<UserSimpleInfoDto> userSimpleInfoList = new ArrayList<>();
-        
-        return new ResponseEntity(userSimpleInfoList, HttpStatus.OK);
+    public ResponseEntity userInfoList(@PageableDefault(size = 5) Pageable pageable) {
+        List<UserSimpleInfoDto> dtoList = userService.userInfoList(pageable);
+        ResponseDto responseDto = ResponseDto.builder()
+                .data(dtoList).build();
+        return ResponseEntity.ok().body(responseDto);
     }
     
     @PatchMapping("/{no}")
     @ApiOperation(value = "회원 정보 수정")
-    public ResponseEntity<String> userUpdate(@PathVariable Long no, UserUpdateRequestDto userUpdateRequestDto) {
-        return new ResponseEntity("수정 완료", HttpStatus.OK);
+    public ResponseEntity userUpdate(@PathVariable Long no, @RequestBody UserUpdateRequestDto userUpdateRequestDto) {
+        try {
+            User user = userService.userUpdate(no, userUpdateRequestDto);
+            ResponseDto responseDto = ResponseDto.builder()
+                    .data(user.getNo()).build();
+            return ResponseEntity.ok().body(responseDto);
+        } catch (Exception e) {
+            ResponseDto responseDto = ResponseDto.builder()
+                    .error(e.getMessage()).build();
+            return ResponseEntity.badRequest().body(responseDto);
+        }
     }
 
     @DeleteMapping("/{no}")

@@ -2,10 +2,13 @@ package com.matching.project.entity;
 
 import com.matching.project.dto.enumerate.OAuth;
 import com.matching.project.dto.enumerate.Role;
+import com.matching.project.dto.user.UserSimpleInfoDto;
+import com.matching.project.dto.user.UserUpdateRequestDto;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.persistence.*;
 import java.util.Arrays;
@@ -70,6 +73,22 @@ public class User implements UserDetails {
         return Arrays.asList(new SimpleGrantedAuthority(permission.toString()));
     }
 
+    public void updatePassword(PasswordEncoder passwordEncoder, String newPassword) {
+
+        if (!"".equals(newPassword) && newPassword != null)
+            this.password = passwordEncoder.encode(newPassword);
+    }
+
+    public User updateUser(UserUpdateRequestDto dto, UserPosition userPosition) {
+        this.name = dto.getName();
+        this.sex = dto.getSex().charAt(0);
+        this.github = dto.getGithub();
+        this.selfIntroduction = dto.getSelfIntroduction();
+        this.image = null;
+        this.userPosition = userPosition;
+        return this;
+    }
+
     public void passwordReIssue(String password) {
         this.password = password;
     }
@@ -102,4 +121,5 @@ public class User implements UserDetails {
     public void emailVerifiedSuccess() {
         this.email_auth = true;
     }
+
 }

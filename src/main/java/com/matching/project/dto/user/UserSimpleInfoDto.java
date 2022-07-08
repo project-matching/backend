@@ -1,6 +1,6 @@
 package com.matching.project.dto.user;
 
-import com.matching.project.dto.enumerate.Position;
+import com.matching.project.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -12,13 +12,14 @@ public class UserSimpleInfoDto {
     private Long no;
     private String profile;
     private String name;
-    private Position projectPosition;
-    private boolean creator;
+    private String email;
 
-    public UserSimpleInfoDto(Long no, String name, Position projectPosition, boolean creator) {
-        this.no = no;
-        this.name = name;
-        this.projectPosition = projectPosition;
-        this.creator = creator;
+    static public UserSimpleInfoDto toUserSimpleInfoDto(final User user) {
+        return UserSimpleInfoDto.builder()
+                .no(user.getNo())
+                .name(user.getName())
+                .email(user.getEmail())
+                .profile(null)
+                .build();
     }
 }
