@@ -13,7 +13,9 @@ import java.util.List;
 
 @Entity
 @Getter
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
 public class Project {
     @Id @GeneratedValue
     private Long no;
@@ -62,28 +64,6 @@ public class Project {
     @ColumnDefault("0")
     private Integer commentCount;
 
-    @OneToMany(mappedBy = "project")
-    private List<ProjectPosition> projectPosition = new ArrayList<>();
-
-    @Builder
-    public Project(Long no, String name, String createUserName, LocalDateTime createDate, LocalDate startDate, LocalDate endDate, boolean state, String introduction, Integer maxPeople, Integer currentPeople, boolean delete, String deleteReason, Image image, Integer viewCount , Integer commentCount) {
-        this.no = no;
-        this.name = name;
-        this.createUserName = createUserName;
-        this.createDate = createDate;
-        this.startDate = startDate;
-        this.endDate = endDate;
-        this.state = state;
-        this.introduction = introduction;
-        this.maxPeople = maxPeople;
-        this.currentPeople = currentPeople;
-        this.delete = delete;
-        this.deleteReason = deleteReason;
-        this.image = image;
-        this.viewCount = viewCount;
-        this.commentCount = commentCount;
-    }
-
     public static Project of(ProjectRegisterRequestDto projectRegisterRequestDto, User user) {
         return Project.builder()
                 .name(projectRegisterRequestDto.getName())
@@ -99,7 +79,7 @@ public class Project {
                 .deleteReason(null)
                 .viewCount(0)
                 .commentCount(0)
-                .image(null)
+                .imageNo(null)
                 .build();
     }
 }

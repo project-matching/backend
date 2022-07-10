@@ -5,7 +5,6 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.matching.project.config.SecurityConfig;
 import com.matching.project.dto.common.TokenDto;
 import com.matching.project.dto.enumerate.OAuth;
-import com.matching.project.dto.enumerate.Position;
 import com.matching.project.dto.enumerate.Role;
 import com.matching.project.dto.project.ProjectPositionDto;
 import com.matching.project.dto.project.ProjectRegisterRequestDto;
@@ -80,10 +79,13 @@ class ProjectControllerTest {
     UserRepository userRepository;
 
     @Autowired
-    ProjectUserRepository projectUserRepository;
+    CommentRepository commentRepository;
 
     @Autowired
-    CommentRepository commentRepository;
+    PositionRepository positionRepository;
+
+    @Autowired
+    TechnicalStackRepository technicalStackRepository;
 
     @Autowired
     BookMarkRepository bookMarkRepository;
@@ -100,9 +102,6 @@ class ProjectControllerTest {
                 .block(false)
                 .blockReason(null)
                 .oauthCategory(OAuth.NORMAL)
-                .permission(Role.ROLE_USER)
-                .image(null)
-                .userPosition(null)
                 .build();
 
         userRepository.save(user1);
@@ -142,7 +141,6 @@ class ProjectControllerTest {
                     .deleteReason(deleteReason)
                     .viewCount(10)
                     .commentCount(10)
-                    .image(null)
                     .build();
             projectRepository.save(project);
         }
@@ -150,6 +148,7 @@ class ProjectControllerTest {
 
     @Test
     void 프로젝트_등록_테스트() throws Exception {
+        // given
         User user1 = User.builder()
                 .name("userName1")
                 .sex('M')
@@ -161,58 +160,101 @@ class ProjectControllerTest {
                 .blockReason(null)
                 .oauthCategory(OAuth.NORMAL)
                 .permission(Role.ROLE_USER)
-                .image(null)
-                .userPosition(null)
                 .build();
 
         userRepository.save(user1);
         String token = jwtTokenService.createToken(new TokenDto(1L, "wkemrm12@naver.com"));
 
-        // given
+        Position position1 = Position.builder()
+                .name("testPosition1")
+                .build();
+        Position position2 = Position.builder()
+                .name("testPosition2")
+                .build();
+
+        positionRepository.save(position1);
+        positionRepository.save(position2);
+
+
+        TechnicalStack technicalStack1 = TechnicalStack.builder()
+                .name("testTechnicalStack1")
+                .build();
+        TechnicalStack technicalStack2 = TechnicalStack.builder()
+                .name("testTechnicalStack2")
+                .build();
+
+        technicalStackRepository.save(technicalStack1);
+        technicalStackRepository.save(technicalStack2);
+
 
         LocalDateTime createDate = LocalDateTime.of(2022, 06, 24, 10, 10, 10);
         LocalDate startDate = LocalDate.of(2022, 06, 24);
         LocalDate endDate = LocalDate.of(2022, 06, 28);
 
-        List<String> technicalStack = new ArrayList<>();
-        technicalStack.add("SPRING");
-        technicalStack.add("JAVA");
-        ProjectPositionDto projectPositionDto = new ProjectPositionDto(Position.BACKEND, technicalStack);
         List<ProjectPositionDto> projectPositionDtoList = new ArrayList<>();
-        projectPositionDtoList.add(projectPositionDto);
+        ProjectPositionDto projectPositionDto1 = ProjectPositionDto.builder()
+                .name("testPosition1")
+                .state(true)
+                .build();
+        ProjectPositionDto projectPositionDto2 = ProjectPositionDto.builder()
+                .name("testPosition2")
+                .state(false)
+                .build();
+        projectPositionDtoList.add(projectPositionDto1);
+        projectPositionDtoList.add(projectPositionDto2);
 
-        ProjectRegisterRequestDto content = ProjectRegisterRequestDto.builder()
+        List<String> projectTechnicalStack = new ArrayList<>();
+        projectTechnicalStack.add("testTechnicalStack1");
+        projectTechnicalStack.add("testTechnicalStack2");
+
+        ProjectRegisterRequestDto projectRegisterRequestDto = ProjectRegisterRequestDto.builder()
                 .name("testName")
                 .profile(null)
                 .createDate(createDate)
                 .startDate(startDate)
                 .endDate(endDate)
-                .introduction("testIntroduction")
+                .introduction("testIntroduction1")
                 .maxPeople(10)
-                .projectPosition(projectPositionDtoList)
                 .build();
+
+        projectRegisterRequestDto.setProjectPositionDtoList(projectPositionDtoList);
+        projectRegisterRequestDto.setProjectTechnicalStack(projectTechnicalStack);
 
         // then
         mvc.perform(post("/v1/project").contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", "Bearer " + token)
-                        .content(new ObjectMapper().registerModule(new JavaTimeModule()).writeValueAsString(content)))
+                        .content(new ObjectMapper().registerModule(new JavaTimeModule()).writeValueAsString(projectRegisterRequestDto)))
                 .andDo(print())
                 .andExpect(header().string("Content-type", "application/json"))
                 .andExpect(jsonPath("$.error").isEmpty())
-                .andExpect(jsonPath("$.data.name").value("testName"))
-                .andExpect(jsonPath("$.data.createUser").value("userName1"))
+                .andExpect(jsonPath("$.data.name").value(projectRegisterRequestDto.getName()))
+                .andExpect(jsonPath("$.data.createUser").value(user1.getName()))
                 .andExpect(jsonPath("$.data.profile").isEmpty())
-                .andExpect(jsonPath("$.data.createDate").value(createDate.toString()))
-                .andExpect(jsonPath("$.data.startDate").value(startDate.toString()))
-                .andExpect(jsonPath("$.data.endDate").value(endDate.toString()))
+                .andExpect(jsonPath("$.data.createDate").value(projectRegisterRequestDto.getCreateDate().toString()))
+                .andExpect(jsonPath("$.data.startDate").value(projectRegisterRequestDto.getStartDate().toString()))
+                .andExpect(jsonPath("$.data.endDate").value(projectRegisterRequestDto.getEndDate().toString()))
                 .andExpect(jsonPath("$.data.state").value(true))
-                .andExpect(jsonPath("$.data.introduction").value("testIntroduction"))
-                .andExpect(jsonPath("$.data.maxPeople").value(10))
+                .andExpect(jsonPath("$.data.introduction").value(projectRegisterRequestDto.getIntroduction()))
+                .andExpect(jsonPath("$.data.maxPeople").value(projectRegisterRequestDto.getMaxPeople()))
                 .andExpect(jsonPath("$.data.currentPeople").value(1))
-                .andExpect(jsonPath("$.data.projectPosition[0].position").value(Position.BACKEND.toString()))
-                .andExpect(jsonPath("$.data.projectPosition[0].technicalStack[0]").value("SPRING"))
-                .andExpect(jsonPath("$.data.projectPosition[0].technicalStack[1]").value("JAVA"))
+                .andExpect(jsonPath("$.data.viewCount").value(0))
+                .andExpect(jsonPath("$.data.commentCount").value(0))
+
+                .andExpect(jsonPath("$.data.projectPositionDtoList[0].name").value(projectPositionDto1.getName()))
+                .andExpect(jsonPath("$.data.projectPositionDtoList[0].state").value(projectPositionDto1.isState()))
+                .andExpect(jsonPath("$.data.projectPositionDtoList[1].name").value(projectPositionDto2.getName()))
+                .andExpect(jsonPath("$.data.projectPositionDtoList[1].state").value(projectPositionDto2.isState()))
+
+                .andExpect(jsonPath("$.data.projectTechnicalStack[0]").value(technicalStack1.getName()))
+                .andExpect(jsonPath("$.data.projectTechnicalStack[1]").value(technicalStack2.getName()))
                 .andExpect(status().isOk());
+
+        List<Project> projectList = projectRepository.findAll();
+        List<ProjectPosition> projectPositionList = projectPositionRepository.findAll();
+        List<ProjectTechnicalStack> projectTechnicalStackList = projectTechnicalStackRepository.findAll();
+        assertEquals(projectList.size(), 1);
+        assertEquals(projectPositionList.size(), projectPositionDtoList.size());
+        assertEquals(projectTechnicalStackList.size(), projectTechnicalStack.size());
     }
     
     @Test
@@ -306,325 +348,10 @@ class ProjectControllerTest {
 
     @Test
     public void 비로그인_상세_프로젝트_조회_테스트() throws Exception {
-        // given
-        LocalDateTime createDate = LocalDateTime.of(2022, 06, 24, 10, 10, 10);
-        LocalDate startDate = LocalDate.of(2022, 06, 24);
-        LocalDate endDate = LocalDate.of(2022, 06, 28);
-
-        // 프로젝트에 참가중인 유저
-        User user1 = User.builder()
-                .name("testUserName1")
-                .sex('M')
-                .email("testEmail1")
-                .password("testPassword")
-                .github("testGithub")
-                .selfIntroduction("testSelfIntroduction")
-                .block(false)
-                .blockReason(null)
-                .oauthCategory(OAuth.NORMAL)
-                .permission(Role.ROLE_USER)
-                .image(null)
-                .userPosition(null)
-                .build();
-
-        User user2 = User.builder()
-                .name("testUserName2")
-                .sex('M')
-                .email("testEmail2")
-                .password("testPassword")
-                .github("testGithub")
-                .selfIntroduction("testSelfIntroduction")
-                .block(false)
-                .blockReason(null)
-                .oauthCategory(OAuth.NORMAL)
-                .permission(Role.ROLE_USER)
-                .image(null)
-                .userPosition(null)
-                .build();
-        userRepository.save(user1);
-        userRepository.save(user2);
-
-        // 프로젝트
-        Project project1 = Project.builder()
-                .name("testProjectName1")
-                .createUserName("testCreateUserName1")
-                .createDate(createDate)
-                .startDate(startDate)
-                .endDate(endDate)
-                .state(true)
-                .introduction("testIntroduction1")
-                .maxPeople(10)
-                .currentPeople(4)
-                .delete(false)
-                .deleteReason(null)
-                .viewCount(10)
-                .commentCount(10)
-                .image(null)
-                .build();
-        Project projectSave1 = projectRepository.save(project1);
-
-        // 프로젝트에서 구하고있는 포지션
-        ProjectPosition projectPosition1 = ProjectPosition.builder()
-                .position(Position.FRONTEND)
-                .state(false)
-                .build();
-        projectPosition1.setProject(project1);
-        ProjectPosition projectPositionSave1 = projectPositionRepository.save(projectPosition1);
-
-        ProjectPosition projectPosition2 = ProjectPosition.builder()
-                .position(Position.BACKEND)
-                .state(false)
-                .build();
-        projectPosition2.setProject(project1);
-        ProjectPosition projectPositionSave2 = projectPositionRepository.save(projectPosition2);
-
-        ProjectTechnicalStack projectTechnicalStack1 = ProjectTechnicalStack.builder()
-                .name("javaScript")
-                .build();
-        projectTechnicalStack1.setProjectPosition(projectPosition1);
-        ProjectTechnicalStack projectTechnicalStackSave1 = projectTechnicalStackRepository.save(projectTechnicalStack1);
-
-        ProjectTechnicalStack projectTechnicalStack2 = ProjectTechnicalStack.builder()
-                .name("java")
-                .build();
-        projectTechnicalStack2.setProjectPosition(projectPosition2);
-        ProjectTechnicalStack projectTechnicalStackSave2 = projectTechnicalStackRepository.save(projectTechnicalStack2);
-
-        ProjectUser projectUser1 = ProjectUser.builder()
-                .projectPosition(Position.FRONTEND)
-                .user(user1)
-                .creator(true)
-                .project(project1).build();
-        ProjectUser projectUser2 = ProjectUser.builder()
-                .projectPosition(Position.BACKEND)
-                .user(user2)
-                .creator(false)
-                .project(project1).build();
-
-        ProjectUser projectUserSave1 = projectUserRepository.save(projectUser1);
-        ProjectUser projectUserSave2 = projectUserRepository.save(projectUser2);
-
-        // 프로젝트 댓글
-        Comment comment1 = Comment.builder()
-                .user(user1)
-                .project(project1)
-                .content("testComment1")
-                .build();
-
-        Comment comment2 = Comment.builder()
-                .user(user1)
-                .project(project1)
-                .content("testComment2")
-                .build();
-
-        Comment commentSave1 = commentRepository.save(comment1);
-        Comment commentSave2 = commentRepository.save(comment2);
-        
-        mvc.perform(get("/v1/project/" + projectSave1.getNo())
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andDo(print())
-                .andExpect(jsonPath("$.data.name").value(project1.getName()))
-                .andExpect(jsonPath("$.data.profile").isEmpty())
-                .andExpect(jsonPath("$.data.createDate").value(projectSave1.getCreateDate().toString()))
-                .andExpect(jsonPath("$.data.startDate").value(projectSave1.getStartDate().toString()))
-                .andExpect(jsonPath("$.data.endDate").value(projectSave1.getEndDate().toString()))
-                .andExpect(jsonPath("$.data.state").value(projectSave1.isState()))
-                .andExpect(jsonPath("$.data.introduction").value(projectSave1.getIntroduction()))
-                .andExpect(jsonPath("$.data.maxPeople").value(projectSave1.getMaxPeople()))
-                .andExpect(jsonPath("$.data.bookmark").value(false))
-                .andExpect(jsonPath("$.data.register").value(projectSave1.getCreateUserName()))
-
-                .andExpect(jsonPath("$.data.userSimpleInfoDtoList[0].no").value(projectUserSave1.getUser().getNo()))
-                .andExpect(jsonPath("$.data.userSimpleInfoDtoList[0].profile").isEmpty())
-                .andExpect(jsonPath("$.data.userSimpleInfoDtoList[0].projectPosition").value(projectUserSave1.getProjectPosition().toString()))
-                .andExpect(jsonPath("$.data.userSimpleInfoDtoList[0].creator").value(projectUserSave1.isCreator()))
-
-                .andExpect(jsonPath("$.data.userSimpleInfoDtoList[1].no").value(projectUserSave2.getUser().getNo()))
-                .andExpect(jsonPath("$.data.userSimpleInfoDtoList[1].profile").isEmpty())
-                .andExpect(jsonPath("$.data.userSimpleInfoDtoList[1].projectPosition").value(projectUserSave2.getProjectPosition().toString()))
-                .andExpect(jsonPath("$.data.userSimpleInfoDtoList[1].creator").value(projectUserSave2.isCreator()))
-
-                .andExpect(jsonPath("$.data.projectPosition[0].position").value(projectPositionSave1.getPosition().toString()))
-                .andExpect(jsonPath("$.data.projectPosition[0].technicalStack[0]").value(projectTechnicalStackSave1.getName()))
-
-                .andExpect(jsonPath("$.data.projectPosition[1].position").value(projectPositionSave2.getPosition().toString()))
-                .andExpect(jsonPath("$.data.projectPosition[1].technicalStack[0]").value(projectTechnicalStackSave2.getName()))
-
-
-                .andExpect(jsonPath("$.data.commentDtoList[0].no").value(commentSave1.getNo()))
-                .andExpect(jsonPath("$.data.commentDtoList[0].registrant").value(commentSave1.getUser().getName()))
-                .andExpect(jsonPath("$.data.commentDtoList[0].content").value(commentSave1.getContent()))
-
-                .andExpect(jsonPath("$.data.commentDtoList[1].no").value(commentSave2.getNo()))
-                .andExpect(jsonPath("$.data.commentDtoList[1].registrant").value(commentSave2.getUser().getName()))
-                .andExpect(jsonPath("$.data.commentDtoList[1].content").value(commentSave2.getContent()))
-
-                .andExpect(status().isOk());
     }
 
     @Test
     public void 로그인_상세_프로젝트_조회_테스트() throws Exception {
-        // given
-        LocalDateTime createDate = LocalDateTime.of(2022, 06, 24, 10, 10, 10);
-        LocalDate startDate = LocalDate.of(2022, 06, 24);
-        LocalDate endDate = LocalDate.of(2022, 06, 28);
 
-        // 프로젝트에 참가중인 유저
-        User user1 = User.builder()
-                .name("testUserName1")
-                .sex('M')
-                .email("wkemrm12@naver.com")
-                .password("testPassword")
-                .github("testGithub")
-                .selfIntroduction("testSelfIntroduction")
-                .block(false)
-                .blockReason(null)
-                .oauthCategory(OAuth.NORMAL)
-                .permission(Role.ROLE_USER)
-                .image(null)
-                .userPosition(null)
-                .build();
-
-        User user2 = User.builder()
-                .name("testUserName2")
-                .sex('M')
-                .email("testEmail2")
-                .password("testPassword")
-                .github("testGithub")
-                .selfIntroduction("testSelfIntroduction")
-                .block(false)
-                .blockReason(null)
-                .oauthCategory(OAuth.NORMAL)
-                .permission(Role.ROLE_USER)
-                .image(null)
-                .userPosition(null)
-                .build();
-        userRepository.save(user1);
-        userRepository.save(user2);
-
-        // 프로젝트
-        Project project1 = Project.builder()
-                .name("testProjectName1")
-                .createUserName("testCreateUserName1")
-                .createDate(createDate)
-                .startDate(startDate)
-                .endDate(endDate)
-                .state(true)
-                .introduction("testIntroduction1")
-                .maxPeople(10)
-                .currentPeople(4)
-                .delete(false)
-                .deleteReason(null)
-                .viewCount(10)
-                .commentCount(10)
-                .image(null)
-                .build();
-        Project projectSave1 = projectRepository.save(project1);
-
-        // 프로젝트에서 구하고있는 포지션
-        ProjectPosition projectPosition1 = ProjectPosition.builder()
-                .position(Position.FRONTEND)
-                .state(false)
-                .build();
-        projectPosition1.setProject(project1);
-        ProjectPosition projectPositionSave1 = projectPositionRepository.save(projectPosition1);
-
-        ProjectPosition projectPosition2 = ProjectPosition.builder()
-                .position(Position.BACKEND)
-                .state(false)
-                .build();
-        projectPosition2.setProject(project1);
-        ProjectPosition projectPositionSave2 = projectPositionRepository.save(projectPosition2);
-
-        ProjectTechnicalStack projectTechnicalStack1 = ProjectTechnicalStack.builder()
-                .name("javaScript")
-                .build();
-        projectTechnicalStack1.setProjectPosition(projectPosition1);
-        ProjectTechnicalStack projectTechnicalStackSave1 = projectTechnicalStackRepository.save(projectTechnicalStack1);
-
-        ProjectTechnicalStack projectTechnicalStack2 = ProjectTechnicalStack.builder()
-                .name("java")
-                .build();
-        projectTechnicalStack2.setProjectPosition(projectPosition2);
-        ProjectTechnicalStack projectTechnicalStackSave2 = projectTechnicalStackRepository.save(projectTechnicalStack2);
-
-        ProjectUser projectUser1 = ProjectUser.builder()
-                .projectPosition(Position.FRONTEND)
-                .user(user1)
-                .creator(true)
-                .project(project1).build();
-        ProjectUser projectUser2 = ProjectUser.builder()
-                .projectPosition(Position.BACKEND)
-                .user(user2)
-                .creator(false)
-                .project(project1).build();
-
-        ProjectUser projectUserSave1 = projectUserRepository.save(projectUser1);
-        ProjectUser projectUserSave2 = projectUserRepository.save(projectUser2);
-
-        // 프로젝트 댓글
-        Comment comment1 = Comment.builder()
-                .user(user1)
-                .project(project1)
-                .content("testComment1")
-                .build();
-
-        Comment comment2 = Comment.builder()
-                .user(user1)
-                .project(project1)
-                .content("testComment2")
-                .build();
-
-        Comment commentSave1 = commentRepository.save(comment1);
-        Comment commentSave2 = commentRepository.save(comment2);
-
-        BookMark bookMark1 = BookMark.builder()
-                .user(user1)
-                .project(project1)
-                .build();
-        bookMarkRepository.save(bookMark1);
-
-        String token = jwtTokenService.createToken(new TokenDto(1L, "wkemrm12@naver.com"));
-        mvc.perform(get("/v1/project/" + projectSave1.getNo())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .header("Authorization", "Bearer " + token))
-                .andDo(print())
-                .andExpect(jsonPath("$.data.name").value(project1.getName()))
-                .andExpect(jsonPath("$.data.profile").isEmpty())
-                .andExpect(jsonPath("$.data.createDate").value(projectSave1.getCreateDate().toString()))
-                .andExpect(jsonPath("$.data.startDate").value(projectSave1.getStartDate().toString()))
-                .andExpect(jsonPath("$.data.endDate").value(projectSave1.getEndDate().toString()))
-                .andExpect(jsonPath("$.data.state").value(projectSave1.isState()))
-                .andExpect(jsonPath("$.data.introduction").value(projectSave1.getIntroduction()))
-                .andExpect(jsonPath("$.data.maxPeople").value(projectSave1.getMaxPeople()))
-                .andExpect(jsonPath("$.data.bookmark").value(true))
-                .andExpect(jsonPath("$.data.register").value(projectSave1.getCreateUserName()))
-
-                .andExpect(jsonPath("$.data.userSimpleInfoDtoList[0].no").value(projectUserSave1.getUser().getNo()))
-                .andExpect(jsonPath("$.data.userSimpleInfoDtoList[0].profile").isEmpty())
-                .andExpect(jsonPath("$.data.userSimpleInfoDtoList[0].projectPosition").value(projectUserSave1.getProjectPosition().toString()))
-                .andExpect(jsonPath("$.data.userSimpleInfoDtoList[0].creator").value(projectUserSave1.isCreator()))
-
-                .andExpect(jsonPath("$.data.userSimpleInfoDtoList[1].no").value(projectUserSave2.getUser().getNo()))
-                .andExpect(jsonPath("$.data.userSimpleInfoDtoList[1].profile").isEmpty())
-                .andExpect(jsonPath("$.data.userSimpleInfoDtoList[1].projectPosition").value(projectUserSave2.getProjectPosition().toString()))
-                .andExpect(jsonPath("$.data.userSimpleInfoDtoList[1].creator").value(projectUserSave2.isCreator()))
-
-                .andExpect(jsonPath("$.data.projectPosition[0].position").value(projectPositionSave1.getPosition().toString()))
-                .andExpect(jsonPath("$.data.projectPosition[0].technicalStack[0]").value(projectTechnicalStackSave1.getName()))
-
-                .andExpect(jsonPath("$.data.projectPosition[1].position").value(projectPositionSave2.getPosition().toString()))
-                .andExpect(jsonPath("$.data.projectPosition[1].technicalStack[0]").value(projectTechnicalStackSave2.getName()))
-
-
-                .andExpect(jsonPath("$.data.commentDtoList[0].no").value(commentSave1.getNo()))
-                .andExpect(jsonPath("$.data.commentDtoList[0].registrant").value(commentSave1.getUser().getName()))
-                .andExpect(jsonPath("$.data.commentDtoList[0].content").value(commentSave1.getContent()))
-
-                .andExpect(jsonPath("$.data.commentDtoList[1].no").value(commentSave2.getNo()))
-                .andExpect(jsonPath("$.data.commentDtoList[1].registrant").value(commentSave2.getUser().getName()))
-                .andExpect(jsonPath("$.data.commentDtoList[1].content").value(commentSave2.getContent()))
-
-                .andExpect(status().isOk());
     }
 }
