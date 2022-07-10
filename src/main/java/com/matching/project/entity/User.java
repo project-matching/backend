@@ -72,19 +72,28 @@ public class User implements UserDetails {
         return Arrays.asList(new SimpleGrantedAuthority(permission.toString()));
     }
 
-    public void updatePassword(PasswordEncoder passwordEncoder, String newPassword) {
+    public void userBlock(String blockReason) {
+        this.block = true;
+        this.blockReason = blockReason;
+    }
 
+    public void userUnBlock() {
+        this.block = false;
+        this.blockReason = null;
+    }
+
+    public void updatePassword(PasswordEncoder passwordEncoder, String newPassword) {
         if (!"".equals(newPassword) && newPassword != null)
             this.password = passwordEncoder.encode(newPassword);
     }
 
-    public User updateUser(UserUpdateRequestDto dto, UserPosition userPosition) {
+    public User updateUser(UserUpdateRequestDto dto, Position position) {
         this.name = dto.getName();
         this.sex = dto.getSex().charAt(0);
         this.github = dto.getGithub();
         this.selfIntroduction = dto.getSelfIntroduction();
-        this.image = null;
-        this.userPosition = userPosition;
+        this.imageNo = null;
+        this.position = position;
         return this;
     }
 

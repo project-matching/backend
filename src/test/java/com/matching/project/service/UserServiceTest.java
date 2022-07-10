@@ -1,42 +1,31 @@
 package com.matching.project.service;
 
-import com.matching.project.dto.common.NormalLoginRequestDto;
 import com.matching.project.dto.enumerate.OAuth;
-import com.matching.project.dto.enumerate.Position;
 import com.matching.project.dto.enumerate.Role;
-import com.matching.project.dto.user.SignUpRequestDto;
-import com.matching.project.dto.user.UserInfoResponseDto;
-import com.matching.project.dto.user.UserSimpleInfoDto;
-import com.matching.project.dto.user.UserUpdateRequestDto;
-import com.matching.project.entity.Image;
+import com.matching.project.dto.user.*;
+import com.matching.project.entity.Position;
+import com.matching.project.entity.TechnicalStack;
 import com.matching.project.entity.User;
-import com.matching.project.entity.UserPosition;
 import com.matching.project.entity.UserTechnicalStack;
-import com.matching.project.repository.UserPositionRepository;
+import com.matching.project.repository.PositionRepository;
+import com.matching.project.repository.TechnicalStackRepository;
 import com.matching.project.repository.UserRepository;
 import com.matching.project.repository.UserTechnicalStackRepository;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.BDDMockito;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.*;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.*;
@@ -57,7 +46,10 @@ class UserServiceTest {
     private UserRepository userRepository;
 
     @Mock
-    private UserPositionRepository userPositionRepository;
+    private PositionRepository positionRepository;
+
+    @Mock
+    private TechnicalStackRepository technicalStackRepository;
 
     @Mock
     private UserTechnicalStackRepository userTechnicalStackRepository;
@@ -68,66 +60,314 @@ class UserServiceTest {
     @InjectMocks
     private UserServiceImpl userService;
 
-    @DisplayName("잘못된 사용자 접근 시도(회원 정보 수정)")
+    @DisplayName("회원 차단 해제 성공")
     @Test
-    public void userUpdateFail1() {
+    public void userUnBlockSuccess() {
         //given
-        Long no = 2L;
+        Long no = 3L;
         String name = "테스터";
         String sex = "M";
         String email = "leeworld9@gmail.com";
-        String password = passwordEncoder.encode("asdfqwef2351235");
+        String password ="asdfqwef2351235";
         String github ="https://github.com/leeworld9";
         String selfIntroduction = "자기소개~~~";
-        Position position = Position.BACKEND;
+        String position = "BACKEND";
         List<String> technicalStackList = new ArrayList<>();
         technicalStackList.add("Spring Boot");
         technicalStackList.add("JPA");
         technicalStackList.add("React");
 
-        Optional<UserPosition> userPosition = Optional.ofNullable(
-                UserPosition.builder()
-                        .no(3L)
-                        .name(position.toString())
-                        .build()
-        );
+        Position p1 = Position.builder().no(1L).name(position).build();
 
-        Optional<User> user = Optional.ofNullable(User.builder()
+        Optional<User> user = Optional.of(User.builder()
                 .no(no)
                 .name(name)
                 .sex(sex.charAt(0))
                 .email(email)
-                .password(password)
+                .password(passwordEncoder.encode(password))
+                .github(github)
+                .selfIntroduction(selfIntroduction)
+                .permission(Role.ROLE_USER)
+                .oauthCategory(OAuth.NORMAL)
+                .block(true)
+                .position(p1)
+                .build()
+        );
+
+        SecurityContext context = SecurityContextHolder.getContext();
+        context.setAuthentication(new UsernamePasswordAuthenticationToken(user.get(), user.get().getEmail(), user.get().getAuthorities()));
+
+        given(userRepository.findById(no)).willReturn(user);
+
+        //when
+        User resUser = userService.userUnBlock(no);
+
+        //then
+        assertThat(resUser.isBlock()).isFalse();
+    }
+
+    @DisplayName("회원 차단 성공")
+    @Test
+    public void userBlockSuccess() {
+        //given
+        Long no = 3L;
+        String name = "테스터";
+        String sex = "M";
+        String email = "leeworld9@gmail.com";
+        String password ="asdfqwef2351235";
+        String github ="https://github.com/leeworld9";
+        String selfIntroduction = "자기소개~~~";
+        String position = "BACKEND";
+        List<String> technicalStackList = new ArrayList<>();
+        technicalStackList.add("Spring Boot");
+        technicalStackList.add("JPA");
+        technicalStackList.add("React");
+
+        Position p1 = Position.builder().no(1L).name(position).build();
+
+        Optional<User> user = Optional.of(User.builder()
+                .no(no)
+                .name(name)
+                .sex(sex.charAt(0))
+                .email(email)
+                .password(passwordEncoder.encode(password))
                 .github(github)
                 .selfIntroduction(selfIntroduction)
                 .permission(Role.ROLE_USER)
                 .oauthCategory(OAuth.NORMAL)
                 .block(false)
-                .userPosition(userPosition.get())
+                .position(p1)
                 .build()
         );
 
-        List<UserTechnicalStack> userTechnicalStackList = new ArrayList<>();
-        UserTechnicalStack userTechnicalStack1 = UserTechnicalStack.builder().name(technicalStackList.get(0)).userPosition(userPosition.get()).build();
-        UserTechnicalStack userTechnicalStack2 = UserTechnicalStack.builder().name(technicalStackList.get(1)).userPosition(userPosition.get()).build();
-        UserTechnicalStack userTechnicalStack3 = UserTechnicalStack.builder().name(technicalStackList.get(2)).userPosition(userPosition.get()).build();
-        userTechnicalStackList.add(userTechnicalStack1);
-        userTechnicalStackList.add(userTechnicalStack2);
-        userTechnicalStackList.add(userTechnicalStack3);
+        SecurityContext context = SecurityContextHolder.getContext();
+        context.setAuthentication(new UsernamePasswordAuthenticationToken(user.get(), user.get().getEmail(), user.get().getAuthorities()));
+
+        given(userRepository.findById(no)).willReturn(user);
+
+        UserBlockRequestDto dto = UserBlockRequestDto.builder().blockReason("test").build();
+
+        //when
+        User resUser = userService.userBlock(no, dto);
+
+        //then
+        assertThat(resUser.isBlock()).isTrue();
+    }
+
+
+
+    @DisplayName("회원 탈퇴 실패 : 잘못된 사용자 접근 시도")
+    @Test
+    public void signOutFail1() {
+        //given
+        Long no = 3L;
+        String name = "테스터";
+        String sex = "M";
+        String email = "leeworld9@gmail.com";
+        String password ="asdfqwef2351235";
+        String github ="https://github.com/leeworld9";
+        String selfIntroduction = "자기소개~~~";
+        String position = "BACKEND";
+        List<String> technicalStackList = new ArrayList<>();
+        technicalStackList.add("Spring Boot");
+        technicalStackList.add("JPA");
+        technicalStackList.add("React");
+
+        Position p1 = Position.builder().no(1L).name(position).build();
+
+        Optional<User> user = Optional.of(User.builder()
+                .no(no)
+                .name(name)
+                .sex(sex.charAt(0))
+                .email(email)
+                .password(passwordEncoder.encode(password))
+                .github(github)
+                .selfIntroduction(selfIntroduction)
+                .permission(Role.ROLE_USER)
+                .oauthCategory(OAuth.NORMAL)
+                .block(false)
+                .position(p1)
+                .build()
+        );
+
+        Optional<User> defUser = Optional.of(User.builder()
+                .no(4L)
+                .name(name)
+                .sex(sex.charAt(0))
+                .email(email)
+                .password(passwordEncoder.encode(password))
+                .github(github)
+                .selfIntroduction(selfIntroduction)
+                .permission(Role.ROLE_USER)
+                .oauthCategory(OAuth.NORMAL)
+                .block(false)
+                .position(p1)
+                .build()
+        );
+
+        SecurityContext context = SecurityContextHolder.getContext();
+        context.setAuthentication(new UsernamePasswordAuthenticationToken(defUser.get(), defUser.get().getEmail(), defUser.get().getAuthorities()));
+
+        SignOutRequestDto dto = SignOutRequestDto.builder().password("asdfqwef2351235").build();
+
+        //when
+        Exception e = Assertions.assertThrows(RuntimeException.class, () -> {
+            userService.userSignOut(no, dto);
+        });
+
+        //then
+        assertThat(e.getMessage()).isEqualTo("Identification Check Fail");
+    }
+
+    @DisplayName("회원 탈퇴 실패 : 패스워드 틀림")
+    @Test
+    public void signOutFail2() {
+        //given
+        Long no = 3L;
+        String name = "테스터";
+        String sex = "M";
+        String email = "leeworld9@gmail.com";
+        String password ="asdfqwef2351235";
+        String github ="https://github.com/leeworld9";
+        String selfIntroduction = "자기소개~~~";
+        String position = "BACKEND";
+        List<String> technicalStackList = new ArrayList<>();
+        technicalStackList.add("Spring Boot");
+        technicalStackList.add("JPA");
+        technicalStackList.add("React");
+
+        Position p1 = Position.builder().no(1L).name(position).build();
+
+        Optional<User> user = Optional.of(User.builder()
+                .no(no)
+                .name(name)
+                .sex(sex.charAt(0))
+                .email(email)
+                .password(passwordEncoder.encode(password))
+                .github(github)
+                .selfIntroduction(selfIntroduction)
+                .permission(Role.ROLE_USER)
+                .oauthCategory(OAuth.NORMAL)
+                .block(false)
+                .position(p1)
+                .build()
+        );
+
+        SecurityContext context = SecurityContextHolder.getContext();
+        context.setAuthentication(new UsernamePasswordAuthenticationToken(user.get(), user.get().getEmail(), user.get().getAuthorities()));
+
+        given(userRepository.findById(no)).willReturn(user);
+
+        SignOutRequestDto dto = SignOutRequestDto.builder().password("test").build();
+
+        //when
+        Exception e = Assertions.assertThrows(RuntimeException.class, () -> {
+            userService.userSignOut(no, dto);
+        });
+
+        //then
+        assertThat(e.getMessage()).isEqualTo("Password is Wrong");
+    }
+
+    @DisplayName("회원 탈퇴 성공")
+    @Test
+    public void signOutSuccess() {
+        //given
+        Long no = 3L;
+        String name = "테스터";
+        String sex = "M";
+        String email = "leeworld9@gmail.com";
+        String password ="asdfqwef2351235";
+        String github ="https://github.com/leeworld9";
+        String selfIntroduction = "자기소개~~~";
+        String position = "BACKEND";
+        List<String> technicalStackList = new ArrayList<>();
+        technicalStackList.add("Spring Boot");
+        technicalStackList.add("JPA");
+        technicalStackList.add("React");
+
+        Position p1 = Position.builder().no(1L).name(position).build();
+
+        Optional<User> user = Optional.of(User.builder()
+                .no(no)
+                .name(name)
+                .sex(sex.charAt(0))
+                .email(email)
+                .password(passwordEncoder.encode(password))
+                .github(github)
+                .selfIntroduction(selfIntroduction)
+                .permission(Role.ROLE_USER)
+                .oauthCategory(OAuth.NORMAL)
+                .block(false)
+                .position(p1)
+                .build()
+        );
+
+        SecurityContext context = SecurityContextHolder.getContext();
+        context.setAuthentication(new UsernamePasswordAuthenticationToken(user.get(), user.get().getEmail(), user.get().getAuthorities()));
+
+        given(userRepository.findById(no)).willReturn(user);
+
+        SignOutRequestDto dto = SignOutRequestDto.builder().password("asdfqwef2351235").build();
+
+        //when
+        Long resultNo = userService.userSignOut(no, dto);
+
+        //then
+        assertThat(resultNo).isEqualTo(no);
+
+        //verify
+        verify(userRepository).deleteById(no);
+    }
+
+
+    @DisplayName("회원 정보 수정 실패 : 잘못된 사용자 접근 시도")
+    @Test
+    public void userUpdateFail1() {
+        //given
+        Long no = 3L;
+        String name = "테스터";
+        String sex = "M";
+        String email = "leeworld9@gmail.com";
+        String password ="asdfqwef2351235";
+        String github ="https://github.com/leeworld9";
+        String selfIntroduction = "자기소개~~~";
+        String position = "BACKEND";
+        List<String> technicalStackList = new ArrayList<>();
+        technicalStackList.add("Spring Boot");
+        technicalStackList.add("JPA");
+        technicalStackList.add("React");
+
+        Position p1 = Position.builder().no(1L).name(position).build();
+
+        Optional<User> user = Optional.of(User.builder()
+                .no(no)
+                .name(name)
+                .sex(sex.charAt(0))
+                .email(email)
+                .password(passwordEncoder.encode(password))
+                .github(github)
+                .selfIntroduction(selfIntroduction)
+                .permission(Role.ROLE_USER)
+                .oauthCategory(OAuth.NORMAL)
+                .block(false)
+                .position(p1)
+                .build()
+        );
 
         SecurityContext context = SecurityContextHolder.getContext();
         context.setAuthentication(new UsernamePasswordAuthenticationToken(user.get(), user.get().getEmail(), user.get().getAuthorities()));
 
         String newName = "테스터2";
         String newSex = "W";
-        String originPassword = "412151asdf";
+        String originPassword = "asdfqwef2351235";
         String newPassword = "231241d2";
         String newGithub ="https://github.com/ggggg";
         String newSelfIntroduction = "자기소개2222";
-        Position newPosition = Position.BACKEND;
+        String newPosition = "FRONTEND";
         List<String> newTechnicalStackList = new ArrayList<>();
-        newTechnicalStackList.add("Querydsl");
         newTechnicalStackList.add("Spring Boot");
+        newTechnicalStackList.add("React");
 
         UserUpdateRequestDto dto = UserUpdateRequestDto.builder()
                 .name(newName)
@@ -139,12 +379,6 @@ class UserServiceTest {
                 .position(newPosition)
                 .technicalStackList(newTechnicalStackList)
                 .build();
-
-        List<UserTechnicalStack> newUserTechnicalStackList = new ArrayList<>();
-        UserTechnicalStack newUserTechnicalStack1 = UserTechnicalStack.builder().name(newTechnicalStackList.get(0)).userPosition(userPosition.get()).build();
-        UserTechnicalStack newUserTechnicalStack2 = UserTechnicalStack.builder().name(newTechnicalStackList.get(1)).userPosition(userPosition.get()).build();
-        newUserTechnicalStackList.add(newUserTechnicalStack1);
-        newUserTechnicalStackList.add(newUserTechnicalStack2);
 
         //when
         Exception e = Assertions.assertThrows(RuntimeException.class, () -> {
@@ -156,7 +390,7 @@ class UserServiceTest {
 
     }
 
-    @DisplayName("비밀번호 인증 실패")
+    @DisplayName("회원 정보 수정 실패 : 비밀번호 인증 실패")
     @Test
     public void userUpdateFai2() {
         //given
@@ -164,58 +398,45 @@ class UserServiceTest {
         String name = "테스터";
         String sex = "M";
         String email = "leeworld9@gmail.com";
-        String password = passwordEncoder.encode("asdfqwef2351235");
+        String password = "asdfqwef2351235";
         String github ="https://github.com/leeworld9";
         String selfIntroduction = "자기소개~~~";
-        Position position = Position.BACKEND;
+        String position = "BACKEND";
         List<String> technicalStackList = new ArrayList<>();
         technicalStackList.add("Spring Boot");
         technicalStackList.add("JPA");
         technicalStackList.add("React");
 
-        Optional<UserPosition> userPosition = Optional.ofNullable(
-                UserPosition.builder()
-                        .no(3L)
-                        .name(position.toString())
-                        .build()
-        );
+        Position p1 = Position.builder().no(1L).name(position).build();
 
-        Optional<User> user = Optional.ofNullable(User.builder()
-                .no(no)
+        Optional<User> user = Optional.of(User.builder()
+                .no(2L)
                 .name(name)
                 .sex(sex.charAt(0))
                 .email(email)
-                .password(password)
+                .password(passwordEncoder.encode(password))
                 .github(github)
                 .selfIntroduction(selfIntroduction)
                 .permission(Role.ROLE_USER)
                 .oauthCategory(OAuth.NORMAL)
                 .block(false)
-                .userPosition(userPosition.get())
+                .position(p1)
                 .build()
         );
-
-        List<UserTechnicalStack> userTechnicalStackList = new ArrayList<>();
-        UserTechnicalStack userTechnicalStack1 = UserTechnicalStack.builder().name(technicalStackList.get(0)).userPosition(userPosition.get()).build();
-        UserTechnicalStack userTechnicalStack2 = UserTechnicalStack.builder().name(technicalStackList.get(1)).userPosition(userPosition.get()).build();
-        UserTechnicalStack userTechnicalStack3 = UserTechnicalStack.builder().name(technicalStackList.get(2)).userPosition(userPosition.get()).build();
-        userTechnicalStackList.add(userTechnicalStack1);
-        userTechnicalStackList.add(userTechnicalStack2);
-        userTechnicalStackList.add(userTechnicalStack3);
 
         SecurityContext context = SecurityContextHolder.getContext();
         context.setAuthentication(new UsernamePasswordAuthenticationToken(user.get(), user.get().getEmail(), user.get().getAuthorities()));
 
         String newName = "테스터2";
         String newSex = "W";
-        String originPassword = "412151asdf";
+        String originPassword = "1251521231";
         String newPassword = "231241d2";
         String newGithub ="https://github.com/ggggg";
         String newSelfIntroduction = "자기소개2222";
-        Position newPosition = Position.BACKEND;
+        String newPosition = "FRONTEND";
         List<String> newTechnicalStackList = new ArrayList<>();
-        newTechnicalStackList.add("Querydsl");
         newTechnicalStackList.add("Spring Boot");
+        newTechnicalStackList.add("React");
 
         UserUpdateRequestDto dto = UserUpdateRequestDto.builder()
                 .name(newName)
@@ -228,14 +449,7 @@ class UserServiceTest {
                 .technicalStackList(newTechnicalStackList)
                 .build();
 
-        List<UserTechnicalStack> newUserTechnicalStackList = new ArrayList<>();
-        UserTechnicalStack newUserTechnicalStack1 = UserTechnicalStack.builder().name(newTechnicalStackList.get(0)).userPosition(userPosition.get()).build();
-        UserTechnicalStack newUserTechnicalStack2 = UserTechnicalStack.builder().name(newTechnicalStackList.get(1)).userPosition(userPosition.get()).build();
-        newUserTechnicalStackList.add(newUserTechnicalStack1);
-        newUserTechnicalStackList.add(newUserTechnicalStack2);
-
         given(userRepository.findById(no)).willReturn(user);
-
 
         //when
         Exception e = Assertions.assertThrows(RuntimeException.class, () -> {
@@ -247,7 +461,7 @@ class UserServiceTest {
 
     }
 
-    @DisplayName("회원 정보 업데이트 성공")
+    @DisplayName("회원 정보 수정 성공")
     @Test
     public void userUpdateSuccess() {
         //given
@@ -255,44 +469,39 @@ class UserServiceTest {
         String name = "테스터";
         String sex = "M";
         String email = "leeworld9@gmail.com";
-        String password = passwordEncoder.encode("asdfqwef2351235");
+        String password = "asdfqwef2351235";
         String github ="https://github.com/leeworld9";
         String selfIntroduction = "자기소개~~~";
-        Position position = Position.BACKEND;
+        String position = "BACKEND";
         List<String> technicalStackList = new ArrayList<>();
         technicalStackList.add("Spring Boot");
         technicalStackList.add("JPA");
         technicalStackList.add("React");
 
-        Optional<UserPosition> userPosition = Optional.ofNullable(
-                UserPosition.builder()
-                        .no(3L)
-                        .name(position.toString())
-                        .build()
-        );
+        Position p1 = Position.builder().no(1L).name(position).build();
 
-        Optional<User> user = Optional.ofNullable(User.builder()
-                .no(no)
+        List<TechnicalStack> technicalStacks = new ArrayList<>();
+        TechnicalStack technicalStack1 = TechnicalStack.builder().no(1L).name("Spring Boot").build();
+        TechnicalStack technicalStack2 = TechnicalStack.builder().no(2L).name("JPA").build();
+        TechnicalStack technicalStack3 = TechnicalStack.builder().no(3L).name("React").build();
+        technicalStacks.add(technicalStack1);
+        technicalStacks.add(technicalStack2);
+        technicalStacks.add(technicalStack3);
+
+        Optional<User> user = Optional.of(User.builder()
+                .no(2L)
                 .name(name)
                 .sex(sex.charAt(0))
                 .email(email)
-                .password(password)
+                .password(passwordEncoder.encode(password))
                 .github(github)
                 .selfIntroduction(selfIntroduction)
                 .permission(Role.ROLE_USER)
                 .oauthCategory(OAuth.NORMAL)
                 .block(false)
-                .userPosition(userPosition.get())
+                .position(p1)
                 .build()
         );
-
-        List<UserTechnicalStack> userTechnicalStackList = new ArrayList<>();
-        UserTechnicalStack userTechnicalStack1 = UserTechnicalStack.builder().name(technicalStackList.get(0)).userPosition(userPosition.get()).build();
-        UserTechnicalStack userTechnicalStack2 = UserTechnicalStack.builder().name(technicalStackList.get(1)).userPosition(userPosition.get()).build();
-        UserTechnicalStack userTechnicalStack3 = UserTechnicalStack.builder().name(technicalStackList.get(2)).userPosition(userPosition.get()).build();
-        userTechnicalStackList.add(userTechnicalStack1);
-        userTechnicalStackList.add(userTechnicalStack2);
-        userTechnicalStackList.add(userTechnicalStack3);
 
         SecurityContext context = SecurityContextHolder.getContext();
         context.setAuthentication(new UsernamePasswordAuthenticationToken(user.get(), user.get().getEmail(), user.get().getAuthorities()));
@@ -303,10 +512,12 @@ class UserServiceTest {
         String newPassword = "231241d2";
         String newGithub ="https://github.com/ggggg";
         String newSelfIntroduction = "자기소개2222";
-        Position newPosition = Position.BACKEND;
+        String newPosition = "FRONTEND";
         List<String> newTechnicalStackList = new ArrayList<>();
-        newTechnicalStackList.add("Querydsl");
         newTechnicalStackList.add("Spring Boot");
+        newTechnicalStackList.add("React");
+
+        Position p2 = Position.builder().no(2L).name(newPosition).build();
 
         UserUpdateRequestDto dto = UserUpdateRequestDto.builder()
                 .name(newName)
@@ -319,15 +530,14 @@ class UserServiceTest {
                 .technicalStackList(newTechnicalStackList)
                 .build();
 
-        List<UserTechnicalStack> newUserTechnicalStackList = new ArrayList<>();
-        UserTechnicalStack newUserTechnicalStack1 = UserTechnicalStack.builder().name(newTechnicalStackList.get(0)).userPosition(userPosition.get()).build();
-        UserTechnicalStack newUserTechnicalStack2 = UserTechnicalStack.builder().name(newTechnicalStackList.get(1)).userPosition(userPosition.get()).build();
-        newUserTechnicalStackList.add(newUserTechnicalStack1);
-        newUserTechnicalStackList.add(newUserTechnicalStack2);
+        List <UserTechnicalStack> userTechnicalStackList = new ArrayList<>();
+        userTechnicalStackList.add(UserTechnicalStack.builder().technicalStack(technicalStack1).user(user.get()).no(1L).build());
+        userTechnicalStackList.add(UserTechnicalStack.builder().technicalStack(technicalStack3).user(user.get()).no(2L).build());
 
         given(userRepository.findById(no)).willReturn(user);
-        given(userPositionRepository.findById(userPosition.get().getNo())).willReturn(userPosition);
-        given(userTechnicalStackRepository.findAllByUserPosition(userPosition.get())).willReturn(userTechnicalStackList);
+        given(positionRepository.findAllByName(newPosition)).willReturn(Optional.ofNullable(p2));
+        given(technicalStackRepository.findAll()).willReturn(technicalStacks);
+        given(userTechnicalStackRepository.findUserTechnicalStacksByUser(no)).willReturn(userTechnicalStackList);
 
         //when
         User resultUser = userService.userUpdate(no, dto);
@@ -338,14 +548,14 @@ class UserServiceTest {
         assertThat(resultUser.getPassword()).isNotEqualTo(dto.getOriginPassword());
         assertThat(resultUser.getGithub()).isEqualTo(dto.getGithub());
         assertThat(resultUser.getSelfIntroduction()).isEqualTo(dto.getSelfIntroduction());
-        assertThat(resultUser.getUserPosition().getName()).isEqualTo(dto.getPosition().toString());
+        assertThat(resultUser.getPosition().getName()).isEqualTo(dto.getPosition());
 
         //verify
-        verify(userTechnicalStackRepository, times(1)).deleteByUserPosition(userPosition.get());
+        verify(userTechnicalStackRepository, times(1)).deleteAllByUser(user.get());
         verify(userTechnicalStackRepository, times(2)).save(any());
     }
 
-    @DisplayName("회원 리스트 조회")
+    @DisplayName("회원 리스트 조회 성공")
     @Test
     public void searchUserList() {
         //given
@@ -380,23 +590,6 @@ class UserServiceTest {
 
     }
 
-    @DisplayName("회원 정보 조회 실패")
-    @Test
-    public void infoFail() {
-        //given
-        Long no = 1L;
-
-        given(userRepository.findById(no)).willThrow(new RuntimeException("Not Find User No"));
-
-        //when
-        Exception e = Assertions.assertThrows(RuntimeException.class, () -> {
-            userService.userInfo(no);
-        });
-
-        //then
-        assertThat(e.getMessage()).isEqualTo("Not Find User No");
-    }
-
     @DisplayName("회원 정보 조회 성공")
     @Test
     public void infoSuccess() {
@@ -408,39 +601,41 @@ class UserServiceTest {
         String password = "asldkjfwlejkf";
         String github ="https://github.com/leeworld9";
         String selfIntroduction = "자기소개~~~";
-        Position position = Position.BACKEND;
+        String position = "BACKEND";
         List<String> technicalStackList = new ArrayList<>();
-        technicalStackList.add("Spring Boot");
         technicalStackList.add("JPA");
-        technicalStackList.add("React");
 
 
-        UserPosition userPosition = UserPosition.builder().no(2L).name(position.toString()).build();
-        List<UserTechnicalStack> userTechnicalStackList = new ArrayList<>();
-        UserTechnicalStack userTechnicalStack1 = UserTechnicalStack.builder().name(technicalStackList.get(0)).userPosition(userPosition).build();
-        UserTechnicalStack userTechnicalStack2 = UserTechnicalStack.builder().name(technicalStackList.get(1)).userPosition(userPosition).build();
-        UserTechnicalStack userTechnicalStack3 = UserTechnicalStack.builder().name(technicalStackList.get(2)).userPosition(userPosition).build();
-        userTechnicalStackList.add(userTechnicalStack1);
-        userTechnicalStackList.add(userTechnicalStack2);
-        userTechnicalStackList.add(userTechnicalStack3);
+        Position p = Position.builder().no(1L).name("BACKEND").build();
+
+        List<TechnicalStack> technicalStacks = new ArrayList<>();
+        TechnicalStack technicalStack1 = TechnicalStack.builder().no(1L).name("Spring Boot").build();
+        TechnicalStack technicalStack2 = TechnicalStack.builder().no(2L).name("JPA").build();
+        TechnicalStack technicalStack3 = TechnicalStack.builder().no(3L).name("React").build();
+        technicalStacks.add(technicalStack1);
+        technicalStacks.add(technicalStack2);
+        technicalStacks.add(technicalStack3);
 
         Optional<User> user = Optional.ofNullable(User.builder()
                 .no(no)
                 .name(name)
                 .sex(sex.charAt(0))
                 .email(email)
-                .password(password)
+                .password(passwordEncoder.encode(password))
                 .github(github)
                 .selfIntroduction(selfIntroduction)
                 .permission(Role.ROLE_USER)
                 .oauthCategory(OAuth.NORMAL)
                 .block(false)
-                .userPosition(userPosition)
+                .position(p)
                 .build()
         );
+
+        List <UserTechnicalStack> userTechnicalStackList = new ArrayList<>();
+        userTechnicalStackList.add(UserTechnicalStack.builder().technicalStack(technicalStack2).user(user.get()).no(1L).build());
+
         given(userRepository.findById(no)).willReturn(user);
-        given(userTechnicalStackRepository.findAllByUserPosition(userPosition)).willReturn(
-                userTechnicalStackList);
+        given(userTechnicalStackRepository.findUserTechnicalStacksByUser(no)).willReturn(userTechnicalStackList);
 
         //when
         UserInfoResponseDto userInfo = userService.userInfo(no);
@@ -451,15 +646,14 @@ class UserServiceTest {
         assertThat(userInfo.getEmail()).isEqualTo(email);
         assertThat(userInfo.getGithub()).isEqualTo(github);
         assertThat(userInfo.getSelfIntroduction()).isEqualTo(selfIntroduction);
-        assertThat(userInfo.getPosition()).isEqualTo(position.toString());
-        assertThat(userInfo.getTechnicalStackList().get(0)).isEqualTo(userTechnicalStack1.getName());
-        assertThat(userInfo.getTechnicalStackList().get(1)).isEqualTo(userTechnicalStack2.getName());
-        assertThat(userInfo.getTechnicalStackList().get(2)).isEqualTo(userTechnicalStack3.getName());
+        assertThat(userInfo.getPosition()).isEqualTo(position);
+        assertThat(userInfo.getTechnicalStackList().get(0)).isEqualTo("JPA");
+
 
 
     }
 
-    @DisplayName("이메일 중복 가입 테스트")
+    @DisplayName("회원가입 실패 : 이메일 중복 가입")
     @Test
     public void signupFail1() {
         //given
@@ -469,7 +663,7 @@ class UserServiceTest {
         String password = "asldkjfwlejkf";
         String github ="https://github.com/leeworld9";
         String selfIntroduction = "자기소개~~~";
-        Position position = Position.BACKEND;
+        String position = "BACKEND";
 
         SignUpRequestDto dto = SignUpRequestDto.builder()
                 .name(name)
@@ -481,18 +675,19 @@ class UserServiceTest {
                 .position(position)
                 .build();
 
-        UserPosition userPosition = UserPosition.builder().name(dto.getPosition().toString()).build();
+        Position p = Position.builder().no(1L).name("BACKEND").build();
+
         Optional<User> user = Optional.of(User.builder()
                 .name(name)
                 .sex(sex.charAt(0))
                 .email(email)
-                .password(password)
+                .password(passwordEncoder.encode(password))
                 .github(github)
                 .selfIntroduction(selfIntroduction)
                 .permission(Role.ROLE_USER)
                 .oauthCategory(OAuth.NORMAL)
                 .block(false)
-                .userPosition(userPosition)
+                .position(null)
                 .build()
                 );
 
@@ -507,7 +702,7 @@ class UserServiceTest {
         assertThat(e.getMessage()).isEqualTo("Email is duplicated.");
     }
 
-    @DisplayName("패스워드(필수 입력 값) 공백 에러 테스트")
+    @DisplayName("회원가입 실패 : 패스워드(필수 입력 값) 공백 에러")
     @Test
     public void signupFail2() {
         //given
@@ -517,7 +712,7 @@ class UserServiceTest {
         String password = "";
         String github ="https://github.com/leeworld9";
         String selfIntroduction = "자기소개~~~";
-        Position position = Position.BACKEND;
+        String position = "BACKEND";
 
         SignUpRequestDto dto = SignUpRequestDto.builder()
                 .name(name)
@@ -538,7 +733,7 @@ class UserServiceTest {
         assertThat(e.getMessage()).isEqualTo("Password value is blanked");
     }
 
-    @DisplayName("성별 값이 비정상적으로 들어왔을 경우 에러 테스트")
+    @DisplayName("회원가입 실패 : 성별 값이 비정상적으로 들어왔을 경우 에러")
     @Test
     public void signupFail3() {
         //given
@@ -548,7 +743,7 @@ class UserServiceTest {
         String password = "asldkjfwlejkf";
         String github ="https://github.com/leeworld9";
         String selfIntroduction = "자기소개~~~";
-        Position position = Position.BACKEND;
+        String position = "BACKEND";
 
         SignUpRequestDto dto = SignUpRequestDto.builder()
                 .name(name)
@@ -569,7 +764,7 @@ class UserServiceTest {
         assertThat(e.getMessage()).isEqualTo("Sex value is blanked OR Invalid");
     }
 
-    @DisplayName("정상 회원가입 성공")
+    @DisplayName("회원가입 성공")
     @Test
     public void signupSuccess() {
         //given
@@ -579,10 +774,9 @@ class UserServiceTest {
         String password = "asldkjfwlejkf";
         String github ="https://github.com/leeworld9";
         String selfIntroduction = "자기소개~~~";
-        Position position = Position.BACKEND;
+        String position = "BACKEND";
         List<String> technicalStackList = new ArrayList<>();
         technicalStackList.add("Spring Boot");
-        technicalStackList.add("JPA");
         technicalStackList.add("React");
 
         SignUpRequestDto dto = SignUpRequestDto.builder()
@@ -596,23 +790,33 @@ class UserServiceTest {
                 .technicalStackList(technicalStackList)
                 .build();
 
-        UserPosition userPosition = UserPosition.builder().name(dto.getPosition().toString()).build();
-        UserTechnicalStack userTechnicalStack1 = UserTechnicalStack.builder().name(dto.getTechnicalStackList().get(0)).userPosition(userPosition).build();
-        UserTechnicalStack userTechnicalStack2 = UserTechnicalStack.builder().name(dto.getTechnicalStackList().get(1)).userPosition(userPosition).build();
-        UserTechnicalStack userTechnicalStack3 = UserTechnicalStack.builder().name(dto.getTechnicalStackList().get(2)).userPosition(userPosition).build();
+        Position p = Position.builder().no(1L).name("BACKEND").build();
+
+        List<TechnicalStack> technicalStacks = new ArrayList<>();
+        TechnicalStack technicalStack1 = TechnicalStack.builder().no(1L).name("Spring Boot").build();
+        TechnicalStack technicalStack2 = TechnicalStack.builder().no(2L).name("JPA").build();
+        TechnicalStack technicalStack3 = TechnicalStack.builder().no(3L).name("React").build();
+        technicalStacks.add(technicalStack1);
+        technicalStacks.add(technicalStack2);
+        technicalStacks.add(technicalStack3);
+
         User user = User.builder()
                 .name(name)
                 .sex(sex.charAt(0))
                 .email(email)
-                .password(password)
+                .password(passwordEncoder.encode(password))
                 .github(github)
                 .selfIntroduction(selfIntroduction)
                 .permission(Role.ROLE_USER)
                 .oauthCategory(OAuth.NORMAL)
                 .block(false)
-                .userPosition(userPosition)
+                .position(p)
                 .build();
 
+        given(userRepository.findByEmail(dto.getEmail())).willReturn(Optional.empty());
+        given(positionRepository.findAllByName(position)).willReturn(Optional.ofNullable(p));
+        given(technicalStackRepository.findAll()).willReturn(technicalStacks);
+        given(positionRepository.save(p)).willReturn(p);
         given(userRepository.save(any(User.class))).willReturn(user);
 
         //when
@@ -624,13 +828,11 @@ class UserServiceTest {
         assertThat(wUser.getEmail()).isEqualTo(dto.getEmail());
         assertThat(wUser.getGithub()).isEqualTo(dto.getGithub());
         assertThat(wUser.getSelfIntroduction()).isEqualTo(dto.getSelfIntroduction());
-        assertThat(wUser.getUserPosition().getName()).isEqualTo(dto.getPosition().toString());
+        assertThat(wUser.getPosition().getName()).isEqualTo(dto.getPosition());
 
         //verify
-        verify(userPositionRepository, times(1)).save(any(UserPosition.class));
-        verify(userTechnicalStackRepository, times(technicalStackList.size())).save(any(UserTechnicalStack.class));
-        verify(userRepository, times(1)).save(any(User.class));
-        verify(passwordEncoder, times(1)).encode(any(String.class));
+        verify(userTechnicalStackRepository, times(2)).save(any());
 
     }
+
 }

@@ -5,11 +5,7 @@ import com.matching.project.dto.enumerate.EmailAuthPurpose;
 import com.matching.project.dto.user.*;
 import com.matching.project.entity.EmailAuth;
 import com.matching.project.entity.User;
-import com.matching.project.entity.UserPosition;
-import com.matching.project.entity.UserTechnicalStack;
-import com.matching.project.repository.EmailAuthRepository;
 import com.matching.project.service.EmailService;
-import com.matching.project.service.EmailServiceImpl;
 import com.matching.project.service.UserService;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -24,8 +20,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @RestController
@@ -76,6 +70,7 @@ public class UserController {
 
             // Valid Authentication Token Save
             EmailAuth emailAuth = emailService.emailAuthTokenSave(signUpResponseDto.getEmail(), EmailAuthPurpose.EMAIL_AUTHENTICATION);
+
             // Send Email
             emailService.sendConfirmEmail(user.getEmail(), emailAuth.getAuthToken());
             return ResponseEntity.ok().body(signUpResponseDto);
@@ -136,7 +131,7 @@ public class UserController {
             return ResponseEntity.badRequest().body(responseDto);
         }
     }
-    
+
     @GetMapping
     @ApiOperation(value = "회원 목록 조회")
     public ResponseEntity userInfoList(@PageableDefault(size = 5) Pageable pageable) {
@@ -145,7 +140,7 @@ public class UserController {
                 .data(dtoList).build();
         return ResponseEntity.ok().body(responseDto);
     }
-    
+
     @PatchMapping("/{no}")
     @ApiOperation(value = "회원 정보 수정")
     public ResponseEntity userUpdate(@PathVariable Long no, @RequestBody UserUpdateRequestDto userUpdateRequestDto) {
@@ -163,14 +158,52 @@ public class UserController {
 
     @DeleteMapping("/{no}")
     @ApiOperation(value = "회원 탈퇴")
-    public ResponseEntity<String> userDelete(@PathVariable Long no) {
-        return new ResponseEntity("삭제 완료", HttpStatus.OK);
+    public ResponseEntity userDelete(@PathVariable Long no, @RequestBody SignOutRequestDto signOutRequestDto) {
+        try {
+            Long deleteNo = userService.userSignOut(no, signOutRequestDto);
+            ResponseDto responseDto = ResponseDto.builder()
+                    .data(deleteNo).build();
+            return ResponseEntity.ok().body(responseDto);
+        } catch (Exception e) {
+            ResponseDto responseDto = ResponseDto.builder()
+                    .error(e.getMessage()).build();
+            return ResponseEntity.badRequest().body(responseDto);
+        }
     }
 
     @GetMapping("/block/{no}")
     @ApiOperation(value = "회원 차단")
-    public ResponseEntity<String> userBlock(@PathVariable Long no) {
-        return new ResponseEntity("차단 완료", HttpStatus.OK);
+    public ResponseEntity userBlock(@PathVariable Long no, @RequestBody UserBlockRequestDto userBlockRequestDto) {
+        try {
+            User user = userService.userBlock(no, userBlockRequestDto);
+            UserBlockResponseDto userBlockResponseDto = UserBlockResponseDto.builder()
+                    .email(user.getEmail())
+                    .block(user.isBlock())
+                    .blockReason(user.getBlockReason())
+                    .build();
+            return ResponseEntity.ok().body(userBlockResponseDto);
+        } catch (Exception e) {
+            ResponseDto responseDto = ResponseDto.builder()
+                    .error(e.getMessage()).build();
+            return ResponseEntity.badRequest().body(responseDto);
+        }
+    }
+
+    @GetMapping("/unblock/{no}")
+    @ApiOperation(value = "회원 차단 해제")
+    public ResponseEntity userBlock(@PathVariable Long no) {
+        try {
+            User user = userService.userUnBlock(no);
+            UserBlockResponseDto userBlockResponseDto = UserBlockResponseDto.builder()
+                    .email(user.getEmail())
+                    .block(user.isBlock())
+                    .build();
+            return ResponseEntity.ok().body(userBlockResponseDto);
+        } catch (Exception e) {
+            ResponseDto responseDto = ResponseDto.builder()
+                    .error(e.getMessage()).build();
+            return ResponseEntity.badRequest().body(responseDto);
+        }
     }
 
     @PostMapping("/search")

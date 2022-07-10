@@ -1,28 +1,22 @@
 package com.matching.project.service;
 
-import com.matching.project.dto.common.NormalLoginRequestDto;
-import com.matching.project.dto.user.SignUpRequestDto;
-import com.matching.project.dto.user.UserInfoResponseDto;
-import com.matching.project.dto.user.UserSimpleInfoDto;
-import com.matching.project.dto.user.UserUpdateRequestDto;
+import com.matching.project.dto.enumerate.OAuth;
+import com.matching.project.dto.enumerate.Role;
+import com.matching.project.dto.user.*;
+import com.matching.project.entity.Position;
+import com.matching.project.entity.TechnicalStack;
 import com.matching.project.entity.User;
-import com.matching.project.entity.UserPosition;
 import com.matching.project.entity.UserTechnicalStack;
-import com.matching.project.repository.UserPositionRepository;
+import com.matching.project.repository.PositionRepository;
+import com.matching.project.repository.TechnicalStackRepository;
 import com.matching.project.repository.UserRepository;
 import com.matching.project.repository.UserTechnicalStackRepository;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -38,7 +32,8 @@ import java.util.stream.Collectors;
 @Service
 public class UserServiceImpl implements UserService{
     private final UserRepository userRepository;
-    private final UserPositionRepository userPositionRepository;
+    private final PositionRepository positionRepository;
+    private final TechnicalStackRepository technicalStackRepository;
     private final UserTechnicalStackRepository userTechnicalStackRepository;
     private final PasswordEncoder passwordEncoder;
 
@@ -56,15 +51,37 @@ public class UserServiceImpl implements UserService{
             throw new RuntimeException("Email is duplicated.");
     }
 
-    public void updateValidCheck(UserUpdateRequestDto dto, String originPassword) {
-        if ("".equals(dto.getName()) || dto.getName() == null)
-            throw new RuntimeException("Name value is blanked");
-        else if ("".equals(dto.getSex()) || dto.getSex() == null || dto.getSex().length() > 1 || !dto.getSex().matches("[mMwWoO]"))
-            throw new RuntimeException("Sex value is blanked OR Invalid");
-        else if ("".equals(dto.getOriginPassword()) || dto.getOriginPassword() == null)
-            throw new RuntimeException("Original Password value is blanked");
-        else if (!passwordEncoder.matches(dto.getOriginPassword(), originPassword))
-            throw new RuntimeException("Original Password is Wrong");
+    public Position getPositionForSave(String s) {
+        Position position = null;
+        if (!"".equals(s) && s != null)
+        {
+            Optional<Position> optionalPosition = positionRepository.findAllByName(s);
+            optionalPosition.orElseThrow(() -> new RuntimeException("Unregistered Position"));
+            if (optionalPosition.isPresent())
+                position = optionalPosition.get();
+        }
+        return position;
+    }
+
+    public List<TechnicalStack> getTechnicalStacksListForSave(List<String> s) {
+        List<TechnicalStack> saveTechnicalStacksList = new ArrayList<>();
+        if (s != null && !s.isEmpty()) {
+            List<TechnicalStack> technicalStacks = technicalStackRepository.findAll();
+            for (String stack : s) {
+                int i;
+                for (i = 0 ; i < technicalStacks.size() ; i++) {
+                    if (technicalStacks.get(i).getName().equals(stack)) {
+                        // 현재는 리스트라서 Position 테이블에 존재하면 다수 입력 가능
+                        // 중복 허용하지 않으려면 set 으로 바꿔주도록 하자.
+                        saveTechnicalStacksList.add(technicalStacks.get(i));
+                        break ;
+                    }
+                }
+                if ( i == technicalStacks.size() )
+                    throw new RuntimeException("Unregistered TechnicalStack");
+            }
+        }
+        return saveTechnicalStacksList;
     }
 
     @Override
@@ -76,33 +93,29 @@ public class UserServiceImpl implements UserService{
         // Password Encode
         dto.setEncodePassword(passwordEncoder.encode(dto.getPassword()));
 
-        // Save UserPosition
-        UserPosition userPosition = null;
-        if (dto.getPosition() != null) {
-            userPosition = dto.toPositionEntity(dto.getPosition());
-            userPositionRepository.save(userPosition);
+        // Get Entity
+        Position position = getPositionForSave(dto.getPosition());
+        List<TechnicalStack> saveTechnicalStacksList = getTechnicalStacksListForSave(dto.getTechnicalStackList());
+
+        // Position Save
+        if (position != null)
+            positionRepository.save(position);
+
+        // User Save
+        User user = dto.toUserEntity(dto, position);
+        userRepository.save(user);
+
+        // TechnicalStacks Save
+        if (!saveTechnicalStacksList.isEmpty()) {
+            for (TechnicalStack t : saveTechnicalStacksList) {
+                userTechnicalStackRepository.save(UserTechnicalStack.builder()
+                        .technicalStack(t)
+                        .user(user)
+                        .build()
+                );
+            }
         }
-
-        // Save UserTechnicalStack
-        if (dto.getTechnicalStackList() != null) {
-            for (UserTechnicalStack stack : dto.toTechStackListEntity(dto.getTechnicalStackList(), userPosition))
-                userTechnicalStackRepository.save(stack);
-        }
-
-        // Save User
-        User user = dto.toUserEntity(dto, userPosition);
-        return userRepository.save(user);
-    }
-
-    @Override
-    public  List<String> userInfoTechStackList(UserPosition userPosition) {
-        List<UserTechnicalStack> userTechnicalStackList = null;
-        if (userPosition != null)
-           userTechnicalStackList = userTechnicalStackRepository.findAllByUserPosition(userPosition);
-        if (userTechnicalStackList != null)
-            return userTechnicalStackList.stream().map(UserTechnicalStack::getName).collect(Collectors.toList());
-        else
-            return null;
+        return user;
     }
 
     @Override
@@ -110,10 +123,14 @@ public class UserServiceImpl implements UserService{
         Optional<User> user = userRepository.findById(no);
         user.orElseThrow(() -> new RuntimeException("Not Find User No"));
 
-        UserPosition userPosition = user.get().getUserPosition();
-        String position = (userPosition != null) ? userPosition.getName() : null;
-
-        List<String> technicalStackList = userInfoTechStackList(user.get().getUserPosition());
+        String position = null;
+        if (user.get().getPosition() != null)
+            position = user.get().getPosition().getName();
+        List<String> technicalStackList = userTechnicalStackRepository.findUserTechnicalStacksByUser(no)
+                .stream()
+                .map(UserTechnicalStack::getTechnicalStack)
+                .map(TechnicalStack::getName)
+                .collect(Collectors.toList());
 
         return UserInfoResponseDto.builder()
                 .name(user.get().getName())
@@ -132,6 +149,19 @@ public class UserServiceImpl implements UserService{
         return users.get().map(UserSimpleInfoDto::toUserSimpleInfoDto).collect(Collectors.toList());
     }
 
+    public void updateValidCheck(UserUpdateRequestDto dto, User user) {
+        if ("".equals(dto.getName()) || dto.getName() == null)
+            throw new RuntimeException("Name value is blanked");
+        else if ("".equals(dto.getSex()) || dto.getSex() == null || dto.getSex().length() > 1 || !dto.getSex().matches("[mMwWoO]"))
+            throw new RuntimeException("Sex value is blanked OR Invalid");
+        else if (user.getOauthCategory() == OAuth.NORMAL) {
+            if ("".equals(dto.getOriginPassword()) || dto.getOriginPassword() == null)
+                throw new RuntimeException("Original Password value is blanked");
+            else if (!passwordEncoder.matches(dto.getOriginPassword(), user.getPassword()))
+                throw new RuntimeException("Original Password is Wrong");
+        }
+    }
+
     @Transactional
     @Override
     public User userUpdate(Long no, UserUpdateRequestDto dto) {
@@ -145,43 +175,103 @@ public class UserServiceImpl implements UserService{
         optionalUser.orElseThrow(() -> new RuntimeException("Not Find User No"));
 
         // Valid Check
-        updateValidCheck(dto, optionalUser.get().getPassword());
+        updateValidCheck(dto, optionalUser.get());
 
         // New Password Encode And Save
-        optionalUser.get().updatePassword(passwordEncoder, dto.getNewPassword());
+        if (optionalUser.get().getOauthCategory() == OAuth.NORMAL)
+            optionalUser.get().updatePassword(passwordEncoder, dto.getNewPassword());
 
-        // Position Update
-        UserPosition userPosition = null;
-        Optional<UserPosition> optionalUserPosition = Optional.empty();
-        if (optionalUser.get().getUserPosition() != null)
-            optionalUserPosition = userPositionRepository.findById(optionalUser.get().getUserPosition().getNo());
-        // 기존 데이터 조회 시 있는지 여부에 따라 분기
-        if (optionalUserPosition.isPresent()) { // 존재
-            /*
-                유저 포지션이 삭제/변경/유지 되는 케이스 모두 기술 스택을 지우도록 작성하였다.
-                유저 포지션을 유지 하는 경우에도 기술 스택의 변경이 많은 경우에는 로직의 시간 복잡도가 n^2 이상 되어서
-                그냥 지우고 새로 하는것이 코스트가 적다고 판단.
-             */
-            if (userTechnicalStackRepository.findAllByUserPosition(optionalUserPosition.get()) != null)
-                userTechnicalStackRepository.deleteByUserPosition(optionalUserPosition.get());
-            if (dto.getPosition() == null) // position은 enum 타입이라서 "" 가 들어올 수 없음.
-                userPositionRepository.deleteByNo(optionalUserPosition.get().getNo());
-            else if (!dto.getPosition().toString().equals(optionalUserPosition.get().getName()))
-                userPosition = optionalUserPosition.get().updatePosition(dto.getPosition());
-            else
-                userPosition = optionalUserPosition.get();
+        // Get Entity
+        Position position = getPositionForSave(dto.getPosition());
+        List<TechnicalStack> saveTechnicalStacksList = getTechnicalStacksListForSave(dto.getTechnicalStackList());
+
+        // User & Position Update
+        optionalUser.get().updateUser(dto, position);
+
+        // UserTechnicalStacks Delete & Save
+        if (userTechnicalStackRepository.findUserTechnicalStacksByUser(no) != null)
+            userTechnicalStackRepository.deleteAllByUser(optionalUser.get());
+        if (!saveTechnicalStacksList.isEmpty()) {
+            for (TechnicalStack t : saveTechnicalStacksList) {
+                userTechnicalStackRepository.save(UserTechnicalStack.builder()
+                        .technicalStack(t)
+                        .user(optionalUser.get())
+                        .build()
+                );
+            }
         }
-        else {
-            if (dto.getPosition() != null) // 존재 x
-                userPosition = userPositionRepository.save(UserUpdateRequestDto.toPositionEntity(dto.getPosition()));
+        return optionalUser.get();
+    }
+
+    @Transactional
+    @Override
+    public Long userSignOut(Long no, SignOutRequestDto dto) {
+        // Identification Check
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        User identificationUser = (User)auth.getPrincipal();
+        if (!Objects.equals(identificationUser.getNo(), no))
+            throw new RuntimeException("Identification Check Fail");
+
+        Optional<User> optionalUser = userRepository.findById(no);
+        optionalUser.orElseThrow(() -> new RuntimeException("Not Find User No"));
+
+        // Password Check
+        if (optionalUser.get().getOauthCategory() == OAuth.NORMAL) {
+            if (!passwordEncoder.matches(dto.getPassword(), optionalUser.get().getPassword()))
+                throw new RuntimeException("Password is Wrong");
         }
 
-        // TechnicalStack Update
-        if (userPosition != null) {
-            if (dto.getTechnicalStackList() != null) {
-                for (UserTechnicalStack stack : dto.toTechStackListEntity(dto.getTechnicalStackList(), userPosition))
-                    userTechnicalStackRepository.save(stack);
-            }}
-        return optionalUser.get().updateUser(dto, userPosition);
+        // UserTechnicalStacks Delete
+        if (userTechnicalStackRepository.findUserTechnicalStacksByUser(no) != null)
+            userTechnicalStackRepository.deleteAllByUser(optionalUser.get());
+
+        // User Delete
+        userRepository.deleteById(no);
+
+        return no;
+    }
+
+    @Transactional
+    @Override
+    public User userBlock(Long no, UserBlockRequestDto dto) {
+        // Permission Check
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        User identificationUser = (User)auth.getPrincipal();
+
+        // 시큐리티에서도 셋팅 할 수 있으나 임시로 작성
+        //if (identificationUser.getPermission() != Role.ROLE_ADMIN)
+        //    throw new RuntimeException("Permission Denied");
+
+        Optional<User> optionalUser = userRepository.findById(no);
+        optionalUser.orElseThrow(() -> new RuntimeException("Not Find User No"));
+
+        if (optionalUser.get().isBlock())
+            throw new RuntimeException("Users already blocked");
+
+        optionalUser.get().userBlock(dto.getBlockReason());
+
+        return optionalUser.get();
+    }
+
+    @Transactional
+    @Override
+    public User userUnBlock(Long no) {
+        // Permission Check
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        User identificationUser = (User)auth.getPrincipal();
+
+        // 시큐리티에서도 셋팅 할 수 있으나 임시로 작성
+        //if (identificationUser.getPermission() != Role.ROLE_ADMIN)
+        //    throw new RuntimeException("Permission Denied");
+
+        Optional<User> optionalUser = userRepository.findById(no);
+        optionalUser.orElseThrow(() -> new RuntimeException("Not Find User No"));
+
+        if (!optionalUser.get().isBlock())
+            throw new RuntimeException("Users who have already been unblocked");
+
+        optionalUser.get().userUnBlock();
+
+        return optionalUser.get();
     }
 }

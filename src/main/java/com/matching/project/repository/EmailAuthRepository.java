@@ -1,9 +1,7 @@
 package com.matching.project.repository;
 
 import com.matching.project.dto.enumerate.EmailAuthPurpose;
-import com.matching.project.entity.Comment;
 import com.matching.project.entity.EmailAuth;
-import com.matching.project.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

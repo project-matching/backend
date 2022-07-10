@@ -50,6 +50,8 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         User user = userRepository.findByEmail(attributes.getEmail())
                 .orElse(attributes.toEntity());
         log.info(user.toString());
+        if (user.isBlock())
+            throw new IllegalArgumentException("This is blocked User ID");
         return userRepository.save(user);
     }
 }

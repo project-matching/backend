@@ -1,6 +1,5 @@
 package com.matching.project.dto.user;
 
-import com.matching.project.dto.enumerate.Position;
 import lombok.*;
 
 import java.util.List;
