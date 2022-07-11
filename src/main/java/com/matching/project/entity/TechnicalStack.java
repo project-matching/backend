@@ -1,17 +1,20 @@
 package com.matching.project.entity;
 
-import com.google.common.annotations.Beta;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-
+import lombok.NoArgsConstructor;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import java.util.List;
 
-@Entity
 @Builder
+@Entity
 @Getter
+@NoArgsConstructor
+@AllArgsConstructor
 public class TechnicalStack {
     @Id @GeneratedValue
     private Long no;

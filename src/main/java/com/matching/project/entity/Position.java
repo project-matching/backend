@@ -1,18 +1,16 @@
 package com.matching.project.entity;
 
-import lombok.Builder;
-import lombok.Data;
-import lombok.Getter;
-import lombok.ToString;
-
+import lombok.*;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
+@Getter
 @Entity
 @Builder
-@Getter
+@AllArgsConstructor
+@NoArgsConstructor
 public class Position {
     @Id @GeneratedValue
     private Long no;

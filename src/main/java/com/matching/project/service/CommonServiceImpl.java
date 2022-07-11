@@ -15,11 +15,12 @@ public class CommonServiceImpl implements CommonService {
     @Override
     public User normalLogin(NormalLoginRequestDto normalLoginRequestDto) {
         User user = (User) customUserDetailsService.loadUserByUsername(normalLoginRequestDto.getEmail());
-        if (!passwordEncoder.matches(normalLoginRequestDto.getPassword(), user.getPassword())) {
-            throw new IllegalArgumentException("This is an incorrect password.");
-        }
-        if (!user.isEmail_auth())
-            throw new IllegalArgumentException("This is an unsigned email");
+        if (!passwordEncoder.matches(normalLoginRequestDto.getPassword(), user.getPassword()))
+            throw new RuntimeException("This is an incorrect password");
+        else if (user.isBlock())
+            throw new RuntimeException("This is blocked User ID");
+        else if (!user.isEmail_auth())
+            throw new RuntimeException("This is an unsigned email");
         return user;
     }
 }
