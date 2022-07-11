@@ -33,6 +33,7 @@ public class ProjectRegisterRequestDto {
     @NotBlank
     private Integer maxPeople;
 
+    private List<ProjectPositionDto> projectPositionDtoList = new ArrayList<>();
 
-    private List<ProjectPositionDto> projectPosition = new ArrayList<>();
+    private List<String> projectTechnicalStack = new ArrayList<>();
 }

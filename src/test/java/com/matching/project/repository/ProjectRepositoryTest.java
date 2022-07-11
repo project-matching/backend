@@ -1,6 +1,5 @@
 package com.matching.project.repository;
 
-import com.matching.project.dto.enumerate.Position;
 import com.matching.project.dto.project.ProjectQueryDto;
 import com.matching.project.entity.Project;
 import com.matching.project.entity.ProjectPosition;
@@ -57,7 +56,6 @@ class ProjectRepositoryTest {
                 .deleteReason(null)
                 .viewCount(10)
                 .commentCount(10)
-                .image(null)
                 .build();
         
         // 모집 완료된 프로젝트 객체
@@ -75,7 +73,6 @@ class ProjectRepositoryTest {
                 .deleteReason(null)
                 .viewCount(10)
                 .commentCount(10)
-                .image(null)
                 .build();
         
         // 모집중인 프로젝트 객체
@@ -93,7 +90,6 @@ class ProjectRepositoryTest {
                 .deleteReason(null)
                 .viewCount(10)
                 .commentCount(10)
-                .image(null)
                 .build();
         
         // 모집 중인 프로젝트
@@ -134,7 +130,6 @@ class ProjectRepositoryTest {
         assertEquals(projectList.get(0).getDeleteReason(), saveProject3.getDeleteReason());
         assertEquals(projectList.get(0).getViewCount(), saveProject3.getViewCount());
         assertEquals(projectList.get(0).getCommentCount(), saveProject3.getCommentCount());
-        assertEquals(projectList.get(0).getImage(), saveProject3.getImage());
     }
 
     @Test
@@ -159,50 +154,42 @@ class ProjectRepositoryTest {
                 .deleteReason(null)
                 .viewCount(10)
                 .commentCount(10)
-                .image(null)
                 .build();
         // 프로젝트 저장
         project = projectRepository.save(project);
 
         // 프로젝트 포지션 저장
         ProjectPosition projectPosition1 = ProjectPosition.builder()
-                .position(Position.FRONTEND)
                 .state(true)
                 .build();
-        projectPosition1.setProject(project);
         projectPosition1 = projectPositionRepository.save(projectPosition1);
 
         ProjectPosition projectPosition2 = ProjectPosition.builder()
-                .position(Position.BACKEND)
                 .state(true)
                 .build();
-        projectPosition2.setProject(project);
         projectPosition2 = projectPositionRepository.save(projectPosition2);
         
         // 프론트 기술스택 저장
         ProjectTechnicalStack frontTechnicalStack1 = ProjectTechnicalStack.builder()
-                .name("frontTechnicalStack1")
                 .build();
-        frontTechnicalStack1.setProjectPosition(projectPosition1);
         projectTechnicalStackRepository.save(frontTechnicalStack1);
 
         ProjectTechnicalStack frontTechnicalStack2 = ProjectTechnicalStack.builder()
-                .name("frontTechnicalStack2")
                 .build();
-        frontTechnicalStack2.setProjectPosition(projectPosition1);
+
         projectTechnicalStackRepository.save(frontTechnicalStack2);
 
         // 백엔드 기술스택 저장
         ProjectTechnicalStack backTechnicalStack1 = ProjectTechnicalStack.builder()
-                .name("frontTechnicalStack1")
+
                 .build();
-        backTechnicalStack1.setProjectPosition(projectPosition2);
+
         projectTechnicalStackRepository.save(backTechnicalStack1);
 
         ProjectTechnicalStack backTechnicalStack2 = ProjectTechnicalStack.builder()
-                .name("frontTechnicalStack2")
+
                 .build();
-        backTechnicalStack2.setProjectPosition(projectPosition2);
+
         projectTechnicalStackRepository.save(backTechnicalStack2);
 
 
@@ -228,22 +215,22 @@ class ProjectRepositoryTest {
         
         // 프로젝트 포지션 값 검증
         assertEquals(detailProject.getProjectPositionList().get(0).getNo(), projectPosition1.getNo());
-        assertEquals(detailProject.getProjectPositionList().get(0).getPosition(), projectPosition1.getPosition());
+
         assertEquals(detailProject.getProjectPositionList().get(0).isState(), projectPosition1.isState());
 
         assertEquals(detailProject.getProjectPositionList().get(1).getNo(), projectPosition2.getNo());
-        assertEquals(detailProject.getProjectPositionList().get(1).getPosition(), projectPosition2.getPosition());
+
         assertEquals(detailProject.getProjectPositionList().get(1).isState(), projectPosition2.isState());
 
         // 프로젝트 기술 스택 검증
         assertEquals(detailProject.getProjectPositionList().get(0).getProjectTechnicalStackList().get(0).getNo(), frontTechnicalStack1.getNo());
-        assertEquals(detailProject.getProjectPositionList().get(0).getProjectTechnicalStackList().get(0).getName(), frontTechnicalStack1.getName());
+
         assertEquals(detailProject.getProjectPositionList().get(0).getProjectTechnicalStackList().get(1).getNo(), frontTechnicalStack2.getNo());
-        assertEquals(detailProject.getProjectPositionList().get(0).getProjectTechnicalStackList().get(1).getName(), frontTechnicalStack2.getName());
+
 
         assertEquals(detailProject.getProjectPositionList().get(1).getProjectTechnicalStackList().get(0).getNo(), backTechnicalStack1.getNo());
-        assertEquals(detailProject.getProjectPositionList().get(1).getProjectTechnicalStackList().get(0).getName(), backTechnicalStack1.getName());
+
         assertEquals(detailProject.getProjectPositionList().get(1).getProjectTechnicalStackList().get(1).getNo(), backTechnicalStack2.getNo());
-        assertEquals(detailProject.getProjectPositionList().get(1).getProjectTechnicalStackList().get(1).getName(), backTechnicalStack2.getName());
+
     }
 }

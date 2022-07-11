@@ -1,7 +1,6 @@
 package com.matching.project.dto.project;
 
 import com.matching.project.dto.comment.CommentDto;
-import com.matching.project.dto.user.UserSimpleInfoDto;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -26,7 +25,6 @@ public class ProjectDto {
     private Integer maxPeople;
     private boolean bookmark;
     private String register;
-    private List<UserSimpleInfoDto> userSimpleInfoDtoList = new ArrayList<>();
     private List<ProjectPositionDto> projectPosition = new ArrayList<>();
     private List<CommentDto> commentDtoList = new ArrayList<>();
 

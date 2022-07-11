@@ -1,6 +1,5 @@
 package com.matching.project.dto.project;
 
-import com.matching.project.dto.enumerate.Position;
 import com.matching.project.entity.Project;
 import com.matching.project.entity.ProjectPosition;
 import com.matching.project.entity.ProjectTechnicalStack;
@@ -27,10 +26,15 @@ public class ProjectRegisterResponseDto {
     private String introduction;
     private Integer maxPeople;
     private Integer currentPeople;
-    private List<ProjectPositionDto> projectPosition = new ArrayList<>();
+    private Integer viewCount;
+    private Integer commentCount;
+
+    private List<ProjectPositionDto> projectPositionDtoList = new ArrayList<>();
+
+    private List<String> projectTechnicalStack = new ArrayList<>();
 
     @Builder
-    public ProjectRegisterResponseDto(Long no, String name, String createUser, String profile, LocalDateTime createDate, LocalDate startDate, LocalDate endDate, boolean state, String introduction, Integer maxPeople, Integer currentPeople) {
+    public ProjectRegisterResponseDto(Long no, String name, String createUser, String profile, LocalDateTime createDate, LocalDate startDate, LocalDate endDate, boolean state, String introduction, Integer maxPeople, Integer currentPeople, Integer viewCount, Integer commentCount) {
         this.no = no;
         this.name = name;
         this.createUser = createUser;
@@ -42,35 +46,7 @@ public class ProjectRegisterResponseDto {
         this.introduction = introduction;
         this.maxPeople = maxPeople;
         this.currentPeople = currentPeople;
-    }
-
-    public static ProjectRegisterResponseDto of (Project project) {
-        ProjectRegisterResponseDto projectRegisterResponseDto = ProjectRegisterResponseDto.builder()
-                .no(project.getNo())
-                .name(project.getName())
-                .createUser(project.getCreateUserName())
-                .profile(null)
-                .createDate(project.getCreateDate())
-                .startDate(project.getStartDate())
-                .endDate(project.getEndDate())
-                .state(project.isState())
-                .introduction(project.getIntroduction())
-                .maxPeople(project.getMaxPeople())
-                .currentPeople(project.getCurrentPeople())
-                .build();
-
-        List<ProjectPosition> projectPosition = project.getProjectPosition();
-        for (ProjectPosition position : projectPosition) {
-            ProjectPositionDto projectPositionDto = new ProjectPositionDto();
-            projectPositionDto.setPosition(position.getPosition());
-            List<String> technicalStack = new ArrayList<>();
-            for (ProjectTechnicalStack projectTechnicalStack : position.getProjectTechnicalStack()) {
-                technicalStack.add(projectTechnicalStack.getName());
-            }
-            projectPositionDto.setTechnicalStack(technicalStack);
-            projectRegisterResponseDto.getProjectPosition().add(projectPositionDto);
-        }
-
-        return projectRegisterResponseDto;
+        this.viewCount = viewCount;
+        this.commentCount = commentCount;
     }
 }

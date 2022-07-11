@@ -1,7 +1,5 @@
 package com.matching.project.entity;
 
-import com.matching.project.dto.enumerate.Position;
-import com.matching.project.dto.project.ProjectPositionDto;
 import com.matching.project.dto.project.ProjectRegisterRequestDto;
 import lombok.*;
 
@@ -11,8 +9,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Builder
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
 public class ProjectPosition {
     @Id
     @GeneratedValue
@@ -33,24 +33,4 @@ public class ProjectPosition {
     private User user;
 
     private boolean creator;
-
-    @Builder
-    public ProjectPosition(Long no, Position position, boolean state, Project project) {
-        this.no = no;
-        this.position = position;
-        this.state = state;
-        this.project = project;
-    }
-
-    public void setProject(Project project) {
-        this.project = project;
-        project.getProjectPosition().add(this);
-    }
-
-    public static ProjectPosition of(ProjectPositionDto projectPositionDto) {
-        return ProjectPosition.builder()
-                .position(projectPositionDto.getPosition())
-                .state(false)
-                .build();
-    }
 }
