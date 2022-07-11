@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class LoginProjectSimpleDto {
+public class ProjectSimpleDto {
     private Long no;
     private String name;
     private String profile;
