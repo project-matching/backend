@@ -91,7 +91,7 @@ class ProjectControllerTest {
     BookMarkRepository bookMarkRepository;
 
     // 프로젝트, 유저 저장
-    void saveProject(){
+    User saveUser() {
         User user1 = User.builder()
                 .name("userName1")
                 .sex('M')
@@ -101,36 +101,41 @@ class ProjectControllerTest {
                 .selfIntroduction("testSelfIntroduction")
                 .block(false)
                 .blockReason(null)
+                .permission(Role.ROLE_USER)
                 .oauthCategory(OAuth.NORMAL)
+                .email_auth(false)
+                .imageNo(0L)
+                .position(null)
                 .build();
 
-        userRepository.save(user1);
+        return userRepository.save(user1);
+    }
+
+    /**
+     * 0 ~ 2 까지 모집중이면서 삭제 안된 프로젝트
+     * 3 모집중이면서 삭제된 프로젝트
+     */
+    List<Project> saveRecruitmentProject(){
+        List<Project> projectList = new ArrayList<>();
 
         LocalDateTime createDate = LocalDateTime.of(2022, 06, 24, 10, 10, 10);
         LocalDate startDate = LocalDate.of(2022, 06, 24);
         LocalDate endDate = LocalDate.of(2022, 06, 28);
 
-        // 0 ~ 2까지 모집중이고 삭제 안당한 프로젝트
-        // 3 ~ 5번쨰 프로젝트는 모집완료된 프로젝트
-        // 6번째 프로젝트는 모집완료 되었고 삭제된 프로젝트
-        // 7번째 프로젝트는 모집중이고 삭제된 프로젝트
-        for (int i = 0 ; i < 10 ; i++) {
-
-            System.out.println("index : " + i);
+        for (int i = 0 ; i < 4 ; i++) {
             boolean state = true;
             boolean delete = false;
             String deleteReason = null;
-            if (i > 3 && i < 7) {
-                state = false;
-            }
-            if (i > 5) {
+
+            if (i == 3) {
                 delete = true;
                 deleteReason = "testDeleteReason" + i;
             }
+
             Project project = Project.builder()
                     .name("testName" + i)
                     .createUserName("user")
-                    .createDate(createDate)
+                    .createDate(createDate.plusDays(i))
                     .startDate(startDate)
                     .endDate(endDate)
                     .state(state)
@@ -142,8 +147,57 @@ class ProjectControllerTest {
                     .viewCount(10)
                     .commentCount(10)
                     .build();
-            projectRepository.save(project);
+            projectList.add(projectRepository.save(project));
         }
+        return projectList;
+    }
+    /**
+     * 4 ~ 6 까지 모집완료이면서 삭제 안된 프로젝트
+     * 7 모집완료이면서 삭제된 프로젝트
+     */     
+    List<Project> saveRecruitmentCompleteProject(){
+        List<Project> projectList = new ArrayList<>();
+
+        LocalDateTime createDate = LocalDateTime.of(2022, 06, 24, 10, 10, 10);
+        LocalDate startDate = LocalDate.of(2022, 06, 24);
+        LocalDate endDate = LocalDate.of(2022, 06, 28);
+
+        for (int i = 4 ; i < 8 ; i++) {
+            boolean state = false;
+            boolean delete = false;
+            String deleteReason = null;
+
+            if (i == 7) {
+                delete = true;
+                deleteReason = "testDeleteReason" + i;
+            }
+
+            Project project = Project.builder()
+                    .name("testName" + i)
+                    .createUserName("user")
+                    .createDate(createDate.plusDays(i))
+                    .startDate(startDate)
+                    .endDate(endDate)
+                    .state(state)
+                    .introduction("testIntroduction" + i)
+                    .maxPeople(10)
+                    .currentPeople(4)
+                    .delete(delete)
+                    .deleteReason(deleteReason)
+                    .viewCount(10)
+                    .commentCount(10)
+                    .build();
+            projectList.add(projectRepository.save(project));
+        }
+        return projectList;
+    }
+
+    BookMark saveBookMark(User user, Project project) {
+        BookMark bookMark = BookMark.builder()
+                .user(user)
+                .project(project)
+                .build();
+        return bookMarkRepository.save(bookMark);
     }
 
     @Test
@@ -259,90 +313,174 @@ class ProjectControllerTest {
     
     @Test
     public void 비로그인_모집중_프로젝트_조회_테스트() throws Exception {
-        saveProject();
+        User saveUser = saveUser();
+        List<Project> saveRecruitmentProject = saveRecruitmentProject();
+        saveRecruitmentCompleteProject();
+        // 0번째 1번째는 북마크
+        saveBookMark(saveUser, saveRecruitmentProject.get(0));
+        saveBookMark(saveUser, saveRecruitmentProject.get(1));
 
         mvc.perform(get("/v1/project/recruitment").contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(header().string("Content-type", "application/json"))
-                .andExpect(jsonPath("$.data[0].name").value("testName3"))
+                .andExpect(jsonPath("$.data[0].name").value("testName2"))
                 .andExpect(jsonPath("$.data[0].profile").isEmpty())
                 .andExpect(jsonPath("$.data[0].maxPeople").value(10))
                 .andExpect(jsonPath("$.data[0].currentPeople").value(4))
                 .andExpect(jsonPath("$.data[0].viewCount").value(10))
                 .andExpect(jsonPath("$.data[0].commentCount").value(10))
                 .andExpect(jsonPath("$.data[0].register").value("user"))
+                .andExpect(jsonPath("$.data[0].bookMark").value(false))
 
-                .andExpect(jsonPath("$.data[1].name").value("testName2"))
+                .andExpect(jsonPath("$.data[1].name").value("testName1"))
                 .andExpect(jsonPath("$.data[1].profile").isEmpty())
                 .andExpect(jsonPath("$.data[1].maxPeople").value(10))
                 .andExpect(jsonPath("$.data[1].currentPeople").value(4))
                 .andExpect(jsonPath("$.data[1].viewCount").value(10))
                 .andExpect(jsonPath("$.data[1].commentCount").value(10))
                 .andExpect(jsonPath("$.data[1].register").value("user"))
+                .andExpect(jsonPath("$.data[1].bookMark").value(false))
 
-                .andExpect(jsonPath("$.data[2].name").value("testName1"))
+                .andExpect(jsonPath("$.data[2].name").value("testName0"))
                 .andExpect(jsonPath("$.data[2].profile").isEmpty())
                 .andExpect(jsonPath("$.data[2].maxPeople").value(10))
                 .andExpect(jsonPath("$.data[2].currentPeople").value(4))
                 .andExpect(jsonPath("$.data[2].viewCount").value(10))
                 .andExpect(jsonPath("$.data[2].commentCount").value(10))
                 .andExpect(jsonPath("$.data[2].register").value("user"))
+                .andExpect(jsonPath("$.data[2].bookMark").value(false))
 
-                .andExpect(jsonPath("$.data[3].name").value("testName0"))
-                .andExpect(jsonPath("$.data[3].profile").isEmpty())
-                .andExpect(jsonPath("$.data[3].maxPeople").value(10))
-                .andExpect(jsonPath("$.data[3].currentPeople").value(4))
-                .andExpect(jsonPath("$.data[3].viewCount").value(10))
-                .andExpect(jsonPath("$.data[3].commentCount").value(10))
-                .andExpect(jsonPath("$.data[3].register").value("user"))
                 .andExpect(status().isOk());
     }
 
     @Test
     public void 로그인_모집중_프로젝트_조회_테스트() throws Exception {
-        saveProject();
+        User saveUser = saveUser();
+        List<Project> saveRecruitmentProject = saveRecruitmentProject();
+        saveRecruitmentCompleteProject();
+        // 0번째 1번째는 북마크
+        saveBookMark(saveUser, saveRecruitmentProject.get(0));
+        saveBookMark(saveUser, saveRecruitmentProject.get(1));
+
         String token = jwtTokenService.createToken(new TokenDto(1L, "wkemrm12@naver.com"));
 
-        mvc.perform(get("/v1/project/login/recruitment")
+        mvc.perform(get("/v1/project/recruitment")
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", "Bearer " + token))
                 .andDo(print())
                 .andExpect(header().string("Content-type", "application/json"))
-                .andExpect(jsonPath("$.data[0].name").value("testName3"))
+                .andExpect(jsonPath("$.data[0].name").value("testName2"))
                 .andExpect(jsonPath("$.data[0].profile").isEmpty())
                 .andExpect(jsonPath("$.data[0].maxPeople").value(10))
                 .andExpect(jsonPath("$.data[0].currentPeople").value(4))
-                .andExpect(jsonPath("$.data[0].bookMark").value(false))
                 .andExpect(jsonPath("$.data[0].viewCount").value(10))
                 .andExpect(jsonPath("$.data[0].commentCount").value(10))
                 .andExpect(jsonPath("$.data[0].register").value("user"))
+                .andExpect(jsonPath("$.data[0].bookMark").value(false))
 
-                .andExpect(jsonPath("$.data[1].name").value("testName2"))
+                .andExpect(jsonPath("$.data[1].name").value("testName1"))
                 .andExpect(jsonPath("$.data[1].profile").isEmpty())
                 .andExpect(jsonPath("$.data[1].maxPeople").value(10))
                 .andExpect(jsonPath("$.data[1].currentPeople").value(4))
-                .andExpect(jsonPath("$.data[1].bookMark").value(false))
                 .andExpect(jsonPath("$.data[1].viewCount").value(10))
                 .andExpect(jsonPath("$.data[1].commentCount").value(10))
                 .andExpect(jsonPath("$.data[1].register").value("user"))
+                .andExpect(jsonPath("$.data[1].bookMark").value(true))
 
-                .andExpect(jsonPath("$.data[2].name").value("testName1"))
+                .andExpect(jsonPath("$.data[2].name").value("testName0"))
                 .andExpect(jsonPath("$.data[2].profile").isEmpty())
                 .andExpect(jsonPath("$.data[2].maxPeople").value(10))
                 .andExpect(jsonPath("$.data[2].currentPeople").value(4))
-                .andExpect(jsonPath("$.data[2].bookMark").value(false))
                 .andExpect(jsonPath("$.data[2].viewCount").value(10))
                 .andExpect(jsonPath("$.data[2].commentCount").value(10))
                 .andExpect(jsonPath("$.data[2].register").value("user"))
+                .andExpect(jsonPath("$.data[2].bookMark").value(true))
+                .andExpect(status().isOk());
+    }
 
-                .andExpect(jsonPath("$.data[3].name").value("testName0"))
-                .andExpect(jsonPath("$.data[3].profile").isEmpty())
-                .andExpect(jsonPath("$.data[3].maxPeople").value(10))
-                .andExpect(jsonPath("$.data[3].currentPeople").value(4))
-                .andExpect(jsonPath("$.data[3].bookMark").value(false))
-                .andExpect(jsonPath("$.data[3].viewCount").value(10))
-                .andExpect(jsonPath("$.data[3].commentCount").value(10))
-                .andExpect(jsonPath("$.data[3].register").value("user"))
+    @Test
+    public void 비로그인_모집완료_프로젝트_조회_테스트() throws Exception {
+        User saveUser = saveUser();
+        saveRecruitmentProject();
+        List<Project> saveRecruitmentCompleteProject = saveRecruitmentCompleteProject();
+        // 4번째 5번째는 북마크
+        saveBookMark(saveUser, saveRecruitmentCompleteProject.get(0));
+        saveBookMark(saveUser, saveRecruitmentCompleteProject.get(1));
+
+        mvc.perform(get("/v1/project/recruitment/complete").contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(header().string("Content-type", "application/json"))
+                .andExpect(jsonPath("$.data[0].name").value("testName6"))
+                .andExpect(jsonPath("$.data[0].profile").isEmpty())
+                .andExpect(jsonPath("$.data[0].maxPeople").value(10))
+                .andExpect(jsonPath("$.data[0].currentPeople").value(4))
+                .andExpect(jsonPath("$.data[0].viewCount").value(10))
+                .andExpect(jsonPath("$.data[0].commentCount").value(10))
+                .andExpect(jsonPath("$.data[0].register").value("user"))
+                .andExpect(jsonPath("$.data[0].bookMark").value(false))
+
+                .andExpect(jsonPath("$.data[1].name").value("testName5"))
+                .andExpect(jsonPath("$.data[1].profile").isEmpty())
+                .andExpect(jsonPath("$.data[1].maxPeople").value(10))
+                .andExpect(jsonPath("$.data[1].currentPeople").value(4))
+                .andExpect(jsonPath("$.data[1].viewCount").value(10))
+                .andExpect(jsonPath("$.data[1].commentCount").value(10))
+                .andExpect(jsonPath("$.data[1].register").value("user"))
+                .andExpect(jsonPath("$.data[1].bookMark").value(false))
+
+                .andExpect(jsonPath("$.data[2].name").value("testName4"))
+                .andExpect(jsonPath("$.data[2].profile").isEmpty())
+                .andExpect(jsonPath("$.data[2].maxPeople").value(10))
+                .andExpect(jsonPath("$.data[2].currentPeople").value(4))
+                .andExpect(jsonPath("$.data[2].viewCount").value(10))
+                .andExpect(jsonPath("$.data[2].commentCount").value(10))
+                .andExpect(jsonPath("$.data[2].register").value("user"))
+                .andExpect(jsonPath("$.data[2].bookMark").value(false))
+
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void 로그인_모집완료_프로젝트_조회_테스트() throws Exception {
+        User saveUser = saveUser();
+        saveRecruitmentProject();
+        List<Project> saveRecruitmentCompleteProject = saveRecruitmentCompleteProject();
+        // 4번째 5번째는 북마크
+        saveBookMark(saveUser, saveRecruitmentCompleteProject.get(0));
+        saveBookMark(saveUser, saveRecruitmentCompleteProject.get(1));
+        String token = jwtTokenService.createToken(new TokenDto(1L, "wkemrm12@naver.com"));
+
+        mvc.perform(get("/v1/project/recruitment/complete")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", "Bearer " + token))
+                .andDo(print())
+                .andExpect(header().string("Content-type", "application/json"))
+                .andExpect(jsonPath("$.data[0].name").value("testName6"))
+                .andExpect(jsonPath("$.data[0].profile").isEmpty())
+                .andExpect(jsonPath("$.data[0].maxPeople").value(10))
+                .andExpect(jsonPath("$.data[0].currentPeople").value(4))
+                .andExpect(jsonPath("$.data[0].viewCount").value(10))
+                .andExpect(jsonPath("$.data[0].commentCount").value(10))
+                .andExpect(jsonPath("$.data[0].register").value("user"))
+                .andExpect(jsonPath("$.data[0].bookMark").value(false))
+
+                .andExpect(jsonPath("$.data[1].name").value("testName5"))
+                .andExpect(jsonPath("$.data[1].profile").isEmpty())
+                .andExpect(jsonPath("$.data[1].maxPeople").value(10))
+                .andExpect(jsonPath("$.data[1].currentPeople").value(4))
+                .andExpect(jsonPath("$.data[1].viewCount").value(10))
+                .andExpect(jsonPath("$.data[1].commentCount").value(10))
+                .andExpect(jsonPath("$.data[1].register").value("user"))
+                .andExpect(jsonPath("$.data[1].bookMark").value(true))
+
+                .andExpect(jsonPath("$.data[2].name").value("testName4"))
+                .andExpect(jsonPath("$.data[2].profile").isEmpty())
+                .andExpect(jsonPath("$.data[2].maxPeople").value(10))
+                .andExpect(jsonPath("$.data[2].currentPeople").value(4))
+                .andExpect(jsonPath("$.data[2].viewCount").value(10))
+                .andExpect(jsonPath("$.data[2].commentCount").value(10))
+                .andExpect(jsonPath("$.data[2].register").value("user"))
+                .andExpect(jsonPath("$.data[2].bookMark").value(true))
                 .andExpect(status().isOk());
     }
 
