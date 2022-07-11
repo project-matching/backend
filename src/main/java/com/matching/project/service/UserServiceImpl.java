@@ -41,13 +41,15 @@ public class UserServiceImpl implements UserService{
         // 참고 : https://lovefor-you.tistory.com/113
         if ("".equals(dto.getName()) || dto.getName() == null)
             throw new RuntimeException("Name value is blanked");
-        else if ("".equals(dto.getSex()) || dto.getSex() == null || dto.getSex().length() > 1 || !dto.getSex().matches("[mMwWoO]"))
-            throw new RuntimeException("Sex value is blanked OR Invalid");
-        else if ("".equals(dto.getEmail()) || dto.getEmail() == null)
+        if (!"".equals(dto.getSex()) && dto.getSex() != null)  {
+            if (dto.getSex().length() > 1 || !dto.getSex().matches("[mMwWoO]"))
+                throw new RuntimeException("Sex value is Invalid");
+        }
+        if ("".equals(dto.getEmail()) || dto.getEmail() == null)
             throw new RuntimeException("Email value is blanked");
-        else if ("".equals(dto.getPassword()) || dto.getPassword() == null)
+        if ("".equals(dto.getPassword()) || dto.getPassword() == null)
             throw new RuntimeException("Password value is blanked");
-        else if (userRepository.findByEmail(dto.getEmail()).isPresent())
+        if (userRepository.findByEmail(dto.getEmail()).isPresent())
             throw new RuntimeException("Email is duplicated.");
     }
 
@@ -152,9 +154,11 @@ public class UserServiceImpl implements UserService{
     public void updateValidCheck(UserUpdateRequestDto dto, User user) {
         if ("".equals(dto.getName()) || dto.getName() == null)
             throw new RuntimeException("Name value is blanked");
-        else if ("".equals(dto.getSex()) || dto.getSex() == null || dto.getSex().length() > 1 || !dto.getSex().matches("[mMwWoO]"))
-            throw new RuntimeException("Sex value is blanked OR Invalid");
-        else if (user.getOauthCategory() == OAuth.NORMAL) {
+        if (!"".equals(dto.getSex()) && dto.getSex() != null)  {
+            if (dto.getSex().length() > 1 || !dto.getSex().matches("[mMwWoO]"))
+                throw new RuntimeException("Sex value is Invalid");
+        }
+        if (user.getOauthCategory() == OAuth.NORMAL) {
             if ("".equals(dto.getOriginPassword()) || dto.getOriginPassword() == null)
                 throw new RuntimeException("Original Password value is blanked");
             else if (!passwordEncoder.matches(dto.getOriginPassword(), user.getPassword()))

@@ -21,23 +21,4 @@ public class UserUpdateRequestDto {
     private List<String> technicalStackList;
     private String github;
     private String selfIntroduction;
-
-//    public static UserPosition toPositionEntity(final Position position) {
-//        return UserPosition.builder()
-//                .name(position.toString())
-//                .build();
-//
-//    }
-//    public static List<UserTechnicalStack> toTechStackListEntity(final List<String> technicalStackList, final UserPosition userposition) {
-//        List<UserTechnicalStack> technicalStackEntityList = new ArrayList<>();
-//        for (String stackName : technicalStackList)
-//        {
-//            technicalStackEntityList.add(UserTechnicalStack.builder()
-//                    .name(stackName)
-//                    .userPosition(userposition)
-//                    .build()
-//            );
-//        }
-//        return technicalStackEntityList;
-//    }
 }

@@ -6,11 +6,11 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
-@Getter
-@Entity
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Getter
+@Builder
+@Entity
 public class Position {
     @Id @GeneratedValue
     private Long no;

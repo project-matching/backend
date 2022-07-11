@@ -8,6 +8,5 @@ import lombok.Getter;
 public class SignUpResponseDto {
     private Long no;
     private String name;
-    private char sex;
     private String email;
 }

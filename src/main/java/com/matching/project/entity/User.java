@@ -88,7 +88,10 @@ public class User implements UserDetails {
 
     public User updateUser(UserUpdateRequestDto dto, Position position) {
         this.name = dto.getName();
-        this.sex = dto.getSex().charAt(0);
+        if (!"".equals(dto.getSex()) && dto.getSex() != null)
+            this.sex = dto.getSex().charAt(0);
+        else
+            this.sex = 0;
         this.github = dto.getGithub();
         this.selfIntroduction = dto.getSelfIntroduction();
         this.imageNo = null;

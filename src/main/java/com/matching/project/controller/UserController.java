@@ -64,7 +64,6 @@ public class UserController {
             SignUpResponseDto signUpResponseDto = SignUpResponseDto.builder()
                     .no(user.getNo())
                     .name(user.getName())
-                    .sex(user.getSex())
                     .email(user.getEmail())
                     .build();
 

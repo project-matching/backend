@@ -30,9 +30,12 @@ public class SignUpRequestDto {
     }
 
     public static User toUserEntity(final SignUpRequestDto signUpRequestDto, Position position) {
-        return User.builder()
+        char sex = 0;
+        if (!"".equals(signUpRequestDto.getSex()) && signUpRequestDto.getSex() != null)
+            sex = signUpRequestDto.getSex().charAt(0);
+        User user = User.builder()
                 .name(signUpRequestDto.name)
-                .sex(signUpRequestDto.sex.charAt(0))
+                .sex(sex)
                 .email(signUpRequestDto.email)
                 .password(signUpRequestDto.password)
                 .github(signUpRequestDto.github)
@@ -43,5 +46,6 @@ public class SignUpRequestDto {
                 .position(position)
                 .email_auth(true) // 임시
                 .build();
+        return user;
     }
 }

@@ -761,7 +761,7 @@ class UserServiceTest {
         });
 
         //then
-        assertThat(e.getMessage()).isEqualTo("Sex value is blanked OR Invalid");
+        assertThat(e.getMessage()).isEqualTo("Sex value is Invalid");
     }
 
     @DisplayName("회원 가입 성공")
