@@ -35,25 +35,17 @@ public class ProjectController {
     }
 
     @GetMapping("/recruitment")
-    @ApiOperation(value = "비로그인 : 모집중인 프로젝트 목록 조회")
-    public ResponseEntity noneLoginProjectRecruitingList(@PageableDefault(size = 5, sort = "no", direction = Sort.Direction.DESC) Pageable pageable) throws Exception{
-        List<NoneLoginProjectSimpleDto> projectSimpleDtoList = projectService.NoneLoginProjectRecruitingList(pageable);
-        return ResponseEntity.ok(new ResponseDto<>(null, projectSimpleDtoList));
-    }
-
-    @GetMapping("/login/recruitment")
-    @ApiOperation(value = "로그인 : 모집중인 프로젝트 목록 조회")
-    public ResponseEntity LoginProjectRecruitingList(@PageableDefault(size = 5, sort = "no", direction = Sort.Direction.DESC) Pageable pageable) throws Exception{
-        List<LoginProjectSimpleDto> projectSimpleDtoList = projectService.LoginProjectRecruitingList(pageable);
+    @ApiOperation(value = "모집중인 프로젝트 목록 조회")
+    public ResponseEntity projectRecruitingList(@PageableDefault(size = 5, sort = "createDate", direction = Sort.Direction.DESC) Pageable pageable) throws Exception {
+        List<ProjectSimpleDto> projectSimpleDtoList = projectService.findProjectList(true, false, pageable);
         return ResponseEntity.ok(new ResponseDto<>(null, projectSimpleDtoList));
     }
 
     @GetMapping("/recruitment/complete")
-    @ApiOperation(value = "비로그인 : 모집 완료된 프로젝트 목록 조회")
-    public ResponseEntity projectRecruitingCompleteList() {
-        List<LoginProjectSimpleDto> projectDtoList = new ArrayList<>();
-
-        return new ResponseEntity(projectDtoList, HttpStatus.OK);
+    @ApiOperation(value = "모집 완료된 프로젝트 목록 조회")
+    public ResponseEntity projectRecruitingCompleteList(@PageableDefault(size = 5, sort = "createDate", direction = Sort.Direction.DESC) Pageable pageable) throws Exception {
+        List<ProjectSimpleDto> projectSimpleDtoList = projectService.findProjectList(false, false, pageable);
+        return ResponseEntity.ok(new ResponseDto<>(null, projectSimpleDtoList));
     }
 
 
@@ -65,13 +57,13 @@ public class ProjectController {
         return ResponseEntity.ok(new ResponseDto<>(null, projectDetail));
     }
 
-    @PostMapping("/search")
-    @ApiOperation(value = "프로젝트 검색")
-    public ResponseEntity projectSearch(ProjectSearchRequestDto projectSearchRequestDto) {
-        List<NoneLoginProjectSimpleDto> projectDtoList = new ArrayList<>();
-
-        return new ResponseEntity(projectDtoList, HttpStatus.OK);
-    }
+//    @PostMapping("/search")
+//    @ApiOperation(value = "프로젝트 검색")
+//    public ResponseEntity projectSearch(ProjectSearchRequestDto projectSearchRequestDto) {
+//        List<NoneLoginProjectSimpleDto> projectDtoList = new ArrayList<>();
+//
+//        return new ResponseEntity(projectDtoList, HttpStatus.OK);
+//    }
 
     @PatchMapping("/{projectNo}")
     @ApiOperation(value = "프로젝트 수정")
