@@ -317,7 +317,7 @@ class UserServiceTest {
         assertThat(resultNo).isEqualTo(no);
 
         //verify
-        verify(userRepository).deleteById(no);
+        verify(userRepository, times(1)).deleteById(no);
     }
 
 
@@ -653,7 +653,7 @@ class UserServiceTest {
 
     }
 
-    @DisplayName("회원가입 실패 : 이메일 중복 가입")
+    @DisplayName("회원 가입 실패 : 이메일 중복 가입")
     @Test
     public void signupFail1() {
         //given
@@ -702,7 +702,7 @@ class UserServiceTest {
         assertThat(e.getMessage()).isEqualTo("Email is duplicated.");
     }
 
-    @DisplayName("회원가입 실패 : 패스워드(필수 입력 값) 공백 에러")
+    @DisplayName("회원 가입 실패 : 패스워드(필수 입력 값) 공백 에러")
     @Test
     public void signupFail2() {
         //given
@@ -733,7 +733,7 @@ class UserServiceTest {
         assertThat(e.getMessage()).isEqualTo("Password value is blanked");
     }
 
-    @DisplayName("회원가입 실패 : 성별 값이 비정상적으로 들어왔을 경우 에러")
+    @DisplayName("회원 가입 실패 : 성별 값이 비정상적으로 들어왔을 경우 에러")
     @Test
     public void signupFail3() {
         //given
@@ -764,7 +764,7 @@ class UserServiceTest {
         assertThat(e.getMessage()).isEqualTo("Sex value is blanked OR Invalid");
     }
 
-    @DisplayName("회원가입 성공")
+    @DisplayName("회원 가입 성공")
     @Test
     public void signupSuccess() {
         //given
