@@ -119,6 +119,55 @@ class BookMarkRepositoryTest {
 
     @Test
     public void 북마크_존재_확인() {
+        // given
+        LocalDateTime createDate = LocalDateTime.of(2022, 06, 24, 10, 10, 10);
+        LocalDate startDate = LocalDate.of(2022, 06, 24);
+        LocalDate endDate = LocalDate.of(2022, 06, 28);
 
+        User user1 = User.builder()
+                .no(1L)
+                .name("testUser1")
+                .sex('M')
+                .email("testEmail1")
+                .password("testPassword1")
+                .github("testGithub1")
+                .block(false)
+                .blockReason(null)
+                .permission(Role.ROLE_USER)
+                .oauthCategory(OAuth.NORMAL)
+                .email_auth(false)
+                .imageNo(0L)
+                .position(null)
+                .build();
+        User saveUser1 = userRepository.save(user1);
+
+        Project project1 = Project.builder()
+                .name("testName1")
+                .createUserName("user1")
+                .createDate(createDate)
+                .startDate(startDate)
+                .endDate(endDate)
+                .state(true)
+                .introduction("testIntroduction1")
+                .maxPeople(10)
+                .currentPeople(4)
+                .delete(true)
+                .deleteReason(null)
+                .viewCount(10)
+                .commentCount(10)
+                .build();
+        Project saveProject1 = projectRepository.save(project1);
+
+        BookMark bookMark1 = BookMark.builder()
+                .project(saveProject1)
+                .user(saveUser1)
+                .build();
+        bookMarkRepository.save(bookMark1);
+
+        // when
+        boolean result = bookMarkRepository.existBookMark(saveUser1, saveProject1);
+
+        // then
+        assertEquals(result, true);
     }
 }

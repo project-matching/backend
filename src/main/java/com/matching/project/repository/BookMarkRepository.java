@@ -2,6 +2,7 @@ package com.matching.project.repository;
 
 import com.matching.project.dto.bookmark.BookMarkDto;
 import com.matching.project.entity.BookMark;
+import com.matching.project.entity.Project;
 import com.matching.project.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -19,6 +20,6 @@ public interface BookMarkRepository extends JpaRepository<BookMark, Long> {
             " from BookMark b" +
             " inner join b.user u" +
             " inner join b.project p" +
-            " where u.no = :userNo and p.no = :projectNo")
-    public boolean existBookMark(@Param("userNo") Long userNo, @Param("projectNo") Long projectNo);
+            " where u = :user and p = :project")
+    public boolean existBookMark(@Param("user") User user, @Param("project") Project project);
 }

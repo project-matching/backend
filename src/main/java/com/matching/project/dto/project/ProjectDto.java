@@ -25,7 +25,8 @@ public class ProjectDto {
     private Integer maxPeople;
     private boolean bookmark;
     private String register;
-    private List<ProjectPositionDto> projectPosition = new ArrayList<>();
+    private List<String> technicalStack = new ArrayList<>();
+    private List<ProjectPositionDetailDto> projectPositionDetailDtoList = new ArrayList<>();
     private List<CommentDto> commentDtoList = new ArrayList<>();
 
     @Builder
