@@ -2,7 +2,6 @@ package com.matching.project.entity;
 
 import com.matching.project.dto.enumerate.OAuth;
 import com.matching.project.dto.enumerate.Role;
-import com.matching.project.dto.user.UserSimpleInfoDto;
 import com.matching.project.dto.user.UserUpdateRequestDto;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
