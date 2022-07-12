@@ -10,8 +10,5 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
-public interface ProjectRepository extends JpaRepository<Project, Long>{
-
-    @Query("select p from Project p where p.state = :state and p.delete = :delete")
-    Page<Project> findByStateProjectPage(@Param("state") boolean state, @Param("delete") boolean delete, Pageable pageable);
+public interface ProjectRepository extends JpaRepository<Project, Long>, ProjectRepositoryCustom{
 }

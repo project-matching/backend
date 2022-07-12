@@ -240,86 +240,164 @@ class ProjectServiceImplTest {
         LocalDate endDate = LocalDate.of(2022, 06, 28);
 
         // 프로젝트 객체
-        Project project1 = Project.builder()
+        List<ProjectSimpleDto> projectSimpleDtoList = new ArrayList<>();
+        ProjectSimpleDto projectSimpleDto1 = ProjectSimpleDto.builder()
                 .no(1L)
                 .name("testName1")
-                .createUserName("user1")
-                .createDate(createDate)
-                .startDate(startDate)
-                .endDate(endDate)
-                .state(true)
-                .introduction("testIntroduction1")
+                .profile(null)
                 .maxPeople(10)
                 .currentPeople(4)
-                .delete(false)
-                .deleteReason(null)
-                .imageNo(0L)
                 .viewCount(10)
                 .commentCount(10)
+                .register("user1")
+                .bookMark(false)
                 .build();
 
-        Project project2 = Project.builder()
+        ProjectSimplePositionDto positionName1 = ProjectSimplePositionDto.builder()
+                .projectNo(1L)
+                .positionName("testPositionName1")
+                .image(null)
+                .state(true)
+                .build();
+
+        ProjectSimplePositionDto positionName2 = ProjectSimplePositionDto.builder()
+                .projectNo(2L)
+                .positionName("testPositionName2")
+                .image(null)
+                .state(true)
+                .build();
+        List<ProjectSimplePositionDto> projectSimplePositionDtoList1 = projectSimpleDto1.getProjectSimplePositionDtoList();
+        projectSimplePositionDtoList1.add(positionName1);
+        projectSimplePositionDtoList1.add(positionName2);
+
+        ProjectSimpleTechnicalStackDto technicalStackName1 = ProjectSimpleTechnicalStackDto.builder()
+                .projectNo(1L)
+                .technicalStackName("testTechnicalStackName1")
+                .build();
+
+        ProjectSimpleTechnicalStackDto technicalStackName2 = ProjectSimpleTechnicalStackDto.builder()
+                .projectNo(1L)
+                .technicalStackName("testTechnicalStackName2")
+                .build();
+
+        List<ProjectSimpleTechnicalStackDto> projectSimpleTechnicalStackDtoList1 = projectSimpleDto1.getProjectSimpleTechnicalStackDtoList();
+        projectSimpleTechnicalStackDtoList1.add(technicalStackName1);
+        projectSimpleTechnicalStackDtoList1.add(technicalStackName2);
+
+        projectSimpleDtoList.add(projectSimpleDto1);
+
+        ProjectSimpleDto projectSimpleDto2 = ProjectSimpleDto.builder()
                 .no(2L)
                 .name("testName2")
-                .createUserName("user1")
-                .createDate(createDate)
-                .startDate(startDate)
-                .endDate(endDate)
-                .state(true)
-                .introduction("testIntroduction2")
+                .profile(null)
                 .maxPeople(10)
                 .currentPeople(4)
-                .delete(false)
-                .deleteReason(null)
-                .imageNo(0L)
                 .viewCount(10)
                 .commentCount(10)
+                .register("user1")
+                .bookMark(false)
                 .build();
 
-        List<Project> projectList = new ArrayList<>();
-        projectList.add(project2);
-        projectList.add(project1);
+        ProjectSimplePositionDto positionName3 = ProjectSimplePositionDto.builder()
+                .projectNo(2L)
+                .positionName("testPositionName3")
+                .image(null)
+                .state(true)
+                .build();
+
+        ProjectSimplePositionDto positionName4 = ProjectSimplePositionDto.builder()
+                .projectNo(2L)
+                .positionName("testPositionName4")
+                .image(null)
+                .state(true)
+                .build();
+        List<ProjectSimplePositionDto> projectSimplePositionDtoList2 = projectSimpleDto2.getProjectSimplePositionDtoList();
+        projectSimplePositionDtoList2.add(positionName3);
+        projectSimplePositionDtoList2.add(positionName4);
+
+        ProjectSimpleTechnicalStackDto technicalStackName3 = ProjectSimpleTechnicalStackDto.builder()
+                .projectNo(2L)
+                .technicalStackName("testTechnicalStackName3")
+                .build();
+
+        ProjectSimpleTechnicalStackDto technicalStackName4 = ProjectSimpleTechnicalStackDto.builder()
+                .projectNo(2L)
+                .technicalStackName("testTechnicalStackName4")
+                .build();
+
+        List<ProjectSimpleTechnicalStackDto> projectSimpleTechnicalStackDtoList2 = projectSimpleDto2.getProjectSimpleTechnicalStackDtoList();
+        projectSimpleTechnicalStackDtoList2.add(technicalStackName3);
+        projectSimpleTechnicalStackDtoList2.add(technicalStackName4);
+
+        projectSimpleDtoList.add(projectSimpleDto2);
+
 
         // List to Page
         Pageable pageable = PageRequest.of(0, 4, Sort.by("createDate").descending());
         int start = (int)pageable.getOffset();
-        int end = (start + pageable.getPageSize()) > projectList.size() ? projectList.size() : (start + pageable.getPageSize());
-        Page<Project> projectPage = new PageImpl<>(projectList.subList(start, end), pageable, projectList.size());
+        int end = (start + pageable.getPageSize()) > projectSimpleDtoList.size() ? projectSimpleDtoList.size() : (start + pageable.getPageSize());
+        Page<ProjectSimpleDto> projectPage = new PageImpl<>(projectSimpleDtoList.subList(start, end), pageable, projectSimpleDtoList.size());
 
-        given(projectRepository.findByStateProjectPage(any(Boolean.class), any(Boolean.class), any(Pageable.class))).willReturn(projectPage);
+        given(projectRepository.findProjectByStatus(any(Pageable.class), any(Boolean.class), any(Boolean.class), any())).willReturn(projectPage);
 
-        List<ProjectSimpleDto> projectSimpleDtoList = null;
+
+        Page<ProjectSimpleDto> projectSimpleDtoPage = null;
 
         Authentication auth = new AnonymousAuthenticationToken("key", "principle", Arrays.asList(new SimpleGrantedAuthority(Role.ROLE_ANONYMOUS.toString())));
         SecurityContextHolder.getContext().setAuthentication(auth);
         try {
-            projectSimpleDtoList = projectService.findProjectList(true, false, pageable);
+            projectSimpleDtoPage = projectService.findProjectList(true, false, null, pageable);
         } catch (Exception e) {
 
         }
+        List<ProjectSimpleDto> content = projectSimpleDtoPage.getContent();
 
-        verify(projectRepository, times(1)).findByStateProjectPage(any(Boolean.class), any(Boolean.class), any(Pageable.class));
+        verify(projectRepository, times(1)).findProjectByStatus(any(Pageable.class), any(Boolean.class), any(Boolean.class), any());
 
-        assertEquals(projectSimpleDtoList.size(), 2);
-        assertEquals(projectSimpleDtoList.get(0).getNo(), 2L);
-        assertEquals(projectSimpleDtoList.get(0).getName(), "testName2");
-        assertEquals(projectSimpleDtoList.get(0).getProfile(), null);
-        assertEquals(projectSimpleDtoList.get(0).getMaxPeople(), 10);
-        assertEquals(projectSimpleDtoList.get(0).getCurrentPeople(), 4);
-        assertEquals(projectSimpleDtoList.get(0).getViewCount(), 10);
-        assertEquals(projectSimpleDtoList.get(0).getCommentCount(), 10);
-        assertEquals(projectSimpleDtoList.get(0).getRegister(), "user1");
-        assertEquals(projectSimpleDtoList.get(0).isBookMark(), false);
+        assertEquals(content.size(), 2);
+        assertEquals(content.get(0).getNo(), projectSimpleDto1.getNo());
+        assertEquals(content.get(0).getName(), projectSimpleDto1.getName());
+        assertEquals(content.get(0).getProfile(), null);
+        assertEquals(content.get(0).getMaxPeople(), projectSimpleDto1.getMaxPeople());
+        assertEquals(content.get(0).getCurrentPeople(), projectSimpleDto1.getCurrentPeople());
+        assertEquals(content.get(0).getViewCount(), projectSimpleDto1.getViewCount());
+        assertEquals(content.get(0).getCommentCount(), projectSimpleDto1.getCommentCount());
+        assertEquals(content.get(0).getRegister(), projectSimpleDto1.getRegister());
+        assertEquals(content.get(0).isBookMark(), projectSimpleDto1.isBookMark());
 
-        assertEquals(projectSimpleDtoList.get(1).getNo(), 1L);
-        assertEquals(projectSimpleDtoList.get(1).getName(), "testName1");
-        assertEquals(projectSimpleDtoList.get(1).getProfile(), null);
-        assertEquals(projectSimpleDtoList.get(1).getMaxPeople(), 10);
-        assertEquals(projectSimpleDtoList.get(1).getCurrentPeople(), 4);
-        assertEquals(projectSimpleDtoList.get(1).getViewCount(), 10);
-        assertEquals(projectSimpleDtoList.get(1).getCommentCount(), 10);
-        assertEquals(projectSimpleDtoList.get(1).getRegister(), "user1");
-        assertEquals(projectSimpleDtoList.get(1).isBookMark(), false);
+        assertEquals(content.get(0).getProjectSimplePositionDtoList().get(0).getProjectNo(), positionName1.getProjectNo());
+        assertEquals(content.get(0).getProjectSimplePositionDtoList().get(0).getPositionName(), positionName1.getPositionName());
+        assertEquals(content.get(0).getProjectSimplePositionDtoList().get(0).getImage(), positionName1.getImage());
+        assertEquals(content.get(0).getProjectSimplePositionDtoList().get(1).getProjectNo(), positionName2.getProjectNo());
+        assertEquals(content.get(0).getProjectSimplePositionDtoList().get(1).getPositionName(), positionName2.getPositionName());
+        assertEquals(content.get(0).getProjectSimplePositionDtoList().get(1).getImage(), positionName2.getImage());
+
+        assertEquals(content.get(0).getProjectSimpleTechnicalStackDtoList().get(0).getProjectNo(), technicalStackName1.getProjectNo());
+        assertEquals(content.get(0).getProjectSimpleTechnicalStackDtoList().get(0).getTechnicalStackName(), technicalStackName1.getTechnicalStackName());
+        assertEquals(content.get(0).getProjectSimpleTechnicalStackDtoList().get(1).getProjectNo(), technicalStackName2.getProjectNo());
+        assertEquals(content.get(0).getProjectSimpleTechnicalStackDtoList().get(1).getTechnicalStackName(), technicalStackName2.getTechnicalStackName());
+
+        assertEquals(content.get(1).getNo(), projectSimpleDto2.getNo());
+        assertEquals(content.get(1).getName(), projectSimpleDto2.getName());
+        assertEquals(content.get(1).getProfile(), null);
+        assertEquals(content.get(1).getMaxPeople(), projectSimpleDto2.getMaxPeople());
+        assertEquals(content.get(1).getCurrentPeople(), projectSimpleDto2.getCurrentPeople());
+        assertEquals(content.get(1).getViewCount(), projectSimpleDto2.getViewCount());
+        assertEquals(content.get(1).getCommentCount(), projectSimpleDto2.getCommentCount());
+        assertEquals(content.get(1).getRegister(), projectSimpleDto2.getRegister());
+        assertEquals(content.get(1).isBookMark(), projectSimpleDto2.isBookMark());
+
+        assertEquals(content.get(1).getProjectSimplePositionDtoList().get(0).getProjectNo(), positionName3.getProjectNo());
+        assertEquals(content.get(1).getProjectSimplePositionDtoList().get(0).getPositionName(), positionName3.getPositionName());
+        assertEquals(content.get(1).getProjectSimplePositionDtoList().get(0).getImage(), positionName3.getImage());
+        assertEquals(content.get(1).getProjectSimplePositionDtoList().get(1).getProjectNo(), positionName4.getProjectNo());
+        assertEquals(content.get(1).getProjectSimplePositionDtoList().get(1).getPositionName(), positionName4.getPositionName());
+        assertEquals(content.get(1).getProjectSimplePositionDtoList().get(1).getImage(), positionName4.getImage());
+
+        assertEquals(content.get(1).getProjectSimpleTechnicalStackDtoList().get(0).getProjectNo(), technicalStackName3.getProjectNo());
+        assertEquals(content.get(1).getProjectSimpleTechnicalStackDtoList().get(0).getTechnicalStackName(), technicalStackName3.getTechnicalStackName());
+        assertEquals(content.get(1).getProjectSimpleTechnicalStackDtoList().get(1).getProjectNo(), technicalStackName4.getProjectNo());
+        assertEquals(content.get(1).getProjectSimpleTechnicalStackDtoList().get(1).getTechnicalStackName(), technicalStackName4.getTechnicalStackName());
     }
 
     @Test
@@ -346,6 +424,98 @@ class ProjectServiceImplTest {
                 .build();
 
         // 프로젝트 객체
+        List<ProjectSimpleDto> projectSimpleDtoList = new ArrayList<>();
+        ProjectSimpleDto projectSimpleDto1 = ProjectSimpleDto.builder()
+                .no(1L)
+                .name("testName1")
+                .profile(null)
+                .maxPeople(10)
+                .currentPeople(4)
+                .viewCount(10)
+                .commentCount(10)
+                .register("user1")
+                .bookMark(false)
+                .build();
+
+        ProjectSimplePositionDto positionName1 = ProjectSimplePositionDto.builder()
+                .projectNo(1L)
+                .positionName("testPositionName1")
+                .image(null)
+                .state(true)
+                .build();
+
+        ProjectSimplePositionDto positionName2 = ProjectSimplePositionDto.builder()
+                .projectNo(2L)
+                .positionName("testPositionName2")
+                .image(null)
+                .state(true)
+                .build();
+        List<ProjectSimplePositionDto> projectSimplePositionDtoList1 = projectSimpleDto1.getProjectSimplePositionDtoList();
+        projectSimplePositionDtoList1.add(positionName1);
+        projectSimplePositionDtoList1.add(positionName2);
+
+        ProjectSimpleTechnicalStackDto technicalStackName1 = ProjectSimpleTechnicalStackDto.builder()
+                .projectNo(1L)
+                .technicalStackName("testTechnicalStackName1")
+                .build();
+
+        ProjectSimpleTechnicalStackDto technicalStackName2 = ProjectSimpleTechnicalStackDto.builder()
+                .projectNo(1L)
+                .technicalStackName("testTechnicalStackName2")
+                .build();
+
+        List<ProjectSimpleTechnicalStackDto> projectSimpleTechnicalStackDtoList1 = projectSimpleDto1.getProjectSimpleTechnicalStackDtoList();
+        projectSimpleTechnicalStackDtoList1.add(technicalStackName1);
+        projectSimpleTechnicalStackDtoList1.add(technicalStackName2);
+
+        projectSimpleDtoList.add(projectSimpleDto1);
+
+        ProjectSimpleDto projectSimpleDto2 = ProjectSimpleDto.builder()
+                .no(2L)
+                .name("testName2")
+                .profile(null)
+                .maxPeople(10)
+                .currentPeople(4)
+                .viewCount(10)
+                .commentCount(10)
+                .register("user1")
+                .bookMark(false)
+                .build();
+
+        ProjectSimplePositionDto positionName3 = ProjectSimplePositionDto.builder()
+                .projectNo(2L)
+                .positionName("testPositionName3")
+                .image(null)
+                .state(true)
+                .build();
+
+        ProjectSimplePositionDto positionName4 = ProjectSimplePositionDto.builder()
+                .projectNo(2L)
+                .positionName("testPositionName4")
+                .image(null)
+                .state(true)
+                .build();
+        List<ProjectSimplePositionDto> projectSimplePositionDtoList2 = projectSimpleDto2.getProjectSimplePositionDtoList();
+        projectSimplePositionDtoList2.add(positionName3);
+        projectSimplePositionDtoList2.add(positionName4);
+
+        ProjectSimpleTechnicalStackDto technicalStackName3 = ProjectSimpleTechnicalStackDto.builder()
+                .projectNo(2L)
+                .technicalStackName("testTechnicalStackName3")
+                .build();
+
+        ProjectSimpleTechnicalStackDto technicalStackName4 = ProjectSimpleTechnicalStackDto.builder()
+                .projectNo(2L)
+                .technicalStackName("testTechnicalStackName4")
+                .build();
+
+        List<ProjectSimpleTechnicalStackDto> projectSimpleTechnicalStackDtoList2 = projectSimpleDto2.getProjectSimpleTechnicalStackDtoList();
+        projectSimpleTechnicalStackDtoList2.add(technicalStackName3);
+        projectSimpleTechnicalStackDtoList2.add(technicalStackName4);
+
+        projectSimpleDtoList.add(projectSimpleDto2);
+
+        List<BookMark> bookMarkList = new ArrayList<>();
         Project project1 = Project.builder()
                 .no(1L)
                 .name("testName1")
@@ -357,36 +527,11 @@ class ProjectServiceImplTest {
                 .introduction("testIntroduction1")
                 .maxPeople(10)
                 .currentPeople(4)
-                .delete(false)
                 .deleteReason(null)
                 .imageNo(0L)
                 .viewCount(10)
                 .commentCount(10)
                 .build();
-
-        Project project2 = Project.builder()
-                .no(2L)
-                .name("testName2")
-                .createUserName("user1")
-                .createDate(createDate)
-                .startDate(startDate)
-                .endDate(endDate)
-                .state(true)
-                .introduction("testIntroduction2")
-                .maxPeople(10)
-                .currentPeople(4)
-                .delete(false)
-                .deleteReason(null)
-                .imageNo(0L)
-                .viewCount(10)
-                .commentCount(10)
-                .build();
-
-        List<Project> projectList = new ArrayList<>();
-        projectList.add(project2);
-        projectList.add(project1);
-
-        List<BookMark> bookMarkList = new ArrayList<>();
         BookMark bookMark1 = BookMark.builder()
                 .no(1L)
                 .user(user1)
@@ -397,44 +542,70 @@ class ProjectServiceImplTest {
         // List to Page
         Pageable pageable = PageRequest.of(0, 4, Sort.by("createDate").descending());
         int start = (int)pageable.getOffset();
-        int end = (start + pageable.getPageSize()) > projectList.size() ? projectList.size() : (start + pageable.getPageSize());
-        Page<Project> projectPage = new PageImpl<>(projectList.subList(start, end), pageable, projectList.size());
+        int end = (start + pageable.getPageSize()) > projectSimpleDtoList.size() ? projectSimpleDtoList.size() : (start + pageable.getPageSize());
+        Page<ProjectSimpleDto> projectPage = new PageImpl<>(projectSimpleDtoList.subList(start, end), pageable, projectSimpleDtoList.size());
 
-        given(projectRepository.findByStateProjectPage(any(Boolean.class), any(Boolean.class), any(Pageable.class))).willReturn(projectPage);
+        given(projectRepository.findProjectByStatus(any(Pageable.class), any(Boolean.class), any(Boolean.class), any())).willReturn(projectPage);
         given(bookMarkRepository.findByUserNo(any())).willReturn(bookMarkList);
 
-        List<ProjectSimpleDto> projectSimpleDtoList = null;
+        Page<ProjectSimpleDto> projectSimpleDtoPage = null;
 
         UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(user1, "", user1.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(auth);
         try {
-            projectSimpleDtoList = projectService.findProjectList(true, false, pageable);
+            projectSimpleDtoPage = projectService.findProjectList(true, false, null, pageable);
         } catch (Exception e) {
-
+            e.printStackTrace();
         }
 
-        verify(projectRepository, times(1)).findByStateProjectPage(any(Boolean.class), any(Boolean.class), any(Pageable.class));
+        verify(projectRepository, times(1)).findProjectByStatus(any(Pageable.class), any(Boolean.class), any(Boolean.class), any());
+        verify(bookMarkRepository, times(1)).findByUserNo(any());
+        List<ProjectSimpleDto> content = projectSimpleDtoPage.getContent();
 
-        assertEquals(projectSimpleDtoList.size(), 2);
-        assertEquals(projectSimpleDtoList.get(0).getNo(), 2L);
-        assertEquals(projectSimpleDtoList.get(0).getName(), "testName2");
-        assertEquals(projectSimpleDtoList.get(0).getProfile(), null);
-        assertEquals(projectSimpleDtoList.get(0).getMaxPeople(), 10);
-        assertEquals(projectSimpleDtoList.get(0).getCurrentPeople(), 4);
-        assertEquals(projectSimpleDtoList.get(0).getViewCount(), 10);
-        assertEquals(projectSimpleDtoList.get(0).getCommentCount(), 10);
-        assertEquals(projectSimpleDtoList.get(0).getRegister(), "user1");
-        assertEquals(projectSimpleDtoList.get(0).isBookMark(), false);
+        assertEquals(content.size(), 2);
+        assertEquals(content.get(0).getNo(), projectSimpleDto1.getNo());
+        assertEquals(content.get(0).getName(), projectSimpleDto1.getName());
+        assertEquals(content.get(0).getProfile(), null);
+        assertEquals(content.get(0).getMaxPeople(), projectSimpleDto1.getMaxPeople());
+        assertEquals(content.get(0).getCurrentPeople(), projectSimpleDto1.getCurrentPeople());
+        assertEquals(content.get(0).getViewCount(), projectSimpleDto1.getViewCount());
+        assertEquals(content.get(0).getCommentCount(), projectSimpleDto1.getCommentCount());
+        assertEquals(content.get(0).getRegister(), projectSimpleDto1.getRegister());
+        assertEquals(content.get(0).isBookMark(), true);
 
-        assertEquals(projectSimpleDtoList.get(1).getNo(), 1L);
-        assertEquals(projectSimpleDtoList.get(1).getName(), "testName1");
-        assertEquals(projectSimpleDtoList.get(1).getProfile(), null);
-        assertEquals(projectSimpleDtoList.get(1).getMaxPeople(), 10);
-        assertEquals(projectSimpleDtoList.get(1).getCurrentPeople(), 4);
-        assertEquals(projectSimpleDtoList.get(1).getViewCount(), 10);
-        assertEquals(projectSimpleDtoList.get(1).getCommentCount(), 10);
-        assertEquals(projectSimpleDtoList.get(1).getRegister(), "user1");
-        assertEquals(projectSimpleDtoList.get(1).isBookMark(), true);
+        assertEquals(content.get(0).getProjectSimplePositionDtoList().get(0).getProjectNo(), positionName1.getProjectNo());
+        assertEquals(content.get(0).getProjectSimplePositionDtoList().get(0).getPositionName(), positionName1.getPositionName());
+        assertEquals(content.get(0).getProjectSimplePositionDtoList().get(0).getImage(), positionName1.getImage());
+        assertEquals(content.get(0).getProjectSimplePositionDtoList().get(1).getProjectNo(), positionName2.getProjectNo());
+        assertEquals(content.get(0).getProjectSimplePositionDtoList().get(1).getPositionName(), positionName2.getPositionName());
+        assertEquals(content.get(0).getProjectSimplePositionDtoList().get(1).getImage(), positionName2.getImage());
+
+        assertEquals(content.get(0).getProjectSimpleTechnicalStackDtoList().get(0).getProjectNo(), technicalStackName1.getProjectNo());
+        assertEquals(content.get(0).getProjectSimpleTechnicalStackDtoList().get(0).getTechnicalStackName(), technicalStackName1.getTechnicalStackName());
+        assertEquals(content.get(0).getProjectSimpleTechnicalStackDtoList().get(1).getProjectNo(), technicalStackName2.getProjectNo());
+        assertEquals(content.get(0).getProjectSimpleTechnicalStackDtoList().get(1).getTechnicalStackName(), technicalStackName2.getTechnicalStackName());
+
+        assertEquals(content.get(1).getNo(), projectSimpleDto2.getNo());
+        assertEquals(content.get(1).getName(), projectSimpleDto2.getName());
+        assertEquals(content.get(1).getProfile(), null);
+        assertEquals(content.get(1).getMaxPeople(), projectSimpleDto2.getMaxPeople());
+        assertEquals(content.get(1).getCurrentPeople(), projectSimpleDto2.getCurrentPeople());
+        assertEquals(content.get(1).getViewCount(), projectSimpleDto2.getViewCount());
+        assertEquals(content.get(1).getCommentCount(), projectSimpleDto2.getCommentCount());
+        assertEquals(content.get(1).getRegister(), projectSimpleDto2.getRegister());
+        assertEquals(content.get(1).isBookMark(), false);
+
+        assertEquals(content.get(1).getProjectSimplePositionDtoList().get(0).getProjectNo(), positionName3.getProjectNo());
+        assertEquals(content.get(1).getProjectSimplePositionDtoList().get(0).getPositionName(), positionName3.getPositionName());
+        assertEquals(content.get(1).getProjectSimplePositionDtoList().get(0).getImage(), positionName3.getImage());
+        assertEquals(content.get(1).getProjectSimplePositionDtoList().get(1).getProjectNo(), positionName4.getProjectNo());
+        assertEquals(content.get(1).getProjectSimplePositionDtoList().get(1).getPositionName(), positionName4.getPositionName());
+        assertEquals(content.get(1).getProjectSimplePositionDtoList().get(1).getImage(), positionName4.getImage());
+
+        assertEquals(content.get(1).getProjectSimpleTechnicalStackDtoList().get(0).getProjectNo(), technicalStackName3.getProjectNo());
+        assertEquals(content.get(1).getProjectSimpleTechnicalStackDtoList().get(0).getTechnicalStackName(), technicalStackName3.getTechnicalStackName());
+        assertEquals(content.get(1).getProjectSimpleTechnicalStackDtoList().get(1).getProjectNo(), technicalStackName4.getProjectNo());
+        assertEquals(content.get(1).getProjectSimpleTechnicalStackDtoList().get(1).getTechnicalStackName(), technicalStackName4.getTechnicalStackName());
     }
 
     @Test

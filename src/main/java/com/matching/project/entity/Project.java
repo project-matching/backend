@@ -64,6 +64,13 @@ public class Project {
     @ColumnDefault("0")
     private Integer commentCount;
 
+    @OneToMany(mappedBy = "project")
+    private List<ProjectPosition> projectPositionList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "project")
+    private List<ProjectTechnicalStack> ProjectTechnicalStackList = new ArrayList<>();
+
+
     public static Project of(ProjectRegisterRequestDto projectRegisterRequestDto, User user) {
         return Project.builder()
                 .name(projectRegisterRequestDto.getName())
