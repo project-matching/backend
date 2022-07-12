@@ -2,8 +2,9 @@ package com.matching.project.repository;
 
 import com.matching.project.dto.enumerate.OAuth;
 import com.matching.project.dto.enumerate.Role;
-import com.matching.project.entity.Comment;
+import com.matching.project.entity.Position;
 import com.matching.project.entity.Project;
+import com.matching.project.entity.ProjectPosition;
 import com.matching.project.entity.User;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Transactional
-class CommentRepositoryTest {
+class ProjectPositionRepositoryTest {
     @Autowired
     private UserRepository userRepository;
 
@@ -27,10 +28,12 @@ class CommentRepositoryTest {
     private ProjectRepository projectRepository;
 
     @Autowired
-    private CommentRepository commentRepository;
+    private PositionRepository positionRepository;
 
+    @Autowired
+    private ProjectPositionRepository projectPositionRepository;
     @Test
-    public void 프로젝트_번호_검색() {
+    public void 프로젝트_포지션_프로젝트_조회() {
         // given
         LocalDateTime createDate = LocalDateTime.of(2022, 06, 24, 10, 10, 10);
         LocalDate startDate = LocalDate.of(2022, 06, 24);
@@ -68,52 +71,49 @@ class CommentRepositoryTest {
                 .viewCount(10)
                 .commentCount(10)
                 .build();
-
-        Project project2 = Project.builder()
-                .name("testName2")
-                .createUserName("user1")
-                .createDate(createDate)
-                .startDate(startDate)
-                .endDate(endDate)
-                .state(true)
-                .introduction("testIntroduction2")
-                .maxPeople(10)
-                .currentPeople(4)
-                .delete(true)
-                .deleteReason(null)
-                .viewCount(10)
-                .commentCount(10)
-                .build();
-
         Project saveProject1 = projectRepository.save(project1);
-        Project saveProject2 = projectRepository.save(project2);
 
-        Comment comment1 = Comment.builder()
-                .user(saveUser1)
+        Position position1 = Position.builder()
+                .name("testPosition1")
+                .build();
+        Position position2 = Position.builder()
+                .name("testPosition2")
+                .build();
+        Position savePosition1 = positionRepository.save(position1);
+        Position savePosition2 = positionRepository.save(position2);
+
+        ProjectPosition projectPosition1 = ProjectPosition.builder()
+                .state(true)
                 .project(saveProject1)
-                .content("testContent1")
-                .build();
-        Comment comment2 = Comment.builder()
+                .position(savePosition1)
                 .user(saveUser1)
-                .project(saveProject2)
-                .content("testContent1")
+                .creator(false)
                 .build();
-        Comment comment3 = Comment.builder()
-                .user(saveUser1)
-                .project(saveProject2)
-                .content("testContent1")
+        ProjectPosition projectPosition2 = ProjectPosition.builder()
+                .state(false)
+                .project(saveProject1)
+                .position(savePosition2)
+                .user(null)
+                .creator(false)
                 .build();
-        Comment saveComment1 = commentRepository.save(comment1);
-        commentRepository.save(comment2);
-        commentRepository.save(comment3);
+        projectPositionRepository.save(projectPosition1);
+        projectPositionRepository.save(projectPosition2);
 
         // when
-        List<Comment> commentList = commentRepository.findByProjectNo(project1);
+        List<ProjectPosition> projectPositionList = projectPositionRepository.findByProjectWithPositionAndProjectAndUserUsingLeftFetchJoin(project1);
 
-        //then
-        assertEquals(commentList.size(), 1);
-        assertEquals(commentList.get(0).getProject(), saveProject1);
-        assertEquals(commentList.get(0).getUser(), saveUser1);
-        assertEquals(commentList.get(0).getContent(), saveComment1.getContent());
+        // then
+        assertEquals(projectPositionList.get(0).getProject(), saveProject1);
+        assertEquals(projectPositionList.get(0).getPosition(), savePosition1);
+        assertEquals(projectPositionList.get(0).getUser(), saveUser1);
+        assertEquals(projectPositionList.get(0).isCreator(), false);
+        assertEquals(projectPositionList.get(0).isState(), true);
+
+        assertEquals(projectPositionList.get(1).getProject(), saveProject1);
+        assertEquals(projectPositionList.get(1).getPosition(), savePosition2);
+        assertEquals(projectPositionList.get(1).getUser(), null);
+        assertEquals(projectPositionList.get(1).isCreator(), false);
+        assertEquals(projectPositionList.get(1).isState(), false);
     }
+
 }

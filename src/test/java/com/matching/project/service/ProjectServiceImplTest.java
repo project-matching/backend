@@ -48,6 +48,12 @@ class ProjectServiceImplTest {
     @Mock
     TechnicalStackRepository technicalStackRepository;
 
+    @Mock
+    BookMarkRepository bookMarkRepository;
+
+    @Mock
+    CommentRepository commentRepository;
+
     @InjectMocks
     ProjectServiceImpl projectService;
 
@@ -228,7 +234,7 @@ class ProjectServiceImplTest {
     }
 
     @Test
-    public void 비로그인_프로젝트_모집중_목록_조회_성공_테스트() {
+    public void 비로그인_프로젝트_목록_조회_성공_테스트() {
         LocalDateTime createDate = LocalDateTime.of(2022, 06, 24, 10, 10, 10);
         LocalDate startDate = LocalDate.of(2022, 06, 24);
         LocalDate endDate = LocalDate.of(2022, 06, 28);
@@ -303,6 +309,7 @@ class ProjectServiceImplTest {
         assertEquals(projectSimpleDtoList.get(0).getViewCount(), 10);
         assertEquals(projectSimpleDtoList.get(0).getCommentCount(), 10);
         assertEquals(projectSimpleDtoList.get(0).getRegister(), "user1");
+        assertEquals(projectSimpleDtoList.get(0).isBookMark(), false);
 
         assertEquals(projectSimpleDtoList.get(1).getNo(), 1L);
         assertEquals(projectSimpleDtoList.get(1).getName(), "testName1");
@@ -312,463 +319,460 @@ class ProjectServiceImplTest {
         assertEquals(projectSimpleDtoList.get(1).getViewCount(), 10);
         assertEquals(projectSimpleDtoList.get(1).getCommentCount(), 10);
         assertEquals(projectSimpleDtoList.get(1).getRegister(), "user1");
+        assertEquals(projectSimpleDtoList.get(1).isBookMark(), false);
     }
 
-
     @Test
-    public void 로그인_프로젝트_모집중_목록_조회_성공_테스트() {
-//        LocalDateTime createDate = LocalDateTime.of(2022, 06, 24, 10, 10, 10);
-//        LocalDate startDate = LocalDate.of(2022, 06, 24);
-//        LocalDate endDate = LocalDate.of(2022, 06, 28);
-//
-//        // 유저 객체
-//        User user = User.builder()
-//                .no(1L)
-//                .name("testName")
-//                .sex('M')
-//                .email("testEmail")
-//                .github("testGithub")
-//                .selfIntroduction("testSelfIntroduction")
-//                .block(false)
-//                .blockReason(null)
-//                .oauthCategory(OAuth.NORMAL)
-//                .permission(Role.ROLE_USER)
-//                .image(null)
-//                .userPosition(null)
-//                .build();
-//
-//        // 프로젝트 객체
-//        Project project1 = Project.builder()
-//                .no(1L)
-//                .name("testName1")
-//                .createUserName("user1")
-//                .createDate(createDate)
-//                .startDate(startDate)
-//                .endDate(endDate)
-//                .state(true)
-//                .introduction("testIntroduction1")
-//                .maxPeople(10)
-//                .currentPeople(4)
-//                .delete(false)
-//                .deleteReason(null)
-//                .viewCount(10)
-//                .commentCount(10)
-//                .image(null)
-//                .build();
-//
-//        Project project2 = Project.builder()
-//                .no(2L)
-//                .name("testName2")
-//                .createUserName("user1")
-//                .createDate(createDate)
-//                .startDate(startDate)
-//                .endDate(endDate)
-//                .state(true)
-//                .introduction("testIntroduction2")
-//                .maxPeople(10)
-//                .currentPeople(4)
-//                .delete(false)
-//                .deleteReason(null)
-//                .viewCount(10)
-//                .commentCount(10)
-//                .image(null)
-//                .build();
-//
-//        List<Project> projectList = new ArrayList<>();
-//        projectList.add(project2);
-//        projectList.add(project1);
-//
-//
-//        // List to Page
-//        Pageable pageable = PageRequest.of(0, 4, Sort.by("no").descending());
-//        int start = (int)pageable.getOffset();
-//        int end = (start + pageable.getPageSize()) > projectList.size() ? projectList.size() : (start + pageable.getPageSize());
-//        Page<Project> projectPage = new PageImpl<>(projectList.subList(start, end), pageable, projectList.size());
-//
-//        List<BookMark> bookMarkList = new ArrayList<>();
-//
-//        BookMark bookMark = BookMark.builder()
-//                .no(1L)
-//                .user(user)
-//                .project(project1)
-//                .build();
-//        bookMarkList.add(bookMark);
-//
-//        UserDetails userDetails = user;
-//
-//        // 로그인한 유저 securityContext set
-//        Authentication auth = new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
-//        SecurityContextHolder.getContext().setAuthentication(auth);
-//
-//        given(bookMarkRepository.findByUserNo(any(Long.class))).willReturn(bookMarkList);
-//        given(projectRepository.findByStateProjectPage(any(Boolean.class), any(Boolean.class), any(Pageable.class))).willReturn(projectPage);
-//
-//        List<LoginProjectSimpleDto> projectSimpleDtoList = null;
-//
-//        try {
-//            projectSimpleDtoList = projectService.LoginProjectRecruitingList(pageable);
-//        } catch (Exception e) {
-//
-//        }
-//
-//        verify(bookMarkRepository, times(1)).findByUserNo(any(Long.class));
-//        verify(projectRepository, times(1)).findByStateProjectPage(any(Boolean.class), any(Boolean.class), any(Pageable.class));
-//
-//        assertEquals(projectSimpleDtoList.size(), 2);
-//        assertEquals(projectSimpleDtoList.get(0).getNo(), 2L);
-//        assertEquals(projectSimpleDtoList.get(0).getName(), "testName2");
-//        assertEquals(projectSimpleDtoList.get(0).getProfile(), null);
-//        assertEquals(projectSimpleDtoList.get(0).getMaxPeople(), 10);
-//        assertEquals(projectSimpleDtoList.get(0).getCurrentPeople(), 4);
-//        assertEquals(projectSimpleDtoList.get(0).isBookMark(), false);
-//        assertEquals(projectSimpleDtoList.get(0).getViewCount(), 10);
-//        assertEquals(projectSimpleDtoList.get(0).getCommentCount(), 10);
-//        assertEquals(projectSimpleDtoList.get(0).getRegister(), "user1");
-//
-//        assertEquals(projectSimpleDtoList.get(1).getNo(), 1L);
-//        assertEquals(projectSimpleDtoList.get(1).getName(), "testName1");
-//        assertEquals(projectSimpleDtoList.get(1).getProfile(), null);
-//        assertEquals(projectSimpleDtoList.get(1).getMaxPeople(), 10);
-//        assertEquals(projectSimpleDtoList.get(1).getCurrentPeople(), 4);
-//        assertEquals(projectSimpleDtoList.get(1).isBookMark(), true);
-//        assertEquals(projectSimpleDtoList.get(1).getViewCount(), 10);
-//        assertEquals(projectSimpleDtoList.get(1).getCommentCount(), 10);
-//        assertEquals(projectSimpleDtoList.get(1).getRegister(), "user1");
+    public void 로그인_프로젝트_목록_조회_성공_테스트() {
+        LocalDateTime createDate = LocalDateTime.of(2022, 06, 24, 10, 10, 10);
+        LocalDate startDate = LocalDate.of(2022, 06, 24);
+        LocalDate endDate = LocalDate.of(2022, 06, 28);
+        
+        // 유저 객체
+        User user1 = User.builder()
+                .no(1L)
+                .name("testUser1")
+                .sex('M')
+                .email("testEmail1")
+                .password("testPassword1")
+                .github("testGithub1")
+                .block(false)
+                .blockReason(null)
+                .permission(Role.ROLE_USER)
+                .oauthCategory(OAuth.NORMAL)
+                .email_auth(false)
+                .imageNo(0L)
+                .position(null)
+                .build();
+
+        // 프로젝트 객체
+        Project project1 = Project.builder()
+                .no(1L)
+                .name("testName1")
+                .createUserName("user1")
+                .createDate(createDate)
+                .startDate(startDate)
+                .endDate(endDate)
+                .state(true)
+                .introduction("testIntroduction1")
+                .maxPeople(10)
+                .currentPeople(4)
+                .delete(false)
+                .deleteReason(null)
+                .imageNo(0L)
+                .viewCount(10)
+                .commentCount(10)
+                .build();
+
+        Project project2 = Project.builder()
+                .no(2L)
+                .name("testName2")
+                .createUserName("user1")
+                .createDate(createDate)
+                .startDate(startDate)
+                .endDate(endDate)
+                .state(true)
+                .introduction("testIntroduction2")
+                .maxPeople(10)
+                .currentPeople(4)
+                .delete(false)
+                .deleteReason(null)
+                .imageNo(0L)
+                .viewCount(10)
+                .commentCount(10)
+                .build();
+
+        List<Project> projectList = new ArrayList<>();
+        projectList.add(project2);
+        projectList.add(project1);
+
+        List<BookMark> bookMarkList = new ArrayList<>();
+        BookMark bookMark1 = BookMark.builder()
+                .no(1L)
+                .user(user1)
+                .project(project1)
+                .build();
+        bookMarkList.add(bookMark1);
+
+        // List to Page
+        Pageable pageable = PageRequest.of(0, 4, Sort.by("createDate").descending());
+        int start = (int)pageable.getOffset();
+        int end = (start + pageable.getPageSize()) > projectList.size() ? projectList.size() : (start + pageable.getPageSize());
+        Page<Project> projectPage = new PageImpl<>(projectList.subList(start, end), pageable, projectList.size());
+
+        given(projectRepository.findByStateProjectPage(any(Boolean.class), any(Boolean.class), any(Pageable.class))).willReturn(projectPage);
+        given(bookMarkRepository.findByUserNo(any())).willReturn(bookMarkList);
+
+        List<ProjectSimpleDto> projectSimpleDtoList = null;
+
+        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(user1, "", user1.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(auth);
+        try {
+            projectSimpleDtoList = projectService.findProjectList(true, false, pageable);
+        } catch (Exception e) {
+
+        }
+
+        verify(projectRepository, times(1)).findByStateProjectPage(any(Boolean.class), any(Boolean.class), any(Pageable.class));
+
+        assertEquals(projectSimpleDtoList.size(), 2);
+        assertEquals(projectSimpleDtoList.get(0).getNo(), 2L);
+        assertEquals(projectSimpleDtoList.get(0).getName(), "testName2");
+        assertEquals(projectSimpleDtoList.get(0).getProfile(), null);
+        assertEquals(projectSimpleDtoList.get(0).getMaxPeople(), 10);
+        assertEquals(projectSimpleDtoList.get(0).getCurrentPeople(), 4);
+        assertEquals(projectSimpleDtoList.get(0).getViewCount(), 10);
+        assertEquals(projectSimpleDtoList.get(0).getCommentCount(), 10);
+        assertEquals(projectSimpleDtoList.get(0).getRegister(), "user1");
+        assertEquals(projectSimpleDtoList.get(0).isBookMark(), false);
+
+        assertEquals(projectSimpleDtoList.get(1).getNo(), 1L);
+        assertEquals(projectSimpleDtoList.get(1).getName(), "testName1");
+        assertEquals(projectSimpleDtoList.get(1).getProfile(), null);
+        assertEquals(projectSimpleDtoList.get(1).getMaxPeople(), 10);
+        assertEquals(projectSimpleDtoList.get(1).getCurrentPeople(), 4);
+        assertEquals(projectSimpleDtoList.get(1).getViewCount(), 10);
+        assertEquals(projectSimpleDtoList.get(1).getCommentCount(), 10);
+        assertEquals(projectSimpleDtoList.get(1).getRegister(), "user1");
+        assertEquals(projectSimpleDtoList.get(1).isBookMark(), true);
     }
 
     @Test
     public void 비로그인_프로젝트_상세_조회_성공_테스트() {
         // given
-//        LocalDateTime createDate = LocalDateTime.of(2022, 06, 24, 10, 10, 10);
-//        LocalDate startDate = LocalDate.of(2022, 06, 24);
-//        LocalDate endDate = LocalDate.of(2022, 06, 28);
-//
-//        // projectQueryDto 객체 생성
-//        ProjectQueryDto projectQueryDto = new ProjectQueryDto(1L, "testProjectName1", "testCreateUserName1", createDate, startDate, endDate, true, "testIntroduction1", 10, 4, false, "deleteReasonTest", 10, 10);
-//
-//        // projectPositionDto 객체 생성
-//        ProjectPositionQueryDto frontPosition = new ProjectPositionQueryDto(1L, Position.FRONTEND, false);
-//        ProjectPositionQueryDto backPosition = new ProjectPositionQueryDto(2L, Position.BACKEND, false);
-//
-//        // ProjectTechnicalStackQueryDto 객체 생성
-//        ProjectTechnicalStackQueryDto frontTechnicalStack1 = new ProjectTechnicalStackQueryDto(1L, 1L, "frontTechnicalStack1");
-//        ProjectTechnicalStackQueryDto frontTechnicalStack2 = new ProjectTechnicalStackQueryDto(1L, 2L, "frontTechnicalStack2");
-//        frontPosition.getProjectTechnicalStackList().add(frontTechnicalStack1);
-//        frontPosition.getProjectTechnicalStackList().add(frontTechnicalStack2);
-//
-//        ProjectTechnicalStackQueryDto backTechnicalStack1 = new ProjectTechnicalStackQueryDto(1L, 3L, "backTechnicalStack1");
-//        ProjectTechnicalStackQueryDto backTechnicalStack2 = new ProjectTechnicalStackQueryDto(1L, 4L, "backTechnicalStack2");
-//        backPosition.getProjectTechnicalStackList().add(backTechnicalStack1);
-//        backPosition.getProjectTechnicalStackList().add(backTechnicalStack2);
-//
-//        projectQueryDto.getProjectPositionList().add(frontPosition);
-//        projectQueryDto.getProjectPositionList().add(backPosition);
-//
-//
-//        // 프로젝트에 참가중인 유저
-//        User user1 = User.builder()
-//                .no(1L)
-//                .name("testUserName1")
-//                .sex('M')
-//                .email("testEmail1")
-//                .password("testPassword")
-//                .github("testGithub")
-//                .selfIntroduction("testSelfIntroduction")
-//                .block(false)
-//                .blockReason(null)
-//                .oauthCategory(OAuth.NORMAL)
-//                .permission(Role.ROLE_USER)
-//                .image(null)
-//                .userPosition(null)
-//                .build();
-//
-//        User user2 = User.builder()
-//                .no(2L)
-//                .name("testUserName2")
-//                .sex('M')
-//                .email("testEmail2")
-//                .password("testPassword")
-//                .github("testGithub")
-//                .selfIntroduction("testSelfIntroduction")
-//                .block(false)
-//                .blockReason(null)
-//                .oauthCategory(OAuth.NORMAL)
-//                .permission(Role.ROLE_USER)
-//                .image(null)
-//                .userPosition(null)
-//                .build();
-//
-//        Project project1 = Project.builder()
-//                .no(1L)
-//                .name("testProjectName1")
-//                .createUserName("testCreateUserName1")
-//                .createDate(createDate)
-//                .startDate(startDate)
-//                .endDate(endDate)
-//                .state(true)
-//                .introduction("testIntroduction1")
-//                .maxPeople(10)
-//                .currentPeople(4)
-//                .delete(false)
-//                .deleteReason(null)
-//                .viewCount(10)
-//                .commentCount(10)
-//                .image(null)
-//                .build();
-//
-//        ProjectUser projectUser1 = ProjectUser.builder()
-//                .no(1L)
-//                .projectPosition(Position.FRONTEND)
-//                .user(user1)
-//                .creator(true)
-//                .project(project1).build();
-//        ProjectUser projectUser2 = ProjectUser.builder()
-//                .no(2L)
-//                .projectPosition(Position.BACKEND)
-//                .user(user2)
-//                .creator(false)
-//                .project(project1).build();
-//        List<ProjectUser> projectUserList = new ArrayList<>();
-//        projectUserList.add(projectUser1);
-//        projectUserList.add(projectUser2);
-//
-//        // 프로젝트 댓글
-//        Comment comment1 = Comment.builder()
-//                .no(1L)
-//                .user(user1)
-//                .project(project1)
-//                .content("testComment1")
-//                .build();
-//
-//        Comment comment2 = Comment.builder()
-//                .no(2L)
-//                .user(user1)
-//                .project(project1)
-//                .content("testComment2")
-//                .build();
-//
-//        List<Comment> commentList = new ArrayList<>();
-//        commentList.add(comment1);
-//        commentList.add(comment2);
-//
-//        given(projectRepository.findDetailProject(any(Long.class))).willReturn(projectQueryDto);
-//        given(projectUserRepository.findByProjectNo(any(Long.class))).willReturn(projectUserList);
-//        given(commentRepository.findByProjectNo(any(Long.class))).willReturn(commentList);
-//
-//        // when
-//        ProjectDto projectDetail = projectService.getProjectDetail(1L);
-//
-//        // then
-//        assertEquals(projectDetail.getName(), project1.getName());
-//        assertEquals(projectDetail.getProfile(), null);
-//        assertEquals(projectDetail.getCreateDate(), project1.getCreateDate());
-//        assertEquals(projectDetail.getStartDate(), project1.getStartDate());
-//        assertEquals(projectDetail.getEndDate(), project1.getEndDate());
-//        assertEquals(projectDetail.isState(), project1.isState());
-//        assertEquals(projectDetail.getIntroduction(), project1.getIntroduction());
-//        assertEquals(projectDetail.getMaxPeople(), project1.getMaxPeople());
-//        assertEquals(projectDetail.isBookmark(), false);
-//        assertEquals(projectDetail.getRegister(), project1.getCreateUserName());
-//
-//        assertEquals(projectDetail.getUserSimpleInfoDtoList().get(0).getNo(), user1.getNo());
-//        assertEquals(projectDetail.getUserSimpleInfoDtoList().get(0).getProfile(), null);
-//        assertEquals(projectDetail.getUserSimpleInfoDtoList().get(0).getName(), user1.getName());
-//        assertEquals(projectDetail.getUserSimpleInfoDtoList().get(0).getProjectPosition(), projectUser1.getProjectPosition());
-//        assertEquals(projectDetail.getUserSimpleInfoDtoList().get(0).isCreator(), projectUser1.isCreator());
-//
-//        assertEquals(projectDetail.getUserSimpleInfoDtoList().get(1).getNo(), user2.getNo());
-//        assertEquals(projectDetail.getUserSimpleInfoDtoList().get(1).getProfile(), null);
-//        assertEquals(projectDetail.getUserSimpleInfoDtoList().get(1).getName(), user2.getName());
-//        assertEquals(projectDetail.getUserSimpleInfoDtoList().get(1).getProjectPosition(), projectUser2.getProjectPosition());
-//        assertEquals(projectDetail.getUserSimpleInfoDtoList().get(1).isCreator(), projectUser2.isCreator());
-//
-//
-//        assertEquals(projectDetail.getProjectPosition().get(0).getPosition(), frontPosition.getPosition());
-//        assertEquals(projectDetail.getProjectPosition().get(0).getTechnicalStack().get(0), frontPosition.getProjectTechnicalStackList().get(0).getName());
-//        assertEquals(projectDetail.getProjectPosition().get(0).getTechnicalStack().get(1), frontPosition.getProjectTechnicalStackList().get(1).getName());
-//
-//        assertEquals(projectDetail.getProjectPosition().get(1).getPosition(), backPosition.getPosition());
-//        assertEquals(projectDetail.getProjectPosition().get(1).getTechnicalStack().get(0), backPosition.getProjectTechnicalStackList().get(0).getName());
-//        assertEquals(projectDetail.getProjectPosition().get(1).getTechnicalStack().get(1), backPosition.getProjectTechnicalStackList().get(1).getName());
-//
-//
-//        assertEquals(projectDetail.getCommentDtoList().get(0).getNo(), comment1.getNo());
-//        assertEquals(projectDetail.getCommentDtoList().get(0).getRegistrant(), user1.getName());
-//        assertEquals(projectDetail.getCommentDtoList().get(0).getContent(), comment1.getContent());
-//
-//        assertEquals(projectDetail.getCommentDtoList().get(1).getNo(), comment2.getNo());
-//        assertEquals(projectDetail.getCommentDtoList().get(1).getRegistrant(), user1.getName());
-//        assertEquals(projectDetail.getCommentDtoList().get(1).getContent(), comment2.getContent());
+        LocalDateTime createDate = LocalDateTime.of(2022, 06, 24, 10, 10, 10);
+        LocalDate startDate = LocalDate.of(2022, 06, 24);
+        LocalDate endDate = LocalDate.of(2022, 06, 28);
+
+        // 유저 객체
+        User user1 = User.builder()
+                .no(1L)
+                .name("testUser1")
+                .sex('M')
+                .email("testEmail1")
+                .password("testPassword1")
+                .github("testGithub1")
+                .block(false)
+                .blockReason(null)
+                .permission(Role.ROLE_USER)
+                .oauthCategory(OAuth.NORMAL)
+                .email_auth(false)
+                .imageNo(0L)
+                .position(null)
+                .build();
+
+        // 프로젝트 객체
+        Project project1 = Project.builder()
+                .no(1L)
+                .name("testName1")
+                .createUserName("user1")
+                .createDate(createDate)
+                .startDate(startDate)
+                .endDate(endDate)
+                .state(true)
+                .introduction("testIntroduction1")
+                .maxPeople(10)
+                .currentPeople(4)
+                .delete(false)
+                .deleteReason(null)
+                .imageNo(0L)
+                .viewCount(10)
+                .commentCount(10)
+                .build();
+        
+        // 포지션 세팅
+        Position position1 = Position.builder()
+                .no(1L)
+                .name("testPosition1")
+                .build();
+        Position position2 = Position.builder()
+                .no(2L)
+                .name("testPosition2")
+                .build();
+
+        List<ProjectPosition> projectPositionList = new ArrayList<>();
+        ProjectPosition projectPosition1 = ProjectPosition.builder()
+                .no(1L)
+                .state(true)
+                .project(project1)
+                .position(position1)
+                .user(user1)
+                .creator(false)
+                .build();
+        ProjectPosition projectPosition2 = ProjectPosition.builder()
+                .no(2L)
+                .state(false)
+                .project(project1)
+                .position(position2)
+                .user(null)
+                .creator(false)
+                .build();
+        projectPositionList.add(projectPosition1);
+        projectPositionList.add(projectPosition2);
+        
+        // 댓글 세팅
+        List<Comment> commentList = new ArrayList<>();
+        Comment comment1 = Comment.builder()
+                .no(1L)
+                .user(user1)
+                .project(project1)
+                .content("testContent1")
+                .build();
+        Comment comment2 = Comment.builder()
+                .no(2L)
+                .user(user1)
+                .project(project1)
+                .content("testContent1")
+                .build();
+        commentList.add(comment1);
+        commentList.add(comment2);
+        
+        // 기술 스택 세팅
+        TechnicalStack technicalStack1 = TechnicalStack.builder()
+                .no(1L)
+                .name("testTechnicalStack1")
+                .build();
+        TechnicalStack technicalStack2 = TechnicalStack.builder()
+                .no(2L)
+                .name("testTechnicalStack2")
+                .build();
+
+        List<ProjectTechnicalStack> projectTechnicalStackList = new ArrayList<>();
+        ProjectTechnicalStack projectTechnicalStack1 = ProjectTechnicalStack.builder()
+                .no(1L)
+                .project(project1)
+                .technicalStack(technicalStack1)
+                .build();
+        ProjectTechnicalStack projectTechnicalStack2 = ProjectTechnicalStack.builder()
+                .no(2L)
+                .project(project1)
+                .technicalStack(technicalStack2)
+                .build();
+        projectTechnicalStackList.add(projectTechnicalStack1);
+        projectTechnicalStackList.add(projectTechnicalStack2);
+
+        given(projectRepository.findById(any())).willReturn(Optional.of(project1));
+        given(projectPositionRepository.findByProjectWithPositionAndProjectAndUserUsingLeftFetchJoin(any())).willReturn(projectPositionList);
+        given(commentRepository.findByProjectNo(any())).willReturn(commentList);
+        given(projectTechnicalStackRepository.findByProjectWithTechnicalStackAndProjectUsingFetchJoin(any())).willReturn(projectTechnicalStackList);
+
+        // when
+        Authentication auth = new AnonymousAuthenticationToken("key", "principle", Arrays.asList(new SimpleGrantedAuthority(Role.ROLE_ANONYMOUS.toString())));
+        SecurityContextHolder.getContext().setAuthentication(auth);
+        ProjectDto projectDto = null;
+
+        try {
+            projectDto = projectService.getProjectDetail(1L);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // then
+        verify(projectRepository).findById(any());
+        verify(projectPositionRepository).findByProjectWithPositionAndProjectAndUserUsingLeftFetchJoin(any());
+        verify(commentRepository).findByProjectNo(any());
+        verify(projectTechnicalStackRepository).findByProjectWithTechnicalStackAndProjectUsingFetchJoin(any());
+
+        assertEquals(projectDto.getName(), project1.getName());
+        assertEquals(projectDto.getProfile(), null);
+        assertEquals(projectDto.getCreateDate(), project1.getCreateDate());
+        assertEquals(projectDto.getStartDate(), project1.getStartDate());
+        assertEquals(projectDto.getEndDate(), project1.getEndDate());
+        assertEquals(projectDto.isState(), project1.isState());
+        assertEquals(projectDto.getIntroduction(), project1.getIntroduction());
+        assertEquals(projectDto.getMaxPeople(), project1.getMaxPeople());
+        assertEquals(projectDto.isBookmark(), false);
+        assertEquals(projectDto.getRegister(), project1.getCreateUserName());
+        assertEquals(projectDto.getTechnicalStack().get(0), technicalStack1.getName());
+        assertEquals(projectDto.getTechnicalStack().get(1), technicalStack2.getName());
+
+        assertEquals(projectDto.getProjectPositionDetailDtoList().get(0).getPositionName(), projectPosition1.getPosition().getName());
+        assertEquals(projectDto.getProjectPositionDetailDtoList().get(0).getUserNo(), projectPosition1.getUser().getNo());
+        assertEquals(projectDto.getProjectPositionDetailDtoList().get(0).getUserName(), projectPosition1.getUser().getName());
+        assertEquals(projectDto.getProjectPositionDetailDtoList().get(0).isState(), projectPosition1.isState());
+
+        assertEquals(projectDto.getProjectPositionDetailDtoList().get(1).getPositionName(), projectPosition2.getPosition().getName());
+        assertEquals(projectDto.getProjectPositionDetailDtoList().get(1).getUserNo(), null);
+        assertEquals(projectDto.getProjectPositionDetailDtoList().get(1).getUserName(), null);
+        assertEquals(projectDto.getProjectPositionDetailDtoList().get(1).isState(), projectPosition2.isState());
+
+        assertEquals(projectDto.getCommentDtoList().get(0).getNo(), comment1.getNo());
+        assertEquals(projectDto.getCommentDtoList().get(0).getRegistrant(), comment1.getUser().getName());
+        assertEquals(projectDto.getCommentDtoList().get(0).getContent(), comment1.getContent());
+
+        assertEquals(projectDto.getCommentDtoList().get(1).getNo(), comment2.getNo());
+        assertEquals(projectDto.getCommentDtoList().get(1).getRegistrant(), comment2.getUser().getName());
+        assertEquals(projectDto.getCommentDtoList().get(1).getContent(), comment2.getContent());
 
     }
 
     @Test
     public void 로그인_프로젝트_상세_조회_성공_테스트() {
-//        // given
-//        LocalDateTime createDate = LocalDateTime.of(2022, 06, 24, 10, 10, 10);
-//        LocalDate startDate = LocalDate.of(2022, 06, 24);
-//        LocalDate endDate = LocalDate.of(2022, 06, 28);
-//
-//        // projectQueryDto 객체 생성
-//        ProjectQueryDto projectQueryDto = new ProjectQueryDto(1L, "testProjectName1", "testCreateUserName1", createDate, startDate, endDate, true, "testIntroduction1", 10, 4, false, "deleteReasonTest", 10, 10);
-//
-//        // projectPositionDto 객체 생성
-//        ProjectPositionQueryDto frontPosition = new ProjectPositionQueryDto(1L, Position.FRONTEND, false);
-//        ProjectPositionQueryDto backPosition = new ProjectPositionQueryDto(2L, Position.BACKEND, false);
-//
-//        // ProjectTechnicalStackQueryDto 객체 생성
-//        ProjectTechnicalStackQueryDto frontTechnicalStack1 = new ProjectTechnicalStackQueryDto(1L, 1L, "frontTechnicalStack1");
-//        ProjectTechnicalStackQueryDto frontTechnicalStack2 = new ProjectTechnicalStackQueryDto(1L, 2L, "frontTechnicalStack2");
-//        frontPosition.getProjectTechnicalStackList().add(frontTechnicalStack1);
-//        frontPosition.getProjectTechnicalStackList().add(frontTechnicalStack2);
-//
-//        ProjectTechnicalStackQueryDto backTechnicalStack1 = new ProjectTechnicalStackQueryDto(1L, 3L, "backTechnicalStack1");
-//        ProjectTechnicalStackQueryDto backTechnicalStack2 = new ProjectTechnicalStackQueryDto(1L, 4L, "backTechnicalStack2");
-//        backPosition.getProjectTechnicalStackList().add(backTechnicalStack1);
-//        backPosition.getProjectTechnicalStackList().add(backTechnicalStack2);
-//
-//        projectQueryDto.getProjectPositionList().add(frontPosition);
-//        projectQueryDto.getProjectPositionList().add(backPosition);
-//
-//
-//        // 프로젝트에 참가중인 유저
-//        User user1 = User.builder()
-//                .no(1L)
-//                .name("testUserName1")
-//                .sex('M')
-//                .email("testEmail1")
-//                .password("testPassword")
-//                .github("testGithub")
-//                .selfIntroduction("testSelfIntroduction")
-//                .block(false)
-//                .blockReason(null)
-//                .oauthCategory(OAuth.NORMAL)
-//                .permission(Role.ROLE_USER)
-//                .image(null)
-//                .userPosition(null)
-//                .build();
-//
-//        User user2 = User.builder()
-//                .no(2L)
-//                .name("testUserName2")
-//                .sex('M')
-//                .email("testEmail2")
-//                .password("testPassword")
-//                .github("testGithub")
-//                .selfIntroduction("testSelfIntroduction")
-//                .block(false)
-//                .blockReason(null)
-//                .oauthCategory(OAuth.NORMAL)
-//                .permission(Role.ROLE_USER)
-//                .image(null)
-//                .userPosition(null)
-//                .build();
-//
-//        Project project1 = Project.builder()
-//                .no(1L)
-//                .name("testProjectName1")
-//                .createUserName("testCreateUserName1")
-//                .createDate(createDate)
-//                .startDate(startDate)
-//                .endDate(endDate)
-//                .state(true)
-//                .introduction("testIntroduction1")
-//                .maxPeople(10)
-//                .currentPeople(4)
-//                .delete(false)
-//                .deleteReason(null)
-//                .viewCount(10)
-//                .commentCount(10)
-//                .image(null)
-//                .build();
-//
-//        ProjectUser projectUser1 = ProjectUser.builder()
-//                .no(1L)
-//                .projectPosition(Position.FRONTEND)
-//                .user(user1)
-//                .creator(true)
-//                .project(project1).build();
-//        ProjectUser projectUser2 = ProjectUser.builder()
-//                .no(2L)
-//                .projectPosition(Position.BACKEND)
-//                .user(user2)
-//                .creator(false)
-//                .project(project1).build();
-//        List<ProjectUser> projectUserList = new ArrayList<>();
-//        projectUserList.add(projectUser1);
-//        projectUserList.add(projectUser2);
-//
-//        // 프로젝트 댓글
-//        Comment comment1 = Comment.builder()
-//                .no(1L)
-//                .user(user1)
-//                .project(project1)
-//                .content("testComment1")
-//                .build();
-//
-//        Comment comment2 = Comment.builder()
-//                .no(2L)
-//                .user(user1)
-//                .project(project1)
-//                .content("testComment2")
-//                .build();
-//
-//        List<Comment> commentList = new ArrayList<>();
-//        commentList.add(comment1);
-//        commentList.add(comment2);
-//
-//        given(projectRepository.findDetailProject(any(Long.class))).willReturn(projectQueryDto);
-//        given(projectUserRepository.findByProjectNo(any(Long.class))).willReturn(projectUserList);
-//        given(commentRepository.findByProjectNo(any(Long.class))).willReturn(commentList);
-//        given(bookMarkRepository.existBookMark(any(Long.class), any(Long.class))).willReturn(true);
-//
-//        // when
-//        UserDetails userDetails = user1;
-//        Authentication auth = new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
-//        SecurityContextHolder.getContext().setAuthentication(auth);
-//        ProjectDto projectDetail = projectService.getProjectDetail(1L);
-//
-//        // then
-//        assertEquals(projectDetail.getName(), project1.getName());
-//        assertEquals(projectDetail.getProfile(), null);
-//        assertEquals(projectDetail.getCreateDate(), project1.getCreateDate());
-//        assertEquals(projectDetail.getStartDate(), project1.getStartDate());
-//        assertEquals(projectDetail.getEndDate(), project1.getEndDate());
-//        assertEquals(projectDetail.isState(), project1.isState());
-//        assertEquals(projectDetail.getIntroduction(), project1.getIntroduction());
-//        assertEquals(projectDetail.getMaxPeople(), project1.getMaxPeople());
-//        assertEquals(projectDetail.isBookmark(), true);
-//        assertEquals(projectDetail.getRegister(), project1.getCreateUserName());
-//
-//        assertEquals(projectDetail.getUserSimpleInfoDtoList().get(0).getNo(), user1.getNo());
-//        assertEquals(projectDetail.getUserSimpleInfoDtoList().get(0).getProfile(), null);
-//        assertEquals(projectDetail.getUserSimpleInfoDtoList().get(0).getName(), user1.getName());
-//        assertEquals(projectDetail.getUserSimpleInfoDtoList().get(0).getProjectPosition(), projectUser1.getProjectPosition());
-//        assertEquals(projectDetail.getUserSimpleInfoDtoList().get(0).isCreator(), projectUser1.isCreator());
-//
-//        assertEquals(projectDetail.getUserSimpleInfoDtoList().get(1).getNo(), user2.getNo());
-//        assertEquals(projectDetail.getUserSimpleInfoDtoList().get(1).getProfile(), null);
-//        assertEquals(projectDetail.getUserSimpleInfoDtoList().get(1).getName(), user2.getName());
-//        assertEquals(projectDetail.getUserSimpleInfoDtoList().get(1).getProjectPosition(), projectUser2.getProjectPosition());
-//        assertEquals(projectDetail.getUserSimpleInfoDtoList().get(1).isCreator(), projectUser2.isCreator());
-//
-//
-//        assertEquals(projectDetail.getProjectPosition().get(0).getPosition(), frontPosition.getPosition());
-//        assertEquals(projectDetail.getProjectPosition().get(0).getTechnicalStack().get(0), frontPosition.getProjectTechnicalStackList().get(0).getName());
-//        assertEquals(projectDetail.getProjectPosition().get(0).getTechnicalStack().get(1), frontPosition.getProjectTechnicalStackList().get(1).getName());
-//
-//        assertEquals(projectDetail.getProjectPosition().get(1).getPosition(), backPosition.getPosition());
-//        assertEquals(projectDetail.getProjectPosition().get(1).getTechnicalStack().get(0), backPosition.getProjectTechnicalStackList().get(0).getName());
-//        assertEquals(projectDetail.getProjectPosition().get(1).getTechnicalStack().get(1), backPosition.getProjectTechnicalStackList().get(1).getName());
-//
-//
-//        assertEquals(projectDetail.getCommentDtoList().get(0).getNo(), comment1.getNo());
-//        assertEquals(projectDetail.getCommentDtoList().get(0).getRegistrant(), user1.getName());
-//        assertEquals(projectDetail.getCommentDtoList().get(0).getContent(), comment1.getContent());
-//
-//        assertEquals(projectDetail.getCommentDtoList().get(1).getNo(), comment2.getNo());
-//        assertEquals(projectDetail.getCommentDtoList().get(1).getRegistrant(), user1.getName());
-//        assertEquals(projectDetail.getCommentDtoList().get(1).getContent(), comment2.getContent());
+        // given
+        LocalDateTime createDate = LocalDateTime.of(2022, 06, 24, 10, 10, 10);
+        LocalDate startDate = LocalDate.of(2022, 06, 24);
+        LocalDate endDate = LocalDate.of(2022, 06, 28);
 
+        // 유저 객체
+        User user1 = User.builder()
+                .no(1L)
+                .name("testUser1")
+                .sex('M')
+                .email("testEmail1")
+                .password("testPassword1")
+                .github("testGithub1")
+                .block(false)
+                .blockReason(null)
+                .permission(Role.ROLE_USER)
+                .oauthCategory(OAuth.NORMAL)
+                .email_auth(false)
+                .imageNo(0L)
+                .position(null)
+                .build();
+
+        // 프로젝트 객체
+        Project project1 = Project.builder()
+                .no(1L)
+                .name("testName1")
+                .createUserName("user1")
+                .createDate(createDate)
+                .startDate(startDate)
+                .endDate(endDate)
+                .state(true)
+                .introduction("testIntroduction1")
+                .maxPeople(10)
+                .currentPeople(4)
+                .delete(false)
+                .deleteReason(null)
+                .imageNo(0L)
+                .viewCount(10)
+                .commentCount(10)
+                .build();
+
+        // 포지션 세팅
+        Position position1 = Position.builder()
+                .no(1L)
+                .name("testPosition1")
+                .build();
+        Position position2 = Position.builder()
+                .no(2L)
+                .name("testPosition2")
+                .build();
+
+        List<ProjectPosition> projectPositionList = new ArrayList<>();
+        ProjectPosition projectPosition1 = ProjectPosition.builder()
+                .no(1L)
+                .state(true)
+                .project(project1)
+                .position(position1)
+                .user(user1)
+                .creator(false)
+                .build();
+        ProjectPosition projectPosition2 = ProjectPosition.builder()
+                .no(2L)
+                .state(false)
+                .project(project1)
+                .position(position2)
+                .user(null)
+                .creator(false)
+                .build();
+        projectPositionList.add(projectPosition1);
+        projectPositionList.add(projectPosition2);
+
+        // 댓글 세팅
+        List<Comment> commentList = new ArrayList<>();
+        Comment comment1 = Comment.builder()
+                .no(1L)
+                .user(user1)
+                .project(project1)
+                .content("testContent1")
+                .build();
+        Comment comment2 = Comment.builder()
+                .no(2L)
+                .user(user1)
+                .project(project1)
+                .content("testContent1")
+                .build();
+        commentList.add(comment1);
+        commentList.add(comment2);
+
+        // 기술 스택 세팅
+        TechnicalStack technicalStack1 = TechnicalStack.builder()
+                .no(1L)
+                .name("testTechnicalStack1")
+                .build();
+        TechnicalStack technicalStack2 = TechnicalStack.builder()
+                .no(2L)
+                .name("testTechnicalStack2")
+                .build();
+
+        List<ProjectTechnicalStack> projectTechnicalStackList = new ArrayList<>();
+        ProjectTechnicalStack projectTechnicalStack1 = ProjectTechnicalStack.builder()
+                .no(1L)
+                .project(project1)
+                .technicalStack(technicalStack1)
+                .build();
+        ProjectTechnicalStack projectTechnicalStack2 = ProjectTechnicalStack.builder()
+                .no(2L)
+                .project(project1)
+                .technicalStack(technicalStack2)
+                .build();
+        projectTechnicalStackList.add(projectTechnicalStack1);
+        projectTechnicalStackList.add(projectTechnicalStack2);
+
+        given(projectRepository.findById(any())).willReturn(Optional.of(project1));
+        given(projectPositionRepository.findByProjectWithPositionAndProjectAndUserUsingLeftFetchJoin(any())).willReturn(projectPositionList);
+        given(commentRepository.findByProjectNo(any())).willReturn(commentList);
+        given(projectTechnicalStackRepository.findByProjectWithTechnicalStackAndProjectUsingFetchJoin(any())).willReturn(projectTechnicalStackList);
+        given(bookMarkRepository.existBookMark(any(), any())).willReturn(true);
+
+        // when
+        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(user1, "", user1.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(auth);
+        ProjectDto projectDto = null;
+
+        try {
+            projectDto = projectService.getProjectDetail(1L);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // then
+        verify(projectRepository).findById(any());
+        verify(projectPositionRepository).findByProjectWithPositionAndProjectAndUserUsingLeftFetchJoin(any());
+        verify(commentRepository).findByProjectNo(any());
+        verify(projectTechnicalStackRepository).findByProjectWithTechnicalStackAndProjectUsingFetchJoin(any());
+        verify(bookMarkRepository).existBookMark(any(), any());
+
+        assertEquals(projectDto.getName(), project1.getName());
+        assertEquals(projectDto.getProfile(), null);
+        assertEquals(projectDto.getCreateDate(), project1.getCreateDate());
+        assertEquals(projectDto.getStartDate(), project1.getStartDate());
+        assertEquals(projectDto.getEndDate(), project1.getEndDate());
+        assertEquals(projectDto.isState(), project1.isState());
+        assertEquals(projectDto.getIntroduction(), project1.getIntroduction());
+        assertEquals(projectDto.getMaxPeople(), project1.getMaxPeople());
+        assertEquals(projectDto.isBookmark(), true);
+        assertEquals(projectDto.getRegister(), project1.getCreateUserName());
+        assertEquals(projectDto.getTechnicalStack().get(0), technicalStack1.getName());
+        assertEquals(projectDto.getTechnicalStack().get(1), technicalStack2.getName());
+
+        assertEquals(projectDto.getProjectPositionDetailDtoList().get(0).getPositionName(), projectPosition1.getPosition().getName());
+        assertEquals(projectDto.getProjectPositionDetailDtoList().get(0).getUserNo(), projectPosition1.getUser().getNo());
+        assertEquals(projectDto.getProjectPositionDetailDtoList().get(0).getUserName(), projectPosition1.getUser().getName());
+        assertEquals(projectDto.getProjectPositionDetailDtoList().get(0).isState(), projectPosition1.isState());
+
+        assertEquals(projectDto.getProjectPositionDetailDtoList().get(1).getPositionName(), projectPosition2.getPosition().getName());
+        assertEquals(projectDto.getProjectPositionDetailDtoList().get(1).getUserNo(), null);
+        assertEquals(projectDto.getProjectPositionDetailDtoList().get(1).getUserName(), null);
+        assertEquals(projectDto.getProjectPositionDetailDtoList().get(1).isState(), projectPosition2.isState());
+
+        assertEquals(projectDto.getCommentDtoList().get(0).getNo(), comment1.getNo());
+        assertEquals(projectDto.getCommentDtoList().get(0).getRegistrant(), comment1.getUser().getName());
+        assertEquals(projectDto.getCommentDtoList().get(0).getContent(), comment1.getContent());
+
+        assertEquals(projectDto.getCommentDtoList().get(1).getNo(), comment2.getNo());
+        assertEquals(projectDto.getCommentDtoList().get(1).getRegistrant(), comment2.getUser().getName());
+        assertEquals(projectDto.getCommentDtoList().get(1).getContent(), comment2.getContent());
     }
 }
