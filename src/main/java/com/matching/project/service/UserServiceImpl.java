@@ -3,14 +3,8 @@ package com.matching.project.service;
 import com.matching.project.dto.enumerate.OAuth;
 import com.matching.project.dto.enumerate.Role;
 import com.matching.project.dto.user.*;
-import com.matching.project.entity.Position;
-import com.matching.project.entity.TechnicalStack;
-import com.matching.project.entity.User;
-import com.matching.project.entity.UserTechnicalStack;
-import com.matching.project.repository.PositionRepository;
-import com.matching.project.repository.TechnicalStackRepository;
-import com.matching.project.repository.UserRepository;
-import com.matching.project.repository.UserTechnicalStackRepository;
+import com.matching.project.entity.*;
+import com.matching.project.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -19,8 +13,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -36,6 +32,8 @@ public class UserServiceImpl implements UserService{
     private final TechnicalStackRepository technicalStackRepository;
     private final UserTechnicalStackRepository userTechnicalStackRepository;
     private final PasswordEncoder passwordEncoder;
+    private final ImageService imageService;
+    private final ImageRepository imageRepository;
 
     public void signUpValidCheck(SignUpRequestDto dto) {
         // 참고 : https://lovefor-you.tistory.com/113
@@ -87,7 +85,7 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public User userSignUp(SignUpRequestDto dto){
+    public User userSignUp(SignUpRequestDto dto, MultipartFile file){
 
         // Valid Check
         signUpValidCheck(dto);
@@ -99,12 +97,22 @@ public class UserServiceImpl implements UserService{
         Position position = getPositionForSave(dto.getPosition());
         List<TechnicalStack> saveTechnicalStacksList = getTechnicalStacksListForSave(dto.getTechnicalStackList());
 
+        // Image Upload
+        Long imageNo = null;
+        try {
+            if (!file.isEmpty())
+                imageNo = imageService.imageUpload(file, 56, 56);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         // Position Save
         if (position != null)
             positionRepository.save(position);
 
         // User Save
         User user = dto.toUserEntity(dto, position);
+        user.setProfileImageNo(imageNo);
         userRepository.save(user);
 
         // TechnicalStacks Save
@@ -121,6 +129,18 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
+    public String getUserProfileImage(Long no) {
+        String imgUrl = null;
+        if (no != null) {
+            Optional<Image> img = imageRepository.findById(no);
+            img.orElseThrow(() -> new RuntimeException("Not Find Profile Image"));
+            if (img.isPresent())
+                imgUrl = img.get().getUrl();
+        }
+        return imgUrl;
+    }
+
+    @Override
     public UserInfoResponseDto userInfo(Long no) {
         Optional<User> user = userRepository.findById(no);
         user.orElseThrow(() -> new RuntimeException("Not Find User No"));
@@ -128,6 +148,7 @@ public class UserServiceImpl implements UserService{
         String position = null;
         if (user.get().getPosition() != null)
             position = user.get().getPosition().getName();
+
         List<String> technicalStackList = userTechnicalStackRepository.findUserTechnicalStacksByUser(no)
                 .stream()
                 .map(UserTechnicalStack::getTechnicalStack)
@@ -142,13 +163,25 @@ public class UserServiceImpl implements UserService{
                 .technicalStackList(technicalStackList)
                 .github(user.get().getGithub())
                 .selfIntroduction(user.get().getSelfIntroduction())
+                .profile(getUserProfileImage(user.get().getImageNo()))
                 .build();
     }
 
     @Override
     public List<UserSimpleInfoDto> userInfoList(Pageable pageable) {
         Page<User> users = userRepository.findAll(pageable);
-        return users.get().map(UserSimpleInfoDto::toUserSimpleInfoDto).collect(Collectors.toList());
+        List<UserSimpleInfoDto> userSimpleInfoDtos = new ArrayList<>();
+        for (User user: users) {
+            String imgUrl = getUserProfileImage(user.getImageNo());
+            userSimpleInfoDtos.add(UserSimpleInfoDto.builder()
+                    .no(user.getNo())
+                    .name(user.getName())
+                    .email(user.getEmail())
+                    .profile(imgUrl)
+                    .build()
+            );
+        }
+        return userSimpleInfoDtos;
     }
 
     public void updateValidCheck(UserUpdateRequestDto dto, User user) {
@@ -168,7 +201,7 @@ public class UserServiceImpl implements UserService{
 
     @Transactional
     @Override
-    public User userUpdate(Long no, UserUpdateRequestDto dto) {
+    public User userUpdate(Long no, UserUpdateRequestDto dto, MultipartFile file) {
         // Identification Check
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User identificationUser = (User)auth.getPrincipal();
@@ -188,6 +221,21 @@ public class UserServiceImpl implements UserService{
         // Get Entity
         Position position = getPositionForSave(dto.getPosition());
         List<TechnicalStack> saveTechnicalStacksList = getTechnicalStacksListForSave(dto.getTechnicalStackList());
+
+        // Delete existing images & New Image Upload
+        Long imageNo = null;
+        if (!file.isEmpty()) {
+            try {
+                // Delete existing images
+                if (optionalUser.get().getImageNo() != null)
+                    imageService.imageDelete(optionalUser.get().getImageNo());
+                // New Image Upload
+                imageNo = imageService.imageUpload(file, 56, 56);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        optionalUser.get().setProfileImageNo(imageNo);
 
         // User & Position Update
         optionalUser.get().updateUser(dto, position);

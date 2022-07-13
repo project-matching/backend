@@ -12,6 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import javax.persistence.*;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Optional;
 
 @Builder
 @NoArgsConstructor
@@ -71,6 +72,10 @@ public class User implements UserDetails {
         return Arrays.asList(new SimpleGrantedAuthority(permission.toString()));
     }
 
+    public void setProfileImageNo(Long imageNo) {
+        this.imageNo = imageNo;
+    }
+
     public void userBlock(String blockReason) {
         this.block = true;
         this.blockReason = blockReason;
@@ -94,7 +99,6 @@ public class User implements UserDetails {
             this.sex = 0;
         this.github = dto.getGithub();
         this.selfIntroduction = dto.getSelfIntroduction();
-        this.imageNo = null;
         this.position = position;
         return this;
     }

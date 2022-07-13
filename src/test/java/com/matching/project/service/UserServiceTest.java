@@ -21,16 +21,23 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.*;
+import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.web.multipart.MultipartFile;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.*;
 
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -53,6 +60,9 @@ class UserServiceTest {
 
     @Mock
     private UserTechnicalStackRepository userTechnicalStackRepository;
+
+    @Mock
+    private ImageService imageService;
 
     @Spy
     private BCryptPasswordEncoder passwordEncoder; // 타입이 'PasswordEncoder'이면 @spy로 하여도 동작하지 않음.
@@ -338,6 +348,8 @@ class UserServiceTest {
         technicalStackList.add("JPA");
         technicalStackList.add("React");
 
+        MockMultipartFile file = new MockMultipartFile("file", "file".getBytes());
+
         Position p1 = Position.builder().no(1L).name(position).build();
 
         Optional<User> user = Optional.of(User.builder()
@@ -382,7 +394,7 @@ class UserServiceTest {
 
         //when
         Exception e = Assertions.assertThrows(RuntimeException.class, () -> {
-            userService.userUpdate(7L, dto);
+            userService.userUpdate(7L, dto, file);
         });
 
         //then
@@ -406,6 +418,8 @@ class UserServiceTest {
         technicalStackList.add("Spring Boot");
         technicalStackList.add("JPA");
         technicalStackList.add("React");
+
+        MockMultipartFile file = new MockMultipartFile("file", "file".getBytes());
 
         Position p1 = Position.builder().no(1L).name(position).build();
 
@@ -453,7 +467,7 @@ class UserServiceTest {
 
         //when
         Exception e = Assertions.assertThrows(RuntimeException.class, () -> {
-            userService.userUpdate(no, dto);
+            userService.userUpdate(no, dto, file);
         });
 
         //then
@@ -517,6 +531,8 @@ class UserServiceTest {
         newTechnicalStackList.add("Spring Boot");
         newTechnicalStackList.add("React");
 
+        MockMultipartFile file = new MockMultipartFile("file", "file".getBytes());
+
         Position p2 = Position.builder().no(2L).name(newPosition).build();
 
         UserUpdateRequestDto dto = UserUpdateRequestDto.builder()
@@ -538,9 +554,14 @@ class UserServiceTest {
         given(positionRepository.findAllByName(newPosition)).willReturn(Optional.ofNullable(p2));
         given(technicalStackRepository.findAll()).willReturn(technicalStacks);
         given(userTechnicalStackRepository.findUserTechnicalStacksByUser(no)).willReturn(userTechnicalStackList);
+        try {
+            given(imageService.imageUpload(file, 56, 56)).willReturn(1L);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         //when
-        User resultUser = userService.userUpdate(no, dto);
+        User resultUser = userService.userUpdate(no, dto, file);
 
         //then
         assertThat(resultUser.getName()).isEqualTo(dto.getName());
@@ -605,7 +626,6 @@ class UserServiceTest {
         List<String> technicalStackList = new ArrayList<>();
         technicalStackList.add("JPA");
 
-
         Position p = Position.builder().no(1L).name("BACKEND").build();
 
         List<TechnicalStack> technicalStacks = new ArrayList<>();
@@ -649,8 +669,6 @@ class UserServiceTest {
         assertThat(userInfo.getPosition()).isEqualTo(position);
         assertThat(userInfo.getTechnicalStackList().get(0)).isEqualTo("JPA");
 
-
-
     }
 
     @DisplayName("회원 가입 실패 : 이메일 중복 가입")
@@ -664,6 +682,8 @@ class UserServiceTest {
         String github ="https://github.com/leeworld9";
         String selfIntroduction = "자기소개~~~";
         String position = "BACKEND";
+
+        MockMultipartFile file = new MockMultipartFile("file", "file".getBytes());
 
         SignUpRequestDto dto = SignUpRequestDto.builder()
                 .name(name)
@@ -695,7 +715,7 @@ class UserServiceTest {
 
         //when
         Exception e = Assertions.assertThrows(RuntimeException.class, () -> {
-            userService.userSignUp(dto);
+            userService.userSignUp(dto, file);
         });
 
         //then
@@ -714,6 +734,8 @@ class UserServiceTest {
         String selfIntroduction = "자기소개~~~";
         String position = "BACKEND";
 
+        MockMultipartFile file = new MockMultipartFile("file", "file".getBytes());
+
         SignUpRequestDto dto = SignUpRequestDto.builder()
                 .name(name)
                 .sex(sex)
@@ -726,7 +748,7 @@ class UserServiceTest {
 
         //when
         Exception e = Assertions.assertThrows(RuntimeException.class, () -> {
-            userService.userSignUp(dto);
+            userService.userSignUp(dto, file);
         });
 
         //then
@@ -745,6 +767,8 @@ class UserServiceTest {
         String selfIntroduction = "자기소개~~~";
         String position = "BACKEND";
 
+        MockMultipartFile file = new MockMultipartFile("file", "file".getBytes());
+
         SignUpRequestDto dto = SignUpRequestDto.builder()
                 .name(name)
                 .sex(sex)
@@ -757,7 +781,7 @@ class UserServiceTest {
 
         //when
         Exception e = Assertions.assertThrows(RuntimeException.class, () -> {
-            userService.userSignUp(dto);
+            userService.userSignUp(dto, file);
         });
 
         //then
@@ -790,6 +814,8 @@ class UserServiceTest {
                 .technicalStackList(technicalStackList)
                 .build();
 
+        MockMultipartFile file = new MockMultipartFile("file", "file".getBytes());
+
         Position p = Position.builder().no(1L).name("BACKEND").build();
 
         List<TechnicalStack> technicalStacks = new ArrayList<>();
@@ -818,9 +844,14 @@ class UserServiceTest {
         given(technicalStackRepository.findAll()).willReturn(technicalStacks);
         given(positionRepository.save(p)).willReturn(p);
         given(userRepository.save(any(User.class))).willReturn(user);
+        try {
+            given(imageService.imageUpload(file, 56, 56)).willReturn(1L);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         //when
-        User wUser = userService.userSignUp(dto);
+        User wUser = userService.userSignUp(dto, file);
 
         //then
         assertThat(wUser.getName()).isEqualTo(dto.getName());
@@ -834,5 +865,4 @@ class UserServiceTest {
         verify(userTechnicalStackRepository, times(2)).save(any());
 
     }
-
 }

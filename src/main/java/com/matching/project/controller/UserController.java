@@ -12,11 +12,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +41,8 @@ public class UserController {
                             UserSimpleInfoDto dto = UserSimpleInfoDto.builder()
                     .no(user.getNo())
                     .name(user.getName())
-                    .profile(null)
+                    .email(user.getEmail())
+                    .profile(userService.getUserProfileImage(user.getImageNo()))
                     .build();
                 ResponseDto<UserSimpleInfoDto> response = ResponseDto.<UserSimpleInfoDto>builder().data(dto).build();
                 return ResponseEntity.ok().body(response);
@@ -55,11 +58,12 @@ public class UserController {
 
     }
 
-    @PostMapping
-    @ApiOperation(value = "회원가입")
-    public ResponseEntity signUp(@RequestBody SignUpRequestDto signUpRequestDto) {
+    @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    @ApiOperation(value = "회원가입", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity signUp(@RequestPart("data") SignUpRequestDto signUpRequestDto,
+                                 @RequestPart("image") MultipartFile file) {
         try {
-            User user = userService.userSignUp(signUpRequestDto);
+            User user = userService.userSignUp(signUpRequestDto, file);
             // 클라이언트에서 dto 정보가 추가적으로 더 필요하면 수정 필요
             SignUpResponseDto signUpResponseDto = SignUpResponseDto.builder()
                     .no(user.getNo())
@@ -140,11 +144,13 @@ public class UserController {
         return ResponseEntity.ok().body(responseDto);
     }
 
-    @PatchMapping("/{no}")
+    @PatchMapping(path = "/{no}", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     @ApiOperation(value = "회원 정보 수정")
-    public ResponseEntity userUpdate(@PathVariable Long no, @RequestBody UserUpdateRequestDto userUpdateRequestDto) {
+    public ResponseEntity userUpdate(@PathVariable Long no,
+                                     @RequestPart("data") UserUpdateRequestDto userUpdateRequestDto,
+                                     @RequestPart("image") MultipartFile file) {
         try {
-            User user = userService.userUpdate(no, userUpdateRequestDto);
+            User user = userService.userUpdate(no, userUpdateRequestDto, file);
             ResponseDto responseDto = ResponseDto.builder()
                     .data(user.getNo()).build();
             return ResponseEntity.ok().body(responseDto);
