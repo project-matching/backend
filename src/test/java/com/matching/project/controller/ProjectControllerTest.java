@@ -4,11 +4,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.matching.project.config.SecurityConfig;
 import com.matching.project.dto.common.TokenDto;
+import com.matching.project.dto.enumerate.Filter;
 import com.matching.project.dto.enumerate.OAuth;
 import com.matching.project.dto.enumerate.Role;
 import com.matching.project.dto.project.ProjectPositionDto;
 import com.matching.project.dto.project.ProjectRegisterRequestDto;
 import com.matching.project.dto.project.ProjectRegisterResponseDto;
+import com.matching.project.dto.project.ProjectSearchRequestDto;
 import com.matching.project.entity.*;
 import com.matching.project.oauth.CustomOAuth2UserService;
 import com.matching.project.repository.*;
@@ -304,39 +306,71 @@ class ProjectControllerTest {
         User saveUser = saveUser();
         List<Project> saveRecruitmentProject = saveRecruitmentProject();
         saveRecruitmentCompleteProject();
+        
+        // 포지션 세팅
+        Position position1 = Position.builder()
+                .name("testPosition1")
+                .build();
+        Position savePosition1 = positionRepository.save(position1);
+        ProjectPosition projectPosition1 = ProjectPosition.builder()
+                .project(saveRecruitmentProject.get(0))
+                .position(savePosition1)
+                .build();
+        ProjectPosition saveProjectPosition1 = projectPositionRepository.save(projectPosition1);
+        
+        // 기술스택 세팅
+        TechnicalStack technicalStack1 = TechnicalStack.builder()
+                .name("testTechnicalStack1")
+                .build();
+        technicalStackRepository.save(technicalStack1);
+
+        ProjectTechnicalStack projectTechnicalStack1 = ProjectTechnicalStack.builder()
+                .technicalStack(technicalStack1)
+                .project(saveRecruitmentProject.get(0))
+                .build();
+
+        ProjectTechnicalStack saveProjectTechnicalStack1 = projectTechnicalStackRepository.save(projectTechnicalStack1);
+
         // 0번째 1번째는 북마크
         saveBookMark(saveUser, saveRecruitmentProject.get(0));
         saveBookMark(saveUser, saveRecruitmentProject.get(1));
 
+        // then
         mvc.perform(get("/v1/project/recruitment").contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(header().string("Content-type", "application/json"))
-                .andExpect(jsonPath("$.data[0].name").value("testName2"))
-                .andExpect(jsonPath("$.data[0].profile").isEmpty())
-                .andExpect(jsonPath("$.data[0].maxPeople").value(10))
-                .andExpect(jsonPath("$.data[0].currentPeople").value(4))
-                .andExpect(jsonPath("$.data[0].viewCount").value(10))
-                .andExpect(jsonPath("$.data[0].commentCount").value(10))
-                .andExpect(jsonPath("$.data[0].register").value("user"))
-                .andExpect(jsonPath("$.data[0].bookMark").value(false))
+                .andExpect(jsonPath("$.data.content[0].name").value("testName2"))
+                .andExpect(jsonPath("$.data.content[0].profile").isEmpty())
+                .andExpect(jsonPath("$.data.content[0].maxPeople").value(10))
+                .andExpect(jsonPath("$.data.content[0].currentPeople").value(4))
+                .andExpect(jsonPath("$.data.content[0].viewCount").value(10))
+                .andExpect(jsonPath("$.data.content[0].commentCount").value(10))
+                .andExpect(jsonPath("$.data.content[0].register").value("user"))
+                .andExpect(jsonPath("$.data.content[0].bookMark").value(false))
 
-                .andExpect(jsonPath("$.data[1].name").value("testName1"))
-                .andExpect(jsonPath("$.data[1].profile").isEmpty())
-                .andExpect(jsonPath("$.data[1].maxPeople").value(10))
-                .andExpect(jsonPath("$.data[1].currentPeople").value(4))
-                .andExpect(jsonPath("$.data[1].viewCount").value(10))
-                .andExpect(jsonPath("$.data[1].commentCount").value(10))
-                .andExpect(jsonPath("$.data[1].register").value("user"))
-                .andExpect(jsonPath("$.data[1].bookMark").value(false))
+                .andExpect(jsonPath("$.data.content[1].name").value("testName1"))
+                .andExpect(jsonPath("$.data.content[1].profile").isEmpty())
+                .andExpect(jsonPath("$.data.content[1].maxPeople").value(10))
+                .andExpect(jsonPath("$.data.content[1].currentPeople").value(4))
+                .andExpect(jsonPath("$.data.content[1].viewCount").value(10))
+                .andExpect(jsonPath("$.data.content[1].commentCount").value(10))
+                .andExpect(jsonPath("$.data.content[1].register").value("user"))
+                .andExpect(jsonPath("$.data.content[1].bookMark").value(false))
 
-                .andExpect(jsonPath("$.data[2].name").value("testName0"))
-                .andExpect(jsonPath("$.data[2].profile").isEmpty())
-                .andExpect(jsonPath("$.data[2].maxPeople").value(10))
-                .andExpect(jsonPath("$.data[2].currentPeople").value(4))
-                .andExpect(jsonPath("$.data[2].viewCount").value(10))
-                .andExpect(jsonPath("$.data[2].commentCount").value(10))
-                .andExpect(jsonPath("$.data[2].register").value("user"))
-                .andExpect(jsonPath("$.data[2].bookMark").value(false))
+                .andExpect(jsonPath("$.data.content[2].name").value("testName0"))
+                .andExpect(jsonPath("$.data.content[2].profile").isEmpty())
+                .andExpect(jsonPath("$.data.content[2].maxPeople").value(10))
+                .andExpect(jsonPath("$.data.content[2].currentPeople").value(4))
+                .andExpect(jsonPath("$.data.content[2].viewCount").value(10))
+                .andExpect(jsonPath("$.data.content[2].commentCount").value(10))
+                .andExpect(jsonPath("$.data.content[2].register").value("user"))
+                .andExpect(jsonPath("$.data.content[2].bookMark").value(false))
+                .andExpect(jsonPath("$.data.content[2].projectSimplePositionDtoList[0].projectNo").value(saveProjectPosition1.getProject().getNo()))
+                .andExpect(jsonPath("$.data.content[2].projectSimplePositionDtoList[0].positionName").value(saveProjectPosition1.getPosition().getName()))
+                .andExpect(jsonPath("$.data.content[2].projectSimplePositionDtoList[0].image").isEmpty())
+                .andExpect(jsonPath("$.data.content[2].projectSimplePositionDtoList[0].state").value(saveProjectPosition1.isState()))
+                .andExpect(jsonPath("$.data.content[2].projectSimpleTechnicalStackDtoList[0].projectNo").value(saveProjectTechnicalStack1.getProject().getNo()))
+                .andExpect(jsonPath("$.data.content[2].projectSimpleTechnicalStackDtoList[0].technicalStackName").value(saveProjectTechnicalStack1.getTechnicalStack().getName()))
 
                 .andExpect(status().isOk());
     }
@@ -346,10 +380,36 @@ class ProjectControllerTest {
         User saveUser = saveUser();
         List<Project> saveRecruitmentProject = saveRecruitmentProject();
         saveRecruitmentCompleteProject();
+
+        // 포지션 세팅
+        Position position1 = Position.builder()
+                .name("testPosition1")
+                .build();
+        Position savePosition1 = positionRepository.save(position1);
+        ProjectPosition projectPosition1 = ProjectPosition.builder()
+                .project(saveRecruitmentProject.get(0))
+                .position(savePosition1)
+                .build();
+        ProjectPosition saveProjectPosition1 = projectPositionRepository.save(projectPosition1);
+
+        // 기술스택 세팅
+        TechnicalStack technicalStack1 = TechnicalStack.builder()
+                .name("testTechnicalStack1")
+                .build();
+        technicalStackRepository.save(technicalStack1);
+
+        ProjectTechnicalStack projectTechnicalStack1 = ProjectTechnicalStack.builder()
+                .technicalStack(technicalStack1)
+                .project(saveRecruitmentProject.get(0))
+                .build();
+
+        ProjectTechnicalStack saveProjectTechnicalStack1 = projectTechnicalStackRepository.save(projectTechnicalStack1);
+
         // 0번째 1번째는 북마크
         saveBookMark(saveUser, saveRecruitmentProject.get(0));
         saveBookMark(saveUser, saveRecruitmentProject.get(1));
 
+        // then
         String token = jwtTokenService.createToken(new TokenDto(saveUser.getNo(), saveUser.getEmail()));
 
         mvc.perform(get("/v1/project/recruitment")
@@ -357,85 +417,153 @@ class ProjectControllerTest {
                         .header("Authorization", "Bearer " + token))
                 .andDo(print())
                 .andExpect(header().string("Content-type", "application/json"))
-                .andExpect(jsonPath("$.data[0].name").value("testName2"))
-                .andExpect(jsonPath("$.data[0].profile").isEmpty())
-                .andExpect(jsonPath("$.data[0].maxPeople").value(10))
-                .andExpect(jsonPath("$.data[0].currentPeople").value(4))
-                .andExpect(jsonPath("$.data[0].viewCount").value(10))
-                .andExpect(jsonPath("$.data[0].commentCount").value(10))
-                .andExpect(jsonPath("$.data[0].register").value("user"))
-                .andExpect(jsonPath("$.data[0].bookMark").value(false))
+                .andExpect(jsonPath("$.data.content[0].name").value("testName2"))
+                .andExpect(jsonPath("$.data.content[0].profile").isEmpty())
+                .andExpect(jsonPath("$.data.content[0].maxPeople").value(10))
+                .andExpect(jsonPath("$.data.content[0].currentPeople").value(4))
+                .andExpect(jsonPath("$.data.content[0].viewCount").value(10))
+                .andExpect(jsonPath("$.data.content[0].commentCount").value(10))
+                .andExpect(jsonPath("$.data.content[0].register").value("user"))
+                .andExpect(jsonPath("$.data.content[0].bookMark").value(false))
 
-                .andExpect(jsonPath("$.data[1].name").value("testName1"))
-                .andExpect(jsonPath("$.data[1].profile").isEmpty())
-                .andExpect(jsonPath("$.data[1].maxPeople").value(10))
-                .andExpect(jsonPath("$.data[1].currentPeople").value(4))
-                .andExpect(jsonPath("$.data[1].viewCount").value(10))
-                .andExpect(jsonPath("$.data[1].commentCount").value(10))
-                .andExpect(jsonPath("$.data[1].register").value("user"))
-                .andExpect(jsonPath("$.data[1].bookMark").value(true))
+                .andExpect(jsonPath("$.data.content[1].name").value("testName1"))
+                .andExpect(jsonPath("$.data.content[1].profile").isEmpty())
+                .andExpect(jsonPath("$.data.content[1].maxPeople").value(10))
+                .andExpect(jsonPath("$.data.content[1].currentPeople").value(4))
+                .andExpect(jsonPath("$.data.content[1].viewCount").value(10))
+                .andExpect(jsonPath("$.data.content[1].commentCount").value(10))
+                .andExpect(jsonPath("$.data.content[1].register").value("user"))
+                .andExpect(jsonPath("$.data.content[1].bookMark").value(true))
 
-                .andExpect(jsonPath("$.data[2].name").value("testName0"))
-                .andExpect(jsonPath("$.data[2].profile").isEmpty())
-                .andExpect(jsonPath("$.data[2].maxPeople").value(10))
-                .andExpect(jsonPath("$.data[2].currentPeople").value(4))
-                .andExpect(jsonPath("$.data[2].viewCount").value(10))
-                .andExpect(jsonPath("$.data[2].commentCount").value(10))
-                .andExpect(jsonPath("$.data[2].register").value("user"))
-                .andExpect(jsonPath("$.data[2].bookMark").value(true))
+                .andExpect(jsonPath("$.data.content[2].name").value("testName0"))
+                .andExpect(jsonPath("$.data.content[2].profile").isEmpty())
+                .andExpect(jsonPath("$.data.content[2].maxPeople").value(10))
+                .andExpect(jsonPath("$.data.content[2].currentPeople").value(4))
+                .andExpect(jsonPath("$.data.content[2].viewCount").value(10))
+                .andExpect(jsonPath("$.data.content[2].commentCount").value(10))
+                .andExpect(jsonPath("$.data.content[2].register").value("user"))
+                .andExpect(jsonPath("$.data.content[2].bookMark").value(true))
+                .andExpect(jsonPath("$.data.content[2].projectSimplePositionDtoList[0].projectNo").value(saveProjectPosition1.getProject().getNo()))
+                .andExpect(jsonPath("$.data.content[2].projectSimplePositionDtoList[0].positionName").value(saveProjectPosition1.getPosition().getName()))
+                .andExpect(jsonPath("$.data.content[2].projectSimplePositionDtoList[0].image").isEmpty())
+                .andExpect(jsonPath("$.data.content[2].projectSimplePositionDtoList[0].state").value(saveProjectPosition1.isState()))
+                .andExpect(jsonPath("$.data.content[2].projectSimpleTechnicalStackDtoList[0].projectNo").value(saveProjectTechnicalStack1.getProject().getNo()))
+                .andExpect(jsonPath("$.data.content[2].projectSimpleTechnicalStackDtoList[0].technicalStackName").value(saveProjectTechnicalStack1.getTechnicalStack().getName()))
+
                 .andExpect(status().isOk());
     }
 
     @Test
     public void 비로그인_모집완료_프로젝트_조회_테스트() throws Exception {
+        // given
         User saveUser = saveUser();
         saveRecruitmentProject();
         List<Project> saveRecruitmentCompleteProject = saveRecruitmentCompleteProject();
+
+        // 포지션 세팅
+        Position position1 = Position.builder()
+                .name("testPosition1")
+                .build();
+        Position savePosition1 = positionRepository.save(position1);
+        ProjectPosition projectPosition1 = ProjectPosition.builder()
+                .project(saveRecruitmentCompleteProject.get(0))
+                .position(savePosition1)
+                .build();
+        ProjectPosition saveProjectPosition1 = projectPositionRepository.save(projectPosition1);
+
+        // 기술스택 세팅
+        TechnicalStack technicalStack1 = TechnicalStack.builder()
+                .name("testTechnicalStack1")
+                .build();
+        technicalStackRepository.save(technicalStack1);
+
+        ProjectTechnicalStack projectTechnicalStack1 = ProjectTechnicalStack.builder()
+                .technicalStack(technicalStack1)
+                .project(saveRecruitmentCompleteProject.get(0))
+                .build();
+
+        ProjectTechnicalStack saveProjectTechnicalStack1 = projectTechnicalStackRepository.save(projectTechnicalStack1);
+
         // 4번째 5번째는 북마크
         saveBookMark(saveUser, saveRecruitmentCompleteProject.get(0));
         saveBookMark(saveUser, saveRecruitmentCompleteProject.get(1));
 
+        // then
         mvc.perform(get("/v1/project/recruitment/complete").contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(header().string("Content-type", "application/json"))
-                .andExpect(jsonPath("$.data[0].name").value("testName6"))
-                .andExpect(jsonPath("$.data[0].profile").isEmpty())
-                .andExpect(jsonPath("$.data[0].maxPeople").value(10))
-                .andExpect(jsonPath("$.data[0].currentPeople").value(4))
-                .andExpect(jsonPath("$.data[0].viewCount").value(10))
-                .andExpect(jsonPath("$.data[0].commentCount").value(10))
-                .andExpect(jsonPath("$.data[0].register").value("user"))
-                .andExpect(jsonPath("$.data[0].bookMark").value(false))
+                .andExpect(jsonPath("$.data.content[0].name").value("testName6"))
+                .andExpect(jsonPath("$.data.content[0].profile").isEmpty())
+                .andExpect(jsonPath("$.data.content[0].maxPeople").value(10))
+                .andExpect(jsonPath("$.data.content[0].currentPeople").value(4))
+                .andExpect(jsonPath("$.data.content[0].viewCount").value(10))
+                .andExpect(jsonPath("$.data.content[0].commentCount").value(10))
+                .andExpect(jsonPath("$.data.content[0].register").value("user"))
+                .andExpect(jsonPath("$.data.content[0].bookMark").value(false))
 
-                .andExpect(jsonPath("$.data[1].name").value("testName5"))
-                .andExpect(jsonPath("$.data[1].profile").isEmpty())
-                .andExpect(jsonPath("$.data[1].maxPeople").value(10))
-                .andExpect(jsonPath("$.data[1].currentPeople").value(4))
-                .andExpect(jsonPath("$.data[1].viewCount").value(10))
-                .andExpect(jsonPath("$.data[1].commentCount").value(10))
-                .andExpect(jsonPath("$.data[1].register").value("user"))
-                .andExpect(jsonPath("$.data[1].bookMark").value(false))
+                .andExpect(jsonPath("$.data.content[1].name").value("testName5"))
+                .andExpect(jsonPath("$.data.content[1].profile").isEmpty())
+                .andExpect(jsonPath("$.data.content[1].maxPeople").value(10))
+                .andExpect(jsonPath("$.data.content[1].currentPeople").value(4))
+                .andExpect(jsonPath("$.data.content[1].viewCount").value(10))
+                .andExpect(jsonPath("$.data.content[1].commentCount").value(10))
+                .andExpect(jsonPath("$.data.content[1].register").value("user"))
+                .andExpect(jsonPath("$.data.content[1].bookMark").value(false))
 
-                .andExpect(jsonPath("$.data[2].name").value("testName4"))
-                .andExpect(jsonPath("$.data[2].profile").isEmpty())
-                .andExpect(jsonPath("$.data[2].maxPeople").value(10))
-                .andExpect(jsonPath("$.data[2].currentPeople").value(4))
-                .andExpect(jsonPath("$.data[2].viewCount").value(10))
-                .andExpect(jsonPath("$.data[2].commentCount").value(10))
-                .andExpect(jsonPath("$.data[2].register").value("user"))
-                .andExpect(jsonPath("$.data[2].bookMark").value(false))
+                .andExpect(jsonPath("$.data.content[2].name").value("testName4"))
+                .andExpect(jsonPath("$.data.content[2].profile").isEmpty())
+                .andExpect(jsonPath("$.data.content[2].maxPeople").value(10))
+                .andExpect(jsonPath("$.data.content[2].currentPeople").value(4))
+                .andExpect(jsonPath("$.data.content[2].viewCount").value(10))
+                .andExpect(jsonPath("$.data.content[2].commentCount").value(10))
+                .andExpect(jsonPath("$.data.content[2].register").value("user"))
+                .andExpect(jsonPath("$.data.content[2].bookMark").value(false))
+                .andExpect(jsonPath("$.data.content[2].projectSimplePositionDtoList[0].projectNo").value(saveProjectPosition1.getProject().getNo()))
+                .andExpect(jsonPath("$.data.content[2].projectSimplePositionDtoList[0].positionName").value(saveProjectPosition1.getPosition().getName()))
+                .andExpect(jsonPath("$.data.content[2].projectSimplePositionDtoList[0].image").isEmpty())
+                .andExpect(jsonPath("$.data.content[2].projectSimplePositionDtoList[0].state").value(saveProjectPosition1.isState()))
+                .andExpect(jsonPath("$.data.content[2].projectSimpleTechnicalStackDtoList[0].projectNo").value(saveProjectTechnicalStack1.getProject().getNo()))
+                .andExpect(jsonPath("$.data.content[2].projectSimpleTechnicalStackDtoList[0].technicalStackName").value(saveProjectTechnicalStack1.getTechnicalStack().getName()))
 
                 .andExpect(status().isOk());
     }
 
     @Test
     public void 로그인_모집완료_프로젝트_조회_테스트() throws Exception {
+        // given
         User saveUser = saveUser();
         saveRecruitmentProject();
         List<Project> saveRecruitmentCompleteProject = saveRecruitmentCompleteProject();
+
+        // 포지션 세팅
+        Position position1 = Position.builder()
+                .name("testPosition1")
+                .build();
+        Position savePosition1 = positionRepository.save(position1);
+        ProjectPosition projectPosition1 = ProjectPosition.builder()
+                .project(saveRecruitmentCompleteProject.get(0))
+                .position(savePosition1)
+                .build();
+        ProjectPosition saveProjectPosition1 = projectPositionRepository.save(projectPosition1);
+
+        // 기술스택 세팅
+        TechnicalStack technicalStack1 = TechnicalStack.builder()
+                .name("testTechnicalStack1")
+                .build();
+        technicalStackRepository.save(technicalStack1);
+
+        ProjectTechnicalStack projectTechnicalStack1 = ProjectTechnicalStack.builder()
+                .technicalStack(technicalStack1)
+                .project(saveRecruitmentCompleteProject.get(0))
+                .build();
+
+        ProjectTechnicalStack saveProjectTechnicalStack1 = projectTechnicalStackRepository.save(projectTechnicalStack1);
+
         // 4번째 5번째는 북마크
         saveBookMark(saveUser, saveRecruitmentCompleteProject.get(0));
         saveBookMark(saveUser, saveRecruitmentCompleteProject.get(1));
+
+        // then
         String token = jwtTokenService.createToken(new TokenDto(saveUser.getNo(), saveUser.getEmail()));
 
         mvc.perform(get("/v1/project/recruitment/complete")
@@ -443,32 +571,39 @@ class ProjectControllerTest {
                         .header("Authorization", "Bearer " + token))
                 .andDo(print())
                 .andExpect(header().string("Content-type", "application/json"))
-                .andExpect(jsonPath("$.data[0].name").value("testName6"))
-                .andExpect(jsonPath("$.data[0].profile").isEmpty())
-                .andExpect(jsonPath("$.data[0].maxPeople").value(10))
-                .andExpect(jsonPath("$.data[0].currentPeople").value(4))
-                .andExpect(jsonPath("$.data[0].viewCount").value(10))
-                .andExpect(jsonPath("$.data[0].commentCount").value(10))
-                .andExpect(jsonPath("$.data[0].register").value("user"))
-                .andExpect(jsonPath("$.data[0].bookMark").value(false))
+                .andExpect(jsonPath("$.data.content[0].name").value("testName6"))
+                .andExpect(jsonPath("$.data.content[0].profile").isEmpty())
+                .andExpect(jsonPath("$.data.content[0].maxPeople").value(10))
+                .andExpect(jsonPath("$.data.content[0].currentPeople").value(4))
+                .andExpect(jsonPath("$.data.content[0].viewCount").value(10))
+                .andExpect(jsonPath("$.data.content[0].commentCount").value(10))
+                .andExpect(jsonPath("$.data.content[0].register").value("user"))
+                .andExpect(jsonPath("$.data.content[0].bookMark").value(false))
 
-                .andExpect(jsonPath("$.data[1].name").value("testName5"))
-                .andExpect(jsonPath("$.data[1].profile").isEmpty())
-                .andExpect(jsonPath("$.data[1].maxPeople").value(10))
-                .andExpect(jsonPath("$.data[1].currentPeople").value(4))
-                .andExpect(jsonPath("$.data[1].viewCount").value(10))
-                .andExpect(jsonPath("$.data[1].commentCount").value(10))
-                .andExpect(jsonPath("$.data[1].register").value("user"))
-                .andExpect(jsonPath("$.data[1].bookMark").value(true))
+                .andExpect(jsonPath("$.data.content[1].name").value("testName5"))
+                .andExpect(jsonPath("$.data.content[1].profile").isEmpty())
+                .andExpect(jsonPath("$.data.content[1].maxPeople").value(10))
+                .andExpect(jsonPath("$.data.content[1].currentPeople").value(4))
+                .andExpect(jsonPath("$.data.content[1].viewCount").value(10))
+                .andExpect(jsonPath("$.data.content[1].commentCount").value(10))
+                .andExpect(jsonPath("$.data.content[1].register").value("user"))
+                .andExpect(jsonPath("$.data.content[1].bookMark").value(true))
 
-                .andExpect(jsonPath("$.data[2].name").value("testName4"))
-                .andExpect(jsonPath("$.data[2].profile").isEmpty())
-                .andExpect(jsonPath("$.data[2].maxPeople").value(10))
-                .andExpect(jsonPath("$.data[2].currentPeople").value(4))
-                .andExpect(jsonPath("$.data[2].viewCount").value(10))
-                .andExpect(jsonPath("$.data[2].commentCount").value(10))
-                .andExpect(jsonPath("$.data[2].register").value("user"))
-                .andExpect(jsonPath("$.data[2].bookMark").value(true))
+                .andExpect(jsonPath("$.data.content[2].name").value("testName4"))
+                .andExpect(jsonPath("$.data.content[2].profile").isEmpty())
+                .andExpect(jsonPath("$.data.content[2].maxPeople").value(10))
+                .andExpect(jsonPath("$.data.content[2].currentPeople").value(4))
+                .andExpect(jsonPath("$.data.content[2].viewCount").value(10))
+                .andExpect(jsonPath("$.data.content[2].commentCount").value(10))
+                .andExpect(jsonPath("$.data.content[2].register").value("user"))
+                .andExpect(jsonPath("$.data.content[2].bookMark").value(true))
+                .andExpect(jsonPath("$.data.content[2].projectSimplePositionDtoList[0].projectNo").value(saveProjectPosition1.getProject().getNo()))
+                .andExpect(jsonPath("$.data.content[2].projectSimplePositionDtoList[0].positionName").value(saveProjectPosition1.getPosition().getName()))
+                .andExpect(jsonPath("$.data.content[2].projectSimplePositionDtoList[0].image").isEmpty())
+                .andExpect(jsonPath("$.data.content[2].projectSimplePositionDtoList[0].state").value(saveProjectPosition1.isState()))
+                .andExpect(jsonPath("$.data.content[2].projectSimpleTechnicalStackDtoList[0].projectNo").value(saveProjectTechnicalStack1.getProject().getNo()))
+                .andExpect(jsonPath("$.data.content[2].projectSimpleTechnicalStackDtoList[0].technicalStackName").value(saveProjectTechnicalStack1.getTechnicalStack().getName()))
+
                 .andExpect(status().isOk());
     }
 
@@ -767,6 +902,267 @@ class ProjectControllerTest {
                 .andExpect(jsonPath("$.data.commentDtoList[1].no").value(saveComment2.getNo()))
                 .andExpect(jsonPath("$.data.commentDtoList[1].registrant").value(saveComment2.getUser().getName()))
                 .andExpect(jsonPath("$.data.commentDtoList[1].content").value(saveComment2.getContent()))
+
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void 비로그인_모집중_프로젝트_검색_테스트() throws Exception {
+        // given
+        User saveUser = saveUser();
+        List<Project> saveRecruitmentProject = saveRecruitmentProject();
+        saveRecruitmentCompleteProject();
+
+        // 포지션 세팅
+        Position position1 = Position.builder()
+                .name("testPosition1")
+                .build();
+        Position savePosition1 = positionRepository.save(position1);
+        ProjectPosition projectPosition1 = ProjectPosition.builder()
+                .project(saveRecruitmentProject.get(0))
+                .position(savePosition1)
+                .build();
+        ProjectPosition saveProjectPosition1 = projectPositionRepository.save(projectPosition1);
+
+        // 기술스택 세팅
+        TechnicalStack technicalStack1 = TechnicalStack.builder()
+                .name("testTechnicalStack1")
+                .build();
+        TechnicalStack saveTechnicalStack1 = technicalStackRepository.save(technicalStack1);
+
+        ProjectTechnicalStack projectTechnicalStack1 = ProjectTechnicalStack.builder()
+                .technicalStack(technicalStack1)
+                .project(saveRecruitmentProject.get(0))
+                .build();
+
+        ProjectTechnicalStack saveProjectTechnicalStack1 = projectTechnicalStackRepository.save(projectTechnicalStack1);
+
+        // 0번째 1번째는 북마크
+        saveBookMark(saveUser, saveRecruitmentProject.get(0));
+        saveBookMark(saveUser, saveRecruitmentProject.get(1));
+
+        // then
+        ProjectSearchRequestDto projectSearchRequestDto = ProjectSearchRequestDto.builder()
+                .filter(Filter.PROJECT_NAME_AND_CONTENT)
+                .content("Name0")
+                .build();
+
+        mvc.perform(post("/v1/project/recruitment/search").contentType(MediaType.APPLICATION_JSON)
+                .content(new ObjectMapper().registerModule(new JavaTimeModule()).writeValueAsString(projectSearchRequestDto)))
+                .andDo(print())
+                .andExpect(header().string("Content-type", "application/json"))
+
+                .andExpect(jsonPath("$.data.content[0].name").value("testName0"))
+                .andExpect(jsonPath("$.data.content[0].profile").isEmpty())
+                .andExpect(jsonPath("$.data.content[0].maxPeople").value(10))
+                .andExpect(jsonPath("$.data.content[0].currentPeople").value(4))
+                .andExpect(jsonPath("$.data.content[0].viewCount").value(10))
+                .andExpect(jsonPath("$.data.content[0].commentCount").value(10))
+                .andExpect(jsonPath("$.data.content[0].register").value("user"))
+                .andExpect(jsonPath("$.data.content[0].bookMark").value(false))
+                .andExpect(jsonPath("$.data.content[0].projectSimplePositionDtoList[0].projectNo").value(saveProjectPosition1.getProject().getNo()))
+                .andExpect(jsonPath("$.data.content[0].projectSimplePositionDtoList[0].positionName").value(saveProjectPosition1.getPosition().getName()))
+                .andExpect(jsonPath("$.data.content[0].projectSimplePositionDtoList[0].image").isEmpty())
+                .andExpect(jsonPath("$.data.content[0].projectSimplePositionDtoList[0].state").value(saveProjectPosition1.isState()))
+                .andExpect(jsonPath("$.data.content[0].projectSimpleTechnicalStackDtoList[0].projectNo").value(saveProjectTechnicalStack1.getProject().getNo()))
+                .andExpect(jsonPath("$.data.content[0].projectSimpleTechnicalStackDtoList[0].technicalStackName").value(saveProjectTechnicalStack1.getTechnicalStack().getName()))
+
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void 로그인_모집중_프로젝트_검색_테스트() throws Exception {
+        // given
+        User saveUser = saveUser();
+        List<Project> saveRecruitmentProject = saveRecruitmentProject();
+        saveRecruitmentCompleteProject();
+
+        // 포지션 세팅
+        Position position1 = Position.builder()
+                .name("testPosition1")
+                .build();
+        Position savePosition1 = positionRepository.save(position1);
+        ProjectPosition projectPosition1 = ProjectPosition.builder()
+                .project(saveRecruitmentProject.get(0))
+                .position(savePosition1)
+                .build();
+        ProjectPosition saveProjectPosition1 = projectPositionRepository.save(projectPosition1);
+
+        // 기술스택 세팅
+        TechnicalStack technicalStack1 = TechnicalStack.builder()
+                .name("testTechnicalStack1")
+                .build();
+        TechnicalStack saveTechnicalStack1 = technicalStackRepository.save(technicalStack1);
+
+        ProjectTechnicalStack projectTechnicalStack1 = ProjectTechnicalStack.builder()
+                .technicalStack(technicalStack1)
+                .project(saveRecruitmentProject.get(0))
+                .build();
+
+        ProjectTechnicalStack saveProjectTechnicalStack1 = projectTechnicalStackRepository.save(projectTechnicalStack1);
+
+        // 0번째 1번째는 북마크
+        saveBookMark(saveUser, saveRecruitmentProject.get(0));
+        saveBookMark(saveUser, saveRecruitmentProject.get(1));
+
+        // then
+        ProjectSearchRequestDto projectSearchRequestDto = ProjectSearchRequestDto.builder()
+                .filter(Filter.PROJECT_NAME_AND_CONTENT)
+                .content("Name0")
+                .build();
+
+        String token = jwtTokenService.createToken(new TokenDto(saveUser.getNo(), saveUser.getEmail()));
+
+        mvc.perform(post("/v1/project/recruitment/search")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", "Bearer " + token)
+                        .content(new ObjectMapper().registerModule(new JavaTimeModule()).writeValueAsString(projectSearchRequestDto)))
+                .andDo(print())
+                .andExpect(header().string("Content-type", "application/json"))
+                .andExpect(jsonPath("$.data.content[0].name").value("testName0"))
+                .andExpect(jsonPath("$.data.content[0].profile").isEmpty())
+                .andExpect(jsonPath("$.data.content[0].maxPeople").value(10))
+                .andExpect(jsonPath("$.data.content[0].currentPeople").value(4))
+                .andExpect(jsonPath("$.data.content[0].viewCount").value(10))
+                .andExpect(jsonPath("$.data.content[0].commentCount").value(10))
+                .andExpect(jsonPath("$.data.content[0].register").value("user"))
+                .andExpect(jsonPath("$.data.content[0].bookMark").value(true))
+                .andExpect(jsonPath("$.data.content[0].projectSimplePositionDtoList[0].projectNo").value(saveProjectPosition1.getProject().getNo()))
+                .andExpect(jsonPath("$.data.content[0].projectSimplePositionDtoList[0].positionName").value(saveProjectPosition1.getPosition().getName()))
+                .andExpect(jsonPath("$.data.content[0].projectSimplePositionDtoList[0].image").isEmpty())
+                .andExpect(jsonPath("$.data.content[0].projectSimplePositionDtoList[0].state").value(saveProjectPosition1.isState()))
+                .andExpect(jsonPath("$.data.content[0].projectSimpleTechnicalStackDtoList[0].projectNo").value(saveProjectTechnicalStack1.getProject().getNo()))
+                .andExpect(jsonPath("$.data.content[0].projectSimpleTechnicalStackDtoList[0].technicalStackName").value(saveProjectTechnicalStack1.getTechnicalStack().getName()))
+
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void 비로그인_모집완료_프로젝트_검색_테스트() throws Exception {
+        // given
+        User saveUser = saveUser();
+        saveRecruitmentProject();
+        List<Project> saveRecruitmentCompleteProject = saveRecruitmentCompleteProject();
+
+        // 포지션 세팅
+        Position position1 = Position.builder()
+                .name("testPosition1")
+                .build();
+        Position savePosition1 = positionRepository.save(position1);
+        ProjectPosition projectPosition1 = ProjectPosition.builder()
+                .project(saveRecruitmentCompleteProject.get(0))
+                .position(savePosition1)
+                .build();
+        ProjectPosition saveProjectPosition1 = projectPositionRepository.save(projectPosition1);
+
+        // 기술스택 세팅
+        TechnicalStack technicalStack1 = TechnicalStack.builder()
+                .name("testTechnicalStack1")
+                .build();
+        TechnicalStack saveTechnicalStack1 = technicalStackRepository.save(technicalStack1);
+
+        ProjectTechnicalStack projectTechnicalStack1 = ProjectTechnicalStack.builder()
+                .technicalStack(technicalStack1)
+                .project(saveRecruitmentCompleteProject.get(0))
+                .build();
+
+        ProjectTechnicalStack saveProjectTechnicalStack1 = projectTechnicalStackRepository.save(projectTechnicalStack1);
+
+        // 4번째 5번째는 북마크
+        saveBookMark(saveUser, saveRecruitmentCompleteProject.get(0));
+        saveBookMark(saveUser, saveRecruitmentCompleteProject.get(1));
+
+        // then
+        ProjectSearchRequestDto projectSearchRequestDto = ProjectSearchRequestDto.builder()
+                .filter(Filter.PROJECT_NAME_AND_CONTENT)
+                .content("Name4")
+                .build();
+
+        mvc.perform(post("/v1/project/recruitment/complete/search").contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().registerModule(new JavaTimeModule()).writeValueAsString(projectSearchRequestDto)))
+                .andDo(print())
+                .andExpect(header().string("Content-type", "application/json"))
+                .andExpect(jsonPath("$.data.content[0].name").value("testName4"))
+                .andExpect(jsonPath("$.data.content[0].profile").isEmpty())
+                .andExpect(jsonPath("$.data.content[0].maxPeople").value(10))
+                .andExpect(jsonPath("$.data.content[0].currentPeople").value(4))
+                .andExpect(jsonPath("$.data.content[0].viewCount").value(10))
+                .andExpect(jsonPath("$.data.content[0].commentCount").value(10))
+                .andExpect(jsonPath("$.data.content[0].register").value("user"))
+                .andExpect(jsonPath("$.data.content[0].bookMark").value(false))
+                .andExpect(jsonPath("$.data.content[0].projectSimplePositionDtoList[0].projectNo").value(saveProjectPosition1.getProject().getNo()))
+                .andExpect(jsonPath("$.data.content[0].projectSimplePositionDtoList[0].positionName").value(saveProjectPosition1.getPosition().getName()))
+                .andExpect(jsonPath("$.data.content[0].projectSimplePositionDtoList[0].image").isEmpty())
+                .andExpect(jsonPath("$.data.content[0].projectSimplePositionDtoList[0].state").value(saveProjectPosition1.isState()))
+                .andExpect(jsonPath("$.data.content[0].projectSimpleTechnicalStackDtoList[0].projectNo").value(saveProjectTechnicalStack1.getProject().getNo()))
+                .andExpect(jsonPath("$.data.content[0].projectSimpleTechnicalStackDtoList[0].technicalStackName").value(saveProjectTechnicalStack1.getTechnicalStack().getName()))
+
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void 로그인_모집완료_프로젝트_검색_테스트() throws Exception {
+        // given
+        User saveUser = saveUser();
+        saveRecruitmentProject();
+        List<Project> saveRecruitmentCompleteProject = saveRecruitmentCompleteProject();
+
+        // 포지션 세팅
+        Position position1 = Position.builder()
+                .name("testPosition1")
+                .build();
+        Position savePosition1 = positionRepository.save(position1);
+        ProjectPosition projectPosition1 = ProjectPosition.builder()
+                .project(saveRecruitmentCompleteProject.get(0))
+                .position(savePosition1)
+                .build();
+        ProjectPosition saveProjectPosition1 = projectPositionRepository.save(projectPosition1);
+
+        // 기술스택 세팅
+        TechnicalStack technicalStack1 = TechnicalStack.builder()
+                .name("testTechnicalStack1")
+                .build();
+        TechnicalStack saveTechnicalStack1 = technicalStackRepository.save(technicalStack1);
+
+        ProjectTechnicalStack projectTechnicalStack1 = ProjectTechnicalStack.builder()
+                .technicalStack(technicalStack1)
+                .project(saveRecruitmentCompleteProject.get(0))
+                .build();
+
+        ProjectTechnicalStack saveProjectTechnicalStack1 = projectTechnicalStackRepository.save(projectTechnicalStack1);
+
+        // 4번째 5번째는 북마크
+        saveBookMark(saveUser, saveRecruitmentCompleteProject.get(0));
+        saveBookMark(saveUser, saveRecruitmentCompleteProject.get(1));
+
+        // then
+        ProjectSearchRequestDto projectSearchRequestDto = ProjectSearchRequestDto.builder()
+                .filter(Filter.PROJECT_NAME_AND_CONTENT)
+                .content("Name4")
+                .build();
+
+        String token = jwtTokenService.createToken(new TokenDto(saveUser.getNo(), saveUser.getEmail()));
+
+        mvc.perform(post("/v1/project/recruitment/complete/search")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", "Bearer " + token)
+                        .content(new ObjectMapper().registerModule(new JavaTimeModule()).writeValueAsString(projectSearchRequestDto)))
+                .andDo(print())
+                .andExpect(header().string("Content-type", "application/json"))
+                .andExpect(jsonPath("$.data.content[0].name").value("testName4"))
+                .andExpect(jsonPath("$.data.content[0].profile").isEmpty())
+                .andExpect(jsonPath("$.data.content[0].maxPeople").value(10))
+                .andExpect(jsonPath("$.data.content[0].currentPeople").value(4))
+                .andExpect(jsonPath("$.data.content[0].viewCount").value(10))
+                .andExpect(jsonPath("$.data.content[0].commentCount").value(10))
+                .andExpect(jsonPath("$.data.content[0].register").value("user"))
+                .andExpect(jsonPath("$.data.content[0].bookMark").value(true))
+                .andExpect(jsonPath("$.data.content[0].projectSimplePositionDtoList[0].projectNo").value(saveProjectPosition1.getProject().getNo()))
+                .andExpect(jsonPath("$.data.content[0].projectSimplePositionDtoList[0].positionName").value(saveProjectPosition1.getPosition().getName()))
+                .andExpect(jsonPath("$.data.content[0].projectSimplePositionDtoList[0].image").isEmpty())
+                .andExpect(jsonPath("$.data.content[0].projectSimplePositionDtoList[0].state").value(saveProjectPosition1.isState()))
+                .andExpect(jsonPath("$.data.content[0].projectSimpleTechnicalStackDtoList[0].projectNo").value(saveProjectTechnicalStack1.getProject().getNo()))
+                .andExpect(jsonPath("$.data.content[0].projectSimpleTechnicalStackDtoList[0].technicalStackName").value(saveProjectTechnicalStack1.getTechnicalStack().getName()))
 
                 .andExpect(status().isOk());
     }

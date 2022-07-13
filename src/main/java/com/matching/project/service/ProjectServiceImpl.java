@@ -1,6 +1,7 @@
 package com.matching.project.service;
 
 import com.matching.project.dto.comment.CommentDto;
+import com.matching.project.dto.enumerate.Filter;
 import com.matching.project.dto.enumerate.Role;
 import com.matching.project.dto.project.*;
 import com.matching.project.entity.*;
@@ -133,42 +134,21 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public List<ProjectSimpleDto> findProjectList(boolean state, boolean delete, Pageable pageable) throws Exception {
-        Page<Project> projectPage = projectRepository.findByStateProjectPage(state, delete, pageable);
+    public Page<ProjectSimpleDto> findProjectList(boolean state, boolean delete, ProjectSearchRequestDto projectSearchRequestDto, Pageable pageable) throws Exception {
+        Page<ProjectSimpleDto> projectSimpleDtoPage = projectRepository.findProjectByStatus(pageable, state, delete, projectSearchRequestDto);
+        List<ProjectSimpleDto> projectSimpleDtoPageContent = projectSimpleDtoPage.getContent();
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        List<ProjectSimpleDto> projectSimpleDtoList = null;
-        if (authentication.getAuthorities().contains(new SimpleGrantedAuthority(Role.ROLE_ANONYMOUS.toString()))) {
-            projectSimpleDtoList = projectPage.map(project -> ProjectSimpleDto.builder()
-                    .no(project.getNo())
-                    .name(project.getName())
-                    .profile(null)
-                    .maxPeople(project.getMaxPeople())
-                    .currentPeople(project.getCurrentPeople())
-                    .viewCount(project.getViewCount())
-                    .commentCount(project.getCommentCount())
-                    .register(project.getCreateUserName())
-                    .bookMark(false)
-                    .build()).toList();
 
-        } else {
+        if (authentication.getAuthorities().contains(new SimpleGrantedAuthority(Role.ROLE_USER.toString()))) {
             Object principal = authentication.getPrincipal();
             User user = (User) principal;
             List<Long> bookMarkList = bookMarkRepository.findByUserNo(user.getNo()).stream().map(bookMark -> bookMark.getProject().getNo()).collect(Collectors.toList());
-            projectSimpleDtoList = projectPage.map(project -> ProjectSimpleDto.builder()
-                    .no(project.getNo())
-                    .name(project.getName())
-                    .profile(null)
-                    .maxPeople(project.getMaxPeople())
-                    .currentPeople(project.getCurrentPeople())
-                    .viewCount(project.getViewCount())
-                    .commentCount(project.getCommentCount())
-                    .register(project.getCreateUserName())
-                    .bookMark(bookMarkList.contains(project.getNo()))
-                    .build()).toList();
+            for (ProjectSimpleDto projectSimpleDto : projectSimpleDtoPageContent) {
+                projectSimpleDto.setBookMark(bookMarkList.contains(projectSimpleDto.getNo()));
+            }
         }
-
-        return projectSimpleDtoList;
+        return projectSimpleDtoPage;
     }
 
     @Override

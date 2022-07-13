@@ -6,6 +6,7 @@ import com.matching.project.service.ProjectService;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -37,33 +38,41 @@ public class ProjectController {
     @GetMapping("/recruitment")
     @ApiOperation(value = "모집중인 프로젝트 목록 조회")
     public ResponseEntity projectRecruitingList(@PageableDefault(size = 5, sort = "createDate", direction = Sort.Direction.DESC) Pageable pageable) throws Exception {
-        List<ProjectSimpleDto> projectSimpleDtoList = projectService.findProjectList(true, false, pageable);
+        Page<ProjectSimpleDto> projectSimpleDtoList = projectService.findProjectList(true, false, null, pageable);
         return ResponseEntity.ok(new ResponseDto<>(null, projectSimpleDtoList));
     }
 
     @GetMapping("/recruitment/complete")
     @ApiOperation(value = "모집 완료된 프로젝트 목록 조회")
     public ResponseEntity projectRecruitingCompleteList(@PageableDefault(size = 5, sort = "createDate", direction = Sort.Direction.DESC) Pageable pageable) throws Exception {
-        List<ProjectSimpleDto> projectSimpleDtoList = projectService.findProjectList(false, false, pageable);
+        Page<ProjectSimpleDto> projectSimpleDtoList = projectService.findProjectList(false, false, null, pageable);
         return ResponseEntity.ok(new ResponseDto<>(null, projectSimpleDtoList));
     }
 
 
     @GetMapping("/{projectNo}")
     @ApiOperation(value = "프로젝트 상세 조회")
-    public ResponseEntity projectInfo(@PathVariable Long projectNo) {
+    public ResponseEntity projectInfo(@PathVariable Long projectNo) throws Exception{
         ProjectDto projectDetail = projectService.getProjectDetail(projectNo);
 
         return ResponseEntity.ok(new ResponseDto<>(null, projectDetail));
     }
 
-//    @PostMapping("/search")
-//    @ApiOperation(value = "프로젝트 검색")
-//    public ResponseEntity projectSearch(ProjectSearchRequestDto projectSearchRequestDto) {
-//        List<NoneLoginProjectSimpleDto> projectDtoList = new ArrayList<>();
-//
-//        return new ResponseEntity(projectDtoList, HttpStatus.OK);
-//    }
+    @PostMapping("/recruitment/search")
+    @ApiOperation(value = "모집중인 프로젝트 검색")
+    public ResponseEntity projectRecruitingSearch(@RequestBody ProjectSearchRequestDto projectSearchRequestDto, @PageableDefault(size = 5, sort = "createDate", direction = Sort.Direction.DESC) Pageable pageable) throws Exception{
+        Page<ProjectSimpleDto> projectSimpleDtoList = projectService.findProjectList(true, false, projectSearchRequestDto, pageable);
+
+        return ResponseEntity.ok(new ResponseDto<>(null, projectSimpleDtoList));
+    }
+
+    @PostMapping("/recruitment/complete/search")
+    @ApiOperation(value = "모집 완료된 프로젝트 검색")
+    public ResponseEntity projectRecruitingCompleteSearch(@RequestBody ProjectSearchRequestDto projectSearchRequestDto, @PageableDefault(size = 5, sort = "createDate", direction = Sort.Direction.DESC) Pageable pageable) throws Exception{
+        Page<ProjectSimpleDto> projectSimpleDtoList = projectService.findProjectList(false, false, projectSearchRequestDto, pageable);
+
+        return ResponseEntity.ok(new ResponseDto<>(null, projectSimpleDtoList));
+    }
 
     @PatchMapping("/{projectNo}")
     @ApiOperation(value = "프로젝트 수정")
