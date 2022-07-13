@@ -65,10 +65,26 @@ class ProjectServiceImplTest {
         LocalDate startDate = LocalDate.of(2022, 06, 24);
         LocalDate endDate = LocalDate.of(2022, 06, 28);
 
+        User user1 = User.builder()
+                .no(1L)
+                .name("testUser1")
+                .sex('M')
+                .email("testEmail1")
+                .password("testPassword1")
+                .github("testGithub1")
+                .block(false)
+                .blockReason(null)
+                .permission(Role.ROLE_USER)
+                .oauthCategory(OAuth.NORMAL)
+                .email_auth(false)
+                .imageNo(0L)
+                .position(null)
+                .build();
+
         Project project1 = Project.builder()
                 .no(1L)
                 .name("testProject1")
-                .createUserName("user1")
+                .createUserName("testUser1")
                 .createDate(createDate)
                 .startDate(startDate)
                 .endDate(endDate)
@@ -81,6 +97,7 @@ class ProjectServiceImplTest {
                 .imageNo(0L)
                 .viewCount(0)
                 .commentCount(0)
+                .user(user1)
                 .build();
 
         List<Position> positionList = new ArrayList<>();
@@ -96,21 +113,6 @@ class ProjectServiceImplTest {
                 .build();
         positionList.add(position2);
 
-        User user1 = User.builder()
-                .no(1L)
-                .name("testUser1")
-                .sex('M')
-                .email("testEmail1")
-                .password("testPassword1")
-                .github("testGithub1")
-                .block(false)
-                .blockReason(null)
-                .permission(Role.ROLE_USER)
-                .oauthCategory(OAuth.NORMAL)
-                .email_auth(false)
-                .imageNo(0L)
-                .position(position1)
-                .build();
 
         ProjectPosition projectPosition1 = ProjectPosition.builder()
                 .no(1L)
@@ -212,7 +214,7 @@ class ProjectServiceImplTest {
 
         assertEquals(projectRegisterResponseDto.getNo(), project1.getNo());
         assertEquals(projectRegisterResponseDto.getName(), project1.getName());
-        assertEquals(projectRegisterResponseDto.getCreateUser(), user1.getName());
+        assertEquals(projectRegisterResponseDto.getCreateUser(), project1.getCreateUserName());
         assertEquals(projectRegisterResponseDto.getProfile(), null);
         assertEquals(projectRegisterResponseDto.getCreateDate(), project1.getCreateDate());
         assertEquals(projectRegisterResponseDto.getStartDate(), project1.getStartDate());
@@ -586,14 +588,15 @@ class ProjectServiceImplTest {
         assertEquals(projectDto.getTechnicalStack().get(0), technicalStack1.getName());
         assertEquals(projectDto.getTechnicalStack().get(1), technicalStack2.getName());
 
+        assertEquals(projectDto.getProjectPositionDetailDtoList().get(0).getNo(), projectPosition1.getNo());
         assertEquals(projectDto.getProjectPositionDetailDtoList().get(0).getPositionName(), projectPosition1.getPosition().getName());
-        assertEquals(projectDto.getProjectPositionDetailDtoList().get(0).getUserNo(), projectPosition1.getUser().getNo());
-        assertEquals(projectDto.getProjectPositionDetailDtoList().get(0).getUserName(), projectPosition1.getUser().getName());
+        assertEquals(projectDto.getProjectPositionDetailDtoList().get(0).getUserDetailDto().getNo(), projectPosition1.getUser().getNo());
+        assertEquals(projectDto.getProjectPositionDetailDtoList().get(0).getUserDetailDto().getUserName(), projectPosition1.getUser().getName());
         assertEquals(projectDto.getProjectPositionDetailDtoList().get(0).isState(), projectPosition1.isState());
 
+        assertEquals(projectDto.getProjectPositionDetailDtoList().get(1).getNo(), projectPosition2.getNo());
         assertEquals(projectDto.getProjectPositionDetailDtoList().get(1).getPositionName(), projectPosition2.getPosition().getName());
-        assertEquals(projectDto.getProjectPositionDetailDtoList().get(1).getUserNo(), null);
-        assertEquals(projectDto.getProjectPositionDetailDtoList().get(1).getUserName(), null);
+        assertEquals(projectDto.getProjectPositionDetailDtoList().get(1).getUserDetailDto(), null);
         assertEquals(projectDto.getProjectPositionDetailDtoList().get(1).isState(), projectPosition2.isState());
 
         assertEquals(projectDto.getCommentDtoList().get(0).getNo(), comment1.getNo());
@@ -757,14 +760,15 @@ class ProjectServiceImplTest {
         assertEquals(projectDto.getTechnicalStack().get(0), technicalStack1.getName());
         assertEquals(projectDto.getTechnicalStack().get(1), technicalStack2.getName());
 
+        assertEquals(projectDto.getProjectPositionDetailDtoList().get(0).getNo(), projectPosition1.getNo());
         assertEquals(projectDto.getProjectPositionDetailDtoList().get(0).getPositionName(), projectPosition1.getPosition().getName());
-        assertEquals(projectDto.getProjectPositionDetailDtoList().get(0).getUserNo(), projectPosition1.getUser().getNo());
-        assertEquals(projectDto.getProjectPositionDetailDtoList().get(0).getUserName(), projectPosition1.getUser().getName());
+        assertEquals(projectDto.getProjectPositionDetailDtoList().get(0).getUserDetailDto().getNo(), projectPosition1.getUser().getNo());
+        assertEquals(projectDto.getProjectPositionDetailDtoList().get(0).getUserDetailDto().getUserName(), projectPosition1.getUser().getName());
         assertEquals(projectDto.getProjectPositionDetailDtoList().get(0).isState(), projectPosition1.isState());
 
+        assertEquals(projectDto.getProjectPositionDetailDtoList().get(1).getNo(), projectPosition2.getNo());
         assertEquals(projectDto.getProjectPositionDetailDtoList().get(1).getPositionName(), projectPosition2.getPosition().getName());
-        assertEquals(projectDto.getProjectPositionDetailDtoList().get(1).getUserNo(), null);
-        assertEquals(projectDto.getProjectPositionDetailDtoList().get(1).getUserName(), null);
+        assertEquals(projectDto.getProjectPositionDetailDtoList().get(1).getUserDetailDto(), null);
         assertEquals(projectDto.getProjectPositionDetailDtoList().get(1).isState(), projectPosition2.isState());
 
         assertEquals(projectDto.getCommentDtoList().get(0).getNo(), comment1.getNo());
@@ -774,5 +778,177 @@ class ProjectServiceImplTest {
         assertEquals(projectDto.getCommentDtoList().get(1).getNo(), comment2.getNo());
         assertEquals(projectDto.getCommentDtoList().get(1).getRegistrant(), comment2.getUser().getName());
         assertEquals(projectDto.getCommentDtoList().get(1).getContent(), comment2.getContent());
+    }
+
+    @Test
+    public void 프로젝트_수정_성공_테스트() {
+        // given
+        LocalDateTime createDate = LocalDateTime.of(2022, 06, 24, 10, 10, 10);
+        LocalDate startDate = LocalDate.of(2022, 06, 24);
+        LocalDate endDate = LocalDate.of(2022, 06, 28);
+
+        // 유저 객체
+        User user1 = User.builder()
+                .no(1L)
+                .name("testUser1")
+                .sex('M')
+                .email("testEmail1")
+                .password("testPassword1")
+                .github("testGithub1")
+                .block(false)
+                .blockReason(null)
+                .permission(Role.ROLE_USER)
+                .oauthCategory(OAuth.NORMAL)
+                .email_auth(false)
+                .imageNo(0L)
+                .position(null)
+                .build();
+
+        // 프로젝트 객체
+        Project project1 = Project.builder()
+                .no(1L)
+                .name("testName1")
+                .createUserName("testUser1")
+                .createDate(createDate)
+                .startDate(startDate)
+                .endDate(endDate)
+                .state(true)
+                .introduction("testIntroduction1")
+                .maxPeople(10)
+                .currentPeople(4)
+                .delete(false)
+                .deleteReason(null)
+                .imageNo(0L)
+                .viewCount(10)
+                .commentCount(10)
+                .user(user1)
+                .build();
+
+        // 포지션 세팅
+        List<Position> positionList = new ArrayList<>();
+        Position position1 = Position.builder()
+                .no(1L)
+                .name("testPosition1")
+                .build();
+        Position position2 = Position.builder()
+                .no(2L)
+                .name("testPosition2")
+                .build();
+        Position position3 = Position.builder()
+                .no(3L)
+                .name("updatePosition1")
+                .build();
+        Position position4 = Position.builder()
+                .no(4L)
+                .name("updatePosition2")
+                .build();
+        positionList.add(position1);
+        positionList.add(position2);
+        positionList.add(position3);
+        positionList.add(position4);
+
+        // 기술 스택 세팅
+        List<TechnicalStack> technicalStackList = new ArrayList<>();
+        TechnicalStack technicalStack1 = TechnicalStack.builder()
+                .no(1L)
+                .name("testTechnicalStack1")
+                .build();
+        TechnicalStack technicalStack2 = TechnicalStack.builder()
+                .no(2L)
+                .name("testTechnicalStack2")
+                .build();
+        TechnicalStack technicalStack3 = TechnicalStack.builder()
+                .no(3L)
+                .name("updateTechnicalStack1")
+                .build();
+        TechnicalStack technicalStack4 = TechnicalStack.builder()
+                .no(4L)
+                .name("updateTechnicalStack2")
+                .build();
+        technicalStackList.add(technicalStack1);
+        technicalStackList.add(technicalStack2);
+        technicalStackList.add(technicalStack3);
+        technicalStackList.add(technicalStack4);
+
+        given(projectRepository.findById(any())).willReturn(Optional.of(project1));
+        given(projectRepository.existProject(any(), any())).willReturn(true);
+        given(positionRepository.findByNameIn(any())).willReturn(positionList);
+        given(technicalStackRepository.findByNameIn(any())).willReturn(technicalStackList);
+
+        // when
+        ProjectUpdateRequestDto projectUpdateRequestDto1 = ProjectUpdateRequestDto.builder()
+                .name("updateName1")
+                .startDate(startDate.plusDays(1))
+                .endDate(endDate.plusDays(1))
+                .introduction("updateIntroduction1")
+                .maxPeople(4)
+                .build();
+
+        List<ProjectPositionUpdateDto> projectPositionDtoList = new ArrayList<>();
+        UserUpdateDto userUpdateDto = new UserUpdateDto(1L, "testUser1");
+        ProjectPositionUpdateDto projectPositionUpdateDto1 = ProjectPositionUpdateDto.builder()
+                .no(1L)
+                .name("testPosition1")
+                .userUpdateDto(userUpdateDto)
+                .build();
+        ProjectPositionUpdateDto projectPositionUpdateDto2 = ProjectPositionUpdateDto.builder()
+                .no(2L)
+                .name("updatePosition2")
+                .userUpdateDto(null)
+                .build();
+        projectPositionDtoList.add(projectPositionUpdateDto1);
+        projectPositionDtoList.add(projectPositionUpdateDto2);
+
+        List<String> projectTechnicalStack = new ArrayList<>();
+        projectTechnicalStack.add("updateTechnicalStack1");
+        projectTechnicalStack.add("updateTechnicalStack2");
+
+        projectUpdateRequestDto1.setProjectPositionDtoList(projectPositionDtoList);
+        projectUpdateRequestDto1.setProjectTechnicalStack(projectTechnicalStack);
+
+        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(user1, "", user1.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(auth);
+
+        ProjectUpdateResponseDto projectUpdateResponseDto = null;
+        try {
+            projectUpdateResponseDto = projectService.updateProject(project1.getNo(), projectUpdateRequestDto1);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // then
+        verify(projectRepository).findById(any());
+        verify(projectRepository).existProject(any(), any());
+        verify(positionRepository).findByNameIn(any());
+        verify(projectPositionRepository).deleteByProjectAndUserIsNull(any());
+        verify(projectPositionRepository, times(1)).save(any());
+        verify(technicalStackRepository).findByNameIn(any());
+        verify(projectTechnicalStackRepository).deleteByProject(any());
+        verify(projectTechnicalStackRepository, times(2)).save(any());
+
+        assertEquals(projectUpdateResponseDto.getNo(), project1.getNo());
+        assertEquals(projectUpdateResponseDto.getName(), projectUpdateRequestDto1.getName());
+        assertEquals(projectUpdateResponseDto.getCreateUser(), user1.getName());
+        assertEquals(projectUpdateResponseDto.getProfile(), null);
+        assertEquals(projectUpdateResponseDto.getCreateDate(), project1.getCreateDate());
+        assertEquals(projectUpdateResponseDto.getStartDate(), projectUpdateRequestDto1.getStartDate());
+        assertEquals(projectUpdateResponseDto.getEndDate(), projectUpdateRequestDto1.getEndDate());
+        assertEquals(projectUpdateResponseDto.isState(), project1.isState());
+        assertEquals(projectUpdateResponseDto.getIntroduction(), projectUpdateRequestDto1.getIntroduction());
+        assertEquals(projectUpdateResponseDto.getMaxPeople(), projectUpdateRequestDto1.getMaxPeople());
+        assertEquals(projectUpdateResponseDto.getCurrentPeople(), project1.getCurrentPeople());
+        assertEquals(projectUpdateResponseDto.getViewCount(), project1.getViewCount());
+        assertEquals(projectUpdateResponseDto.getCommentCount(), project1.getCommentCount());
+
+
+        assertEquals(projectUpdateResponseDto.getProjectPositionDtoList().get(0).getNo(), projectPositionDtoList.get(0).getNo());
+        assertEquals(projectUpdateResponseDto.getProjectPositionDtoList().get(0).getName(), projectPositionDtoList.get(0).getName());
+        assertEquals(projectUpdateResponseDto.getProjectPositionDtoList().get(0).getUserUpdateDto(), userUpdateDto);
+        assertEquals(projectUpdateResponseDto.getProjectPositionDtoList().get(1).getNo(), projectPositionDtoList.get(1).getNo());
+        assertEquals(projectUpdateResponseDto.getProjectPositionDtoList().get(1).getName(), projectPositionDtoList.get(1).getName());
+        assertEquals(projectUpdateResponseDto.getProjectPositionDtoList().get(1).getUserUpdateDto(), null);
+
+        assertEquals(projectUpdateResponseDto.getProjectTechnicalStack().get(0), projectTechnicalStack.get(0));
+        assertEquals(projectUpdateResponseDto.getProjectTechnicalStack().get(1), projectTechnicalStack.get(1));
     }
 }

@@ -67,8 +67,10 @@ public class ProjectController {
 
     @PatchMapping("/{projectNo}")
     @ApiOperation(value = "프로젝트 수정")
-    public ResponseEntity projectUpdate(ProjectUpdateRequestDto projectUpdateRequestDto) {
-        return new ResponseEntity(HttpStatus.OK);
+    public ResponseEntity projectUpdate(@PathVariable Long projectNo, @RequestBody ProjectUpdateRequestDto projectUpdateRequestDto) throws Exception {
+        ProjectUpdateResponseDto projectUpdateResponseDto = projectService.updateProject(projectNo, projectUpdateRequestDto);
+
+        return ResponseEntity.ok(new ResponseDto<>(null, projectUpdateResponseDto));
     }
 
     @DeleteMapping("/{projectNo}")

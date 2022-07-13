@@ -7,9 +7,7 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 @Builder
-public class ProjectPositionDetailDto {
+public class UserDetailDto {
     private Long no;
-    private String positionName;
-    private boolean state;
-    private UserDetailDto userDetailDto;
+    private String userName;
 }

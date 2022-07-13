@@ -8,4 +8,5 @@ public interface ProjectService {
     public ProjectRegisterResponseDto projectRegister(ProjectRegisterRequestDto projectRegisterRequestDto) throws Exception;
     public List<ProjectSimpleDto> findProjectList(boolean state, boolean delete, Pageable pageable) throws Exception;
     public ProjectDto getProjectDetail(Long projectNo);
+    public ProjectUpdateResponseDto updateProject(Long projectNo, ProjectUpdateRequestDto projectUpdateRequestDto) throws Exception;
 }

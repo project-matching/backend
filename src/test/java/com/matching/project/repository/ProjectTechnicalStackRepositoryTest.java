@@ -84,4 +84,56 @@ class ProjectTechnicalStackRepositoryTest {
         assertEquals(projectTechnicalStackList.get(1).getTechnicalStack(), saveTechnicalStack2);
     }
 
+    @Test
+    public void 프로젝트_기술스택_삭제_프로젝트_조건문() {
+        // given
+        LocalDateTime createDate = LocalDateTime.of(2022, 06, 24, 10, 10, 10);
+        LocalDate startDate = LocalDate.of(2022, 06, 24);
+        LocalDate endDate = LocalDate.of(2022, 06, 28);
+
+        Project project1 = Project.builder()
+                .name("testName1")
+                .createUserName("user1")
+                .createDate(createDate)
+                .startDate(startDate)
+                .endDate(endDate)
+                .state(true)
+                .introduction("testIntroduction1")
+                .maxPeople(10)
+                .currentPeople(4)
+                .delete(true)
+                .deleteReason(null)
+                .viewCount(10)
+                .commentCount(10)
+                .build();
+        Project saveProject1 = projectRepository.save(project1);
+
+        TechnicalStack technicalStack1 = TechnicalStack.builder()
+                .name("testTechnicalStack1")
+                .build();
+        TechnicalStack technicalStack2 = TechnicalStack.builder()
+                .name("testTechnicalStack2")
+                .build();
+        TechnicalStack saveTechnicalStack1 = technicalStackRepository.save(technicalStack1);
+        TechnicalStack saveTechnicalStack2 = technicalStackRepository.save(technicalStack2);
+
+        ProjectTechnicalStack projectTechnicalStack1 = ProjectTechnicalStack.builder()
+                .project(saveProject1)
+                .technicalStack(saveTechnicalStack1)
+                .build();
+        ProjectTechnicalStack projectTechnicalStack2 = ProjectTechnicalStack.builder()
+                .project(saveProject1)
+                .technicalStack(saveTechnicalStack2)
+                .build();
+        projectTechnicalStackRepository.save(projectTechnicalStack1);
+        projectTechnicalStackRepository.save(projectTechnicalStack2);
+
+        // when
+        projectTechnicalStackRepository.deleteByProject(saveProject1);
+
+        // then
+        List<ProjectTechnicalStack> projectTechnicalStackList = projectTechnicalStackRepository.findAll();
+
+        assertEquals(projectTechnicalStackList.size(), 0);
+    }
 }

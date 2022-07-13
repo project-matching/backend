@@ -1,9 +1,12 @@
 package com.matching.project.repository;
 
+import com.matching.project.dto.enumerate.OAuth;
+import com.matching.project.dto.enumerate.Role;
 import com.matching.project.dto.project.ProjectQueryDto;
 import com.matching.project.entity.Project;
 import com.matching.project.entity.ProjectPosition;
 import com.matching.project.entity.ProjectTechnicalStack;
+import com.matching.project.entity.User;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -29,13 +32,10 @@ class ProjectRepositoryTest {
     public ProjectRepository projectRepository;
 
     @Autowired
-    public ProjectPositionRepository projectPositionRepository;
-
-    @Autowired
-    public ProjectTechnicalStackRepository projectTechnicalStackRepository;
+    public UserRepository userRepository;
 
     @Test
-    public void 프로젝트_탐색() {
+    public void 프로젝트_탐색_테스트() {
         // given
         LocalDateTime createDate = LocalDateTime.of(2022, 06, 24, 10, 10, 10);
         LocalDate startDate = LocalDate.of(2022, 06, 24);
@@ -131,106 +131,50 @@ class ProjectRepositoryTest {
         assertEquals(projectList.get(0).getViewCount(), saveProject3.getViewCount());
         assertEquals(projectList.get(0).getCommentCount(), saveProject3.getCommentCount());
     }
+    
+    @Test
+    public void 프로젝트_존재_테스트() {
+        // given
+        LocalDateTime createDate = LocalDateTime.of(2022, 06, 24, 10, 10, 10);
+        LocalDate startDate = LocalDate.of(2022, 06, 24);
+        LocalDate endDate = LocalDate.of(2022, 06, 28);
 
-//    @Test
-//    public void 상세_프로젝트_조회() {
-//        // given
-//        LocalDateTime createDate = LocalDateTime.of(2022, 06, 24, 10, 10, 10);
-//        LocalDate startDate = LocalDate.of(2022, 06, 24);
-//        LocalDate endDate = LocalDate.of(2022, 06, 28);
-//
-//        // 프로젝트 객체
-//        Project project = Project.builder()
-//                .name("projectTestName")
-//                .createUserName("user")
-//                .createDate(createDate)
-//                .startDate(startDate)
-//                .endDate(endDate)
-//                .state(true)
-//                .introduction("testIntroduction")
-//                .maxPeople(10)
-//                .currentPeople(4)
-//                .delete(false)
-//                .deleteReason(null)
-//                .viewCount(10)
-//                .commentCount(10)
-//                .build();
-//        // 프로젝트 저장
-//        project = projectRepository.save(project);
-//
-//        // 프로젝트 포지션 저장
-//        ProjectPosition projectPosition1 = ProjectPosition.builder()
-//                .state(true)
-//                .build();
-//        projectPosition1 = projectPositionRepository.save(projectPosition1);
-//
-//        ProjectPosition projectPosition2 = ProjectPosition.builder()
-//                .state(true)
-//                .build();
-//        projectPosition2 = projectPositionRepository.save(projectPosition2);
-//
-//        // 프론트 기술스택 저장
-//        ProjectTechnicalStack frontTechnicalStack1 = ProjectTechnicalStack.builder()
-//                .build();
-//        projectTechnicalStackRepository.save(frontTechnicalStack1);
-//
-//        ProjectTechnicalStack frontTechnicalStack2 = ProjectTechnicalStack.builder()
-//                .build();
-//
-//        projectTechnicalStackRepository.save(frontTechnicalStack2);
-//
-//        // 백엔드 기술스택 저장
-//        ProjectTechnicalStack backTechnicalStack1 = ProjectTechnicalStack.builder()
-//
-//                .build();
-//
-//        projectTechnicalStackRepository.save(backTechnicalStack1);
-//
-//        ProjectTechnicalStack backTechnicalStack2 = ProjectTechnicalStack.builder()
-//
-//                .build();
-//
-//        projectTechnicalStackRepository.save(backTechnicalStack2);
-//
-//
-//        // when
-//        ProjectQueryDto detailProject = projectRepository.findDetailProject(project.getNo());
-//
-//
-//        // then
-//        // 프로젝트 값 검증
-//        assertEquals(detailProject.getNo(), project.getNo());
-//        assertEquals(detailProject.getName(), project.getName());
-//        assertEquals(detailProject.getCreateDate(), project.getCreateDate());
-//        assertEquals(detailProject.getStartDate(), project.getStartDate());
-//        assertEquals(detailProject.getEndDate(), project.getEndDate());
-//        assertEquals(detailProject.isState(), project.isState());
-//        assertEquals(detailProject.getIntroduction(), project.getIntroduction());
-//        assertEquals(detailProject.getMaxPeople(), project.getMaxPeople());
-//        assertEquals(detailProject.getCurrentPeople(), project.getCurrentPeople());
-//        assertEquals(detailProject.isDelete(), project.isDelete());
-//        assertEquals(detailProject.getDeleteReason(), project.getDeleteReason());
-//        assertEquals(detailProject.getViewCount(), project.getViewCount());
-//        assertEquals(detailProject.getCommentCount(), project.getCommentCount());
-//
-//        // 프로젝트 포지션 값 검증
-//        assertEquals(detailProject.getProjectPositionList().get(0).getNo(), projectPosition1.getNo());
-//
-//        assertEquals(detailProject.getProjectPositionList().get(0).isState(), projectPosition1.isState());
-//
-//        assertEquals(detailProject.getProjectPositionList().get(1).getNo(), projectPosition2.getNo());
-//
-//        assertEquals(detailProject.getProjectPositionList().get(1).isState(), projectPosition2.isState());
-//
-//        // 프로젝트 기술 스택 검증
-//        assertEquals(detailProject.getProjectPositionList().get(0).getProjectTechnicalStackList().get(0).getNo(), frontTechnicalStack1.getNo());
-//
-//        assertEquals(detailProject.getProjectPositionList().get(0).getProjectTechnicalStackList().get(1).getNo(), frontTechnicalStack2.getNo());
-//
-//
-//        assertEquals(detailProject.getProjectPositionList().get(1).getProjectTechnicalStackList().get(0).getNo(), backTechnicalStack1.getNo());
-//
-//        assertEquals(detailProject.getProjectPositionList().get(1).getProjectTechnicalStackList().get(1).getNo(), backTechnicalStack2.getNo());
-//
-//    }
+        User user1 = User.builder()
+                .name("testUser1")
+                .sex('M')
+                .email("testEmail1")
+                .password("testPassword1")
+                .github("testGithub1")
+                .block(false)
+                .blockReason(null)
+                .permission(Role.ROLE_USER)
+                .oauthCategory(OAuth.NORMAL)
+                .email_auth(false)
+                .imageNo(0L)
+                .position(null)
+                .build();
+        User saveUser1 = userRepository.save(user1);
+
+        Project project1 = Project.builder()
+                .name("testName1")
+                .createUserName("user1")
+                .createDate(createDate)
+                .startDate(startDate)
+                .endDate(endDate)
+                .state(true)
+                .introduction("testIntroduction1")
+                .maxPeople(10)
+                .currentPeople(4)
+                .delete(true)
+                .deleteReason(null)
+                .viewCount(10)
+                .commentCount(10)
+                .user(saveUser1)
+                .build();
+        Project saveProject1 = projectRepository.save(project1);
+
+        boolean isCreate = projectRepository.existProject(saveUser1, saveProject1);
+
+        assertEquals(isCreate, true);
+    }
 }

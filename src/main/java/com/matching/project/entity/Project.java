@@ -64,6 +64,10 @@ public class Project {
     @ColumnDefault("0")
     private Integer commentCount;
 
+    @ManyToOne
+    @JoinColumn(name = "user_no")
+    private User user;
+
     public static Project of(ProjectRegisterRequestDto projectRegisterRequestDto, User user) {
         return Project.builder()
                 .name(projectRegisterRequestDto.getName())
@@ -81,5 +85,14 @@ public class Project {
                 .commentCount(0)
                 .imageNo(null)
                 .build();
+    }
+    
+    // todo 이미지 업로드 기능이 생기면 수정 필요
+    public void changeUpdateInfo(String name, LocalDate startDate, LocalDate endDate, String introduction, Integer maxPeople) {
+        this.name = name;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.introduction = introduction;
+        this.maxPeople = maxPeople;
     }
 }

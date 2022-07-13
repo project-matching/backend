@@ -15,6 +15,6 @@ public class Position {
     @Id @GeneratedValue
     private Long no;
 
-    @Column(length = 20, nullable = false)
+    @Column(length = 50, nullable = false)
     private String name;
 }

@@ -6,6 +6,7 @@ import com.matching.project.dto.project.*;
 import com.matching.project.entity.*;
 import com.matching.project.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
@@ -13,6 +14,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -48,25 +50,12 @@ public class ProjectServiceImpl implements ProjectService {
             new IllegalArgumentException("잘못된 기술스택입니다.");
         }
     }
-
-    @Override
-    public ProjectRegisterResponseDto projectRegister(ProjectRegisterRequestDto projectRegisterRequestDto) throws Exception{
+    
+    // 프로젝트 포지션 저장 메소드
+    private void saveProjectPosition(Project project, List<ProjectPositionDto> projectPositionDtoList, List<Position> positionList) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) authentication.getPrincipal();
 
-        Project project = Project.of(projectRegisterRequestDto, user);
-        project = projectRepository.save(project);
-
-        List<ProjectPositionDto> projectPositionDtoList = projectRegisterRequestDto.getProjectPositionDtoList();
-        List<String> positionNameList = projectPositionDtoList.stream()
-                .map(projectPositionDto -> projectPositionDto.getName()).collect(Collectors.toList());
-
-        List<Position> positionList = positionRepository.findByNameIn(positionNameList);
-
-        // 포지션 존재여부 판단
-        positionValidation(positionList, positionNameList);
-
-        // ProjectPosition 저장
         for (ProjectPositionDto projectPositionDto : projectPositionDtoList) {
             ProjectPosition projectPosition = null;
             if (projectPositionDto.isState()) {
@@ -93,12 +82,10 @@ public class ProjectServiceImpl implements ProjectService {
             }
             projectPositionRepository.save(projectPosition);
         }
-
-        // 기술스택 존재 여부 판단
-        List<String> technicalStackNameList = projectRegisterRequestDto.getProjectTechnicalStack();
-        List<TechnicalStack> technicalStackList = technicalStackRepository.findByNameIn(technicalStackNameList);
-        technicalStackValidation(technicalStackList, technicalStackNameList);
-
+    }
+    
+    // 기술 스택 저장
+    public void saveTechnicalStack(Project project, List<String> technicalStackNameList, List<TechnicalStack> technicalStackList) {
         for (String name : technicalStackNameList) {
             ProjectTechnicalStack projectTechnicalStack = ProjectTechnicalStack.builder()
                     .technicalStack(technicalStackList.stream()
@@ -109,12 +96,40 @@ public class ProjectServiceImpl implements ProjectService {
                     .build();
             projectTechnicalStackRepository.save(projectTechnicalStack);
         }
+    }
+    @Override
+    public ProjectRegisterResponseDto projectRegister(ProjectRegisterRequestDto projectRegisterRequestDto) throws Exception{
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user = (User) authentication.getPrincipal();
 
+        Project project = Project.of(projectRegisterRequestDto, user);
+        project = projectRepository.save(project);
+
+        List<ProjectPositionDto> projectPositionDtoList = projectRegisterRequestDto.getProjectPositionDtoList();
+        List<String> positionNameList = projectPositionDtoList.stream()
+                .map(projectPositionDto -> projectPositionDto.getName()).collect(Collectors.toList());
+
+        List<Position> positionList = positionRepository.findByNameIn(positionNameList);
+
+        // 포지션 존재여부 판단
+        positionValidation(positionList, positionNameList);
+        
+        // 포지션 저장
+        saveProjectPosition(project, projectPositionDtoList, positionList);
+
+        List<String> technicalStackNameList = projectRegisterRequestDto.getProjectTechnicalStack();
+        List<TechnicalStack> technicalStackList = technicalStackRepository.findByNameIn(technicalStackNameList);
+
+        // 기술스택 존재 여부 판단
+        technicalStackValidation(technicalStackList, technicalStackNameList);
+
+        // 기술스택 저장
+        saveTechnicalStack(project, technicalStackNameList, technicalStackList);
 
         ProjectRegisterResponseDto projectRegisterResponseDto = ProjectRegisterResponseDto.builder()
                 .no(project.getNo())
                 .name(project.getName())
-                .createUser(user.getName())
+                .createUser(project.getCreateUserName())
                 .profile(null)
                 .createDate(project.getCreateDate())
                 .startDate(project.getStartDate())
@@ -200,10 +215,10 @@ public class ProjectServiceImpl implements ProjectService {
         List<ProjectPositionDetailDto> projectPositionDetailDtoList = projectPositionList.stream()
                 .map(projectPosition ->
                         new ProjectPositionDetailDto(
+                                projectPosition.getNo(),
                                 projectPosition.getPosition().getName(),
-                                projectPosition.getUser() == null ? null : projectPosition.getUser().getNo(),
-                                projectPosition.getUser() == null ? null : projectPosition.getUser().getName(),
-                                projectPosition.isState())
+                                projectPosition.isState(),
+                                projectPosition.getUser() == null ? null : new UserDetailDto(projectPosition.getUser().getNo(), projectPosition.getUser().getName()))
                 ).collect(Collectors.toList());
         projectDto.setProjectPositionDetailDtoList(projectPositionDetailDtoList);
         
@@ -233,5 +248,92 @@ public class ProjectServiceImpl implements ProjectService {
         }
 
         return projectDto;
+    }
+    
+    // 프로젝트를 생성한 유저인지 판단
+    private boolean isCreate(User user, Project project) {
+        return projectRepository.existProject(user, project);
+    }
+    
+    @Override
+    public ProjectUpdateResponseDto updateProject(Long projectNo, ProjectUpdateRequestDto projectUpdateRequestDto) throws Exception {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User user = (User) principal;
+
+        // 프로젝트 조회
+        Project project = projectRepository.findById(projectNo).orElseThrow(() -> new NoSuchElementException("프로젝트를 찾지 못했습니다."));
+
+        // 프로젝트를 생성한 유저인지 판단
+        if (!isCreate(user, project)) {
+            new IllegalArgumentException("잘못된 접근입니다.");
+        }
+        // 프로젝트 수정
+        project.changeUpdateInfo(projectUpdateRequestDto.getName(),
+                projectUpdateRequestDto.getStartDate(),
+                projectUpdateRequestDto.getEndDate(),
+                projectUpdateRequestDto.getIntroduction(),
+                projectUpdateRequestDto.getMaxPeople());
+
+        // 포지션 존재여부 판단
+        List<ProjectPositionUpdateDto> projectPositionUpdateDto = projectUpdateRequestDto.getProjectPositionDtoList();
+        List<String> positionNameList = projectPositionUpdateDto.stream()
+                .map(projectPositionDto -> projectPositionDto.getName()).collect(Collectors.toList());
+        List<Position> positionList = positionRepository.findByNameIn(positionNameList);
+
+        positionValidation(positionList, positionNameList);
+
+        // 유저가 없는 포지션 삭제
+        projectPositionRepository.deleteByProjectAndUserIsNull(project);
+
+        // 유저가 있는지 판단 후 유저가 없는 프로젝트만 save
+        List<ProjectPositionUpdateDto> noneUserProjectPositionDto = projectPositionUpdateDto.stream()
+                .filter(projectPositionDto -> projectPositionDto.getUserUpdateDto() == null)
+                .collect(Collectors.toList());
+
+        for (ProjectPositionUpdateDto positionUpdateDto : noneUserProjectPositionDto) {
+            ProjectPosition projectPosition = ProjectPosition.builder()
+                    .state(false)
+                    .project(project)
+                    .position(positionList.stream()
+                            .filter(position -> (position.getName()).equals(positionUpdateDto.getName()))
+                            .findAny()
+                            .orElseThrow(() -> new NoSuchElementException("잘못된 position")))
+                    .user(null)
+                    .creator(true)
+                    .build();
+
+            projectPositionRepository.save(projectPosition);
+        }
+
+        List<String> technicalStackNameList = projectUpdateRequestDto.getProjectTechnicalStack();
+        List<TechnicalStack> technicalStackList = technicalStackRepository.findByNameIn(technicalStackNameList);
+
+        // 기술스택 존재 여부 판단
+        technicalStackValidation(technicalStackList, technicalStackNameList);
+
+        // 기술 스택 삭제
+        projectTechnicalStackRepository.deleteByProject(project);
+        // 기술스택 저장
+        saveTechnicalStack(project, technicalStackNameList, technicalStackList);
+
+        ProjectUpdateResponseDto projectUpdateResponseDto = ProjectUpdateResponseDto.builder()
+                .no(project.getNo())
+                .name(project.getName())
+                .createUser(project.getCreateUserName())
+                .profile(null)
+                .createDate(project.getCreateDate())
+                .startDate(project.getStartDate())
+                .endDate(project.getEndDate())
+                .state(project.isState())
+                .introduction(project.getIntroduction())
+                .maxPeople(project.getMaxPeople())
+                .currentPeople(project.getCurrentPeople())
+                .viewCount(project.getViewCount())
+                .commentCount(project.getCommentCount())
+                .build();
+        projectUpdateResponseDto.setProjectPositionDtoList(projectPositionUpdateDto);
+        projectUpdateResponseDto.setProjectTechnicalStack(technicalStackNameList);
+
+        return projectUpdateResponseDto;
     }
 }
