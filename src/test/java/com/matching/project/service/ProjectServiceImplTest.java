@@ -170,7 +170,6 @@ class ProjectServiceImplTest {
         ProjectRegisterRequestDto projectRegisterRequestDto = ProjectRegisterRequestDto.builder()
                 .name("testProject1")
                 .profile(null)
-                .createDate(createDate)
                 .startDate(startDate)
                 .endDate(endDate)
                 .introduction("testIntroduction1")

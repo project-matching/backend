@@ -15,31 +15,30 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 public class ProjectDto {
+    private Long projectNo;
     private String name;
-    private String profile;
-    private LocalDateTime createDate;
     private LocalDate startDate;
     private LocalDate endDate;
     private boolean state;
     private String introduction;
+    private Integer currentPeople;
     private Integer maxPeople;
     private boolean bookmark;
-    private String register;
+    private boolean applicationStatus;
     private List<String> technicalStack = new ArrayList<>();
     private List<ProjectPositionDetailDto> projectPositionDetailDtoList = new ArrayList<>();
-    private List<CommentDto> commentDtoList = new ArrayList<>();
 
-    @Builder
-    public ProjectDto(String name, String profile, LocalDateTime createDate, LocalDate startDate, LocalDate endDate, boolean state, String introduction, Integer maxPeople, boolean bookmark, String register) {
-        this.name = name;
-        this.profile = profile;
-        this.createDate = createDate;
-        this.startDate = startDate;
-        this.endDate = endDate;
-        this.state = state;
-        this.introduction = introduction;
-        this.maxPeople = maxPeople;
-        this.bookmark = bookmark;
-        this.register = register;
-    }
+//    @Builder
+//    public ProjectDto(String name, String profile, LocalDateTime createDate, LocalDate startDate, LocalDate endDate, boolean state, String introduction, Integer maxPeople, boolean bookmark, String register) {
+//        this.name = name;
+//        this.profile = profile;
+//        this.createDate = createDate;
+//        this.startDate = startDate;
+//        this.endDate = endDate;
+//        this.state = state;
+//        this.introduction = introduction;
+//        this.maxPeople = maxPeople;
+//        this.bookmark = bookmark;
+//        this.register = register;
+//    }
 }

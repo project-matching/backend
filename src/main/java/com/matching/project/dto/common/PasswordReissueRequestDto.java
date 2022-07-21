@@ -10,6 +10,7 @@ import lombok.*;
 @Getter
 public class PasswordReissueRequestDto {
     String email;
+    String password;
     String authToken;
     EmailAuthPurpose purpose;
 }

@@ -21,4 +21,7 @@ public class TechnicalStack {
 
     @Column(length = 20, nullable = false)
     private String name;
+
+    @Column(nullable = true)
+    private Long imageNo;
 }

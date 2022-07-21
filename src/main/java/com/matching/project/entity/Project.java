@@ -64,6 +64,10 @@ public class Project {
     @ColumnDefault("0")
     private Integer commentCount;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_no")
+    private User user;
+
     @OneToMany(mappedBy = "project")
     private List<ProjectPosition> projectPositionList = new ArrayList<>();
 
@@ -71,22 +75,22 @@ public class Project {
     private List<ProjectTechnicalStack> ProjectTechnicalStackList = new ArrayList<>();
 
 
-    public static Project of(ProjectRegisterRequestDto projectRegisterRequestDto, User user) {
-        return Project.builder()
-                .name(projectRegisterRequestDto.getName())
-                .createUserName(user.getName())
-                .createDate(projectRegisterRequestDto.getCreateDate())
-                .startDate(projectRegisterRequestDto.getStartDate())
-                .endDate(projectRegisterRequestDto.getEndDate())
-                .state(true)
-                .introduction(projectRegisterRequestDto.getIntroduction())
-                .maxPeople(projectRegisterRequestDto.getMaxPeople())
-                .currentPeople(1)
-                .delete(false)
-                .deleteReason(null)
-                .viewCount(0)
-                .commentCount(0)
-                .imageNo(null)
-                .build();
-    }
+//    public static Project of(ProjectRegisterRequestDto projectRegisterRequestDto, User user) {
+//        return Project.builder()
+//                .name(projectRegisterRequestDto.getName())
+//                .createUserName(user.getName())
+//                .createDate(LocalDateTime.now())
+//                .startDate(projectRegisterRequestDto.getStartDate())
+//                .endDate(projectRegisterRequestDto.getEndDate())
+//                .state(true)
+//                .introduction(projectRegisterRequestDto.getIntroduction())
+//                .maxPeople(projectRegisterRequestDto.getMaxPeople())
+//                .currentPeople(1)
+//                .delete(false)
+//                .deleteReason(null)
+//                .viewCount(0)
+//                .commentCount(0)
+//                .imageNo(null)
+//                .build();
+//    }
 }

@@ -30,7 +30,7 @@ public class User implements UserDetails {
     private String name;
 
     @Column(length = 1, nullable = false)
-    private char sex;
+    private String sex;
 
     @Column(unique = true, length = 100, nullable = false)
     private String email;
@@ -88,10 +88,10 @@ public class User implements UserDetails {
 
     public User updateUser(UserUpdateRequestDto dto, Position position) {
         this.name = dto.getName();
-        if (!"".equals(dto.getSex()) && dto.getSex() != null)
-            this.sex = dto.getSex().charAt(0);
-        else
-            this.sex = 0;
+//        if (!"".equals(dto.getSex()) && dto.getSex() != null)
+//            //this.sex = dto.getSex().charAt(0);
+//        else
+//            this.sex = 0;
         this.github = dto.getGithub();
         this.selfIntroduction = dto.getSelfIntroduction();
         this.imageNo = null;

@@ -17,13 +17,8 @@ import java.util.List;
 @Getter
 public class SignUpRequestDto {
     private String name;
-    private String sex;
     private String email;
     private String password;
-    private String position;
-    private List<String> technicalStackList;
-    private String github;
-    private String selfIntroduction;
 
     public void setEncodePassword(String encodePassword) {
         this.password = encodePassword;
@@ -31,21 +26,21 @@ public class SignUpRequestDto {
 
     public static User toUserEntity(final SignUpRequestDto signUpRequestDto, Position position) {
         char sex = 0;
-        if (!"".equals(signUpRequestDto.getSex()) && signUpRequestDto.getSex() != null)
-            sex = signUpRequestDto.getSex().charAt(0);
-        User user = User.builder()
-                .name(signUpRequestDto.name)
-                .sex(sex)
-                .email(signUpRequestDto.email)
-                .password(signUpRequestDto.password)
-                .github(signUpRequestDto.github)
-                .selfIntroduction(signUpRequestDto.selfIntroduction)
-                .permission(Role.ROLE_USER)
-                .oauthCategory(OAuth.NORMAL)
-                .block(false)
-                .position(position)
-                .email_auth(true) // 임시
-                .build();
-        return user;
+//        if (!"".equals(signUpRequestDto.getSex()) && signUpRequestDto.getSex() != null)
+//            sex = signUpRequestDto.getSex().charAt(0);
+//        User user = User.builder()
+//                .name(signUpRequestDto.name)
+//                .sex(sex)
+//                .email(signUpRequestDto.email)
+//                .password(signUpRequestDto.password)
+//                .github(signUpRequestDto.github)
+//                .selfIntroduction(signUpRequestDto.selfIntroduction)
+//                .permission(Role.ROLE_USER)
+//                .oauthCategory(OAuth.NORMAL)
+//                .block(false)
+//                .position(position)
+//                .email_auth(true) // 임시
+//                .build();
+        return null;
     }
 }

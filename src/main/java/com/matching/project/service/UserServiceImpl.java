@@ -38,19 +38,19 @@ public class UserServiceImpl implements UserService{
     private final PasswordEncoder passwordEncoder;
 
     public void signUpValidCheck(SignUpRequestDto dto) {
-        // 참고 : https://lovefor-you.tistory.com/113
-        if ("".equals(dto.getName()) || dto.getName() == null)
-            throw new RuntimeException("Name value is blanked");
-        if (!"".equals(dto.getSex()) && dto.getSex() != null)  {
-            if (dto.getSex().length() > 1 || !dto.getSex().matches("[mMwWoO]"))
-                throw new RuntimeException("Sex value is Invalid");
-        }
-        if ("".equals(dto.getEmail()) || dto.getEmail() == null)
-            throw new RuntimeException("Email value is blanked");
-        if ("".equals(dto.getPassword()) || dto.getPassword() == null)
-            throw new RuntimeException("Password value is blanked");
-        if (userRepository.findByEmail(dto.getEmail()).isPresent())
-            throw new RuntimeException("Email is duplicated.");
+//        // 참고 : https://lovefor-you.tistory.com/113
+//        if ("".equals(dto.getName()) || dto.getName() == null)
+//            throw new RuntimeException("Name value is blanked");
+//        if (!"".equals(dto.getSex()) && dto.getSex() != null)  {
+//            if (dto.getSex().length() > 1 || !dto.getSex().matches("[mMwWoO]"))
+//                throw new RuntimeException("Sex value is Invalid");
+//        }
+//        if ("".equals(dto.getEmail()) || dto.getEmail() == null)
+//            throw new RuntimeException("Email value is blanked");
+//        if ("".equals(dto.getPassword()) || dto.getPassword() == null)
+//            throw new RuntimeException("Password value is blanked");
+//        if (userRepository.findByEmail(dto.getEmail()).isPresent())
+//            throw new RuntimeException("Email is duplicated.");
     }
 
     public Position getPositionForSave(String s) {
@@ -88,123 +88,126 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public User userSignUp(SignUpRequestDto dto){
-
-        // Valid Check
-        signUpValidCheck(dto);
-
-        // Password Encode
-        dto.setEncodePassword(passwordEncoder.encode(dto.getPassword()));
-
-        // Get Entity
-        Position position = getPositionForSave(dto.getPosition());
-        List<TechnicalStack> saveTechnicalStacksList = getTechnicalStacksListForSave(dto.getTechnicalStackList());
-
-        // Position Save
-        if (position != null)
-            positionRepository.save(position);
-
-        // User Save
-        User user = dto.toUserEntity(dto, position);
-        userRepository.save(user);
-
-        // TechnicalStacks Save
-        if (!saveTechnicalStacksList.isEmpty()) {
-            for (TechnicalStack t : saveTechnicalStacksList) {
-                userTechnicalStackRepository.save(UserTechnicalStack.builder()
-                        .technicalStack(t)
-                        .user(user)
-                        .build()
-                );
-            }
-        }
-        return user;
+//
+//        // Valid Check
+//        signUpValidCheck(dto);
+//
+//        // Password Encode
+//        dto.setEncodePassword(passwordEncoder.encode(dto.getPassword()));
+//
+//        // Get Entity
+//        Position position = getPositionForSave(dto.getPosition());
+//        List<TechnicalStack> saveTechnicalStacksList = getTechnicalStacksListForSave(dto.getTechnicalStackList());
+//
+//        // Position Save
+//        if (position != null)
+//            positionRepository.save(position);
+//
+//        // User Save
+//        User user = dto.toUserEntity(dto, position);
+//        userRepository.save(user);
+//
+//        // TechnicalStacks Save
+//        if (!saveTechnicalStacksList.isEmpty()) {
+//            for (TechnicalStack t : saveTechnicalStacksList) {
+//                userTechnicalStackRepository.save(UserTechnicalStack.builder()
+//                        .technicalStack(t)
+//                        .user(user)
+//                        .build()
+//                );
+//            }
+//        }
+        return null;
     }
 
     @Override
     public UserInfoResponseDto userInfo(Long no) {
-        Optional<User> user = userRepository.findById(no);
-        user.orElseThrow(() -> new RuntimeException("Not Find User No"));
-
-        String position = null;
-        if (user.get().getPosition() != null)
-            position = user.get().getPosition().getName();
-        List<String> technicalStackList = userTechnicalStackRepository.findUserTechnicalStacksByUser(no)
-                .stream()
-                .map(UserTechnicalStack::getTechnicalStack)
-                .map(TechnicalStack::getName)
-                .collect(Collectors.toList());
-
-        return UserInfoResponseDto.builder()
-                .name(user.get().getName())
-                .sex(user.get().getSex())
-                .email(user.get().getEmail())
-                .position(position)
-                .technicalStackList(technicalStackList)
-                .github(user.get().getGithub())
-                .selfIntroduction(user.get().getSelfIntroduction())
-                .build();
+//        Optional<User> user = userRepository.findById(no);
+//        user.orElseThrow(() -> new RuntimeException("Not Find User No"));
+//
+//        String position = null;
+//        if (user.get().getPosition() != null)
+//            position = user.get().getPosition().getName();
+//        List<String> technicalStackList = userTechnicalStackRepository.findUserTechnicalStacksByUser(no)
+//                .stream()
+//                .map(UserTechnicalStack::getTechnicalStack)
+//                .map(TechnicalStack::getName)
+//                .collect(Collectors.toList());
+//
+//        return UserInfoResponseDto.builder()
+//                .name(user.get().getName())
+//                .sex(user.get().getSex())
+//                .email(user.get().getEmail())
+//                .position(position)
+//                .technicalStackList(technicalStackList)
+//                .github(user.get().getGithub())
+//                .selfIntroduction(user.get().getSelfIntroduction())
+//                .build();
+        return null;
     }
 
     @Override
     public List<UserSimpleInfoDto> userInfoList(Pageable pageable) {
-        Page<User> users = userRepository.findAll(pageable);
-        return users.get().map(UserSimpleInfoDto::toUserSimpleInfoDto).collect(Collectors.toList());
+//        Page<User> users = userRepository.findAll(pageable);
+//        return users.get().map(UserSimpleInfoDto::toUserSimpleInfoDto).collect(Collectors.toList());
+        return null;
     }
 
     public void updateValidCheck(UserUpdateRequestDto dto, User user) {
-        if ("".equals(dto.getName()) || dto.getName() == null)
-            throw new RuntimeException("Name value is blanked");
-        if (!"".equals(dto.getSex()) && dto.getSex() != null)  {
-            if (dto.getSex().length() > 1 || !dto.getSex().matches("[mMwWoO]"))
-                throw new RuntimeException("Sex value is Invalid");
-        }
-        if (user.getOauthCategory() == OAuth.NORMAL) {
-            if ("".equals(dto.getOriginPassword()) || dto.getOriginPassword() == null)
-                throw new RuntimeException("Original Password value is blanked");
-            else if (!passwordEncoder.matches(dto.getOriginPassword(), user.getPassword()))
-                throw new RuntimeException("Original Password is Wrong");
-        }
+//        if ("".equals(dto.getName()) || dto.getName() == null)
+//            throw new RuntimeException("Name value is blanked");
+//        if (!"".equals(dto.getSex()) && dto.getSex() != null)  {
+//            if (dto.getSex().length() > 1 || !dto.getSex().matches("[mMwWoO]"))
+//                throw new RuntimeException("Sex value is Invalid");
+//        }
+//        if (user.getOauthCategory() == OAuth.NORMAL) {
+//            if ("".equals(dto.getOriginPassword()) || dto.getOriginPassword() == null)
+//                throw new RuntimeException("Original Password value is blanked");
+//            else if (!passwordEncoder.matches(dto.getOriginPassword(), user.getPassword()))
+//                throw new RuntimeException("Original Password is Wrong");
+//        }
     }
 
     @Transactional
     @Override
     public User userUpdate(Long no, UserUpdateRequestDto dto) {
-        // Identification Check
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        User identificationUser = (User)auth.getPrincipal();
-        if (!Objects.equals(identificationUser.getNo(), no))
-            throw new RuntimeException("Identification Check Fail");
-
-        Optional<User> optionalUser = userRepository.findById(no);
-        optionalUser.orElseThrow(() -> new RuntimeException("Not Find User No"));
-
-        // Valid Check
-        updateValidCheck(dto, optionalUser.get());
-
-        // New Password Encode And Save
-        if (optionalUser.get().getOauthCategory() == OAuth.NORMAL)
-            optionalUser.get().updatePassword(passwordEncoder, dto.getNewPassword());
-
-        // Get Entity
-        Position position = getPositionForSave(dto.getPosition());
-        List<TechnicalStack> saveTechnicalStacksList = getTechnicalStacksListForSave(dto.getTechnicalStackList());
-
-        // User & Position Update
-        optionalUser.get().updateUser(dto, position);
-
-        // UserTechnicalStacks Delete & Save
-        if (userTechnicalStackRepository.findUserTechnicalStacksByUser(no) != null)
-            userTechnicalStackRepository.deleteAllByUser(optionalUser.get());
-        if (!saveTechnicalStacksList.isEmpty()) {
-            for (TechnicalStack t : saveTechnicalStacksList) {
-                userTechnicalStackRepository.save(UserTechnicalStack.builder()
-                        .technicalStack(t)
-                        .user(optionalUser.get())
-                        .build()
-                );
-            }
-        }
-        return optionalUser.get();
+//        // Identification Check
+//        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+//        User identificationUser = (User)auth.getPrincipal();
+//        if (!Objects.equals(identificationUser.getNo(), no))
+//            throw new RuntimeException("Identification Check Fail");
+//
+//        Optional<User> optionalUser = userRepository.findById(no);
+//        optionalUser.orElseThrow(() -> new RuntimeException("Not Find User No"));
+//
+//        // Valid Check
+//        updateValidCheck(dto, optionalUser.get());
+//
+//        // New Password Encode And Save
+//        if (optionalUser.get().getOauthCategory() == OAuth.NORMAL)
+//            optionalUser.get().updatePassword(passwordEncoder, dto.getNewPassword());
+//
+//        // Get Entity
+//        Position position = getPositionForSave(dto.getPosition());
+//        List<TechnicalStack> saveTechnicalStacksList = getTechnicalStacksListForSave(dto.getTechnicalStackList());
+//
+//        // User & Position Update
+//        optionalUser.get().updateUser(dto, position);
+//
+//        // UserTechnicalStacks Delete & Save
+//        if (userTechnicalStackRepository.findUserTechnicalStacksByUser(no) != null)
+//            userTechnicalStackRepository.deleteAllByUser(optionalUser.get());
+//        if (!saveTechnicalStacksList.isEmpty()) {
+//            for (TechnicalStack t : saveTechnicalStacksList) {
+//                userTechnicalStackRepository.save(UserTechnicalStack.builder()
+//                        .technicalStack(t)
+//                        .user(optionalUser.get())
+//                        .build()
+//                );
+//            }
+//        }
+//        return optionalUser.get();
+        return null;
     }
 
     @Transactional

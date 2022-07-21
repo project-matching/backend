@@ -250,9 +250,8 @@ class ProjectControllerTest {
         projectTechnicalStack.add("testTechnicalStack2");
 
         ProjectRegisterRequestDto projectRegisterRequestDto = ProjectRegisterRequestDto.builder()
-                .name("testName")
+                .name(null)
                 .profile(null)
-                .createDate(createDate)
                 .startDate(startDate)
                 .endDate(endDate)
                 .introduction("testIntroduction1")
@@ -274,7 +273,6 @@ class ProjectControllerTest {
                 .andExpect(jsonPath("$.data.name").value(projectRegisterRequestDto.getName()))
                 .andExpect(jsonPath("$.data.createUser").value(saveUser.getName()))
                 .andExpect(jsonPath("$.data.profile").isEmpty())
-                .andExpect(jsonPath("$.data.createDate").value(projectRegisterRequestDto.getCreateDate().toString()))
                 .andExpect(jsonPath("$.data.startDate").value(projectRegisterRequestDto.getStartDate().toString()))
                 .andExpect(jsonPath("$.data.endDate").value(projectRegisterRequestDto.getEndDate().toString()))
                 .andExpect(jsonPath("$.data.state").value(true))

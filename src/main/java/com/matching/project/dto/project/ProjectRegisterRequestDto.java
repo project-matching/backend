@@ -1,10 +1,12 @@
 package com.matching.project.dto.project;
 
+import com.matching.project.dto.projectposition.ProjectPositionRegisterDto;
 import com.matching.project.entity.Project;
 import lombok.*;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -16,11 +18,6 @@ public class ProjectRegisterRequestDto {
     @NotBlank
     private String name;
 
-    private String profile;
-
-    @NotBlank
-    private LocalDateTime createDate;
-
     @NotBlank
     private LocalDate startDate;
 
@@ -30,10 +27,11 @@ public class ProjectRegisterRequestDto {
     @NotNull
     private String introduction;
 
-    @NotBlank
-    private Integer maxPeople;
+    @NotNull
+    @Size(min = 0)
+    private List<ProjectPositionRegisterDto> projectPositionRegisterDtoList;
 
-    private List<ProjectPositionDto> projectPositionDtoList = new ArrayList<>();
-
-    private List<String> projectTechnicalStack = new ArrayList<>();
+    @NotNull
+    @Size(min = 0)
+    private List<Long> projectTechnicalStackList;
 }

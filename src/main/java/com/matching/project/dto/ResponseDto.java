@@ -1,5 +1,6 @@
 package com.matching.project.dto;
 
+import com.matching.project.error.ErrorResponse;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,6 +13,6 @@ import java.util.List;
 @AllArgsConstructor
 @Data
 public class ResponseDto<T> {
-    private String error;
+    private ErrorResponse error;
     private T data;
 }

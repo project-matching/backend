@@ -21,7 +21,7 @@ public class OAuthAttributes {
     private Map<String, Object> attributes;
     private String nameAttributeKey;
     private String name;
-    private char sex;
+    private String sex;
     private String email;
     private String password;
     private OAuth oauthCategory;
@@ -39,7 +39,7 @@ public class OAuthAttributes {
     private static OAuthAttributes ofGoogle(String nameAttributeKey, Map<String, Object> attributes) {
         return OAuthAttributes.builder()
                 .name((String) attributes.get("name"))
-                .sex('S')
+                .sex("S")
                 .email((String) attributes.get("email"))
                 .password("NONE")
                 .oauthCategory(OAuth.GOOGLE)
@@ -51,7 +51,7 @@ public class OAuthAttributes {
     private static OAuthAttributes ofGithub(String nameAttributeKey, Map<String, Object> attributes) {
         return OAuthAttributes.builder()
                 .name((String) attributes.get("login"))
-                .sex('S')
+                .sex("S")
                 .email(String.valueOf(attributes.get("id")))
                 .password("NONE")
                 .oauthCategory(OAuth.GITHUB)

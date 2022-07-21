@@ -15,8 +15,6 @@ public class UserUpdateRequestDto {
     private String profile;
     private String name;
     private String sex;
-    private String originPassword;
-    private String newPassword;
     private String position;
     private List<String> technicalStackList;
     private String github;

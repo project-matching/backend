@@ -1,5 +1,6 @@
 package com.matching.project.dto.project;
 
+import com.matching.project.dto.user.UserDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -8,8 +9,7 @@ import lombok.Data;
 @AllArgsConstructor
 @Builder
 public class ProjectPositionDetailDto {
+    private Long projectPositionNo;
     private String positionName;
-    private Long userNo;
-    private String userName;
-    private boolean state;
+    private UserDto userDto;
 }

@@ -10,12 +10,9 @@ import lombok.Data;
 public class ProjectSimplePositionDto {
     private Long projectNo;
     private String positionName;
-    private String image;
-    private boolean state;
 
     public ProjectSimplePositionDto(Long projectNo, String positionName, boolean state) {
         this.projectNo = projectNo;
         this.positionName = positionName;
-        this.state = state;
     }
 }

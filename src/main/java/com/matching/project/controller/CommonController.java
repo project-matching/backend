@@ -30,8 +30,8 @@ public class CommonController {
 
     // 일반 로그인
     @PostMapping("/login")
-    @ApiOperation(value = "일반 로그인")
-    public ResponseEntity normalLogin(@RequestBody NormalLoginRequestDto dto) {
+    @ApiOperation(value = "일반 로그인 (수정 완료)")
+    public ResponseEntity<ResponseDto<String>> normalLogin(@RequestBody NormalLoginRequestDto dto) {
         try {
             User user = commonService.normalLogin(dto);
             TokenDto tokenDto = TokenDto.builder()
@@ -42,14 +42,14 @@ public class CommonController {
             ResponseDto<String> response = ResponseDto.<String>builder().data(jwtAccessToken).build();
             return ResponseEntity.ok().body(response);
         } catch (Exception e) {
-            ResponseDto<String> response = ResponseDto.<String>builder().error(e.getMessage()).build();
+            ResponseDto<String> response = ResponseDto.<String>builder().error(null).build();
             return ResponseEntity.badRequest().body(response);
         }
     }
 
     // 소셜 로그인
     @GetMapping("/logout")
-    @ApiOperation(value = "로그아웃")
+    @ApiOperation(value = "로그아웃 (추후 수정 필요)")
     public ResponseEntity<String> logout() {
         //프론트에서 저장된 jwt 토큰 제거도 필요
         SecurityContextHolder.clearContext();
@@ -57,40 +57,33 @@ public class CommonController {
         return new ResponseEntity(response, HttpStatus.OK);
     }
 
+    // request dto 수정 필요
     @PostMapping("/password/reissue")
-    @ApiOperation(value = "비밀번호 재발급 이메일 요청")
-    public ResponseEntity passwordReissueCall(@RequestBody PasswordReissueCallRequestDto dto) {
-        try {
-            dto.setPurpose(EmailAuthPurpose.PASSWORD_REISSUE);
+    @ApiOperation(value = "비밀번호 변경 이메일 요청 (request dto 수정 필요)")
+    public ResponseEntity<ResponseDto<Boolean>> passwordReissueCall(@RequestBody PasswordReissueCallRequestDto dto) {
+        dto.setPurpose(EmailAuthPurpose.PASSWORD_REISSUE);
 
-            EmailAuth emailAuth = emailService.beforeSendWork(dto.getEmail(), dto.getPurpose());
-            emailService.sendPasswordReissueEmail(dto.getEmail(), emailAuth.getAuthToken());
+        EmailAuth emailAuth = emailService.beforeSendWork(dto.getEmail(), dto.getPurpose());
+        emailService.sendPasswordReissueEmail(dto.getEmail(), emailAuth.getAuthToken());
 
-            ResponseDto<String> response = ResponseDto.<String>builder().data("패스워드 재발급 요청이 이메일로 전송되었습니다.").build();
-            return ResponseEntity.ok().body(response);
-        } catch (Exception e) {
-            ResponseDto<String> response = ResponseDto.<String>builder().error(e.getMessage()).build();
-            return ResponseEntity.badRequest().body(response);
-        }
+        return ResponseEntity.ok(new ResponseDto<Boolean>(null, true));
     }
 
+    // request dto 수정 필요
     @GetMapping("/password/reissue")
-    @ApiOperation(value = "비밀번호 재발급 (토큰 유효성 체크 포함)")
-    public ResponseEntity passwordReissue(PasswordReissueRequestDto dto) {
-        try {
-            dto.setPurpose(EmailAuthPurpose.PASSWORD_REISSUE);
+    @ApiOperation(value = "비밀번호 변경 페이지 (request dto 수정 필요)")
+    public ResponseEntity<ResponseDto<String>> passwordReissue(PasswordReissueRequestDto dto) {
+        dto.setPurpose(EmailAuthPurpose.PASSWORD_REISSUE);
 
-            String newPassword = emailService.CheckPasswordReissueEmail(dto);
-            PasswordReissueResponseDto reissueResponseDto = PasswordReissueResponseDto.builder()
-                    .email(dto.getEmail())
-                    .password(newPassword)
-                    .build();
+        String newPassword = emailService.CheckPasswordReissueEmail(dto);
+        PasswordReissueResponseDto reissueResponseDto = PasswordReissueResponseDto.builder()
+                .email(dto.getEmail())
+                .password(newPassword)
+                .build();
 
-            ResponseDto<PasswordReissueResponseDto> response = ResponseDto.<PasswordReissueResponseDto>builder().data(reissueResponseDto).build();
-            return ResponseEntity.ok().body(response);
-        } catch (Exception e) {
-            ResponseDto<String> response = ResponseDto.<String>builder().error(e.getMessage()).build();
-            return ResponseEntity.badRequest().body(response);
-        }
+        //TODO
+        //JWT
+        return ResponseEntity.ok(new ResponseDto<String>(null, "jwt"));
+
     }
 }

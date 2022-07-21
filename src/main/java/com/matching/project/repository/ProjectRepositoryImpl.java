@@ -76,46 +76,47 @@ public class ProjectRepositoryImpl implements ProjectRepositoryCustom {
 
     @Override
     public Page<ProjectSimpleDto> findProjectByStatus(Pageable pageable, boolean state, boolean delete, ProjectSearchRequestDto projectSearchRequestDto){
-        List<ProjectSimpleDto> projectSimpleDtoList = queryFactory.select(Projections.constructor(ProjectSimpleDto.class,
-                        project.no,
-                        project.name,
-                        project.maxPeople,
-                        project.currentPeople,
-                        project.viewCount,
-                        project.commentCount,
-                        project.createUserName))
-                .from(project)
-                .where(
-                        eqStatus(state),
-                        eqDelete(delete),
-                        search(projectSearchRequestDto))
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .orderBy(projectSort(pageable))
-                .fetch();
-
-        Map<Long, List<ProjectSimplePositionDto>> projectPositionMap = findProjectPositionMap(toProjectNo(projectSimpleDtoList));
-
-        projectSimpleDtoList.forEach(
-                projectSimpleDto
-                        -> projectSimpleDto.setProjectSimplePositionDtoList(projectPositionMap.get(projectSimpleDto.getNo()
-                ))
-        );
-
-        Map<Long, List<ProjectSimpleTechnicalStackDto>> projectTechnicalStackMap = findProjectTechnicalStackMap(toProjectNo(projectSimpleDtoList));
-
-        projectSimpleDtoList.forEach(
-                projectSimpleDto
-                        -> projectSimpleDto.setProjectSimpleTechnicalStackDtoList(projectTechnicalStackMap.get(projectSimpleDto.getNo()
-                ))
-        );
-
-        int totalSize = queryFactory // count 쿼리
-                .selectFrom(project)
-                .where(project.state.eq(state).and(project.delete.eq(delete)))
-                .fetch().size();
-
-        return new PageImpl<>(projectSimpleDtoList, pageable, totalSize);
+//        List<ProjectSimpleDto> projectSimpleDtoList = queryFactory.select(Projections.constructor(ProjectSimpleDto.class,
+//                        project.no,
+//                        project.name,
+//                        project.maxPeople,
+//                        project.currentPeople,
+//                        project.viewCount,
+//                        project.commentCount,
+//                        project.createUserName))
+//                .from(project)
+//                .where(
+//                        eqStatus(state),
+//                        eqDelete(delete),
+//                        search(projectSearchRequestDto))
+//                .offset(pageable.getOffset())
+//                .limit(pageable.getPageSize())
+//                .orderBy(projectSort(pageable))
+//                .fetch();
+//
+//        Map<Long, List<ProjectSimplePositionDto>> projectPositionMap = findProjectPositionMap(toProjectNo(projectSimpleDtoList));
+//
+//        projectSimpleDtoList.forEach(
+//                projectSimpleDto
+//                        -> projectSimpleDto.setProjectSimplePositionDtoList(projectPositionMap.get(projectSimpleDto.getNo()
+//                ))
+//        );
+//
+//        Map<Long, List<ProjectSimpleTechnicalStackDto>> projectTechnicalStackMap = findProjectTechnicalStackMap(toProjectNo(projectSimpleDtoList));
+//
+//        projectSimpleDtoList.forEach(
+//                projectSimpleDto
+//                        -> projectSimpleDto.setProjectSimpleTechnicalStackDtoList(projectTechnicalStackMap.get(projectSimpleDto.getNo()
+//                ))
+//        );
+//
+//        int totalSize = queryFactory // count 쿼리
+//                .selectFrom(project)
+//                .where(project.state.eq(state).and(project.delete.eq(delete)))
+//                .fetch().size();
+//
+//        return new PageImpl<>(projectSimpleDtoList, pageable, totalSize);
+        return null;
     }
 
     private BooleanExpression eqStatus(boolean state) {
@@ -127,23 +128,24 @@ public class ProjectRepositoryImpl implements ProjectRepositoryCustom {
     }
 
     private BooleanExpression search(ProjectSearchRequestDto projectSearchRequestDto) {
-        if (projectSearchRequestDto == null) {
-            return null;
-        }
-
-        Filter filter = projectSearchRequestDto.getFilter();
-
-        switch (filter) {
-            case PROJECT_NAME_AND_CONTENT:
-                return project.name.contains(projectSearchRequestDto.getContent()).or(project.introduction.contains(projectSearchRequestDto.getContent()));
-        }
+//        if (projectSearchRequestDto == null) {
+//            return null;
+//        }
+//
+//        Filter filter = projectSearchRequestDto.getFilter();
+//
+//        switch (filter) {
+//            case PROJECT_NAME_AND_CONTENT:
+//                return project.name.contains(projectSearchRequestDto.getContent()).or(project.introduction.contains(projectSearchRequestDto.getContent()));
+//        }
         return null;
     }
 
     private List<Long> toProjectNo(List<ProjectSimpleDto> result) {
-        return result.stream()
-                .map(projectSimpleDto -> projectSimpleDto.getNo())
-                .collect(Collectors.toList());
+//        return result.stream()
+//                .map(projectSimpleDto -> projectSimpleDto.getNo())
+//                .collect(Collectors.toList());
+        return null;
     }
 
     private Map<Long, List<ProjectSimplePositionDto>> findProjectPositionMap(List<Long> projectNoList){
@@ -162,16 +164,17 @@ public class ProjectRepositoryImpl implements ProjectRepositoryCustom {
     }
 
     private Map<Long, List<ProjectSimpleTechnicalStackDto>> findProjectTechnicalStackMap(List<Long> projectNoList){
-        List<ProjectSimpleTechnicalStackDto> projectSimplePositionDtoList = queryFactory.select(Projections.constructor(ProjectSimpleTechnicalStackDto.class,
-                        project.no,
-                        technicalStack.name))
-                .from(projectTechnicalStack)
-                .join(projectTechnicalStack.project, project)
-                .join(projectTechnicalStack.technicalStack, technicalStack)
-                .where(project.no.in(projectNoList))
-                .fetch();
-
-        return projectSimplePositionDtoList.stream()
-                .collect(Collectors.groupingBy(ProjectSimpleTechnicalStackDto::getProjectNo));
+//        List<ProjectSimpleTechnicalStackDto> projectSimplePositionDtoList = queryFactory.select(Projections.constructor(ProjectSimpleTechnicalStackDto.class,
+//                        project.no,
+//                        technicalStack.name))
+//                .from(projectTechnicalStack)
+//                .join(projectTechnicalStack.project, project)
+//                .join(projectTechnicalStack.technicalStack, technicalStack)
+//                .where(project.no.in(projectNoList))
+//                .fetch();
+//
+//        return projectSimplePositionDtoList.stream()
+//                .collect(Collectors.groupingBy(ProjectSimpleTechnicalStackDto::getProjectNo));
+        return null;
     }
 }
