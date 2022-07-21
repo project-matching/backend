@@ -17,4 +17,5 @@ public class UserInfoResponseDto {
     private List<String> technicalStackList;
     private String github;
     private String selfIntroduction;
+    private String profile;
 }

@@ -59,5 +59,16 @@ spring:
     ansi:
       enabled: always
 
+cloud:
+  aws:
+    credentials:
+      access-key: ENC(JyNo5X7v+0mnqn3WN2dOxx/UOlBGWAlJG7snEoCkGHk=)
+      secret-key: ENC(6+PKiZ/cNqhmIpnFJjYFBep2WWyOq8MEoCYKUkwgo0Hpq/3WDgkKW+g+q+iVlD99RqtT8aO6koY=)
+    s3:
+      bucket: project-matching-s3
+    region:
+      static: ap-northeast-2
+    stack:
+      auto: false
 
 
