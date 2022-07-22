@@ -1,11 +1,12 @@
 package com.matching.project.dto.project;
 
-import com.matching.project.dto.enumerate.Position;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ProjectParticipateRequestDto {
-    private Long projectNo;
-    private Long userNo;
-    private String comment;
+    private Long projectPositionNo;
+    private List<String> technicalStackList;
+    private String gitHub;
+    private String motive;
 }

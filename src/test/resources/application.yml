@@ -1,0 +1,66 @@
+logging:
+  level:
+    org.hibernate.type: trace
+
+key:
+  jwt:
+    secret: testfasdfasdfsdafasfasfdsafsadfsafsasfasfasfasfasfasfasfasfa
+
+server:
+  port: 8080
+jasypt:
+  encryptor:
+    password: test
+spring:
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: test
+    password: test
+    properties:
+      mail:
+        smtp:
+          starttls:
+            enable: true
+            required: true
+          auth: true
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: test
+            client-secret: test
+            scope: profile, email
+          github:
+            clientId: test
+            clientSecret: test
+  datasource:
+    hikari:
+      jdbc-url: jdbc:h2:mem://localhost/~/testdb;MODE=MYSQL
+  h2:
+    console:
+      enabled: true
+  jpa:
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQL5Dialect
+        # 예약어 에러로 인하여, SQL 실행 시 인용 부호로 테이블과 컬럼을 감싸는 옵션 활성화
+        #globally_quoted_identifiers: true
+    show-sql: true
+    hibernate:
+      ddl-auto: create
+
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+  output:
+    ansi:
+      enabled: always
+
+
+

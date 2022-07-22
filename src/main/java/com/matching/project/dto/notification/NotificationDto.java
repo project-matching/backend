@@ -1,20 +1,21 @@
 package com.matching.project.dto.notification;
 
 import com.matching.project.dto.enumerate.Type;
+import lombok.Data;
 import lombok.Getter;
 
 import javax.persistence.Column;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-@Getter
+import java.time.LocalDateTime;
+
+@Data
 public class NotificationDto {
-    private String content;
-
-    private Long sender;
-
-    private Long receiver;
-
     private Type type;
 
-    private Long projectParticipateNo;
+    private String title;
+
+    private String content;
+
+    private LocalDateTime createDate;
 }

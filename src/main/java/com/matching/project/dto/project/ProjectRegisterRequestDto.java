@@ -1,20 +1,37 @@
 package com.matching.project.dto.project;
 
-import lombok.Getter;
+import com.matching.project.dto.projectposition.ProjectPositionRegisterDto;
+import com.matching.project.entity.Project;
+import lombok.*;
 
-import javax.persistence.Column;
-import javax.persistence.Lob;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
-@Getter
+@Data
+@Builder
 public class ProjectRegisterRequestDto {
+    @NotBlank
     private String name;
-    private String profile;
-    private LocalDateTime createDate;
-    private LocalDateTime startDate;
-    private LocalDateTime endDate;
+
+    @NotBlank
+    private LocalDate startDate;
+
+    @NotBlank
+    private LocalDate endDate;
+
+    @NotNull
     private String introduction;
-    private Integer maxPeople;
-    private List<ProjectPositionDto> projectPosition;
+
+    @NotNull
+    @Size(min = 0)
+    private List<ProjectPositionRegisterDto> projectPositionRegisterDtoList;
+
+    @NotNull
+    @Size(min = 0)
+    private List<Long> projectTechnicalStackList;
 }

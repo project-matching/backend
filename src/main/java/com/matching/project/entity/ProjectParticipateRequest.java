@@ -3,7 +3,7 @@ package com.matching.project.entity;
 import javax.persistence.*;
 
 @Entity
-public class ProjectParticipate {
+public class ProjectParticipateRequest {
     @Id @GeneratedValue
     private Long id;
 
@@ -12,6 +12,12 @@ public class ProjectParticipate {
     private User userNo;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "project_no")
-    private Project projectNo;
+    @JoinColumn(name = "project_position_no")
+    private ProjectPosition projectPosition;
+
+    @Column(length = 255)
+    private String motive;
+
+    @Column(length = 255)
+    private String github;
 }

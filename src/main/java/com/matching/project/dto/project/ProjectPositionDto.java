@@ -1,12 +1,11 @@
 package com.matching.project.dto.project;
 
-import com.matching.project.dto.enumerate.Position;
-import lombok.Getter;
+import lombok.Builder;
+import lombok.Data;
 
-import java.util.List;
-
-@Getter
+@Data
+@Builder
 public class ProjectPositionDto {
-    private Position position;
-    private List<String> technicalStack;
+    private String name;
+    private boolean state;
 }

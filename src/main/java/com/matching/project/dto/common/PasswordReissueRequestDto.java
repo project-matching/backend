@@ -1,8 +1,16 @@
 package com.matching.project.dto.common;
 
-import lombok.Getter;
+import com.matching.project.dto.enumerate.EmailAuthPurpose;
+import lombok.*;
 
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Setter
 @Getter
 public class PasswordReissueRequestDto {
-    private String email;
+    String email;
+    String password;
+    String authToken;
+    EmailAuthPurpose purpose;
 }

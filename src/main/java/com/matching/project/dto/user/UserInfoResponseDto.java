@@ -1,16 +1,19 @@
 package com.matching.project.dto.user;
 
-import com.matching.project.dto.enumerate.Position;
-import lombok.Getter;
+import lombok.*;
 
 import java.util.List;
 
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Getter
+@Setter
 public class UserInfoResponseDto {
     private String name;
     private char sex;
     private String email;
-    private Position position;
+    private String position;
     private List<String> technicalStackList;
     private String github;
     private String selfIntroduction;
