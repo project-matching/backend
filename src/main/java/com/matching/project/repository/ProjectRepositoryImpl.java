@@ -62,8 +62,6 @@ public class ProjectRepositoryImpl implements ProjectRepositoryCustom {
                         return new OrderSpecifier(direction, project.maxPeople);
                     case "deleteReason":
                         return new OrderSpecifier(direction, project.deleteReason);
-                    case "imageNo":
-                        return new OrderSpecifier(direction, project.imageNo);
                     case "viewCount":
                         return new OrderSpecifier(direction, project.viewCount);
                     case "commentCount":

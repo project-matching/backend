@@ -16,6 +16,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+
 @RestController
 @RequestMapping("/v1/project")
 @RequiredArgsConstructor
@@ -32,10 +34,8 @@ public class ProjectController {
 
     @PostMapping
     @ApiOperation(value = "프로젝트 등록 (수정 완료)")
-    public ResponseEntity<ResponseDto<Long>> projectRegister(@RequestBody ProjectRegisterRequestDto projectRegisterRequestDto) throws Exception{
-        ProjectRegisterResponseDto projectRegisterResponseDto = projectService.projectRegister(projectRegisterRequestDto);
-
-        return ResponseEntity.ok(new ResponseDto<>(null, 1L));
+    public ResponseEntity<ResponseDto<Long>> projectRegister(@Valid @RequestBody ProjectRegisterRequestDto projectRegisterRequestDto) throws Exception{
+        return ResponseEntity.ok(new ResponseDto<>(null, projectService.projectRegister(projectRegisterRequestDto)));
     }
 
     @GetMapping("/recruitment")

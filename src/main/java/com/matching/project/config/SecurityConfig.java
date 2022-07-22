@@ -6,6 +6,7 @@ import com.matching.project.service.JwtTokenService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -43,6 +44,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenService),
                         UsernamePasswordAuthenticationFilter.class)
                 .authorizeRequests()
+                .antMatchers(HttpMethod.POST, "/v1/project").hasAnyRole("USER", "ADMIN")
                 .antMatchers("/v1/project/create").hasAnyRole("USER", "ADMIN")
                 .antMatchers("/v1/project/recruitment/*")
                     .hasAnyRole("USER", "ADMIN", "ANONYMOUS")

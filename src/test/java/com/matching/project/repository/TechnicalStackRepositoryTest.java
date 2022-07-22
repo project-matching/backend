@@ -34,16 +34,16 @@ class TechnicalStackRepositoryTest {
         TechnicalStack technicalStack3 = TechnicalStack.builder()
                 .name("testTechnicalStack3")
                 .build();
-        technicalStackRepository.save(technicalStack1);
-        technicalStackRepository.save(technicalStack2);
-        technicalStackRepository.save(technicalStack3);
+        TechnicalStack saveTechnicalStack1 = technicalStackRepository.save(technicalStack1);
+        TechnicalStack saveTechnicalStack2 = technicalStackRepository.save(technicalStack2);
+        TechnicalStack saveTechnicalStack3 = technicalStackRepository.save(technicalStack3);
 
         // when
-        List<String> names = new ArrayList<>();
-        names.add("testTechnicalStack1");
-        names.add("testTechnicalStack2");
-        names.add("testTechnicalStack3");
-        List<TechnicalStack> findTechnicalStackList = technicalStackRepository.findByNameIn(names);
+        List<Long> noList = new ArrayList<>();
+        noList.add(saveTechnicalStack1.getNo());
+        noList.add(saveTechnicalStack2.getNo());
+        noList.add(saveTechnicalStack3.getNo());
+        List<TechnicalStack> findTechnicalStackList = technicalStackRepository.findByNoIn(noList);
 
         // then
         assertEquals(findTechnicalStackList.size(), 3);
