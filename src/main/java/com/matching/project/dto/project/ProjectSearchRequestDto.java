@@ -1,13 +1,10 @@
 package com.matching.project.dto.project;
 
-import com.matching.project.dto.enumerate.Filter;
-import lombok.Builder;
-import lombok.Data;
+import com.matching.project.dto.enumerate.ProjectSearchFilter;
 import lombok.Getter;
 
-@Builder
-@Data
+@Getter
 public class ProjectSearchRequestDto {
-    private Filter filter;
+    private ProjectSearchFilter projectSearchFilter;
     private String content;
 }

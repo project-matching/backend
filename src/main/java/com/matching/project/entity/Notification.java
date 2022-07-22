@@ -9,21 +9,22 @@ public class Notification {
     @Id @GeneratedValue
     private Long no;
 
-    @Column(length = 50, nullable = false)
-    private String title;
-
     @Column(length = 255, nullable = false)
     private String content;
+
+    @Column(length = 100, nullable = false)
+    private Long sender;
+
+    @Column(length = 100, nullable = false)
+    private Long receiver;
 
     @Enumerated(EnumType.STRING)
     @Column(length = 20, nullable = false)
     private Type type;
 
+    @Column(nullable = true)
+    private Long projectParticipateNo;
 
     @Column(nullable = false)
     private boolean read;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_no")
-    private User user;
 }
