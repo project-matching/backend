@@ -49,11 +49,12 @@ public class OAathSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
         // api 리다이렉트에는 로그인 인증 후 jwt 토큰을 보낼 URI(react)가 설정되어야함.
         // 해당부분은 추후 프론트엔드 담당자와 상의가 필요함
-        String targetUrl;
-        targetUrl = UriComponentsBuilder.fromUriString("/common/login/auth/success")
-                .queryParam("token=" + token )
-                .build().toUriString();
-        getRedirectStrategy().sendRedirect(request, response, targetUrl);
+        getRedirectStrategy().sendRedirect(request, response, "http://localhost:3000/auth/success?token="+ token);
+//        String targetUrl;
+//        targetUrl = UriComponentsBuilder.fromUriString("/common/login/auth/success")
+//                .queryParam("token=" + token )
+//                .build().toUriString();
+//        getRedirectStrategy().sendRedirect(request, response, targetUrl);
     }
 
 

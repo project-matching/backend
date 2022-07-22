@@ -4,6 +4,7 @@ import com.matching.project.dto.ResponseDto;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -11,7 +12,11 @@ import org.springframework.validation.FieldError;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Getter
 @Builder
@@ -23,31 +28,29 @@ public class ErrorResponse {
     private final List<String> message;
 
     public static ResponseEntity<ResponseDto> toResponseEntity(ErrorCode errorCode) {
-        List<String> message = new ArrayList<>();
         return ResponseEntity
                 .status(errorCode.getHttpStatus())
                 .body(new ResponseDto(ErrorResponse.builder()
                         .status(errorCode.getHttpStatus().value())
                         .error(errorCode.getHttpStatus().name())
                         .code(errorCode.name())
-                        .message(message)
-                        .build(), null));
+                        .message(List.of(errorCode.getDetail()))
+                        .build(), false));
     }
 
     public static ResponseEntity<ResponseDto> toResponseEntity(ErrorCode errorCode, BindingResult bindingResult) {
-        List<String> message = new ArrayList<>();
-
-        for (FieldError fieldError : bindingResult.getFieldErrors()) {
-            message.add(fieldError.getDefaultMessage());
-        }
-
         return ResponseEntity
                 .status(errorCode.getHttpStatus())
                 .body(new ResponseDto(ErrorResponse.builder()
                         .status(errorCode.getHttpStatus().value())
                         .error(errorCode.getHttpStatus().name())
                         .code(errorCode.name())
-                        .message(message)
-                        .build(), null));
+                        .message(bindingResult.getFieldErrors()
+                                .stream()
+                                .map(fieldError ->
+                                        "[" + fieldError.getObjectName() + "] => "
+                                                + fieldError.getField() + " : " + fieldError.getDefaultMessage())
+                                .collect(Collectors.toList()))
+                        .build(), false));
     }
 }
