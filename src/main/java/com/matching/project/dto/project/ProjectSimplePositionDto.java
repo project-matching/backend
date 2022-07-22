@@ -9,10 +9,6 @@ import lombok.Data;
 @AllArgsConstructor
 public class ProjectSimplePositionDto {
     private Long projectNo;
+    private Long positionNo;
     private String positionName;
-
-    public ProjectSimplePositionDto(Long projectNo, String positionName, boolean state) {
-        this.projectNo = projectNo;
-        this.positionName = positionName;
-    }
 }

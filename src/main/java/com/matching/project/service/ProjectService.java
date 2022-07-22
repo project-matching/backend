@@ -1,6 +1,5 @@
 package com.matching.project.service;
 
-import com.matching.project.dto.enumerate.Filter;
 import com.matching.project.dto.project.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

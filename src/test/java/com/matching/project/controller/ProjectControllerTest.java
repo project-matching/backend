@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.matching.project.config.SecurityConfig;
 import com.matching.project.dto.common.TokenDto;
-import com.matching.project.dto.enumerate.Filter;
 import com.matching.project.dto.enumerate.OAuth;
 import com.matching.project.dto.enumerate.Role;
 import com.matching.project.dto.project.ProjectPositionDto;
@@ -87,6 +86,9 @@ class ProjectControllerTest {
     PositionRepository positionRepository;
 
     @Autowired
+    ImageRepository imageRepository;
+
+    @Autowired
     TechnicalStackRepository technicalStackRepository;
 
     @Autowired
@@ -112,96 +114,96 @@ class ProjectControllerTest {
 
         return userRepository.save(user1);
     }
-//
-//    /**
-//     * 0 ~ 2 까지 모집중이면서 삭제 안된 프로젝트
-//     * 3 모집중이면서 삭제된 프로젝트
-//     */
-//    List<Project> saveRecruitmentProject(){
-//        List<Project> projectList = new ArrayList<>();
-//
-//        LocalDateTime createDate = LocalDateTime.of(2022, 06, 24, 10, 10, 10);
-//        LocalDate startDate = LocalDate.of(2022, 06, 24);
-//        LocalDate endDate = LocalDate.of(2022, 06, 28);
-//
-//        for (int i = 0 ; i < 4 ; i++) {
-//            boolean state = true;
-//            boolean delete = false;
-//            String deleteReason = null;
-//
-//            if (i == 3) {
-//                delete = true;
-//                deleteReason = "testDeleteReason" + i;
-//            }
-//
-//            Project project = Project.builder()
-//                    .name("testName" + i)
-//                    .createUserName("user")
-//                    .createDate(createDate.plusDays(i))
-//                    .startDate(startDate)
-//                    .endDate(endDate)
-//                    .state(state)
-//                    .introduction("testIntroduction" + i)
-//                    .maxPeople(10)
-//                    .currentPeople(4)
-//                    .delete(delete)
-//                    .deleteReason(deleteReason)
-//                    .viewCount(10)
-//                    .commentCount(10)
-//                    .build();
-//            projectList.add(projectRepository.save(project));
-//        }
-//        return projectList;
-//    }
-//    /**
-//     * 4 ~ 6 까지 모집완료이면서 삭제 안된 프로젝트
-//     * 7 모집완료이면서 삭제된 프로젝트
-//     */
-//    List<Project> saveRecruitmentCompleteProject(){
-//        List<Project> projectList = new ArrayList<>();
-//
-//        LocalDateTime createDate = LocalDateTime.of(2022, 06, 24, 10, 10, 10);
-//        LocalDate startDate = LocalDate.of(2022, 06, 24);
-//        LocalDate endDate = LocalDate.of(2022, 06, 28);
-//
-//        for (int i = 4 ; i < 8 ; i++) {
-//            boolean state = false;
-//            boolean delete = false;
-//            String deleteReason = null;
-//
-//            if (i == 7) {
-//                delete = true;
-//                deleteReason = "testDeleteReason" + i;
-//            }
-//
-//            Project project = Project.builder()
-//                    .name("testName" + i)
-//                    .createUserName("user")
-//                    .createDate(createDate.plusDays(i))
-//                    .startDate(startDate)
-//                    .endDate(endDate)
-//                    .state(state)
-//                    .introduction("testIntroduction" + i)
-//                    .maxPeople(10)
-//                    .currentPeople(4)
-//                    .delete(delete)
-//                    .deleteReason(deleteReason)
-//                    .viewCount(10)
-//                    .commentCount(10)
-//                    .build();
-//            projectList.add(projectRepository.save(project));
-//        }
-//        return projectList;
-//    }
-//
-//    BookMark saveBookMark(User user, Project project) {
-//        BookMark bookMark = BookMark.builder()
-//                .user(user)
-//                .project(project)
-//                .build();
-//        return bookMarkRepository.save(bookMark);
-//    }
-//
+
+    /**
+     * 0 ~ 2 까지 모집중이면서 삭제 안된 프로젝트
+     * 3 모집중이면서 삭제된 프로젝트
+     */
+    List<Project> saveRecruitmentProject(){
+        List<Project> projectList = new ArrayList<>();
+
+        LocalDateTime createDate = LocalDateTime.now();
+        LocalDate startDate = LocalDate.of(2022, 06, 24);
+        LocalDate endDate = LocalDate.of(2022, 06, 28);
+
+        for (int i = 0 ; i < 4 ; i++) {
+            boolean state = true;
+            boolean delete = false;
+            String deleteReason = null;
+
+            if (i == 3) {
+                delete = true;
+                deleteReason = "testDeleteReason" + i;
+            }
+
+            Project project = Project.builder()
+                    .name("testName" + i)
+                    .createUserName("user")
+                    .createDate(createDate.plusDays(i))
+                    .startDate(startDate)
+                    .endDate(endDate)
+                    .state(state)
+                    .introduction("testIntroduction" + i)
+                    .maxPeople(10)
+                    .currentPeople(4)
+                    .delete(delete)
+                    .deleteReason(deleteReason)
+                    .viewCount(10)
+                    .commentCount(10)
+                    .build();
+            projectList.add(projectRepository.save(project));
+        }
+        return projectList;
+    }
+    /**
+     * 4 ~ 6 까지 모집완료이면서 삭제 안된 프로젝트
+     * 7 모집완료이면서 삭제된 프로젝트
+     */
+    List<Project> saveRecruitmentCompleteProject(){
+        List<Project> projectList = new ArrayList<>();
+
+        LocalDateTime createDate = LocalDateTime.now();
+        LocalDate startDate = LocalDate.of(2022, 06, 24);
+        LocalDate endDate = LocalDate.of(2022, 06, 28);
+
+        for (int i = 4 ; i < 8 ; i++) {
+            boolean state = false;
+            boolean delete = false;
+            String deleteReason = null;
+
+            if (i == 7) {
+                delete = true;
+                deleteReason = "testDeleteReason" + i;
+            }
+
+            Project project = Project.builder()
+                    .name("testName" + i)
+                    .createUserName("user")
+                    .createDate(createDate.plusDays(i))
+                    .startDate(startDate)
+                    .endDate(endDate)
+                    .state(state)
+                    .introduction("testIntroduction" + i)
+                    .maxPeople(10)
+                    .currentPeople(4)
+                    .delete(delete)
+                    .deleteReason(deleteReason)
+                    .viewCount(10)
+                    .commentCount(10)
+                    .build();
+            projectList.add(projectRepository.save(project));
+        }
+        return projectList;
+    }
+
+    BookMark saveBookMark(User user, Project project) {
+        BookMark bookMark = BookMark.builder()
+                .user(user)
+                .project(project)
+                .build();
+        return bookMarkRepository.save(bookMark);
+    }
+
     @Test
     void 프로젝트_등록_폼_테스트() throws Exception {
         // given
@@ -344,312 +346,320 @@ class ProjectControllerTest {
 //        assertEquals(projectTechnicalStackList.size(), projectTechnicalStack.size());
 //    }
 //
-//    @Test
-//    public void 비로그인_모집중_프로젝트_조회_테스트() throws Exception {
-//        User saveUser = saveUser();
-//        List<Project> saveRecruitmentProject = saveRecruitmentProject();
-//        saveRecruitmentCompleteProject();
-//
-//        // 포지션 세팅
-//        Position position1 = Position.builder()
-//                .name("testPosition1")
-//                .build();
-//        Position savePosition1 = positionRepository.save(position1);
-//        ProjectPosition projectPosition1 = ProjectPosition.builder()
-//                .project(saveRecruitmentProject.get(0))
-//                .position(savePosition1)
-//                .build();
-//        ProjectPosition saveProjectPosition1 = projectPositionRepository.save(projectPosition1);
-//
-//        // 기술스택 세팅
-//        TechnicalStack technicalStack1 = TechnicalStack.builder()
-//                .name("testTechnicalStack1")
-//                .build();
-//        technicalStackRepository.save(technicalStack1);
-//
-//        ProjectTechnicalStack projectTechnicalStack1 = ProjectTechnicalStack.builder()
-//                .technicalStack(technicalStack1)
-//                .project(saveRecruitmentProject.get(0))
-//                .build();
-//
-//        ProjectTechnicalStack saveProjectTechnicalStack1 = projectTechnicalStackRepository.save(projectTechnicalStack1);
-//
-//        // 0번째 1번째는 북마크
-//        saveBookMark(saveUser, saveRecruitmentProject.get(0));
-//        saveBookMark(saveUser, saveRecruitmentProject.get(1));
-//
-//        // then
-//        mvc.perform(get("/v1/project/recruitment").contentType(MediaType.APPLICATION_JSON))
-//                .andDo(print())
-//                .andExpect(header().string("Content-type", "application/json"))
-//                .andExpect(jsonPath("$.data.content[0].name").value("testName2"))
-//                .andExpect(jsonPath("$.data.content[0].profile").isEmpty())
-//                .andExpect(jsonPath("$.data.content[0].maxPeople").value(10))
-//                .andExpect(jsonPath("$.data.content[0].currentPeople").value(4))
-//                .andExpect(jsonPath("$.data.content[0].viewCount").value(10))
-//                .andExpect(jsonPath("$.data.content[0].commentCount").value(10))
-//                .andExpect(jsonPath("$.data.content[0].register").value("user"))
-//                .andExpect(jsonPath("$.data.content[0].bookMark").value(false))
-//
-//                .andExpect(jsonPath("$.data.content[1].name").value("testName1"))
-//                .andExpect(jsonPath("$.data.content[1].profile").isEmpty())
-//                .andExpect(jsonPath("$.data.content[1].maxPeople").value(10))
-//                .andExpect(jsonPath("$.data.content[1].currentPeople").value(4))
-//                .andExpect(jsonPath("$.data.content[1].viewCount").value(10))
-//                .andExpect(jsonPath("$.data.content[1].commentCount").value(10))
-//                .andExpect(jsonPath("$.data.content[1].register").value("user"))
-//                .andExpect(jsonPath("$.data.content[1].bookMark").value(false))
-//
-//                .andExpect(jsonPath("$.data.content[2].name").value("testName0"))
-//                .andExpect(jsonPath("$.data.content[2].profile").isEmpty())
-//                .andExpect(jsonPath("$.data.content[2].maxPeople").value(10))
-//                .andExpect(jsonPath("$.data.content[2].currentPeople").value(4))
-//                .andExpect(jsonPath("$.data.content[2].viewCount").value(10))
-//                .andExpect(jsonPath("$.data.content[2].commentCount").value(10))
-//                .andExpect(jsonPath("$.data.content[2].register").value("user"))
-//                .andExpect(jsonPath("$.data.content[2].bookMark").value(false))
-//                .andExpect(jsonPath("$.data.content[2].projectSimplePositionDtoList[0].projectNo").value(saveProjectPosition1.getProject().getNo()))
-//                .andExpect(jsonPath("$.data.content[2].projectSimplePositionDtoList[0].positionName").value(saveProjectPosition1.getPosition().getName()))
-//                .andExpect(jsonPath("$.data.content[2].projectSimplePositionDtoList[0].image").isEmpty())
-//                .andExpect(jsonPath("$.data.content[2].projectSimplePositionDtoList[0].state").value(saveProjectPosition1.isState()))
-//                .andExpect(jsonPath("$.data.content[2].projectSimpleTechnicalStackDtoList[0].projectNo").value(saveProjectTechnicalStack1.getProject().getNo()))
-//                .andExpect(jsonPath("$.data.content[2].projectSimpleTechnicalStackDtoList[0].technicalStackName").value(saveProjectTechnicalStack1.getTechnicalStack().getName()))
-//
-//                .andExpect(status().isOk());
-//    }
-//
-//    @Test
-//    public void 로그인_모집중_프로젝트_조회_테스트() throws Exception {
-//        User saveUser = saveUser();
-//        List<Project> saveRecruitmentProject = saveRecruitmentProject();
-//        saveRecruitmentCompleteProject();
-//
-//        // 포지션 세팅
-//        Position position1 = Position.builder()
-//                .name("testPosition1")
-//                .build();
-//        Position savePosition1 = positionRepository.save(position1);
-//        ProjectPosition projectPosition1 = ProjectPosition.builder()
-//                .project(saveRecruitmentProject.get(0))
-//                .position(savePosition1)
-//                .build();
-//        ProjectPosition saveProjectPosition1 = projectPositionRepository.save(projectPosition1);
-//
-//        // 기술스택 세팅
-//        TechnicalStack technicalStack1 = TechnicalStack.builder()
-//                .name("testTechnicalStack1")
-//                .build();
-//        technicalStackRepository.save(technicalStack1);
-//
-//        ProjectTechnicalStack projectTechnicalStack1 = ProjectTechnicalStack.builder()
-//                .technicalStack(technicalStack1)
-//                .project(saveRecruitmentProject.get(0))
-//                .build();
-//
-//        ProjectTechnicalStack saveProjectTechnicalStack1 = projectTechnicalStackRepository.save(projectTechnicalStack1);
-//
-//        // 0번째 1번째는 북마크
-//        saveBookMark(saveUser, saveRecruitmentProject.get(0));
-//        saveBookMark(saveUser, saveRecruitmentProject.get(1));
-//
-//        // then
-//        String token = jwtTokenService.createToken(new TokenDto(saveUser.getNo(), saveUser.getEmail()));
-//
-//        mvc.perform(get("/v1/project/recruitment")
-//                        .contentType(MediaType.APPLICATION_JSON)
-//                        .header("Authorization", "Bearer " + token))
-//                .andDo(print())
-//                .andExpect(header().string("Content-type", "application/json"))
-//                .andExpect(jsonPath("$.data.content[0].name").value("testName2"))
-//                .andExpect(jsonPath("$.data.content[0].profile").isEmpty())
-//                .andExpect(jsonPath("$.data.content[0].maxPeople").value(10))
-//                .andExpect(jsonPath("$.data.content[0].currentPeople").value(4))
-//                .andExpect(jsonPath("$.data.content[0].viewCount").value(10))
-//                .andExpect(jsonPath("$.data.content[0].commentCount").value(10))
-//                .andExpect(jsonPath("$.data.content[0].register").value("user"))
-//                .andExpect(jsonPath("$.data.content[0].bookMark").value(false))
-//
-//                .andExpect(jsonPath("$.data.content[1].name").value("testName1"))
-//                .andExpect(jsonPath("$.data.content[1].profile").isEmpty())
-//                .andExpect(jsonPath("$.data.content[1].maxPeople").value(10))
-//                .andExpect(jsonPath("$.data.content[1].currentPeople").value(4))
-//                .andExpect(jsonPath("$.data.content[1].viewCount").value(10))
-//                .andExpect(jsonPath("$.data.content[1].commentCount").value(10))
-//                .andExpect(jsonPath("$.data.content[1].register").value("user"))
-//                .andExpect(jsonPath("$.data.content[1].bookMark").value(true))
-//
-//                .andExpect(jsonPath("$.data.content[2].name").value("testName0"))
-//                .andExpect(jsonPath("$.data.content[2].profile").isEmpty())
-//                .andExpect(jsonPath("$.data.content[2].maxPeople").value(10))
-//                .andExpect(jsonPath("$.data.content[2].currentPeople").value(4))
-//                .andExpect(jsonPath("$.data.content[2].viewCount").value(10))
-//                .andExpect(jsonPath("$.data.content[2].commentCount").value(10))
-//                .andExpect(jsonPath("$.data.content[2].register").value("user"))
-//                .andExpect(jsonPath("$.data.content[2].bookMark").value(true))
-//                .andExpect(jsonPath("$.data.content[2].projectSimplePositionDtoList[0].projectNo").value(saveProjectPosition1.getProject().getNo()))
-//                .andExpect(jsonPath("$.data.content[2].projectSimplePositionDtoList[0].positionName").value(saveProjectPosition1.getPosition().getName()))
-//                .andExpect(jsonPath("$.data.content[2].projectSimplePositionDtoList[0].image").isEmpty())
-//                .andExpect(jsonPath("$.data.content[2].projectSimplePositionDtoList[0].state").value(saveProjectPosition1.isState()))
-//                .andExpect(jsonPath("$.data.content[2].projectSimpleTechnicalStackDtoList[0].projectNo").value(saveProjectTechnicalStack1.getProject().getNo()))
-//                .andExpect(jsonPath("$.data.content[2].projectSimpleTechnicalStackDtoList[0].technicalStackName").value(saveProjectTechnicalStack1.getTechnicalStack().getName()))
-//
-//                .andExpect(status().isOk());
-//    }
-//
-//    @Test
-//    public void 비로그인_모집완료_프로젝트_조회_테스트() throws Exception {
-//        // given
-//        User saveUser = saveUser();
-//        saveRecruitmentProject();
-//        List<Project> saveRecruitmentCompleteProject = saveRecruitmentCompleteProject();
-//
-//        // 포지션 세팅
-//        Position position1 = Position.builder()
-//                .name("testPosition1")
-//                .build();
-//        Position savePosition1 = positionRepository.save(position1);
-//        ProjectPosition projectPosition1 = ProjectPosition.builder()
-//                .project(saveRecruitmentCompleteProject.get(0))
-//                .position(savePosition1)
-//                .build();
-//        ProjectPosition saveProjectPosition1 = projectPositionRepository.save(projectPosition1);
-//
-//        // 기술스택 세팅
-//        TechnicalStack technicalStack1 = TechnicalStack.builder()
-//                .name("testTechnicalStack1")
-//                .build();
-//        technicalStackRepository.save(technicalStack1);
-//
-//        ProjectTechnicalStack projectTechnicalStack1 = ProjectTechnicalStack.builder()
-//                .technicalStack(technicalStack1)
-//                .project(saveRecruitmentCompleteProject.get(0))
-//                .build();
-//
-//        ProjectTechnicalStack saveProjectTechnicalStack1 = projectTechnicalStackRepository.save(projectTechnicalStack1);
-//
-//        // 4번째 5번째는 북마크
-//        saveBookMark(saveUser, saveRecruitmentCompleteProject.get(0));
-//        saveBookMark(saveUser, saveRecruitmentCompleteProject.get(1));
-//
-//        // then
-//        mvc.perform(get("/v1/project/recruitment/complete").contentType(MediaType.APPLICATION_JSON))
-//                .andDo(print())
-//                .andExpect(header().string("Content-type", "application/json"))
-//                .andExpect(jsonPath("$.data.content[0].name").value("testName6"))
-//                .andExpect(jsonPath("$.data.content[0].profile").isEmpty())
-//                .andExpect(jsonPath("$.data.content[0].maxPeople").value(10))
-//                .andExpect(jsonPath("$.data.content[0].currentPeople").value(4))
-//                .andExpect(jsonPath("$.data.content[0].viewCount").value(10))
-//                .andExpect(jsonPath("$.data.content[0].commentCount").value(10))
-//                .andExpect(jsonPath("$.data.content[0].register").value("user"))
-//                .andExpect(jsonPath("$.data.content[0].bookMark").value(false))
-//
-//                .andExpect(jsonPath("$.data.content[1].name").value("testName5"))
-//                .andExpect(jsonPath("$.data.content[1].profile").isEmpty())
-//                .andExpect(jsonPath("$.data.content[1].maxPeople").value(10))
-//                .andExpect(jsonPath("$.data.content[1].currentPeople").value(4))
-//                .andExpect(jsonPath("$.data.content[1].viewCount").value(10))
-//                .andExpect(jsonPath("$.data.content[1].commentCount").value(10))
-//                .andExpect(jsonPath("$.data.content[1].register").value("user"))
-//                .andExpect(jsonPath("$.data.content[1].bookMark").value(false))
-//
-//                .andExpect(jsonPath("$.data.content[2].name").value("testName4"))
-//                .andExpect(jsonPath("$.data.content[2].profile").isEmpty())
-//                .andExpect(jsonPath("$.data.content[2].maxPeople").value(10))
-//                .andExpect(jsonPath("$.data.content[2].currentPeople").value(4))
-//                .andExpect(jsonPath("$.data.content[2].viewCount").value(10))
-//                .andExpect(jsonPath("$.data.content[2].commentCount").value(10))
-//                .andExpect(jsonPath("$.data.content[2].register").value("user"))
-//                .andExpect(jsonPath("$.data.content[2].bookMark").value(false))
-//                .andExpect(jsonPath("$.data.content[2].projectSimplePositionDtoList[0].projectNo").value(saveProjectPosition1.getProject().getNo()))
-//                .andExpect(jsonPath("$.data.content[2].projectSimplePositionDtoList[0].positionName").value(saveProjectPosition1.getPosition().getName()))
-//                .andExpect(jsonPath("$.data.content[2].projectSimplePositionDtoList[0].image").isEmpty())
-//                .andExpect(jsonPath("$.data.content[2].projectSimplePositionDtoList[0].state").value(saveProjectPosition1.isState()))
-//                .andExpect(jsonPath("$.data.content[2].projectSimpleTechnicalStackDtoList[0].projectNo").value(saveProjectTechnicalStack1.getProject().getNo()))
-//                .andExpect(jsonPath("$.data.content[2].projectSimpleTechnicalStackDtoList[0].technicalStackName").value(saveProjectTechnicalStack1.getTechnicalStack().getName()))
-//
-//                .andExpect(status().isOk());
-//    }
-//
-//    @Test
-//    public void 로그인_모집완료_프로젝트_조회_테스트() throws Exception {
-//        // given
-//        User saveUser = saveUser();
-//        saveRecruitmentProject();
-//        List<Project> saveRecruitmentCompleteProject = saveRecruitmentCompleteProject();
-//
-//        // 포지션 세팅
-//        Position position1 = Position.builder()
-//                .name("testPosition1")
-//                .build();
-//        Position savePosition1 = positionRepository.save(position1);
-//        ProjectPosition projectPosition1 = ProjectPosition.builder()
-//                .project(saveRecruitmentCompleteProject.get(0))
-//                .position(savePosition1)
-//                .build();
-//        ProjectPosition saveProjectPosition1 = projectPositionRepository.save(projectPosition1);
-//
-//        // 기술스택 세팅
-//        TechnicalStack technicalStack1 = TechnicalStack.builder()
-//                .name("testTechnicalStack1")
-//                .build();
-//        technicalStackRepository.save(technicalStack1);
-//
-//        ProjectTechnicalStack projectTechnicalStack1 = ProjectTechnicalStack.builder()
-//                .technicalStack(technicalStack1)
-//                .project(saveRecruitmentCompleteProject.get(0))
-//                .build();
-//
-//        ProjectTechnicalStack saveProjectTechnicalStack1 = projectTechnicalStackRepository.save(projectTechnicalStack1);
-//
-//        // 4번째 5번째는 북마크
-//        saveBookMark(saveUser, saveRecruitmentCompleteProject.get(0));
-//        saveBookMark(saveUser, saveRecruitmentCompleteProject.get(1));
-//
-//        // then
-//        String token = jwtTokenService.createToken(new TokenDto(saveUser.getNo(), saveUser.getEmail()));
-//
-//        mvc.perform(get("/v1/project/recruitment/complete")
-//                        .contentType(MediaType.APPLICATION_JSON)
-//                        .header("Authorization", "Bearer " + token))
-//                .andDo(print())
-//                .andExpect(header().string("Content-type", "application/json"))
-//                .andExpect(jsonPath("$.data.content[0].name").value("testName6"))
-//                .andExpect(jsonPath("$.data.content[0].profile").isEmpty())
-//                .andExpect(jsonPath("$.data.content[0].maxPeople").value(10))
-//                .andExpect(jsonPath("$.data.content[0].currentPeople").value(4))
-//                .andExpect(jsonPath("$.data.content[0].viewCount").value(10))
-//                .andExpect(jsonPath("$.data.content[0].commentCount").value(10))
-//                .andExpect(jsonPath("$.data.content[0].register").value("user"))
-//                .andExpect(jsonPath("$.data.content[0].bookMark").value(false))
-//
-//                .andExpect(jsonPath("$.data.content[1].name").value("testName5"))
-//                .andExpect(jsonPath("$.data.content[1].profile").isEmpty())
-//                .andExpect(jsonPath("$.data.content[1].maxPeople").value(10))
-//                .andExpect(jsonPath("$.data.content[1].currentPeople").value(4))
-//                .andExpect(jsonPath("$.data.content[1].viewCount").value(10))
-//                .andExpect(jsonPath("$.data.content[1].commentCount").value(10))
-//                .andExpect(jsonPath("$.data.content[1].register").value("user"))
-//                .andExpect(jsonPath("$.data.content[1].bookMark").value(true))
-//
-//                .andExpect(jsonPath("$.data.content[2].name").value("testName4"))
-//                .andExpect(jsonPath("$.data.content[2].profile").isEmpty())
-//                .andExpect(jsonPath("$.data.content[2].maxPeople").value(10))
-//                .andExpect(jsonPath("$.data.content[2].currentPeople").value(4))
-//                .andExpect(jsonPath("$.data.content[2].viewCount").value(10))
-//                .andExpect(jsonPath("$.data.content[2].commentCount").value(10))
-//                .andExpect(jsonPath("$.data.content[2].register").value("user"))
-//                .andExpect(jsonPath("$.data.content[2].bookMark").value(true))
-//                .andExpect(jsonPath("$.data.content[2].projectSimplePositionDtoList[0].projectNo").value(saveProjectPosition1.getProject().getNo()))
-//                .andExpect(jsonPath("$.data.content[2].projectSimplePositionDtoList[0].positionName").value(saveProjectPosition1.getPosition().getName()))
-//                .andExpect(jsonPath("$.data.content[2].projectSimplePositionDtoList[0].image").isEmpty())
-//                .andExpect(jsonPath("$.data.content[2].projectSimplePositionDtoList[0].state").value(saveProjectPosition1.isState()))
-//                .andExpect(jsonPath("$.data.content[2].projectSimpleTechnicalStackDtoList[0].projectNo").value(saveProjectTechnicalStack1.getProject().getNo()))
-//                .andExpect(jsonPath("$.data.content[2].projectSimpleTechnicalStackDtoList[0].technicalStackName").value(saveProjectTechnicalStack1.getTechnicalStack().getName()))
-//
-//                .andExpect(status().isOk());
-//    }
-//
+    @Test
+    public void 비로그인_모집중_프로젝트_조회_테스트() throws Exception {
+        User saveUser = saveUser();
+        List<Project> saveRecruitmentProject = saveRecruitmentProject();
+        saveRecruitmentCompleteProject();
+
+        // 포지션 세팅
+        Position position1 = Position.builder()
+                .name("testPosition1")
+                .build();
+        Position savePosition1 = positionRepository.save(position1);
+        ProjectPosition projectPosition1 = ProjectPosition.builder()
+                .project(saveRecruitmentProject.get(0))
+                .position(savePosition1)
+                .build();
+        ProjectPosition saveProjectPosition1 = projectPositionRepository.save(projectPosition1);
+
+        // 이미지 세팅
+        Image image1 = Image.builder()
+                .logicalName("testLogicalName1")
+                .physicalName("testPhysicalName1")
+                .build();
+        Image saveImage1 = imageRepository.save(image1);
+
+        // 기술스택 세팅
+        TechnicalStack technicalStack1 = TechnicalStack.builder()
+                .imageNo(saveImage1.getNo())
+                .name("testTechnicalStack1")
+                .build();
+        technicalStackRepository.save(technicalStack1);
+
+        ProjectTechnicalStack projectTechnicalStack1 = ProjectTechnicalStack.builder()
+                .technicalStack(technicalStack1)
+                .project(saveRecruitmentProject.get(0))
+                .build();
+
+        ProjectTechnicalStack saveProjectTechnicalStack1 = projectTechnicalStackRepository.save(projectTechnicalStack1);
+
+        // 0번째 1번째는 북마크
+        saveBookMark(saveUser, saveRecruitmentProject.get(0));
+        saveBookMark(saveUser, saveRecruitmentProject.get(1));
+
+        // then
+        mvc.perform(get("/v1/project/recruitment").contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(header().string("Content-type", "application/json"))
+                .andExpect(jsonPath("$.data.content[0].name").value("testName2"))
+                .andExpect(jsonPath("$.data.content[0].maxPeople").value(10))
+                .andExpect(jsonPath("$.data.content[0].currentPeople").value(4))
+                .andExpect(jsonPath("$.data.content[0].viewCount").value(10))
+                .andExpect(jsonPath("$.data.content[0].register").value("user"))
+                .andExpect(jsonPath("$.data.content[0].bookMark").value(false))
+
+                .andExpect(jsonPath("$.data.content[1].name").value("testName1"))
+                .andExpect(jsonPath("$.data.content[1].maxPeople").value(10))
+                .andExpect(jsonPath("$.data.content[1].currentPeople").value(4))
+                .andExpect(jsonPath("$.data.content[1].viewCount").value(10))
+                .andExpect(jsonPath("$.data.content[1].register").value("user"))
+                .andExpect(jsonPath("$.data.content[1].bookMark").value(false))
+
+                .andExpect(jsonPath("$.data.content[2].name").value("testName0"))
+                .andExpect(jsonPath("$.data.content[2].maxPeople").value(10))
+                .andExpect(jsonPath("$.data.content[2].currentPeople").value(4))
+                .andExpect(jsonPath("$.data.content[2].viewCount").value(10))
+                .andExpect(jsonPath("$.data.content[2].register").value("user"))
+                .andExpect(jsonPath("$.data.content[2].bookMark").value(false))
+                .andExpect(jsonPath("$.data.content[2].projectSimplePositionDtoList[0].projectNo").value(saveProjectPosition1.getProject().getNo()))
+                .andExpect(jsonPath("$.data.content[2].projectSimplePositionDtoList[0].positionNo").value(saveProjectPosition1.getPosition().getNo()))
+                .andExpect(jsonPath("$.data.content[2].projectSimplePositionDtoList[0].positionName").value(saveProjectPosition1.getPosition().getName()))
+                .andExpect(jsonPath("$.data.content[2].projectSimpleTechnicalStackDtoList[0].projectNo").value(saveProjectTechnicalStack1.getProject().getNo()))
+                .andExpect(jsonPath("$.data.content[2].projectSimpleTechnicalStackDtoList[0].image").value(saveImage1.getLogicalName()))
+                .andExpect(jsonPath("$.data.content[2].projectSimpleTechnicalStackDtoList[0].technicalStackName").value(saveProjectTechnicalStack1.getTechnicalStack().getName()))
+
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void 로그인_모집중_프로젝트_조회_테스트() throws Exception {
+        User saveUser = saveUser();
+        List<Project> saveRecruitmentProject = saveRecruitmentProject();
+        saveRecruitmentCompleteProject();
+
+        // 포지션 세팅
+        Position position1 = Position.builder()
+                .name("testPosition1")
+                .build();
+        Position savePosition1 = positionRepository.save(position1);
+        ProjectPosition projectPosition1 = ProjectPosition.builder()
+                .project(saveRecruitmentProject.get(0))
+                .position(savePosition1)
+                .build();
+        ProjectPosition saveProjectPosition1 = projectPositionRepository.save(projectPosition1);
+
+        // 이미지 세팅
+        Image image1 = Image.builder()
+                .logicalName("testLogicalName1")
+                .physicalName("testPhysicalName1")
+                .build();
+        Image saveImage1 = imageRepository.save(image1);
+
+        // 기술스택 세팅
+        TechnicalStack technicalStack1 = TechnicalStack.builder()
+                .imageNo(saveImage1.getNo())
+                .name("testTechnicalStack1")
+                .build();
+        technicalStackRepository.save(technicalStack1);
+
+        ProjectTechnicalStack projectTechnicalStack1 = ProjectTechnicalStack.builder()
+                .technicalStack(technicalStack1)
+                .project(saveRecruitmentProject.get(0))
+                .build();
+
+        ProjectTechnicalStack saveProjectTechnicalStack1 = projectTechnicalStackRepository.save(projectTechnicalStack1);
+
+        // 0번째 1번째는 북마크
+        saveBookMark(saveUser, saveRecruitmentProject.get(0));
+        saveBookMark(saveUser, saveRecruitmentProject.get(1));
+
+        // then
+        String token = jwtTokenService.createToken(new TokenDto(saveUser.getNo(), saveUser.getEmail()));
+
+        mvc.perform(get("/v1/project/recruitment")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", "Bearer " + token))
+                .andDo(print())
+                .andExpect(header().string("Content-type", "application/json"))
+                .andExpect(jsonPath("$.data.content[0].name").value("testName2"))
+                .andExpect(jsonPath("$.data.content[0].maxPeople").value(10))
+                .andExpect(jsonPath("$.data.content[0].currentPeople").value(4))
+                .andExpect(jsonPath("$.data.content[0].viewCount").value(10))
+                .andExpect(jsonPath("$.data.content[0].register").value("user"))
+                .andExpect(jsonPath("$.data.content[0].bookMark").value(false))
+
+                .andExpect(jsonPath("$.data.content[1].name").value("testName1"))
+                .andExpect(jsonPath("$.data.content[1].maxPeople").value(10))
+                .andExpect(jsonPath("$.data.content[1].currentPeople").value(4))
+                .andExpect(jsonPath("$.data.content[1].viewCount").value(10))
+                .andExpect(jsonPath("$.data.content[1].register").value("user"))
+                .andExpect(jsonPath("$.data.content[1].bookMark").value(true))
+
+                .andExpect(jsonPath("$.data.content[2].name").value("testName0"))
+                .andExpect(jsonPath("$.data.content[2].maxPeople").value(10))
+                .andExpect(jsonPath("$.data.content[2].currentPeople").value(4))
+                .andExpect(jsonPath("$.data.content[2].viewCount").value(10))
+                .andExpect(jsonPath("$.data.content[2].register").value("user"))
+                .andExpect(jsonPath("$.data.content[2].bookMark").value(true))
+                .andExpect(jsonPath("$.data.content[2].projectSimplePositionDtoList[0].projectNo").value(saveProjectPosition1.getProject().getNo()))
+                .andExpect(jsonPath("$.data.content[2].projectSimplePositionDtoList[0].positionNo").value(saveProjectPosition1.getPosition().getNo()))
+                .andExpect(jsonPath("$.data.content[2].projectSimplePositionDtoList[0].positionName").value(saveProjectPosition1.getPosition().getName()))
+                .andExpect(jsonPath("$.data.content[2].projectSimpleTechnicalStackDtoList[0].projectNo").value(saveProjectTechnicalStack1.getProject().getNo()))
+                .andExpect(jsonPath("$.data.content[2].projectSimpleTechnicalStackDtoList[0].image").value(saveImage1.getLogicalName()))
+                .andExpect(jsonPath("$.data.content[2].projectSimpleTechnicalStackDtoList[0].technicalStackName").value(saveProjectTechnicalStack1.getTechnicalStack().getName()))
+
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void 비로그인_모집완료_프로젝트_조회_테스트() throws Exception {
+        // given
+        User saveUser = saveUser();
+        saveRecruitmentProject();
+        List<Project> saveRecruitmentCompleteProject = saveRecruitmentCompleteProject();
+
+        // 포지션 세팅
+        Position position1 = Position.builder()
+                .name("testPosition1")
+                .build();
+        Position savePosition1 = positionRepository.save(position1);
+        ProjectPosition projectPosition1 = ProjectPosition.builder()
+                .project(saveRecruitmentCompleteProject.get(0))
+                .position(savePosition1)
+                .build();
+        ProjectPosition saveProjectPosition1 = projectPositionRepository.save(projectPosition1);
+
+        // 이미지 세팅
+        Image image1 = Image.builder()
+                .logicalName("testLogicalName1")
+                .physicalName("testPhysicalName1")
+                .build();
+        Image saveImage1 = imageRepository.save(image1);
+
+        // 기술스택 세팅
+        TechnicalStack technicalStack1 = TechnicalStack.builder()
+                .imageNo(saveImage1.getNo())
+                .name("testTechnicalStack1")
+                .build();
+        technicalStackRepository.save(technicalStack1);
+
+        ProjectTechnicalStack projectTechnicalStack1 = ProjectTechnicalStack.builder()
+                .technicalStack(technicalStack1)
+                .project(saveRecruitmentCompleteProject.get(0))
+                .build();
+
+        ProjectTechnicalStack saveProjectTechnicalStack1 = projectTechnicalStackRepository.save(projectTechnicalStack1);
+
+        // 4번째 5번째는 북마크
+        saveBookMark(saveUser, saveRecruitmentCompleteProject.get(0));
+        saveBookMark(saveUser, saveRecruitmentCompleteProject.get(1));
+
+        // then
+        mvc.perform(get("/v1/project/recruitment/complete").contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(header().string("Content-type", "application/json"))
+                .andExpect(jsonPath("$.data.content[0].name").value("testName6"))
+                .andExpect(jsonPath("$.data.content[0].maxPeople").value(10))
+                .andExpect(jsonPath("$.data.content[0].currentPeople").value(4))
+                .andExpect(jsonPath("$.data.content[0].viewCount").value(10))
+                .andExpect(jsonPath("$.data.content[0].register").value("user"))
+                .andExpect(jsonPath("$.data.content[0].bookMark").value(false))
+
+                .andExpect(jsonPath("$.data.content[1].name").value("testName5"))
+                .andExpect(jsonPath("$.data.content[1].maxPeople").value(10))
+                .andExpect(jsonPath("$.data.content[1].currentPeople").value(4))
+                .andExpect(jsonPath("$.data.content[1].viewCount").value(10))
+                .andExpect(jsonPath("$.data.content[1].register").value("user"))
+                .andExpect(jsonPath("$.data.content[1].bookMark").value(false))
+
+                .andExpect(jsonPath("$.data.content[2].name").value("testName4"))
+                .andExpect(jsonPath("$.data.content[2].maxPeople").value(10))
+                .andExpect(jsonPath("$.data.content[2].currentPeople").value(4))
+                .andExpect(jsonPath("$.data.content[2].viewCount").value(10))
+                .andExpect(jsonPath("$.data.content[2].register").value("user"))
+                .andExpect(jsonPath("$.data.content[2].bookMark").value(false))
+                .andExpect(jsonPath("$.data.content[2].projectSimplePositionDtoList[0].projectNo").value(saveProjectPosition1.getProject().getNo()))
+                .andExpect(jsonPath("$.data.content[2].projectSimplePositionDtoList[0].positionNo").value(saveProjectPosition1.getPosition().getNo()))
+                .andExpect(jsonPath("$.data.content[2].projectSimplePositionDtoList[0].positionName").value(saveProjectPosition1.getPosition().getName()))
+                .andExpect(jsonPath("$.data.content[2].projectSimpleTechnicalStackDtoList[0].projectNo").value(saveProjectTechnicalStack1.getProject().getNo()))
+                .andExpect(jsonPath("$.data.content[2].projectSimpleTechnicalStackDtoList[0].image").value(saveImage1.getLogicalName()))
+                .andExpect(jsonPath("$.data.content[2].projectSimpleTechnicalStackDtoList[0].technicalStackName").value(saveProjectTechnicalStack1.getTechnicalStack().getName()))
+
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void 로그인_모집완료_프로젝트_조회_테스트() throws Exception {
+        // given
+        User saveUser = saveUser();
+        saveRecruitmentProject();
+        List<Project> saveRecruitmentCompleteProject = saveRecruitmentCompleteProject();
+
+        // 포지션 세팅
+        Position position1 = Position.builder()
+                .name("testPosition1")
+                .build();
+        Position savePosition1 = positionRepository.save(position1);
+        ProjectPosition projectPosition1 = ProjectPosition.builder()
+                .project(saveRecruitmentCompleteProject.get(0))
+                .position(savePosition1)
+                .build();
+        ProjectPosition saveProjectPosition1 = projectPositionRepository.save(projectPosition1);
+
+        // 이미지 세팅
+        Image image1 = Image.builder()
+                .logicalName("testLogicalName1")
+                .physicalName("testPhysicalName1")
+                .build();
+        Image saveImage1 = imageRepository.save(image1);
+
+        // 기술스택 세팅
+        TechnicalStack technicalStack1 = TechnicalStack.builder()
+                .imageNo(saveImage1.getNo())
+                .name("testTechnicalStack1")
+                .build();
+        technicalStackRepository.save(technicalStack1);
+
+        ProjectTechnicalStack projectTechnicalStack1 = ProjectTechnicalStack.builder()
+                .technicalStack(technicalStack1)
+                .project(saveRecruitmentCompleteProject.get(0))
+                .build();
+
+        ProjectTechnicalStack saveProjectTechnicalStack1 = projectTechnicalStackRepository.save(projectTechnicalStack1);
+
+        // 4번째 5번째는 북마크
+        saveBookMark(saveUser, saveRecruitmentCompleteProject.get(0));
+        saveBookMark(saveUser, saveRecruitmentCompleteProject.get(1));
+
+        // then
+        String token = jwtTokenService.createToken(new TokenDto(saveUser.getNo(), saveUser.getEmail()));
+
+        mvc.perform(get("/v1/project/recruitment/complete")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", "Bearer " + token))
+                .andDo(print())
+                .andExpect(header().string("Content-type", "application/json"))
+                .andExpect(jsonPath("$.data.content[0].name").value("testName6"))
+                .andExpect(jsonPath("$.data.content[0].maxPeople").value(10))
+                .andExpect(jsonPath("$.data.content[0].currentPeople").value(4))
+                .andExpect(jsonPath("$.data.content[0].viewCount").value(10))
+                .andExpect(jsonPath("$.data.content[0].register").value("user"))
+                .andExpect(jsonPath("$.data.content[0].bookMark").value(false))
+
+                .andExpect(jsonPath("$.data.content[1].name").value("testName5"))
+                .andExpect(jsonPath("$.data.content[1].maxPeople").value(10))
+                .andExpect(jsonPath("$.data.content[1].currentPeople").value(4))
+                .andExpect(jsonPath("$.data.content[1].viewCount").value(10))
+                .andExpect(jsonPath("$.data.content[1].register").value("user"))
+                .andExpect(jsonPath("$.data.content[1].bookMark").value(true))
+
+                .andExpect(jsonPath("$.data.content[2].name").value("testName4"))
+                .andExpect(jsonPath("$.data.content[2].maxPeople").value(10))
+                .andExpect(jsonPath("$.data.content[2].currentPeople").value(4))
+                .andExpect(jsonPath("$.data.content[2].viewCount").value(10))
+                .andExpect(jsonPath("$.data.content[2].register").value("user"))
+                .andExpect(jsonPath("$.data.content[2].bookMark").value(true))
+                .andExpect(jsonPath("$.data.content[2].projectSimplePositionDtoList[0].projectNo").value(saveProjectPosition1.getProject().getNo()))
+                .andExpect(jsonPath("$.data.content[2].projectSimplePositionDtoList[0].positionNo").value(saveProjectPosition1.getPosition().getNo()))
+                .andExpect(jsonPath("$.data.content[2].projectSimplePositionDtoList[0].positionName").value(saveProjectPosition1.getPosition().getName()))
+                .andExpect(jsonPath("$.data.content[2].projectSimpleTechnicalStackDtoList[0].projectNo").value(saveProjectTechnicalStack1.getProject().getNo()))
+                .andExpect(jsonPath("$.data.content[2].projectSimpleTechnicalStackDtoList[0].image").value(saveImage1.getLogicalName()))
+                .andExpect(jsonPath("$.data.content[2].projectSimpleTechnicalStackDtoList[0].technicalStackName").value(saveProjectTechnicalStack1.getTechnicalStack().getName()))
+
+                .andExpect(status().isOk());
+    }
+
 //    @Test
 //    public void 비로그인_상세_프로젝트_조회_테스트() throws Exception {
 //        // given
