@@ -53,6 +53,21 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
+    public ProjectRegisterFormResponseDto findProjectRegisterForm() throws Exception {
+        List<Position> positionList = positionRepository.findAll();
+        List<PositionRegisterFormDto> positionRegisterFormDtoList = positionList.stream()
+                .map(position -> new PositionRegisterFormDto(position.getNo(), position.getName()))
+                .collect(Collectors.toList());
+
+        List<TechnicalStack> technicalStackList = technicalStackRepository.findAll();
+        List<TechnicalStackRegisterFormDto> technicalStackRegisterFormDtoList = technicalStackList.stream()
+                .map(technicalStack -> new TechnicalStackRegisterFormDto(technicalStack.getNo(), technicalStack.getName()))
+                .collect(Collectors.toList());
+
+        return new ProjectRegisterFormResponseDto(positionRegisterFormDtoList, technicalStackRegisterFormDtoList);
+    }
+
+    @Override
     public ProjectRegisterResponseDto projectRegister(ProjectRegisterRequestDto projectRegisterRequestDto) throws Exception{
 //        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 //        User user = (User) authentication.getPrincipal();

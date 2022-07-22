@@ -25,8 +25,9 @@ public class ProjectController {
 
     @GetMapping("/create")
     @ApiOperation(value = "프로젝트 등록 페이지 (수정 완료)")
-    public ResponseEntity<ResponseDto<ProjectRegisterFormResponseDto>> projectRegisterForm() {
-        return ResponseEntity.ok(new ResponseDto<ProjectRegisterFormResponseDto>());
+    public ResponseEntity<ResponseDto<ProjectRegisterFormResponseDto>> projectRegisterForm() throws Exception{
+
+        return ResponseEntity.ok(new ResponseDto<ProjectRegisterFormResponseDto>(null, projectService.findProjectRegisterForm()));
     }
 
     @PostMapping
