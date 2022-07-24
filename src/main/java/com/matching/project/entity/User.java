@@ -10,6 +10,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Optional;
@@ -50,6 +51,10 @@ public class User implements UserDetails {
     @Column(length = 255)
     private String blockReason;
 
+    private boolean withdrawal;
+
+    private LocalDateTime withdrawalTime;
+
     @Enumerated(EnumType.STRING)
     @Column(length = 20, nullable = false)
     private Role permission;
@@ -76,6 +81,11 @@ public class User implements UserDetails {
         this.imageNo = imageNo;
     }
 
+    public void userWithdrawal() {
+        this.withdrawal = true;
+        this.withdrawalTime = LocalDateTime.now();
+    }
+
     public void userBlock(String blockReason) {
         this.block = true;
         this.blockReason = blockReason;
@@ -87,16 +97,12 @@ public class User implements UserDetails {
     }
 
     public void updatePassword(PasswordEncoder passwordEncoder, String newPassword) {
-        if (!"".equals(newPassword) && newPassword != null)
-            this.password = passwordEncoder.encode(newPassword);
+        this.password = passwordEncoder.encode(newPassword);
     }
 
     public User updateUser(UserUpdateRequestDto dto, Position position) {
         this.name = dto.getName();
-//        if (!"".equals(dto.getSex()) && dto.getSex() != null)
-//            //this.sex = dto.getSex().charAt(0);
-//        else
-//            this.sex = 0;
+        this.sex = dto.getSex();
         this.github = dto.getGithub();
         this.selfIntroduction = dto.getSelfIntroduction();
         this.position = position;

@@ -8,12 +8,13 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 public interface UserService {
-    User userSignUp(SignUpRequestDto signUpRequestDto, MultipartFile file);
-    UserInfoResponseDto userInfo(Long no);
-    List<UserSimpleInfoDto> userInfoList(Pageable pageable);
-    User userUpdate(Long no, UserUpdateRequestDto userUpdateRequestDto, MultipartFile file);
-    Long userSignOut(Long no, SignOutRequestDto signOutRequestDto);
-    User userBlock(Long no, UserBlockRequestDto userBlockRequestDto);
-    User userUnBlock(Long no);
-    String getUserProfileImage(Long no);
+    User userSignUp(SignUpRequestDto signUpRequestDto);
+    UserInfoResponseDto getUserInfo();
+    UserProfileInfoResponseDto userProfileInfo();
+    List<UserSimpleInfoDto> userInfoList(Pageable pageable, UserFilterDto userFilterDto);
+    User userUpdate(UserUpdateRequestDto userUpdateRequestDto, MultipartFile file);
+    User userPasswordUpdate(PasswordUpdateRequestDto passwordUpdateRequestDto);
+    User userSignOut();
+    User userBlock(Long userNo, String reason);
+    User userUnBlock(Long userNo);
 }

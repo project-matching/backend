@@ -2,6 +2,8 @@ package com.matching.project.service;
 
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.matching.project.entity.Image;
+import com.matching.project.error.CustomException;
+import com.matching.project.error.ErrorCode;
 import com.matching.project.repository.ImageRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,11 +28,15 @@ public class ImageServiceImpl implements ImageService{
     private final ImageRepository imageRepository;
 
     @Override
-    public BufferedImage imageResize(InputStream inputStream, int width, int height) throws IOException {
-        BufferedImage inputImage = ImageIO.read(inputStream);
-
-        BufferedImage outputImage =
-                new BufferedImage(width, height, inputImage.getType());
+    public BufferedImage imageResize(InputStream inputStream, int width, int height){
+        BufferedImage inputImage = null;
+        BufferedImage outputImage = null;
+        try {
+            inputImage = ImageIO.read(inputStream);
+            outputImage = new BufferedImage(width, height, inputImage.getType());
+        } catch (Exception e) {
+            throw new CustomException(ErrorCode.FILE_READ_FAIL_EXCEPTION);
+        }
 
         Graphics2D graphics2D = outputImage.createGraphics();
         graphics2D.drawImage(inputImage, 0, 0, width, height, null);
@@ -47,21 +53,21 @@ public class ImageServiceImpl implements ImageService{
         double size = (double) file.getSize() / (1024.0 * 1024.0);
         log.debug("{}MB", size);
         if (size > allowSize)
-            throw new IllegalArgumentException(allowSize + " MB 이상의 파일은 허용되지 않음");
+            throw new CustomException(ErrorCode.SIZE_OVER_EXCEPTION);
 
         // 확장자 체크
         String ext = FilenameUtils.getExtension(file.getOriginalFilename());
         if (ext == null)
-            throw new IllegalArgumentException("확장자가 존재하지 않음");
+            throw new CustomException(ErrorCode.NONEXISTENT_EXT_EXCEPTION);
         List<String> allowExt = Arrays.asList("jpg", "png", "bmp", "gif", "jpeg", "img");
         allowExt.stream()
                 .filter(allow -> allow.equals(ext.toLowerCase()))
                 .findAny()
-                .orElseThrow(() -> new IllegalArgumentException("허용하지 않는 확장자"));
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_ALLOWED_EXT_EXCEPTION));
     }
 
     @Override
-    public Long imageUpload(MultipartFile file, int width, int height) throws IOException{
+    public Long imageUpload(MultipartFile file, int width, int height){
         // 유효성 체크
         imageValidCheck(file);
 
@@ -75,10 +81,19 @@ public class ImageServiceImpl implements ImageService{
 
         // 리사이징
         log.info("이미지 리사이징 시작");
-        BufferedImage resizedImage = imageResize(new BufferedInputStream(file.getInputStream()), width, height);
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        BufferedImage resizedImage = null;
+        try {
+            resizedImage = imageResize(new BufferedInputStream(file.getInputStream()), width, height);
+        } catch (IOException e) {
+            throw new CustomException(ErrorCode.FILE_CONVERSION_EXCEPTION);
+        }
 
-        ImageIO.write(resizedImage, ext, os);
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        try {
+            ImageIO.write(resizedImage, ext, os);
+        } catch (IOException e) {
+            throw new CustomException(ErrorCode.FILE_WRITE_FAIL_EXCEPTION);
+        }
         InputStream is = new ByteArrayInputStream(os.toByteArray());
         log.info("이미지 리사이징 완료");
 
@@ -100,19 +115,22 @@ public class ImageServiceImpl implements ImageService{
     }
 
     @Override
-    public void imageDelete(Long no) throws IOException{
+    public void imageDelete(Long no){
         Optional<Image> image = imageRepository.findById(no);
-        image.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 파일 입니다."));
+        image.orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_FILE_EXCEPTION));
         log.info("이미지 S3 삭제 시작");
         amazonS3Service.deleteFile(image.get().getPhysicalName());
         log.info("이미지 S3 삭제 완료");
         imageRepository.deleteById(no);
     }
 
-
-
-
-
-
-
+    @Override
+    public String getImageUrl(Long imageNo) {
+        String imageUrl = null;
+        if (imageNo != null) {
+            Optional<Image> image = imageRepository.findById(imageNo);
+            imageUrl = image.get().getUrl();
+        }
+        return imageUrl;
+    }
 }

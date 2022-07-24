@@ -48,6 +48,7 @@ spring:
         dialect: org.hibernate.dialect.MySQL5Dialect
         # 예약어 에러로 인하여, SQL 실행 시 인용 부호로 테이블과 컬럼을 감싸는 옵션 활성화
         globally_quoted_identifiers: true
+        format_sql: true
     show-sql: true
     hibernate:
       ddl-auto: create
