@@ -35,7 +35,6 @@ import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
-
     /*
         ref : https://github.com/HomoEfficio/dev-tips/blob/master/Spring-Boot-%EB%A0%88%EC%9D%B4%EC%96%B4%EB%B3%84-%ED%85%8C%EC%8A%A4%ED%8A%B8.md
      */

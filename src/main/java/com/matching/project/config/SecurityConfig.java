@@ -45,7 +45,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         UsernamePasswordAuthenticationFilter.class)
                 .authorizeRequests()
 
-
                 //CommonController
                 .antMatchers("/v1/common/logout").hasAnyRole("USER", "ADMIN")
                 .antMatchers("/v1/common/**").anonymous()
@@ -64,7 +63,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
                 //AnyRequest
                 .anyRequest().permitAll()
-
 
                 .and()
                 .logout()
