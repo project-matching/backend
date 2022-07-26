@@ -238,7 +238,7 @@ class ProjectControllerTest {
         technicalStackRepository.save(technicalStack2);
 
         // then
-        String token = jwtTokenService.createToken(new TokenDto(saveUser.getNo(), saveUser.getEmail()));
+        String token = jwtTokenService.createToken(new TokenDto(saveUser.getEmail()));
 
         mvc.perform(get("/v1/project/create").contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", "Bearer " + token))
@@ -305,7 +305,7 @@ class ProjectControllerTest {
                 .build();
 
         // then
-        String token = jwtTokenService.createToken(new TokenDto(saveUser.getNo(), saveUser.getEmail()));
+        String token = jwtTokenService.createToken(new TokenDto(saveUser.getEmail()));
 
         MvcResult result = mvc.perform(post("/v1/project").contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", "Bearer " + token)
@@ -363,7 +363,7 @@ class ProjectControllerTest {
                 .build();
 
         // then
-        String token = jwtTokenService.createToken(new TokenDto(saveUser.getNo(), saveUser.getEmail()));
+        String token = jwtTokenService.createToken(new TokenDto(saveUser.getEmail()));
 
         mvc.perform(post("/v1/project").contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", "Bearer " + token)
