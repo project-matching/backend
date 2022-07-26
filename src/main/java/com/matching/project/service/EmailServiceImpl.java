@@ -1,12 +1,14 @@
 package com.matching.project.service;
 
-import com.matching.project.dto.common.PasswordReissueRequestDto;
+import com.matching.project.dto.common.PasswordInitRequestDto;
+import com.matching.project.dto.common.TokenDto;
 import com.matching.project.dto.enumerate.EmailAuthPurpose;
 import com.matching.project.dto.enumerate.OAuth;
-import com.matching.project.dto.user.EmailAuthReSendRequestDto;
 import com.matching.project.dto.user.EmailAuthRequestDto;
 import com.matching.project.entity.EmailAuth;
 import com.matching.project.entity.User;
+import com.matching.project.error.CustomException;
+import com.matching.project.error.ErrorCode;
 import com.matching.project.repository.EmailAuthRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,13 +33,17 @@ public class EmailServiceImpl implements EmailService {
     private final EmailAuthRepository emailAuthRepository;
     private final CustomUserDetailsService customUserDetailsService;
     private final PasswordEncoder passwordEncoder;
+    private final JwtTokenService jwtTokenService;
+
+    //@Value("${frontend.url}")
+    //private String frontUrl;
 
     public User userValidCheck(String email, EmailAuthPurpose purpose) {
         User user = (User) customUserDetailsService.loadUserByUsername(email);
         if (user.getOauthCategory() != OAuth.NORMAL)
-            throw new RuntimeException("Not applicable for Oauth login users");
+            throw new CustomException(ErrorCode.SOCIAL_USER_NOT_ALLOWED_FEATURE_EXCEPTION);
         else if (purpose == EmailAuthPurpose.EMAIL_AUTHENTICATION && user.isEmail_auth())
-            throw new RuntimeException("Already Authentication Completed");
+            throw new CustomException(ErrorCode.ALREADY_AUTHENTICATED_AUTH_TOKEN_EXCEPTION);
         return user;
     }
 
@@ -45,9 +51,9 @@ public class EmailServiceImpl implements EmailService {
         Optional<EmailAuth> emailAuth = emailAuthRepository.findByEmailAndAndAuthTokenAndPurpose(
                 email, authToken, purpose);
         if (emailAuth.isEmpty())
-            throw new RuntimeException("Email AuthToken Not Found");
+            throw new CustomException(ErrorCode.NOT_FOUND_AUTH_TOKEN_EXCEPTION);
         else if (emailAuth.get().getExpireDate().isBefore(LocalDateTime.now()))
-            throw new RuntimeException("Email AuthToken Expired");
+            throw new CustomException(ErrorCode.EXPIRED_AUTH_TOKEN_EXCEPTION);
     }
 
     @Transactional
@@ -79,62 +85,63 @@ public class EmailServiceImpl implements EmailService {
 
     @Transactional
     @Override
-    public User CheckConfirmEmail(EmailAuthRequestDto dto) {
+    public User checkConfirmEmail(EmailAuthRequestDto dto, EmailAuthPurpose purpose) {
         // User Valid Check
-        User user = userValidCheck(dto.getEmail(), dto.getPurpose());
+        User user = userValidCheck(dto.getEmail(), purpose);
 
         // Email Authentication Valid Check
-        emailAuthValidCheck(dto.getEmail(), dto.getAuthToken(), dto.getPurpose());
+        emailAuthValidCheck(dto.getEmail(), dto.getAuthToken(), purpose);
 
         // Email Verify Save
         user.emailVerifiedSuccess();
 
         // Delete used Authentication token
-        emailAuthRepository.deleteAllByEmailAndPurpose(dto.getEmail(), dto.getPurpose());
+        emailAuthRepository.deleteAllByEmailAndPurpose(dto.getEmail(), purpose);
+
         return user;
     }
 
     @Async
     @Override
     public void sendConfirmEmail(String email, String authToken) {
-//        SimpleMailMessage smm = new SimpleMailMessage();
-//        smm.setTo(email);
-//        smm.setSubject("회원가입 이메일 인증");
-//        smm.setText("http://localhost:8080/v1/user/confirm?email="+email+"&authToken="+authToken);
-//
-//        javaMailSender.send(smm);
-//        log.info("회원 가입 이메일 전송 to {}", email);
+        SimpleMailMessage smm = new SimpleMailMessage();
+        smm.setTo(email);
+        smm.setSubject("회원가입 이메일 인증");
+        // 임시 -> 프론트 주소로 바뀌여야함.
+        smm.setText("http://localhost:8080/v1/user/confirm?email="+email+"&authToken="+authToken);
+
+        javaMailSender.send(smm);
+        log.info("회원가입 이메일 전송 to {}", email);
     }
 
     @Transactional
     @Override
-    public String CheckPasswordReissueEmail(PasswordReissueRequestDto dto) {
+    public User checkPasswordInitEmail(PasswordInitRequestDto dto, EmailAuthPurpose purpose) {
         // User Valid Check
-        User user = userValidCheck(dto.getEmail(), dto.getPurpose());
+        User user = userValidCheck(dto.getEmail(), purpose);
 
         // Email Authentication Valid Check
-        emailAuthValidCheck(dto.getEmail(), dto.getAuthToken(), dto.getPurpose());
+        emailAuthValidCheck(dto.getEmail(), dto.getAuthToken(), purpose);
 
-        // password ReIsuue
-        String newPassword = Integer.toString((int)(Math.random()*1000000000));
-        user.passwordReIssue(passwordEncoder.encode(newPassword));
+        // Password Update
+        user.updatePassword(passwordEncoder, dto.getPassword());
 
         // Delete used Authentication token
-        emailAuthRepository.deleteAllByEmailAndPurpose(dto.getEmail(), dto.getPurpose());
+        emailAuthRepository.deleteAllByEmailAndPurpose(dto.getEmail(), purpose);
 
-        return newPassword;
+        return user;
     }
 
     @Async
     @Override
-    public void sendPasswordReissueEmail(String email, String authToken) {
+    public void sendPasswordInitEmail(String email, String authToken) {
         SimpleMailMessage smm = new SimpleMailMessage();
         smm.setTo(email);
         smm.setSubject("비밀번호 재발급 요청하기");
-        smm.setText("http://localhost:8080/v1/common/password/reissue?email="+email+"&authToken="+authToken);
+        // 임시 -> 프론트 주소로 바뀌여야함.
+        smm.setText("http://localhost:8080/v1/common/password/confirm?email="+email+"&authToken="+authToken);
 
         javaMailSender.send(smm);
         log.info("비밀번호 재발급 요청 to {}", email);
     }
-
 }

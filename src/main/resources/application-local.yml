@@ -48,6 +48,7 @@ spring:
         dialect: org.hibernate.dialect.MySQL5Dialect
         # 예약어 에러로 인하여, SQL 실행 시 인용 부호로 테이블과 컬럼을 감싸는 옵션 활성화
         globally_quoted_identifiers: true
+        format_sql: true
     show-sql: true
     hibernate:
       ddl-auto: create
@@ -59,5 +60,16 @@ spring:
     ansi:
       enabled: always
 
+cloud:
+  aws:
+    credentials:
+      access-key: ENC(JyNo5X7v+0mnqn3WN2dOxx/UOlBGWAlJG7snEoCkGHk=)
+      secret-key: ENC(6+PKiZ/cNqhmIpnFJjYFBep2WWyOq8MEoCYKUkwgo0Hpq/3WDgkKW+g+q+iVlD99RqtT8aO6koY=)
+    s3:
+      bucket: project-matching-s3
+    region:
+      static: ap-northeast-2
+    stack:
+      auto: false
 
 

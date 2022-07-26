@@ -1,10 +1,13 @@
 package com.matching.project.service;
 
 import com.matching.project.dto.common.NormalLoginRequestDto;
+import com.matching.project.dto.common.TokenDto;
 import com.matching.project.dto.enumerate.OAuth;
 import com.matching.project.dto.enumerate.Role;
 import com.matching.project.entity.Position;
 import com.matching.project.entity.User;
+import com.matching.project.error.CustomException;
+import com.matching.project.error.ErrorCode;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -33,6 +36,9 @@ class CommonServiceImplTest {
     @Spy
     private BCryptPasswordEncoder passwordEncoder;
 
+    @Mock
+    private JwtTokenService jwtTokenService;
+
     @InjectMocks
     private CommonServiceImpl commonService;
 
@@ -57,12 +63,12 @@ class CommonServiceImplTest {
         given((User) customUserDetailsService.loadUserByUsername(email)).willReturn(mockUser);
 
         //when
-        Exception e = Assertions.assertThrows(RuntimeException.class, () -> {
-            User user = commonService.normalLogin(dto);
+        CustomException e = Assertions.assertThrows(CustomException.class, () -> {
+            commonService.normalLogin(dto);
         });
 
         //then
-        assertThat(e.getMessage()).isEqualTo("This is an unsigned email");
+        assertThat(e.getErrorCode().getDetail()).isEqualTo("This is an unsigned email");
     }
 
     @DisplayName("노말 로그인 실패 : 존재하지 않는 이메일")
@@ -77,15 +83,15 @@ class CommonServiceImplTest {
                 .password(password)
                 .build();
 
-        given((User) customUserDetailsService.loadUserByUsername(email)).willThrow(new UsernameNotFoundException("This is not a registered email"));
+        given((User) customUserDetailsService.loadUserByUsername(email)).willThrow(new CustomException(ErrorCode.NOT_REGISTERED_EMAIL_EXCEPTION));
 
         //when
-        Exception e = Assertions.assertThrows(UsernameNotFoundException.class, () -> {
-            User user = commonService.normalLogin(dto);
+        CustomException e = Assertions.assertThrows(CustomException.class, () -> {
+            commonService.normalLogin(dto);
         });
 
         //then
-        assertThat(e.getMessage()).isEqualTo("This is not a registered email");
+        assertThat(e.getErrorCode().getDetail()).isEqualTo("This is not a registered email");
     }
 
     @DisplayName("노말 로그인 실패 : 패스워드가 틀림")
@@ -108,12 +114,12 @@ class CommonServiceImplTest {
         given((User) customUserDetailsService.loadUserByUsername(email)).willReturn(mockUser);
 
         //when
-        Exception e = Assertions.assertThrows(RuntimeException.class, () -> {
-            User user = commonService.normalLogin(dto);
+        CustomException e = Assertions.assertThrows(CustomException.class, () -> {
+            commonService.normalLogin(dto);
         });
 
         //then
-        assertThat(e.getMessage()).isEqualTo("This is an incorrect password");
+        assertThat(e.getErrorCode().getDetail()).isEqualTo("This is an incorrect password");
 
     }
 
@@ -139,12 +145,42 @@ class CommonServiceImplTest {
         given(customUserDetailsService.loadUserByUsername(email)).willReturn(mockUser);
 
         //when
-        Exception e = Assertions.assertThrows(RuntimeException.class, () -> {
+        CustomException e = Assertions.assertThrows(CustomException.class, () -> {
             commonService.normalLogin(dto);
         });
 
         //then
-        assertThat(e.getMessage()).isEqualTo("This is blocked User ID");
+        assertThat(e.getErrorCode().getDetail()).isEqualTo("This is blocked User ID");
+    }
+
+    @DisplayName("노말 로그인 실패 : 탈퇴한 사용자")
+    @Test
+    void normalLoginFail5() {
+        //given
+        String email = "test@naver.com";
+        String password = "test";
+
+        User mockUser = User.builder()
+                .email(email)
+                .password(passwordEncoder.encode(password))
+                .withdrawal(true)
+                .email_auth(true)
+                .build();
+
+        NormalLoginRequestDto dto = NormalLoginRequestDto.builder()
+                .email(email)
+                .password(password)
+                .build();
+
+        given(customUserDetailsService.loadUserByUsername(email)).willReturn(mockUser);
+
+        //when
+        CustomException e = Assertions.assertThrows(CustomException.class, () -> {
+            commonService.normalLogin(dto);
+        });
+
+        //then
+        assertThat(e.getErrorCode().getDetail()).isEqualTo("This is withdrawal User ID");
     }
 
     @DisplayName("노말 로그인 성공")
@@ -171,6 +207,6 @@ class CommonServiceImplTest {
         User user = commonService.normalLogin(dto);
 
         //then
-        assertThat(user.getEmail()).isEqualTo(dto.getEmail());
+        assertThat(email).isEqualTo(user.getEmail());
     }
 }

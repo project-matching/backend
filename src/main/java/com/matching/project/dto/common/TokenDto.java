@@ -8,6 +8,5 @@ import lombok.*;
 @Setter
 @Getter
 public class TokenDto {
-    Long no;
     String email;
 }
