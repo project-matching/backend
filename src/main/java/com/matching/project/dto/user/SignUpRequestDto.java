@@ -7,8 +7,11 @@ import com.matching.project.entity.User;
 import com.matching.project.entity.UserTechnicalStack;
 import lombok.*;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
+
 
 @Builder
 @NoArgsConstructor
@@ -16,31 +19,31 @@ import java.util.List;
 @Setter
 @Getter
 public class SignUpRequestDto {
+    @NotBlank
     private String name;
+
+    @NotBlank
     private String email;
+
+    @NotBlank
     private String password;
 
     public void setEncodePassword(String encodePassword) {
         this.password = encodePassword;
     }
 
-    public static User toUserEntity(final SignUpRequestDto signUpRequestDto, Position position) {
-        char sex = 0;
-//        if (!"".equals(signUpRequestDto.getSex()) && signUpRequestDto.getSex() != null)
-//            sex = signUpRequestDto.getSex().charAt(0);
-//        User user = User.builder()
-//                .name(signUpRequestDto.name)
-//                .sex(sex)
-//                .email(signUpRequestDto.email)
-//                .password(signUpRequestDto.password)
-//                .github(signUpRequestDto.github)
-//                .selfIntroduction(signUpRequestDto.selfIntroduction)
-//                .permission(Role.ROLE_USER)
-//                .oauthCategory(OAuth.NORMAL)
-//                .block(false)
-//                .position(position)
-//                .email_auth(true) // 임시
-//                .build();
-        return null;
+    public static User toUserEntity(final SignUpRequestDto signUpRequestDto) {
+        User user = User.builder()
+                .name(signUpRequestDto.name)
+                .sex("N")
+                .email(signUpRequestDto.email)
+                .password(signUpRequestDto.password)
+                .permission(Role.ROLE_USER)
+                .oauthCategory(OAuth.NORMAL)
+                .block(false)
+                .withdrawal(false)
+                .email_auth(false)
+                .build();
+        return user;
     }
 }

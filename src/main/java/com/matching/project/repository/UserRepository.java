@@ -12,5 +12,6 @@ import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByEmail(String email);
-    Page<User> findAll(Pageable pageable);
+    @Query("select u from User u left join fetch u.position where u.no = ?1")
+    Optional<User> findByNoWithPositionUsingLeftFetchJoin(Long no);
 }

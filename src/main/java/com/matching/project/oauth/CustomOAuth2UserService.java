@@ -2,6 +2,8 @@ package com.matching.project.oauth;
 
 import com.matching.project.dto.common.TokenDto;
 import com.matching.project.entity.User;
+import com.matching.project.error.CustomException;
+import com.matching.project.error.ErrorCode;
 import com.matching.project.repository.UserRepository;
 import com.matching.project.service.JwtTokenService;
 import lombok.RequiredArgsConstructor;
@@ -50,8 +52,12 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         User user = userRepository.findByEmail(attributes.getEmail())
                 .orElse(attributes.toEntity());
         log.info(user.toString());
-        if (user.isBlock())
-            throw new IllegalArgumentException("This is blocked User ID");
+
+        if (user.isWithdrawal())
+            throw new CustomException(ErrorCode.WITHDRAWAL_EXCEPTION);
+        else if (user.isBlock())
+            throw new CustomException(ErrorCode.BLOCKED_EXCEPTION); // 에러에서 사유도 출력되도록 할 필요가 있음
+
         return userRepository.save(user);
     }
 }
