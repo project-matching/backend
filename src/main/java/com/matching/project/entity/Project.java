@@ -13,7 +13,6 @@ import java.util.List;
 
 @Entity
 @Getter
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Project {
@@ -53,9 +52,6 @@ public class Project {
     @Column(length = 255)
     private String deleteReason;
 
-    @Column(nullable = true)
-    private Long imageNo;
-
     @Column(nullable = false)
     @ColumnDefault("0")
     private Integer viewCount;
@@ -74,23 +70,41 @@ public class Project {
     @OneToMany(mappedBy = "project")
     private List<ProjectTechnicalStack> ProjectTechnicalStackList = new ArrayList<>();
 
+    @Builder
+    public Project(Long no, String name, String createUserName, LocalDateTime createDate, LocalDate startDate, LocalDate endDate, boolean state, String introduction, Integer maxPeople, Integer currentPeople, boolean delete, String deleteReason, Integer viewCount, Integer commentCount, User user) {
+        this.no = no;
+        this.name = name;
+        this.createUserName = createUserName;
+        this.createDate = createDate;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.state = state;
+        this.introduction = introduction;
+        this.maxPeople = maxPeople;
+        this.currentPeople = currentPeople;
+        this.delete = delete;
+        this.deleteReason = deleteReason;
+        this.viewCount = viewCount;
+        this.commentCount = commentCount;
+        this.user = user;
+    }
 
-//    public static Project of(ProjectRegisterRequestDto projectRegisterRequestDto, User user) {
-//        return Project.builder()
-//                .name(projectRegisterRequestDto.getName())
-//                .createUserName(user.getName())
-//                .createDate(LocalDateTime.now())
-//                .startDate(projectRegisterRequestDto.getStartDate())
-//                .endDate(projectRegisterRequestDto.getEndDate())
-//                .state(true)
-//                .introduction(projectRegisterRequestDto.getIntroduction())
-//                .maxPeople(projectRegisterRequestDto.getMaxPeople())
-//                .currentPeople(1)
-//                .delete(false)
-//                .deleteReason(null)
-//                .viewCount(0)
-//                .commentCount(0)
-//                .imageNo(null)
-//                .build();
-//    }
+    public static Project of(ProjectRegisterRequestDto projectRegisterRequestDto, User user) {
+        return Project.builder()
+                .name(projectRegisterRequestDto.getName())
+                .createUserName(user.getName())
+                .createDate(LocalDateTime.now())
+                .startDate(projectRegisterRequestDto.getStartDate())
+                .endDate(projectRegisterRequestDto.getEndDate())
+                .state(true)
+                .introduction(projectRegisterRequestDto.getIntroduction())
+                .maxPeople(projectRegisterRequestDto.getProjectPositionRegisterDtoList().size())
+                .currentPeople(1)
+                .delete(false)
+                .deleteReason(null)
+                .viewCount(0)
+                .commentCount(0)
+                .user(user)
+                .build();
+    }
 }

@@ -33,4 +33,9 @@ public class ProjectPosition {
     private User user;
 
     private boolean creator;
+
+    public void setProject(Project project) {
+        this.project = project;
+        project.getProjectPositionList().add(this);
+    }
 }

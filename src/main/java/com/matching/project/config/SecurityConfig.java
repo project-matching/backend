@@ -44,6 +44,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenService),
                         UsernamePasswordAuthenticationFilter.class)
                 .authorizeRequests()
+                
+                //ProjectController
+                .antMatchers(HttpMethod.POST, "/v1/project").hasAnyRole("USER", "ADMIN")
+                .antMatchers("/v1/project/create").hasAnyRole("USER", "ADMIN")
+                .antMatchers("/v1/project/recruitment/*")
+                    .hasAnyRole("USER", "ADMIN", "ANONYMOUS")
+                .antMatchers("/v1/project/recruitment/complete/*")
+                .hasAnyRole("USER", "ADMIN", "ANONYMOUS")
 
                 //CommonController
                 .antMatchers("/v1/common/logout").hasAnyRole("USER", "ADMIN")

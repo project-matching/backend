@@ -2,15 +2,20 @@ package com.matching.project.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 import com.matching.project.config.SecurityConfig;
+import com.matching.project.dto.ResponseDto;
 import com.matching.project.dto.common.TokenDto;
 import com.matching.project.dto.enumerate.Filter;
 import com.matching.project.dto.enumerate.OAuth;
 import com.matching.project.dto.enumerate.Role;
 import com.matching.project.dto.project.ProjectPositionDto;
 import com.matching.project.dto.project.ProjectRegisterRequestDto;
-import com.matching.project.dto.project.ProjectRegisterResponseDto;
 import com.matching.project.dto.project.ProjectSearchRequestDto;
+import com.matching.project.dto.projectposition.ProjectPositionRegisterDto;
+import com.matching.project.dto.user.ProjectRegisterUserDto;
 import com.matching.project.entity.*;
 import com.matching.project.oauth.CustomOAuth2UserService;
 import com.matching.project.repository.*;
@@ -42,8 +47,12 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.awt.*;
+import java.lang.reflect.Type;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -247,102 +256,123 @@ class ProjectControllerTest {
                 .andExpect(jsonPath("$.data.technicalStackRegisterFormDtoList[1].technicalStackName").value(technicalStack2.getName()))
                 .andExpect(status().isOk());
     }
-//    @Test
-//    void 프로젝트_등록_테스트() throws Exception {
-//        // given
-//        User saveUser = saveUser();
-//
-//        Position position1 = Position.builder()
-//                .name("testPosition1")
-//                .build();
-//        Position position2 = Position.builder()
-//                .name("testPosition2")
-//                .build();
-//
-//        positionRepository.save(position1);
-//        positionRepository.save(position2);
-//
-//
-//        TechnicalStack technicalStack1 = TechnicalStack.builder()
-//                .name("testTechnicalStack1")
-//                .build();
-//        TechnicalStack technicalStack2 = TechnicalStack.builder()
-//                .name("testTechnicalStack2")
-//                .build();
-//
-//        technicalStackRepository.save(technicalStack1);
-//        technicalStackRepository.save(technicalStack2);
-//
-//
-//        LocalDateTime createDate = LocalDateTime.of(2022, 06, 24, 10, 10, 10);
-//        LocalDate startDate = LocalDate.of(2022, 06, 24);
-//        LocalDate endDate = LocalDate.of(2022, 06, 28);
-//
-//        List<ProjectPositionDto> projectPositionDtoList = new ArrayList<>();
-//        ProjectPositionDto projectPositionDto1 = ProjectPositionDto.builder()
-//                .name("testPosition1")
-//                .state(true)
-//                .build();
-//        ProjectPositionDto projectPositionDto2 = ProjectPositionDto.builder()
-//                .name("testPosition2")
-//                .state(false)
-//                .build();
-//        projectPositionDtoList.add(projectPositionDto1);
-//        projectPositionDtoList.add(projectPositionDto2);
-//
-//        List<String> projectTechnicalStack = new ArrayList<>();
-//        projectTechnicalStack.add("testTechnicalStack1");
-//        projectTechnicalStack.add("testTechnicalStack2");
-//
-//        ProjectRegisterRequestDto projectRegisterRequestDto = ProjectRegisterRequestDto.builder()
-//                .name(null)
-//                .profile(null)
-//                .startDate(startDate)
-//                .endDate(endDate)
-//                .introduction("testIntroduction1")
-//                .maxPeople(10)
-//                .build();
-//
-//        projectRegisterRequestDto.setProjectPositionDtoList(projectPositionDtoList);
-//        projectRegisterRequestDto.setProjectTechnicalStack(projectTechnicalStack);
-//
-//        // then
-//        String token = jwtTokenService.createToken(new TokenDto(saveUser.getNo(), saveUser.getEmail()));
-//
-//        mvc.perform(post("/v1/project").contentType(MediaType.APPLICATION_JSON)
-//                        .header("Authorization", "Bearer " + token)
-//                        .content(new ObjectMapper().registerModule(new JavaTimeModule()).writeValueAsString(projectRegisterRequestDto)))
-//                .andDo(print())
-//                .andExpect(header().string("Content-type", "application/json"))
-//                .andExpect(jsonPath("$.error").isEmpty())
-//                .andExpect(jsonPath("$.data.name").value(projectRegisterRequestDto.getName()))
-//                .andExpect(jsonPath("$.data.createUser").value(saveUser.getName()))
-//                .andExpect(jsonPath("$.data.profile").isEmpty())
-//                .andExpect(jsonPath("$.data.startDate").value(projectRegisterRequestDto.getStartDate().toString()))
-//                .andExpect(jsonPath("$.data.endDate").value(projectRegisterRequestDto.getEndDate().toString()))
-//                .andExpect(jsonPath("$.data.state").value(true))
-//                .andExpect(jsonPath("$.data.introduction").value(projectRegisterRequestDto.getIntroduction()))
-//                .andExpect(jsonPath("$.data.maxPeople").value(projectRegisterRequestDto.getMaxPeople()))
-//                .andExpect(jsonPath("$.data.currentPeople").value(1))
-//                .andExpect(jsonPath("$.data.viewCount").value(0))
-//                .andExpect(jsonPath("$.data.commentCount").value(0))
-//
-//                .andExpect(jsonPath("$.data.projectPositionDtoList[0].name").value(projectPositionDto1.getName()))
-//                .andExpect(jsonPath("$.data.projectPositionDtoList[0].state").value(projectPositionDto1.isState()))
-//                .andExpect(jsonPath("$.data.projectPositionDtoList[1].name").value(projectPositionDto2.getName()))
-//                .andExpect(jsonPath("$.data.projectPositionDtoList[1].state").value(projectPositionDto2.isState()))
-//
-//                .andExpect(jsonPath("$.data.projectTechnicalStack[0]").value(technicalStack1.getName()))
-//                .andExpect(jsonPath("$.data.projectTechnicalStack[1]").value(technicalStack2.getName()))
-//                .andExpect(status().isOk());
-//
-//        List<Project> projectList = projectRepository.findAll();
-//        List<ProjectPosition> projectPositionList = projectPositionRepository.findAll();
-//        List<ProjectTechnicalStack> projectTechnicalStackList = projectTechnicalStackRepository.findAll();
-//        assertEquals(projectList.size(), 1);
-//        assertEquals(projectPositionList.size(), projectPositionDtoList.size());
-//        assertEquals(projectTechnicalStackList.size(), projectTechnicalStack.size());
-//    }
+
+    @Test
+    void 프로젝트_등록_테스트() throws Exception {
+        // given
+        User saveUser = saveUser();
+
+        Position position1 = Position.builder()
+                .name("testPosition1")
+                .build();
+        Position position2 = Position.builder()
+                .name("testPosition2")
+                .build();
+
+        Position savePosition1 = positionRepository.save(position1);
+        Position savePosition2 = positionRepository.save(position2);
+
+
+        TechnicalStack technicalStack1 = TechnicalStack.builder()
+                .name("testTechnicalStack1")
+                .build();
+        TechnicalStack technicalStack2 = TechnicalStack.builder()
+                .name("testTechnicalStack2")
+                .build();
+
+        TechnicalStack saveTechnicalStack1 = technicalStackRepository.save(technicalStack1);
+        TechnicalStack saveTechnicalStack2 = technicalStackRepository.save(technicalStack2);
+
+
+        LocalDate startDate = LocalDate.of(2022, 06, 24);
+        LocalDate endDate = LocalDate.of(2022, 06, 28);
+
+        List<ProjectPositionRegisterDto> projectPositionRegisterDtoList = new ArrayList<>();
+        projectPositionRegisterDtoList.add(new ProjectPositionRegisterDto(savePosition1.getNo(), new ProjectRegisterUserDto(saveUser.getNo())));
+        projectPositionRegisterDtoList.add(new ProjectPositionRegisterDto(savePosition2.getNo(), null));
+
+        List<Long> projectTechnicalStackList = new ArrayList<>();
+        projectTechnicalStackList.add(saveTechnicalStack1.getNo());
+        projectTechnicalStackList.add(saveTechnicalStack2.getNo());
+
+        ProjectRegisterRequestDto projectRegisterRequestDto = ProjectRegisterRequestDto.builder()
+                .name("testName")
+                .startDate(startDate)
+                .endDate(endDate)
+                .introduction("testIntroduction1")
+                .projectPositionRegisterDtoList(projectPositionRegisterDtoList)
+                .projectTechnicalStackList(projectTechnicalStackList)
+                .build();
+
+        // then
+        String token = jwtTokenService.createToken(new TokenDto(saveUser.getNo(), saveUser.getEmail()));
+
+        MvcResult result = mvc.perform(post("/v1/project").contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", "Bearer " + token)
+                        .content(new ObjectMapper().registerModule(new JavaTimeModule()).writeValueAsString(projectRegisterRequestDto)))
+                .andDo(print())
+                .andExpect(header().string("Content-type", "application/json"))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        Type type = new TypeToken<ResponseDto<Long>>() {}.getType();
+        ResponseDto<Long> responseDto = new Gson().fromJson(result.getResponse().getContentAsString(), type);
+
+        Project project = projectRepository.findById((Long)responseDto.getData()).get();
+        assertEquals(project.getNo(), responseDto.getData());
+        assertEquals(project.getName(), projectRegisterRequestDto.getName());
+        assertEquals(project.getCreateUserName(), saveUser.getName());
+        assertEquals(project.getStartDate(), projectRegisterRequestDto.getStartDate());
+        assertEquals(project.getEndDate(), projectRegisterRequestDto.getEndDate());
+        assertEquals(project.isState(), true);
+        assertEquals(project.getIntroduction(), projectRegisterRequestDto.getIntroduction());
+        assertEquals(project.getMaxPeople(), projectRegisterRequestDto.getProjectPositionRegisterDtoList().size());
+        assertEquals(project.isDelete(), false);
+        assertEquals(project.getDeleteReason(), null);
+        assertEquals(project.getViewCount(), 0);
+        assertEquals(project.getCommentCount(), 0);
+        assertEquals(project.getUser(), saveUser);
+
+        assertEquals(project.getProjectPositionList().get(0).getPosition(), savePosition1);
+        assertEquals(project.getProjectPositionList().get(0).getProject(), project);
+        assertEquals(project.getProjectPositionList().get(0).getUser(), saveUser);
+        assertEquals(project.getProjectPositionList().get(1).getPosition(), savePosition2);
+        assertEquals(project.getProjectPositionList().get(1).getProject(), project);
+        assertEquals(project.getProjectPositionList().get(1).getUser(), null);
+
+        assertEquals(project.getProjectTechnicalStackList().get(0).getTechnicalStack(), saveTechnicalStack1);
+        assertEquals(project.getProjectTechnicalStackList().get(0).getProject(), project);
+        assertEquals(project.getProjectTechnicalStackList().get(1).getTechnicalStack(), saveTechnicalStack2);
+        assertEquals(project.getProjectTechnicalStackList().get(1).getProject(), project);
+    }
+
+    @Test
+    void 프로젝트_등록_VALIDATION_테스트() throws Exception {
+        // given
+        User saveUser = saveUser();
+        List<ProjectPositionRegisterDto> projectPositionRegisterDtoList = new ArrayList<>();
+        projectPositionRegisterDtoList.add(new ProjectPositionRegisterDto(null, null));
+
+        ProjectRegisterRequestDto projectRegisterRequestDto = ProjectRegisterRequestDto.builder()
+                .name(null)
+                .startDate(null)
+                .endDate(null)
+                .introduction(null)
+                .projectPositionRegisterDtoList(projectPositionRegisterDtoList)
+                .projectTechnicalStackList(null)
+                .build();
+
+        // then
+        String token = jwtTokenService.createToken(new TokenDto(saveUser.getNo(), saveUser.getEmail()));
+
+        mvc.perform(post("/v1/project").contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", "Bearer " + token)
+                        .content(new ObjectMapper().registerModule(new JavaTimeModule()).writeValueAsString(projectRegisterRequestDto)))
+                .andDo(print())
+                .andExpect(header().string("Content-type", "application/json"))
+                .andExpect(status().isBadRequest())
+                .andReturn();
+    }
 //
 //    @Test
 //    public void 비로그인_모집중_프로젝트_조회_테스트() throws Exception {
