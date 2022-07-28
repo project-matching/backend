@@ -16,6 +16,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -65,6 +66,7 @@ public class CommentServiceImpl implements CommentService {
         return comment;
     }
 
+    @Transactional
     @Override
     public Comment commentUpdate(Long commentNo, String content) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -82,6 +84,7 @@ public class CommentServiceImpl implements CommentService {
         return optionalComment.get();
     }
 
+    @Transactional
     @Override
     public void commentDelete(Long commentNo) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();

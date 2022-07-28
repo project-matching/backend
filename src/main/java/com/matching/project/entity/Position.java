@@ -17,4 +17,8 @@ public class Position extends BaseTimeEntity {
 
     @Column(length = 20, nullable = false)
     private String name;
+
+    public void updatePositionName(String updatePositionName) {
+        this.name = updatePositionName;
+    }
 }

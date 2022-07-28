@@ -2,6 +2,7 @@ package com.matching.project.controller;
 
 import com.matching.project.dto.ResponseDto;
 import com.matching.project.dto.comment.CommentDto;
+import com.matching.project.dto.comment.CommentRequestDto;
 import com.matching.project.entity.Comment;
 import com.matching.project.service.CommentService;
 import io.swagger.annotations.ApiOperation;
@@ -25,8 +26,8 @@ public class CommentController {
 
     @PostMapping("/{projectNo}")
     @ApiOperation(value = "댓글 등록")
-    public ResponseEntity<ResponseDto<Boolean>> commentRegister(@PathVariable Long projectNo, String content) {
-        Comment comment = commentService.commentRegister(projectNo, content);
+    public ResponseEntity<ResponseDto<Boolean>> commentRegister(@PathVariable Long projectNo, @RequestBody CommentRequestDto dto) {
+        Comment comment = commentService.commentRegister(projectNo, dto.getContent());
         return ResponseEntity.ok(new ResponseDto(null, true));
     }
 
@@ -39,8 +40,8 @@ public class CommentController {
 
     @PatchMapping("/{commentNo}")
     @ApiOperation(value = "댓글 수정")
-    public ResponseEntity<ResponseDto<Boolean>> commentUpdate(@PathVariable Long commentNo, String content) {
-        Comment comment = commentService.commentUpdate(commentNo, content);
+    public ResponseEntity<ResponseDto<Boolean>> commentUpdate(@PathVariable Long commentNo, @RequestBody CommentRequestDto dto) {
+        Comment comment = commentService.commentUpdate(commentNo, dto.getContent());
         return ResponseEntity.ok(new ResponseDto(null, true));
     }
 

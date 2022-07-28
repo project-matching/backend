@@ -85,8 +85,6 @@ class UserServiceTest {
         SecurityContext context = SecurityContextHolder.getContext();
         context.setAuthentication(new UsernamePasswordAuthenticationToken(user.get(), user.get().getEmail(), user.get().getAuthorities()));
 
-        given(userRepository.findByNoWithPositionUsingLeftFetchJoin(no)).willReturn(user);
-
         PasswordUpdateRequestDto dto = PasswordUpdateRequestDto.builder()
                 .oldPassword("test")
                 .newPassword(newPassword)
@@ -124,8 +122,6 @@ class UserServiceTest {
         SecurityContext context = SecurityContextHolder.getContext();
         context.setAuthentication(new UsernamePasswordAuthenticationToken(user.get(), user.get().getEmail(), user.get().getAuthorities()));
 
-        given(userRepository.findByNoWithPositionUsingLeftFetchJoin(no)).willReturn(user);
-
         PasswordUpdateRequestDto dto = PasswordUpdateRequestDto.builder()
                 .oldPassword("test1")
                 .newPassword(newPassword)
@@ -162,8 +158,6 @@ class UserServiceTest {
 
         SecurityContext context = SecurityContextHolder.getContext();
         context.setAuthentication(new UsernamePasswordAuthenticationToken(user.get(), user.get().getEmail(), user.get().getAuthorities()));
-
-        given(userRepository.findByNoWithPositionUsingLeftFetchJoin(no)).willReturn(user);
 
         PasswordUpdateRequestDto dto = PasswordUpdateRequestDto.builder()
                 .oldPassword(password)
@@ -320,8 +314,6 @@ class UserServiceTest {
         SecurityContext context = SecurityContextHolder.getContext();
         context.setAuthentication(new UsernamePasswordAuthenticationToken(user.get(), user.get().getEmail(), user.get().getAuthorities()));
 
-        given(userRepository.findById(no)).willReturn(user);
-
         //when
         User resUser = userService.userSignOut();
 
@@ -370,7 +362,6 @@ class UserServiceTest {
                 .technicalStackList(newTechnicalStackList)
                 .build();
 
-        given(userRepository.findById(no)).willReturn(user);
         given(positionRepository.findAllByName(newPosition)).willReturn(Optional.empty());
 
         //when
@@ -433,7 +424,6 @@ class UserServiceTest {
                 .technicalStackList(newTechnicalStackList)
                 .build();
 
-        given(userRepository.findById(no)).willReturn(user);
         given(positionRepository.findAllByName(newPosition)).willReturn(Optional.ofNullable(p));
         given(technicalStackRepository.findAll()).willReturn(technicalStacks);
 
@@ -502,7 +492,6 @@ class UserServiceTest {
         userTechnicalStackList.add(UserTechnicalStack.builder().no(1L).user(user.get()).technicalStack(technicalStack1).build());
         userTechnicalStackList.add(UserTechnicalStack.builder().no(2L).user(user.get()).technicalStack(technicalStack2).build());
 
-        given(userRepository.findById(no)).willReturn(user);
         given(positionRepository.findAllByName(newPosition)).willReturn(Optional.ofNullable(p));
         given(technicalStackRepository.findAll()).willReturn(technicalStacks);
         given(imageService.imageUpload(file, 56, 56)).willReturn(imageNo);
@@ -622,7 +611,6 @@ class UserServiceTest {
         List <UserTechnicalStack> userTechnicalStackList = new ArrayList<>();
         userTechnicalStackList.add(UserTechnicalStack.builder().no(1L).user(user.get()).technicalStack(technicalStack2).build());
 
-        given(userRepository.findByNoWithPositionUsingLeftFetchJoin(no)).willReturn(user);
         given(imageService.getImageUrl(user.get().getImageNo())).willReturn(profile.getUrl());
         given(userTechnicalStackRepository.findUserTechnicalStacksByUser(no)).willReturn(userTechnicalStackList);
         given(imageService.getImageUrl(2L)).willReturn(tech2.getUrl());
