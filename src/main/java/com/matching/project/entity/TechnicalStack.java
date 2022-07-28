@@ -15,7 +15,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class TechnicalStack {
+public class TechnicalStack extends BaseTimeEntity{
     @Id @GeneratedValue
     private Long no;
 

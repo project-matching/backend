@@ -1,14 +1,18 @@
 package com.matching.project.entity;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
-@Entity
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 @Getter
-public class Comment {
+@Entity
+public class Comment extends BaseTimeEntity{
     @Id @GeneratedValue
     private Long no;
 
@@ -22,4 +26,8 @@ public class Comment {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "project_no")
     private Project project;
+
+    public void updateComment(String content) {
+        this.content = content;
+    }
 }

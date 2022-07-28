@@ -11,7 +11,7 @@ import javax.persistence.Id;
 @Getter
 @Builder
 @Entity
-public class Position {
+public class Position extends BaseTimeEntity {
     @Id @GeneratedValue
     private Long no;
 

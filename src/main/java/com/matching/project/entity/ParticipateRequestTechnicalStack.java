@@ -11,7 +11,7 @@ import javax.persistence.*;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ParticipateRequestTechnicalStack {
+public class ParticipateRequestTechnicalStack extends BaseTimeEntity {
     @Id @GeneratedValue
     private Long no;
 

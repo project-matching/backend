@@ -5,7 +5,7 @@ import com.matching.project.dto.enumerate.Type;
 import javax.persistence.*;
 
 @Entity
-public class Notification {
+public class Notification extends BaseTimeEntity{
     @Id @GeneratedValue
     private Long no;
 

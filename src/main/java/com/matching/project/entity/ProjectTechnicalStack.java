@@ -13,7 +13,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProjectTechnicalStack {
+public class ProjectTechnicalStack extends BaseTimeEntity{
     @Id
     @GeneratedValue
     private Long no;
