@@ -119,8 +119,8 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public List<UserSimpleInfoDto> userInfoList(Pageable pageable, UserFilterDto userFilterDto) {
-        Page<User> users = userRepositoryCustom.findByNoUsingQueryDsl(pageable, userFilterDto);
+    public List<UserSimpleInfoDto> userInfoList(UserFilterDto userFilterDto, Pageable pageable) {
+        Page<User> users = userRepositoryCustom.findByNoUsingQueryDsl(userFilterDto, pageable);
         return users.get().map(user -> UserSimpleInfoDto.builder()
                 .userNo(user.getNo())
                 .name(user.getName())

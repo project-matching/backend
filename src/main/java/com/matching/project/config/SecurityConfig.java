@@ -72,9 +72,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.DELETE,"/v1/comment/**").hasAnyRole("USER", "ADMIN")
 
                 //PositionController
-                .antMatchers(HttpMethod.GET,"/v1/position").hasAnyRole("ADMIN")
-                .antMatchers(HttpMethod.POST,"/v1/position").hasAnyRole("ADMIN")
+                .antMatchers(HttpMethod.POST,"/v1/position").hasAnyRole("USER", "ADMIN")
+                .antMatchers(HttpMethod.GET,"/v1/position").hasAnyRole("USER", "ADMIN")
                 .antMatchers(HttpMethod.PUT,"/v1/position").hasAnyRole("ADMIN")
+
+                //NotificationController
+                .antMatchers(HttpMethod.POST,"/v1/notification").hasAnyRole("ADMIN")
+                .antMatchers(HttpMethod.GET,"/v1/notification").hasAnyRole("USER", "ADMIN")
+                .antMatchers(HttpMethod.GET,"/v1/notification/**").hasAnyRole("USER", "ADMIN")
 
                 //ProjectController
                 //.antMatchers("/v1/project/recruitment/*").hasAnyRole("USER", "ADMIN", "ANONYMOUS")

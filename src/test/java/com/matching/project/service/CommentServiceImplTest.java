@@ -73,7 +73,7 @@ class CommentServiceImplTest {
 
         //when
         CustomException e = Assertions.assertThrows(CustomException.class, () -> {
-            List<CommentDto> commentList = commentService.commentList(pageable, projectNo);
+            List<CommentDto> commentList = commentService.commentList(projectNo, pageable);
         });
 
         //then
@@ -128,10 +128,10 @@ class CommentServiceImplTest {
         int end = (start + pageable.getPageSize()) > commentList.size() ? commentList.size() : (start + pageable.getPageSize());
         Page<Comment> users = new PageImpl<>(commentList.subList(start, end), pageable, commentList.size());
 
-        given(commentRepository.findByProjectNoUsingPaging(pageable, project)).willReturn(users.stream().collect(Collectors.toList()));
+        given(commentRepository.findByProjectNoUsingPaging(project, pageable)).willReturn(users.stream().collect(Collectors.toList()));
 
         //when
-        List<CommentDto> commentDtoList = commentService.commentList(pageable, projectNo);
+        List<CommentDto> commentDtoList = commentService.commentList(projectNo, pageable);
 
         //then
         assertThat(commentDtoList.get(0).getCommentNo()).isEqualTo(Integer.toUnsignedLong(3));

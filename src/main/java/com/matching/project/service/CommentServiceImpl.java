@@ -34,14 +34,14 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public List<CommentDto> commentList(Pageable pageable, Long projectNo) {
+    public List<CommentDto> commentList(Long projectNo, Pageable pageable) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Optional<User> optionalUser = Optional.ofNullable((User)auth.getPrincipal());
 
         Optional<Project> optionalProject = projectRepository.findById(projectNo);
         optionalProject.orElseThrow(() -> new CustomException(ErrorCode.NOT_FIND_PROJECT_NO_EXCEPTION));
 
-        List<Comment> commentPage = commentRepository.findByProjectNoUsingPaging(pageable, optionalProject.get());
+        List<Comment> commentPage = commentRepository.findByProjectNoUsingPaging(optionalProject.get(), pageable);
 
         return commentPage.stream().map(CommentDto::toCommentDto).collect(Collectors.toList());
     }

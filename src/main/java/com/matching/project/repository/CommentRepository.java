@@ -15,5 +15,5 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     //List<Comment> findByProjectNo(@Param("project") Project project);
 
     @Query("select c from Comment c join fetch c.user u join fetch c.project p where p = :project order by c.no asc")
-    List<Comment> findByProjectNoUsingPaging(Pageable pageable, @Param("project") Project project);
+    List<Comment> findByProjectNoUsingPaging(@Param("project") Project project, Pageable pageable);
 }

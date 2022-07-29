@@ -33,8 +33,9 @@ public class CommentController {
 
     @GetMapping("/{projectNo}")
     @ApiOperation(value = "댓글 조회")
-    public ResponseEntity<ResponseDto<List<CommentDto>>> commentList(@PageableDefault(size = 5) Pageable pageable, @PathVariable Long projectNo) {
-        List<CommentDto> commentDtos = commentService.commentList(pageable, projectNo);
+    public ResponseEntity<ResponseDto<List<CommentDto>>> commentList(@PathVariable Long projectNo,
+                                                                     @PageableDefault(size = 5) Pageable pageable) {
+        List<CommentDto> commentDtos = commentService.commentList(projectNo, pageable);
         return ResponseEntity.ok(new ResponseDto(null, commentDtos));
     }
 

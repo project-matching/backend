@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import java.util.List;
 
 public interface CommentService {
-    List<CommentDto> commentList(Pageable pageable, Long projectNo);
+    List<CommentDto> commentList(Long projectNo, Pageable pageable);
     Comment commentRegister(Long projectNo, String content);
     Comment commentUpdate(Long commentNo, String content);
     void commentDelete(Long commentNo);

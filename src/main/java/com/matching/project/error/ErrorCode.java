@@ -51,6 +51,9 @@ public enum ErrorCode {
     UNREGISTERED_POSITION_EXCEPTION(INTERNAL_SERVER_ERROR, "Unregistered Position"),
     ALREADY_REGISTERED_POSITION_EXCEPTION(INTERNAL_SERVER_ERROR, "Already Registered Position"),
 
+    //Notification
+    NOT_FIND_NOTIFICATION_NO_EXCEPTION(INTERNAL_SERVER_ERROR, "Not Find Notification No"),
+
     //Project
     NOT_FIND_PROJECT_NO_EXCEPTION(INTERNAL_SERVER_ERROR, "Not Find Project No"),
 

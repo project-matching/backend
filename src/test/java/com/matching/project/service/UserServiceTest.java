@@ -536,12 +536,12 @@ class UserServiceTest {
 
         UserFilterDto userFilterDto = UserFilterDto.builder().userFilter(UserFilter.NAME).content("테스터").build();
 
-        given(userRepositoryCustom.findByNoUsingQueryDsl(pageable, userFilterDto)).willReturn(users);
+        given(userRepositoryCustom.findByNoUsingQueryDsl(userFilterDto, pageable)).willReturn(users);
         for (int i = start; i < start + size; i++)
             given(imageService.getImageUrl(Integer.toUnsignedLong(i))).willReturn("url_"+i);
 
         //when
-        List<UserSimpleInfoDto> dtoList = userService.userInfoList(pageable, userFilterDto);
+        List<UserSimpleInfoDto> dtoList = userService.userInfoList(userFilterDto, pageable);
 
         //then
         assertThat(dtoList.get(0).getUserNo()).isEqualTo(2);
