@@ -21,7 +21,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(value = {CustomException.class})
-    protected ResponseEntity handleNoSuchElementException(CustomException e) {
+    protected ResponseEntity handleCustomException(CustomException e) {
         return ErrorResponse.toResponseEntity(e.getErrorCode());
     }
 }

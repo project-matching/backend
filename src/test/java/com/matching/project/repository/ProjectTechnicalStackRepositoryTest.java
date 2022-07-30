@@ -76,7 +76,7 @@ class ProjectTechnicalStackRepositoryTest {
         ProjectTechnicalStack saveProjectTechnicalStack2 = projectTechnicalStackRepository.save(projectTechnicalStack2);
 
         // when
-        List<ProjectTechnicalStack> projectTechnicalStackList = projectTechnicalStackRepository.findByProjectWithTechnicalStackAndProjectUsingFetchJoin(project1);
+        List<ProjectTechnicalStack> projectTechnicalStackList = projectTechnicalStackRepository.findTechnicalStackAndProjectUsingFetchJoin(project1);
 
         // then
         assertEquals(projectTechnicalStackList.size(), 2);

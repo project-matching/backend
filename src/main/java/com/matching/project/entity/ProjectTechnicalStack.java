@@ -27,6 +27,9 @@ public class ProjectTechnicalStack {
     private Project project;
 
     public void setProject(Project project) {
+        if(this.project != null) {
+            this.project.getProjectTechnicalStackList().remove(this);
+        }
         this.project = project;
         project.getProjectTechnicalStackList().add(this);
     }

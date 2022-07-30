@@ -5,6 +5,8 @@ import com.matching.project.dto.enumerate.Filter;
 import com.matching.project.dto.enumerate.Role;
 import com.matching.project.dto.project.*;
 import com.matching.project.dto.projectposition.ProjectPositionRegisterDto;
+import com.matching.project.dto.projectposition.ProjectPositionUpdateFormDto;
+import com.matching.project.dto.user.ProjectUpdateFormUserDto;
 import com.matching.project.entity.*;
 import com.matching.project.error.CustomException;
 import com.matching.project.error.ErrorCode;
@@ -136,6 +138,52 @@ public class ProjectServiceImpl implements ProjectService {
 //        }
 //        return projectSimpleDtoPage;
         return null;
+    }
+    
+    // 프로젝트 수정 폼 조회
+    @Override
+    public ProjectUpdateFormResponseDto getProjectUpdateForm(Long projectNo) throws Exception {
+        // 프로젝트 조회
+        Project project = projectRepository.findById(projectNo).orElseThrow(() -> new CustomException(ErrorCode.PROJECT_NO_SUCH_ELEMENT_EXCEPTION));
+
+        // 포지션 조회
+        List<PositionUpdateFormDto> positionUpdateFormDtoList = positionRepository.findAll().stream()
+                .map(position -> new PositionUpdateFormDto(position.getNo(), position.getName()))
+                .collect(Collectors.toList());
+
+        // 기술스택 조회
+        List<TechnicalStackUpdateFormDto> technicalStackUpdateFormDtoList = technicalStackRepository.findAll().stream()
+                .map(technicalStack -> new TechnicalStackUpdateFormDto(technicalStack.getNo(), technicalStack.getName()))
+                .collect(Collectors.toList());
+
+        // 프로젝트 포지션 조회
+        List<ProjectPositionUpdateFormDto> projectPositionUpdateFormDtoList = projectPositionRepository.findProjectAndPositionAndUserUsingFetchJoinByProjectNo(project).stream()
+                .map(projectPosition -> new ProjectPositionUpdateFormDto(
+                        projectPosition.getNo(),
+                        projectPosition.getPosition().getNo(),
+                        projectPosition.getPosition().getName(),
+                        projectPosition.getUser() == null ? null : new ProjectUpdateFormUserDto(projectPosition.getUser().getNo())
+                )).collect(Collectors.toList());
+
+        // 프로젝트 기술스택 조회
+        List<String> projectTechnicalStackList = projectTechnicalStackRepository.findTechnicalStackAndProjectUsingFetchJoin(project).stream()
+                .map(projectTechnicalStack -> projectTechnicalStack.getTechnicalStack().getName())
+                .collect(Collectors.toList());
+
+        ProjectUpdateFormResponseDto projectUpdateFormResponseDto = ProjectUpdateFormResponseDto.builder()
+                .projectNo(project.getNo())
+                .name(project.getName())
+                .state(project.isState())
+                .startDate(project.getStartDate())
+                .endDate(project.getEndDate())
+                .introduction(project.getIntroduction())
+                .build();
+        projectUpdateFormResponseDto.setPositionUpdateFormDtoList(positionUpdateFormDtoList);
+        projectUpdateFormResponseDto.setProjectPositionUpdateFormDtoList(projectPositionUpdateFormDtoList);
+        projectUpdateFormResponseDto.setTechnicalStackUpdateFormDtoList(technicalStackUpdateFormDtoList);
+        projectUpdateFormResponseDto.setProjectTechnicalStackList(projectTechnicalStackList);
+
+        return projectUpdateFormResponseDto;
     }
 
     @Override

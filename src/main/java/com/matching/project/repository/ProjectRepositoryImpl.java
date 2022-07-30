@@ -35,7 +35,6 @@ import static com.matching.project.entity.QTechnicalStack.technicalStack;
 @RequiredArgsConstructor
 public class ProjectRepositoryImpl implements ProjectRepositoryCustom {
     private final JPAQueryFactory queryFactory;
-    private final EntityManager em;
 
     private OrderSpecifier<?> projectSort(Pageable pageable) {
         if (!pageable.getSort().isEmpty()) {
