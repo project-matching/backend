@@ -52,4 +52,32 @@ class TechnicalStackRepositoryTest {
         assertEquals(findTechnicalStackList.get(1).getName(), technicalStack2.getName());
         assertEquals(findTechnicalStackList.get(2).getName(), technicalStack3.getName());
     }
+
+    @Test
+    public void 기술_스택_존재_확인() {
+        // given
+        TechnicalStack technicalStack1 = TechnicalStack.builder()
+                .name("testTechnicalStack1")
+                .build();
+        TechnicalStack technicalStack2 = TechnicalStack.builder()
+                .name("testTechnicalStack2")
+                .build();
+        TechnicalStack technicalStack3 = TechnicalStack.builder()
+                .name("testTechnicalStack3")
+                .build();
+        TechnicalStack saveTechnicalStack1 = technicalStackRepository.save(technicalStack1);
+        TechnicalStack saveTechnicalStack2 = technicalStackRepository.save(technicalStack2);
+        TechnicalStack saveTechnicalStack3 = technicalStackRepository.save(technicalStack3);
+
+        // when
+        List<String> names = new ArrayList<>();
+        names.add("testTechnicalStack1");
+
+        List<TechnicalStack> technicalStackList = technicalStackRepository.findByNameIn(names);
+
+        // then
+        assertEquals(technicalStackList.size(), 1);
+
+        assertEquals(technicalStackList.get(0), saveTechnicalStack1);
+    }
 }
