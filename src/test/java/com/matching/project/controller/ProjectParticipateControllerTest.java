@@ -934,4 +934,288 @@ class ProjectParticipateControllerTest {
                 .andExpect(status().is5xxServerError())
                 .andReturn();
     }
+
+    @Test
+    public void 프로젝트_참가_신청_거절_테스트() throws Exception{
+        // 유저 세팅
+        User user1 = User.builder()
+                .name("userName1")
+                .sex("M")
+                .email("wkemrm1@naver.com")
+                .password("testPassword")
+                .github("testGithub")
+                .selfIntroduction("testSelfIntroduction")
+                .block(false)
+                .blockReason(null)
+                .permission(Role.ROLE_USER)
+                .oauthCategory(OAuth.NORMAL)
+                .email_auth(false)
+                .imageNo(0L)
+                .position(null)
+                .build();
+        User saveUser1 = userRepository.save(user1);
+
+        User user2 = User.builder()
+                .name("userName2")
+                .sex("M")
+                .email("wkemrm2@naver.com")
+                .password("testPassword")
+                .github("testGithub")
+                .selfIntroduction("testSelfIntroduction")
+                .block(false)
+                .blockReason(null)
+                .permission(Role.ROLE_USER)
+                .oauthCategory(OAuth.NORMAL)
+                .email_auth(false)
+                .imageNo(0L)
+                .position(null)
+                .build();
+        User saveUser2 = userRepository.save(user2);
+
+        // 프로젝트 세팅
+        LocalDateTime createDate = LocalDateTime.now();
+        LocalDate startDate = LocalDate.of(2022, 06, 24);
+        LocalDate endDate = LocalDate.of(2022, 06, 28);
+
+        Project project = Project.builder()
+                .name("testName1")
+                .createUserName("user")
+                .createDate(createDate)
+                .startDate(startDate)
+                .endDate(endDate)
+                .state(true)
+                .introduction("testIntroduction1")
+                .maxPeople(10)
+                .currentPeople(4)
+                .delete(false)
+                .deleteReason(null)
+                .viewCount(10)
+                .commentCount(10)
+                .user(saveUser1)
+                .build();
+        Project saveProject1 = projectRepository.save(project);
+
+        // 포지션 세팅
+        Position position1 = Position.builder()
+                .name("testPosition1")
+                .build();
+        Position position2 = Position.builder()
+                .name("testPosition2")
+                .build();
+
+        Position savePosition1 = positionRepository.save(position1);
+        Position savePosition2 = positionRepository.save(position2);
+
+        // 프로젝트 포지션 세팅
+        ProjectPosition projectPosition1 = ProjectPosition.builder()
+                .project(saveProject1)
+                .position(savePosition1)
+                .user(null)
+                .state(false)
+                .creator(false)
+                .build();
+
+        ProjectPosition projectPosition2 = ProjectPosition.builder()
+                .project(saveProject1)
+                .position(savePosition2)
+                .user(null)
+                .state(false)
+                .creator(false)
+                .build();
+        ProjectPosition saveProjectPosition1 = projectPositionRepository.save(projectPosition1);
+        ProjectPosition saveProjectPosition2 = projectPositionRepository.save(projectPosition2);
+
+        // 기술스택 세팅
+        TechnicalStack technicalStack1 = TechnicalStack.builder()
+                .name("testTechnicalStack1")
+                .build();
+        TechnicalStack technicalStack2 = TechnicalStack.builder()
+                .name("testTechnicalStack2")
+                .build();
+
+        technicalStackRepository.save(technicalStack1);
+        technicalStackRepository.save(technicalStack2);
+
+        // 프로젝트 신청 세팅
+        ProjectParticipateRequest projectParticipateRequest1 = ProjectParticipateRequest.builder()
+                .projectPosition(saveProjectPosition1)
+                .user(saveUser2)
+                .github("testGitHub1")
+                .motive("testMotive1")
+                .build();
+
+        ProjectParticipateRequest saveProjectParticipateRequest1 = projectParticipateRequestRepository.save(projectParticipateRequest1);
+
+        // 프로젝트 신청 기술 스택 세팅
+        ParticipateRequestTechnicalStack participateRequestTechnicalStack1 = ParticipateRequestTechnicalStack.builder()
+                .technicalStack(technicalStack1)
+                .projectParticipateRequest(saveProjectParticipateRequest1)
+                .build();
+
+        ParticipateRequestTechnicalStack participateRequestTechnicalStack2 = ParticipateRequestTechnicalStack.builder()
+                .technicalStack(technicalStack2)
+                .projectParticipateRequest(saveProjectParticipateRequest1)
+                .build();
+
+        participateRequestTechnicalStackRepository.save(participateRequestTechnicalStack1);
+        participateRequestTechnicalStackRepository.save(participateRequestTechnicalStack2);
+
+        // then
+        String token = jwtTokenService.createToken(new TokenDto(saveUser1.getEmail()));
+
+        mvc.perform(post("/v1/participate/" + saveProjectParticipateRequest1.getNo() + "/refusal").contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", "Bearer " + token)
+                .content(new ObjectMapper().registerModule(new JavaTimeModule()).writeValueAsString("testReason")))
+                .andDo(print())
+                .andExpect(header().string("Content-type", "application/json"))
+                .andExpect(jsonPath("$.data").value(true))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        List<ParticipateRequestTechnicalStack> participateRequestTechnicalStackRepositoryAll = participateRequestTechnicalStackRepository.findAll();
+        Optional<ProjectParticipateRequest> projectParticipateRequest = projectParticipateRequestRepository.findById(saveProjectParticipateRequest1.getNo());
+
+        assertEquals(projectParticipateRequest.isEmpty(), true);
+        assertEquals(participateRequestTechnicalStackRepositoryAll.size(), 0);
+    }
+
+    @Test
+    public void 프로젝트_참가_신청_거절_내가_만든_프로젝트_아닌_경우_테스트() throws Exception{
+        // 유저 세팅
+        User user1 = User.builder()
+                .name("userName1")
+                .sex("M")
+                .email("wkemrm1@naver.com")
+                .password("testPassword")
+                .github("testGithub")
+                .selfIntroduction("testSelfIntroduction")
+                .block(false)
+                .blockReason(null)
+                .permission(Role.ROLE_USER)
+                .oauthCategory(OAuth.NORMAL)
+                .email_auth(false)
+                .imageNo(0L)
+                .position(null)
+                .build();
+        User saveUser1 = userRepository.save(user1);
+
+        User user2 = User.builder()
+                .name("userName2")
+                .sex("M")
+                .email("wkemrm2@naver.com")
+                .password("testPassword")
+                .github("testGithub")
+                .selfIntroduction("testSelfIntroduction")
+                .block(false)
+                .blockReason(null)
+                .permission(Role.ROLE_USER)
+                .oauthCategory(OAuth.NORMAL)
+                .email_auth(false)
+                .imageNo(0L)
+                .position(null)
+                .build();
+        User saveUser2 = userRepository.save(user2);
+
+        // 프로젝트 세팅
+        LocalDateTime createDate = LocalDateTime.now();
+        LocalDate startDate = LocalDate.of(2022, 06, 24);
+        LocalDate endDate = LocalDate.of(2022, 06, 28);
+
+        Project project = Project.builder()
+                .name("testName1")
+                .createUserName("user")
+                .createDate(createDate)
+                .startDate(startDate)
+                .endDate(endDate)
+                .state(true)
+                .introduction("testIntroduction1")
+                .maxPeople(10)
+                .currentPeople(4)
+                .delete(false)
+                .deleteReason(null)
+                .viewCount(10)
+                .commentCount(10)
+                .user(saveUser1)
+                .build();
+        Project saveProject1 = projectRepository.save(project);
+
+        // 포지션 세팅
+        Position position1 = Position.builder()
+                .name("testPosition1")
+                .build();
+        Position position2 = Position.builder()
+                .name("testPosition2")
+                .build();
+
+        Position savePosition1 = positionRepository.save(position1);
+        Position savePosition2 = positionRepository.save(position2);
+
+        // 프로젝트 포지션 세팅
+        ProjectPosition projectPosition1 = ProjectPosition.builder()
+                .project(saveProject1)
+                .position(savePosition1)
+                .user(null)
+                .state(false)
+                .creator(false)
+                .build();
+
+        ProjectPosition projectPosition2 = ProjectPosition.builder()
+                .project(saveProject1)
+                .position(savePosition2)
+                .user(null)
+                .state(false)
+                .creator(false)
+                .build();
+        ProjectPosition saveProjectPosition1 = projectPositionRepository.save(projectPosition1);
+        ProjectPosition saveProjectPosition2 = projectPositionRepository.save(projectPosition2);
+
+        // 기술스택 세팅
+        TechnicalStack technicalStack1 = TechnicalStack.builder()
+                .name("testTechnicalStack1")
+                .build();
+        TechnicalStack technicalStack2 = TechnicalStack.builder()
+                .name("testTechnicalStack2")
+                .build();
+
+        technicalStackRepository.save(technicalStack1);
+        technicalStackRepository.save(technicalStack2);
+
+        // 프로젝트 신청 세팅
+        ProjectParticipateRequest projectParticipateRequest1 = ProjectParticipateRequest.builder()
+                .projectPosition(saveProjectPosition1)
+                .user(saveUser2)
+                .github("testGitHub1")
+                .motive("testMotive1")
+                .build();
+
+        ProjectParticipateRequest saveProjectParticipateRequest1 = projectParticipateRequestRepository.save(projectParticipateRequest1);
+
+        // 프로젝트 신청 기술 스택 세팅
+        ParticipateRequestTechnicalStack participateRequestTechnicalStack1 = ParticipateRequestTechnicalStack.builder()
+                .technicalStack(technicalStack1)
+                .projectParticipateRequest(saveProjectParticipateRequest1)
+                .build();
+
+        ParticipateRequestTechnicalStack participateRequestTechnicalStack2 = ParticipateRequestTechnicalStack.builder()
+                .technicalStack(technicalStack2)
+                .projectParticipateRequest(saveProjectParticipateRequest1)
+                .build();
+
+        participateRequestTechnicalStackRepository.save(participateRequestTechnicalStack1);
+        participateRequestTechnicalStackRepository.save(participateRequestTechnicalStack2);
+
+        // then
+        String token = jwtTokenService.createToken(new TokenDto(saveUser2.getEmail()));
+
+        mvc.perform(post("/v1/participate/" + saveProjectParticipateRequest1.getNo() + "/refusal").contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", "Bearer " + token)
+                .content(new ObjectMapper().registerModule(new JavaTimeModule()).writeValueAsString("testReason")))
+                .andDo(print())
+                .andExpect(header().string("Content-type", "application/json"))
+                .andExpect(jsonPath("$.error.status").value(ErrorCode.PROJECT_NOT_REGISTER_USER.getHttpStatus().value()))
+                .andExpect(jsonPath("$.error.error").value(ErrorCode.PROJECT_NOT_REGISTER_USER.getHttpStatus().name()))
+                .andExpect(jsonPath("$.error.message[0]").value(ErrorCode.PROJECT_NOT_REGISTER_USER.getDetail()))
+                .andExpect(status().is5xxServerError())
+                .andReturn();
+    }
 }

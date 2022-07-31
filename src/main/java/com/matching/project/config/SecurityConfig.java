@@ -72,6 +72,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 //ProjectParticipateController
                 .antMatchers("/v1/participate").hasRole("USER")
                 .antMatchers("/v1/participate/*/permit").hasRole("USER")
+                .antMatchers("/v1/participate/*/refusal").hasRole("USER")
                 //AnyRequest
                 .anyRequest().permitAll()
 

@@ -50,7 +50,7 @@ public class ProjectParticipateController {
     // 프로젝트 참가 거부
     @PostMapping("/{projectParticipateNo}/refusal")
     @ApiOperation(value = "프로젝트 참가 거부 (수정 완료)")
-    public ResponseEntity<ResponseDto<Boolean>> projectParticipateRefusal(@PathVariable Long projectParticipateNo, String reason) {
-        return ResponseEntity.ok(new ResponseDto(null, true));
+    public ResponseEntity<ResponseDto<Boolean>> projectParticipateRefusal(@PathVariable Long projectParticipateNo, String reason) throws Exception{
+        return ResponseEntity.ok(new ResponseDto(null, projectParticipateRequestService.refusalProjectParticipate(projectParticipateNo, reason)));
     }
 }

@@ -109,7 +109,31 @@ public class ProjectParticipateRequestServiceImpl implements ProjectParticipateR
         ProjectPosition projectPosition = projectPositionRepository.findById(projectParticipateRequest.getProjectPosition().getNo())
                 .orElseThrow(() -> new CustomException(ErrorCode.PROJECT_POSITION_NO_SUCH_ELEMENT_EXCEPTION));
         projectPosition.changeUser(projectParticipateRequest.getUser());
+        
+        //todo 알림 추가 필요
+        return true;
+    }
 
+    // 프로젝트 참가 신청 거절
+    @Override
+    public boolean refusalProjectParticipate(Long projectParticipateNo, String reason) throws Exception {
+        // 현재 유저 가져오기
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user = (User) authentication.getPrincipal();
+
+        // 프로젝트 신청 조회
+        ProjectParticipateRequest projectParticipateRequest = projectParticipateRequestRepository.findProjectPositionAndUserAndProjectFetchJoinByNo(projectParticipateNo);
+
+        // 유저가 만든 프로젝트인지 판단
+        isCreatedProject(user, projectParticipateRequest.getProjectPosition().getProject());
+
+        // 프로젝트 신청 기술스택 삭제
+        participateRequestTechnicalStackRepository.deleteByProjectParticipateNo(projectParticipateRequest.getNo());
+
+        // 프로젝트 신청 삭제
+        projectParticipateRequestRepository.deleteByNo(projectParticipateRequest.getNo());
+
+        //todo 알림 추가 필요
         return true;
     }
 
