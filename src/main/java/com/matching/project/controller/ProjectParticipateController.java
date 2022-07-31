@@ -8,6 +8,10 @@ import com.matching.project.dto.projectparticipate.ProjectParticipateFormRespons
 import com.matching.project.service.ProjectParticipateRequestService;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.parameters.P;
@@ -30,8 +34,10 @@ public class ProjectParticipateController {
 
     @GetMapping("/{projectNo}")
     @ApiOperation(value = "프로젝트 신청 관리 페이지 (수정 완료)")
-    public ResponseEntity<ResponseDto<List<ProjectParticipateFormResponseDto>>> projectParticipateManagementForm(@PathVariable Long projectNo) {
-        return ResponseEntity.ok(new ResponseDto(null, null));
+    public ResponseEntity<ResponseDto<Page<ProjectParticipateFormResponseDto>>> projectParticipateManagementForm(@PathVariable Long projectNo, @PageableDefault(size = 5, sort = "no", direction = Sort.Direction.DESC) Pageable pageable) throws Exception{
+        Page<ProjectParticipateFormResponseDto> projectParticipateManagementForm = projectParticipateRequestService.findProjectParticipateManagementForm(projectNo, pageable);
+
+        return ResponseEntity.ok(new ResponseDto(null, projectParticipateManagementForm));
     }
 
     // 프로젝트 참가 허가

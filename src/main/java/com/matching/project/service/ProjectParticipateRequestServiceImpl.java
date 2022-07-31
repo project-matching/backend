@@ -1,17 +1,20 @@
 package com.matching.project.service;
 
+import com.matching.project.dto.ResponseDto;
 import com.matching.project.dto.project.ProjectParticipateRequestDto;
+import com.matching.project.dto.projectparticipate.ProjectParticipateFormResponseDto;
 import com.matching.project.entity.*;
 import com.matching.project.error.CustomException;
 import com.matching.project.error.ErrorCode;
-import com.matching.project.repository.ParticipateRequestTechnicalStackRepository;
-import com.matching.project.repository.ProjectParticipateRequestRepository;
-import com.matching.project.repository.ProjectPositionRepository;
-import com.matching.project.repository.TechnicalStackRepository;
+import com.matching.project.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.List;
 
@@ -22,7 +25,8 @@ public class ProjectParticipateRequestServiceImpl implements ProjectParticipateR
     private final ParticipateRequestTechnicalStackRepository participateRequestTechnicalStackRepository;
     private final ProjectPositionRepository projectPositionRepository;
     private final TechnicalStackRepository technicalStackRepository;
-    
+    private final ProjectRepository projectRepository;
+
     // 프로젝트 참가 신청 등록
     @Override
     public boolean projectParticipateRequestRegister(ProjectParticipateRequestDto projectParticipateRequestDto) throws Exception {
@@ -62,4 +66,26 @@ public class ProjectParticipateRequestServiceImpl implements ProjectParticipateR
 
         return true;
     }
+    
+    // 프로젝트 참가 신청 폼 조회
+    @Override
+    public Page<ProjectParticipateFormResponseDto> findProjectParticipateManagementForm(Long projectNo, Pageable pageable) throws Exception {
+        // 현재 유저 가져오기
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user = (User) authentication.getPrincipal();
+
+        // 유저가 만든 프로젝트인지 판단
+        isCreatedProject(user, projectNo);
+
+        return projectParticipateRequestRepository.findProjectParticipateRequestByProjectNo(projectNo, pageable);
+    }
+    
+    // 유저가 만든 프로젝트인지 판단
+    private void isCreatedProject(User user, Long projectNo) {
+        Project project = projectRepository.findProjectWithUserUsingFetchJoinByProjectNo(projectNo);
+        if (project.getUser() == null || project.getUser().getNo() != user.getNo()) {
+            throw new CustomException(ErrorCode.PROJECT_NOT_REGISTER_USER);
+        }
+    }
+
 }

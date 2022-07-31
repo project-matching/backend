@@ -9,4 +9,5 @@ import org.springframework.data.domain.Pageable;
 
 public interface ProjectRepositoryCustom {
     public Page<ProjectSimpleDto> findProjectByStatus(Pageable pageable, boolean status, boolean delete, ProjectSearchRequestDto projectSearchRequestDto);
+    public Project findProjectWithUserUsingFetchJoinByProjectNo(Long projectNo);
 }

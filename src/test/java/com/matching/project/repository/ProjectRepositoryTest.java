@@ -2,6 +2,8 @@ package com.matching.project.repository;
 
 import com.matching.project.config.QuerydslConfiguration;
 import com.matching.project.dto.enumerate.Filter;
+import com.matching.project.dto.enumerate.OAuth;
+import com.matching.project.dto.enumerate.Role;
 import com.matching.project.dto.project.*;
 import com.matching.project.entity.*;
 import org.junit.jupiter.api.Test;
@@ -641,4 +643,91 @@ class ProjectRepositoryTest {
 //        assertEquals(projectList.get(0).getProjectSimpleTechnicalStackDtoList().get(1).getProjectNo(), saveProjectTechnicalStack2.getProject().getNo());
 //        assertEquals(projectList.get(0).getProjectSimpleTechnicalStackDtoList().get(1).getTechnicalStackName(), saveProjectTechnicalStack2.getTechnicalStack().getName());
 //    }
+@Autowired
+private ProjectRepository projectRepository;
+
+    @Autowired
+    private ProjectPositionRepository projectPositionRepository;
+
+    @Autowired
+    private ProjectTechnicalStackRepository projectTechnicalStackRepository;
+
+    @Autowired
+    private PositionRepository positionRepository;
+
+    @Autowired
+    private TechnicalStackRepository technicalStackRepository;
+
+    @Autowired
+    private ImageRepository imageRepository;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private ProjectParticipateRequestRepository projectParticipateRequestRepository;
+
+    @Test
+    public void 프로젝트_탐색() {
+        // given
+        LocalDateTime createDate = LocalDateTime.now();
+        LocalDate startDate = LocalDate.of(2022, 06, 24);
+        LocalDate endDate = LocalDate.of(2022, 06, 28);
+        
+        // 유저 객체
+        User user1 = User.builder()
+                .name("userName1")
+                .sex("M")
+                .email("wkemrm12@naver.com")
+                .password("testPassword")
+                .github("testGithub")
+                .selfIntroduction("testSelfIntroduction")
+                .block(false)
+                .blockReason(null)
+                .permission(Role.ROLE_USER)
+                .oauthCategory(OAuth.NORMAL)
+                .email_auth(false)
+                .imageNo(0L)
+                .position(null)
+                .build();
+        User saveUser1 = userRepository.save(user1);
+        
+        // 프로젝트 객체
+        Project project1 = Project.builder()
+                .name("testName1")
+                .createUserName("user1")
+                .createDate(createDate.plusDays(1))
+                .startDate(startDate)
+                .endDate(endDate)
+                .state(true)
+                .introduction("testIntroduction1")
+                .maxPeople(10)
+                .currentPeople(4)
+                .delete(false)
+                .deleteReason(null)
+                .viewCount(10)
+                .commentCount(10)
+                .user(saveUser1)
+                .build();
+        Project saveProject1 = projectRepository.save(project1);
+
+        // when
+        Project resultProject = projectRepository.findProjectWithUserUsingFetchJoinByProjectNo(saveProject1.getNo());
+
+        //then
+        assertEquals(resultProject.getNo(), saveProject1.getNo());
+        assertEquals(resultProject.getName(), saveProject1.getName());
+        assertEquals(resultProject.getCreateDate(), saveProject1.getCreateDate());
+        assertEquals(resultProject.getStartDate(), saveProject1.getStartDate());
+        assertEquals(resultProject.getEndDate(), saveProject1.getEndDate());
+        assertEquals(resultProject.isState(), saveProject1.isState());
+        assertEquals(resultProject.getIntroduction(), saveProject1.getIntroduction());
+        assertEquals(resultProject.getMaxPeople(), saveProject1.getMaxPeople());
+        assertEquals(resultProject.getCurrentPeople(), saveProject1.getCurrentPeople());
+        assertEquals(resultProject.isDelete(), saveProject1.isDelete());
+        assertEquals(resultProject.getDeleteReason(), null);
+        assertEquals(resultProject.getViewCount(), saveProject1.getViewCount());
+        assertEquals(resultProject.getCommentCount(), saveProject1.getCommentCount());
+        assertEquals(resultProject.getUser(), saveProject1.getUser());
+    }
 }

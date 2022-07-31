@@ -116,6 +116,15 @@ public class ProjectRepositoryImpl implements ProjectRepositoryCustom {
 //        return new PageImpl<>(projectSimpleDtoList, pageable, totalSize);
         return null;
     }
+    
+    // 프로젝트, 유저 join 조회
+    @Override
+    public Project findProjectWithUserUsingFetchJoinByProjectNo(Long projectNo) {
+        return queryFactory.selectFrom(QProject.project)
+                .join(QProject.project.user)
+                .where(QProject.project.no.eq(projectNo))
+                .fetchOne();
+    }
 
     private BooleanExpression eqStatus(boolean state) {
         return project.state.eq(state);

@@ -51,7 +51,10 @@ public enum ErrorCode {
     PROJECT_POSITION_EXISTENCE_USER(INTERNAL_SERVER_ERROR, "ProjectPosition existence user"),
 
     // TechnicalStack
-    TECHNICAL_STACK_NOT_FOUND(BAD_REQUEST, "TechnicalStack bad request")
+    TECHNICAL_STACK_NOT_FOUND(BAD_REQUEST, "TechnicalStack bad request"),
+
+    // Project
+    PROJECT_NOT_REGISTER_USER(INTERNAL_SERVER_ERROR, "Project not register user")
     ;
 
 
