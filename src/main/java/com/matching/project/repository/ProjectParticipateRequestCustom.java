@@ -9,4 +9,6 @@ import java.util.List;
 
 public interface ProjectParticipateRequestCustom {
     public Page<ProjectParticipateFormResponseDto> findProjectParticipateRequestByProjectNo(Long projectNo, Pageable pageable) throws Exception;
+    public ProjectParticipateRequest findProjectPositionAndUserAndProjectFetchJoinByNo(Long no) throws Exception;
+    public long deleteByNo(Long no) throws Exception;
 }

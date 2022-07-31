@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 @Import(QuerydslConfiguration.class)
@@ -252,4 +253,198 @@ class ProjectParticipateRequestRepositoryTest {
         assertEquals(projectParticipateFormResponseDtoList.get(2).getTechnicalStackList().get(0), saveParticipateRequestTechnicalStack1.getTechnicalStack().getName());
     }
 
+    @Test
+    public void 프로젝트_프로젝트포지션_유저_조인_조회() {
+        // given
+        LocalDateTime createDate = LocalDateTime.now();
+        LocalDate startDate = LocalDate.of(2022, 06, 24);
+        LocalDate endDate = LocalDate.of(2022, 06, 28);
+
+        // 유저 세팅
+        User user1 = User.builder()
+                .name("userName1")
+                .sex("M")
+                .email("wkemrm1@naver.com")
+                .password("testPassword")
+                .github("testGithub")
+                .selfIntroduction("testSelfIntroduction")
+                .block(false)
+                .blockReason(null)
+                .permission(Role.ROLE_USER)
+                .oauthCategory(OAuth.NORMAL)
+                .email_auth(false)
+                .imageNo(0L)
+                .position(null)
+                .build();
+
+        User saveUser1 = userRepository.save(user1);
+
+        // 프로젝트 객체
+        Project project1 = Project.builder()
+                .name("testName1")
+                .createUserName("user1")
+                .createDate(createDate.plusDays(1))
+                .startDate(startDate)
+                .endDate(endDate)
+                .state(true)
+                .introduction("testIntroduction1")
+                .maxPeople(10)
+                .currentPeople(4)
+                .delete(false)
+                .deleteReason(null)
+                .viewCount(10)
+                .user(saveUser1)
+                .commentCount(10)
+                .build();
+        Project saveProject1 = projectRepository.save(project1);
+
+        // 포지션 세팅
+        Position position1 = Position.builder()
+                .name("testPosition1")
+                .build();
+        Position position2 = Position.builder()
+                .name("testPosition2")
+                .build();
+        positionRepository.save(position1);
+        positionRepository.save(position2);
+
+        // 프로젝트 포지션 세팅
+        ProjectPosition projectPosition1 = ProjectPosition.builder()
+                .state(true)
+                .project(project1)
+                .position(position1)
+                .user(null)
+                .creator(false)
+                .build();
+        ProjectPosition projectPosition2 = ProjectPosition.builder()
+                .state(false)
+                .project(project1)
+                .position(position2)
+                .user(null)
+                .creator(false)
+                .build();
+        ProjectPosition saveProjectPosition1 = projectPositionRepository.save(projectPosition1);
+        ProjectPosition saveProjectPosition2 = projectPositionRepository.save(projectPosition2);
+
+        // 참여 신청 세팅
+        ProjectParticipateRequest projectParticipateRequest1 = ProjectParticipateRequest.builder()
+                .user(saveUser1)
+                .projectPosition(saveProjectPosition1)
+                .motive("testMotive1")
+                .github("testGitHub1")
+                .build();
+
+        ProjectParticipateRequest saveProjectParticipateRequest1 = projectParticipateRequestRepository.save(projectParticipateRequest1);
+
+        // when
+        ProjectParticipateRequest projectParticipateRequest = null;
+        try {
+            projectParticipateRequest = projectParticipateRequestRepository.findProjectPositionAndUserAndProjectFetchJoinByNo(saveProjectParticipateRequest1.getNo());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // then
+        assertEquals(projectParticipateRequest.getNo(), saveProjectParticipateRequest1.getNo());
+        assertEquals(projectParticipateRequest.getProjectPosition(), saveProjectParticipateRequest1.getProjectPosition());
+        assertEquals(projectParticipateRequest.getProjectPosition().getProject(), saveProjectParticipateRequest1.getProjectPosition().getProject());
+        assertEquals(projectParticipateRequest.getUser(), saveProjectParticipateRequest1.getUser());
+        assertEquals(projectParticipateRequest.getMotive(), saveProjectParticipateRequest1.getMotive());
+        assertEquals(projectParticipateRequest.getGithub(), saveProjectParticipateRequest1.getGithub());
+    }
+
+    @Test
+    public void 프로젝트_신청_삭제() {
+        // given
+        LocalDateTime createDate = LocalDateTime.now();
+        LocalDate startDate = LocalDate.of(2022, 06, 24);
+        LocalDate endDate = LocalDate.of(2022, 06, 28);
+
+        // 유저 세팅
+        User user1 = User.builder()
+                .name("userName1")
+                .sex("M")
+                .email("wkemrm1@naver.com")
+                .password("testPassword")
+                .github("testGithub")
+                .selfIntroduction("testSelfIntroduction")
+                .block(false)
+                .blockReason(null)
+                .permission(Role.ROLE_USER)
+                .oauthCategory(OAuth.NORMAL)
+                .email_auth(false)
+                .imageNo(0L)
+                .position(null)
+                .build();
+
+        User saveUser1 = userRepository.save(user1);
+
+        // 프로젝트 객체
+        Project project1 = Project.builder()
+                .name("testName1")
+                .createUserName("user1")
+                .createDate(createDate.plusDays(1))
+                .startDate(startDate)
+                .endDate(endDate)
+                .state(true)
+                .introduction("testIntroduction1")
+                .maxPeople(10)
+                .currentPeople(4)
+                .delete(false)
+                .deleteReason(null)
+                .viewCount(10)
+                .user(saveUser1)
+                .commentCount(10)
+                .build();
+        Project saveProject1 = projectRepository.save(project1);
+
+        // 포지션 세팅
+        Position position1 = Position.builder()
+                .name("testPosition1")
+                .build();
+        Position position2 = Position.builder()
+                .name("testPosition2")
+                .build();
+        positionRepository.save(position1);
+        positionRepository.save(position2);
+
+        // 프로젝트 포지션 세팅
+        ProjectPosition projectPosition1 = ProjectPosition.builder()
+                .state(true)
+                .project(project1)
+                .position(position1)
+                .user(null)
+                .creator(false)
+                .build();
+        ProjectPosition projectPosition2 = ProjectPosition.builder()
+                .state(false)
+                .project(project1)
+                .position(position2)
+                .user(null)
+                .creator(false)
+                .build();
+        ProjectPosition saveProjectPosition1 = projectPositionRepository.save(projectPosition1);
+        ProjectPosition saveProjectPosition2 = projectPositionRepository.save(projectPosition2);
+
+        // 참여 신청 세팅
+        ProjectParticipateRequest projectParticipateRequest1 = ProjectParticipateRequest.builder()
+                .user(saveUser1)
+                .projectPosition(saveProjectPosition1)
+                .motive("testMotive1")
+                .github("testGitHub1")
+                .build();
+
+        ProjectParticipateRequest saveProjectParticipateRequest1 = projectParticipateRequestRepository.save(projectParticipateRequest1);
+
+        // when
+        try {
+            projectParticipateRequestRepository.deleteByNo(saveProjectParticipateRequest1.getNo());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // then
+        Optional<ProjectParticipateRequest> result = projectParticipateRequestRepository.findById(saveProjectParticipateRequest1.getNo());
+        assertEquals(result.isEmpty(), true);
+    }
 }

@@ -43,8 +43,8 @@ public class ProjectParticipateController {
     // 프로젝트 참가 허가
     @PostMapping("/{projectParticipateNo}/permit")
     @ApiOperation(value = "프로젝트 참가 신청 수락 (수정 완료)")
-    public ResponseEntity<ResponseDto<Boolean>> projectParticipatePermit(@PathVariable Long projectParticipateNo) {
-        return ResponseEntity.ok(new ResponseDto(null, true));
+    public ResponseEntity<ResponseDto<Boolean>> projectParticipatePermit(@PathVariable Long projectParticipateNo) throws Exception {
+        return ResponseEntity.ok(new ResponseDto(null, projectParticipateRequestService.permitProjectParticipate(projectParticipateNo)));
     }
 
     // 프로젝트 참가 거부

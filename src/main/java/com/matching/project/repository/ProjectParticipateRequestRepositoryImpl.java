@@ -16,6 +16,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -34,6 +35,7 @@ import static com.matching.project.entity.QUser.user;
 @RequiredArgsConstructor
 public class ProjectParticipateRequestRepositoryImpl implements ProjectParticipateRequestCustom {
     private final JPAQueryFactory queryFactory;
+    private final EntityManager entityManager;
 
     // Sort해주는 메소드
     private OrderSpecifier<?> projectParticipateRequestSort(Pageable pageable) {
@@ -129,5 +131,29 @@ public class ProjectParticipateRequestRepositoryImpl implements ProjectParticipa
 
     private BooleanExpression eqProjectNo(Long projectNo) {
         return project.no.eq(projectNo);
+    }
+    
+    // User, projectPosition join 메소드
+    @Override
+    public ProjectParticipateRequest findProjectPositionAndUserAndProjectFetchJoinByNo(Long no) throws Exception {
+        return queryFactory
+                .selectFrom(projectParticipateRequest)
+                .join(projectParticipateRequest.user, user)
+                .join(projectParticipateRequest.projectPosition.project, project)
+                .join(projectParticipateRequest.projectPosition, projectPosition)
+                .where(projectParticipateRequest.no.eq(no))
+                .fetchOne();
+    }
+    
+    // no로 projectParticipateRequest 삭제하는 메소드
+    @Override
+    public long deleteByNo(Long no) throws Exception {
+        long deleteNo = queryFactory.delete(projectParticipateRequest)
+                .where(projectParticipateRequest.no.eq(no))
+                .execute();
+        entityManager.flush();
+        entityManager.clear();
+        
+        return deleteNo;
     }
 }

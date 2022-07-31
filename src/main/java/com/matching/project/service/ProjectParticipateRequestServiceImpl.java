@@ -14,11 +14,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+
+
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import javax.persistence.EntityManager;
 import java.util.List;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class ProjectParticipateRequestServiceImpl implements ProjectParticipateRequestService {
     private final ProjectParticipateRequestRepository projectParticipateRequestRepository;
@@ -75,14 +80,41 @@ public class ProjectParticipateRequestServiceImpl implements ProjectParticipateR
         User user = (User) authentication.getPrincipal();
 
         // 유저가 만든 프로젝트인지 판단
-        isCreatedProject(user, projectNo);
+        Project project = projectRepository.findProjectWithUserUsingFetchJoinByProjectNo(projectNo);
+        isCreatedProject(user, project);
 
         return projectParticipateRequestRepository.findProjectParticipateRequestByProjectNo(projectNo, pageable);
     }
     
+    // 프로젝트 참가 신청 수락
+    @Override
+    public boolean permitProjectParticipate(Long projectParticipateNo) throws Exception {
+        // 현재 유저 가져오기
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user = (User) authentication.getPrincipal();
+
+        // 프로젝트 신청 조회
+        ProjectParticipateRequest projectParticipateRequest = projectParticipateRequestRepository.findProjectPositionAndUserAndProjectFetchJoinByNo(projectParticipateNo);
+
+        // 유저가 만든 프로젝트인지 판단
+        isCreatedProject(user, projectParticipateRequest.getProjectPosition().getProject());
+        
+        // 프로젝트 신청 기술스택 삭제
+        participateRequestTechnicalStackRepository.deleteByProjectParticipateNo(projectParticipateRequest.getNo());
+        
+        // 프로젝트 신청 삭제
+        projectParticipateRequestRepository.deleteByNo(projectParticipateRequest.getNo());
+
+        // 포지션 유저 업데이트
+        ProjectPosition projectPosition = projectPositionRepository.findById(projectParticipateRequest.getProjectPosition().getNo())
+                .orElseThrow(() -> new CustomException(ErrorCode.PROJECT_POSITION_NO_SUCH_ELEMENT_EXCEPTION));
+        projectPosition.changeUser(projectParticipateRequest.getUser());
+
+        return true;
+    }
+
     // 유저가 만든 프로젝트인지 판단
-    private void isCreatedProject(User user, Long projectNo) {
-        Project project = projectRepository.findProjectWithUserUsingFetchJoinByProjectNo(projectNo);
+    private void isCreatedProject(User user, Project project) {
         if (project.getUser() == null || project.getUser().getNo() != user.getNo()) {
             throw new CustomException(ErrorCode.PROJECT_NOT_REGISTER_USER);
         }

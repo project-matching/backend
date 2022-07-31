@@ -38,4 +38,8 @@ public class ProjectPosition {
         this.project = project;
         project.getProjectPositionList().add(this);
     }
+
+    public void changeUser(User user) {
+        this.user = user;
+    }
 }
