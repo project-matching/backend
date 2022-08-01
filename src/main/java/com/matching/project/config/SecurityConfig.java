@@ -58,12 +58,28 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/v1/common/**").anonymous()
 
                 //UserController
-                .antMatchers("/v1/user/list", "/v1/user/block/**", "/v1/user/unblock/**").hasAnyRole("USER", "ADMIN") // 테스트를 위해 유저권한도 일시 부여
+                .antMatchers("/v1/user/list", "/v1/user/block/**", "/v1/user/unblock/**").hasAnyRole("ADMIN")
                 .antMatchers(HttpMethod.POST, "/v1/user").anonymous()
                 .antMatchers(HttpMethod.GET,"/v1/user").hasAnyRole("USER", "ADMIN")
                 .antMatchers(HttpMethod.PATCH,"/v1/user").hasAnyRole("USER", "ADMIN")
                 .antMatchers(HttpMethod.DELETE,"/v1/user").hasAnyRole("USER", "ADMIN")
                 .antMatchers("/v1/user/info", "/v1/user/password").hasAnyRole("USER", "ADMIN")
+
+                //CommentController
+                .antMatchers(HttpMethod.POST,"/v1/comment/**").hasAnyRole("USER", "ADMIN")
+                .antMatchers(HttpMethod.GET,"/v1/comment/**").hasAnyRole("USER", "ADMIN")
+                .antMatchers(HttpMethod.PATCH,"/v1/comment/**").hasAnyRole("USER", "ADMIN")
+                .antMatchers(HttpMethod.DELETE,"/v1/comment/**").hasAnyRole("USER", "ADMIN")
+
+                //PositionController
+                .antMatchers(HttpMethod.POST,"/v1/position").hasAnyRole("USER", "ADMIN")
+                .antMatchers(HttpMethod.GET,"/v1/position").hasAnyRole("USER", "ADMIN")
+                .antMatchers(HttpMethod.PUT,"/v1/position").hasAnyRole("ADMIN")
+
+                //NotificationController
+                .antMatchers(HttpMethod.POST,"/v1/notification").hasAnyRole("ADMIN")
+                .antMatchers(HttpMethod.GET,"/v1/notification").hasAnyRole("USER", "ADMIN")
+                .antMatchers(HttpMethod.GET,"/v1/notification/**").hasAnyRole("USER", "ADMIN")
 
                 //ProjectController
                 //.antMatchers("/v1/project/recruitment/*").hasAnyRole("USER", "ADMIN", "ANONYMOUS")

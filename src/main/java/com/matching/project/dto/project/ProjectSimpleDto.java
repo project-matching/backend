@@ -19,26 +19,24 @@ public class ProjectSimpleDto {
     private List<ProjectSimplePositionDto> projectSimplePositionDtoList;
     private List<ProjectSimpleTechnicalStackDto> projectSimpleTechnicalStackDtoList;
 
-//    public ProjectSimpleDto(Long no, String name, Integer maxPeople, Integer currentPeople, Integer viewCount, Integer commentCount, String register) {
-//        this.no = no;
-//        this.name = name;
-//        this.maxPeople = maxPeople;
-//        this.currentPeople = currentPeople;
-//        this.viewCount = viewCount;
-//        this.commentCount = commentCount;
-//        this.register = register;
-//    }
+    public ProjectSimpleDto(Long projectNo, String name, Integer maxPeople, Integer currentPeople, Integer viewCount, String register) {
+        this.projectNo = projectNo;
+        this.name = name;
+        this.maxPeople = maxPeople;
+        this.currentPeople = currentPeople;
+        this.viewCount = viewCount;
+        this.register = register;
+    }
 
-//    @Builder
-//    public ProjectSimpleDto(Long no, String name, Integer maxPeople, Integer currentPeople, Integer viewCount, Integer commentCount, String register, boolean bookMark) {
-//        this.no = no;
-//        this.name = name;
-//        this.maxPeople = maxPeople;
-//        this.currentPeople = currentPeople;
-//        this.viewCount = viewCount;
-//        this.commentCount = commentCount;
-//        this.register = register;
-//        this.bookMark = bookMark;
-//    }
+    @Builder
+    public ProjectSimpleDto(Long projectNo, String name, Integer maxPeople, Integer currentPeople, Integer viewCount, String register, boolean bookMark) {
+        this.projectNo = projectNo;
+        this.name = name;
+        this.maxPeople = maxPeople;
+        this.currentPeople = currentPeople;
+        this.viewCount = viewCount;
+        this.register = register;
+        this.bookMark = bookMark;
+    }
 }
 

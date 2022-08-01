@@ -70,10 +70,7 @@ public class UserServiceImpl implements UserService{
     @Override
     public UserInfoResponseDto getUserInfo() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        User identificationUser = (User)auth.getPrincipal();
-
-        Optional<User> optionalUser = userRepository.findByNoWithPositionUsingLeftFetchJoin(identificationUser.getNo());
-        optionalUser.orElseThrow(() -> new CustomException(ErrorCode.NOT_REGISTERED_EMAIL_EXCEPTION));
+        Optional<User> optionalUser = Optional.ofNullable((User)auth.getPrincipal());
 
         // Image
         String imageUrl = imageService.getImageUrl(optionalUser.get().getImageNo());
@@ -107,7 +104,6 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public User userSignUp(SignUpRequestDto dto){
-
         // Valid Check
         if (userRepository.findByEmail(dto.getEmail()).isPresent())
             throw new CustomException(ErrorCode.DUPLICATE_EMAIL_EXCEPTION);
@@ -123,8 +119,8 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public List<UserSimpleInfoDto> userInfoList(Pageable pageable, UserFilterDto userFilterDto) {
-        Page<User> users = userRepositoryCustom.findByNoUsingQueryDsl(pageable, userFilterDto);
+    public List<UserSimpleInfoDto> userInfoList(UserFilterDto userFilterDto, Pageable pageable) {
+        Page<User> users = userRepositoryCustom.findByNoUsingQueryDsl(userFilterDto, pageable);
         return users.get().map(user -> UserSimpleInfoDto.builder()
                 .userNo(user.getNo())
                 .name(user.getName())
@@ -138,10 +134,7 @@ public class UserServiceImpl implements UserService{
     @Override
     public User userPasswordUpdate(PasswordUpdateRequestDto dto) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        User identificationUser = (User)auth.getPrincipal();
-
-        Optional<User> optionalUser = userRepository.findByNoWithPositionUsingLeftFetchJoin(identificationUser.getNo());
-        //optionalUser.orElseThrow(() -> new CustomException(ErrorCode.NOT_REGISTERED_EMAIL_EXCEPTION));
+        Optional<User> optionalUser = Optional.ofNullable((User)auth.getPrincipal());
 
         if (optionalUser.get().getOauthCategory() == OAuth.NORMAL) {
             if (!passwordEncoder.matches(dto.getOldPassword(), optionalUser.get().getPassword()))
@@ -156,10 +149,7 @@ public class UserServiceImpl implements UserService{
     @Override
     public UserProfileInfoResponseDto userProfileInfo() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        User identificationUser = (User)auth.getPrincipal();
-
-        Optional<User> optionalUser = userRepository.findByNoWithPositionUsingLeftFetchJoin(identificationUser.getNo());
-        //optionalUser.orElseThrow(() -> new CustomException(ErrorCode.NOT_REGISTERED_EMAIL_EXCEPTION));
+        Optional<User> optionalUser = Optional.ofNullable((User)auth.getPrincipal());
 
         // Image
         String imageUrl = imageService.getImageUrl(optionalUser.get().getImageNo());
@@ -192,10 +182,7 @@ public class UserServiceImpl implements UserService{
     public User userUpdate(UserUpdateRequestDto dto, MultipartFile file) {
         // Identification Check
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        User identificationUser = (User)auth.getPrincipal();
-
-        Optional<User> optionalUser = userRepository.findById(identificationUser.getNo());
-        //optionalUser.orElseThrow(() -> new CustomException(ErrorCode.NOT_REGISTERED_EMAIL_EXCEPTION));
+        Optional<User> optionalUser = Optional.ofNullable((User)auth.getPrincipal());
 
         // Get Entity
         Position position = getPositionForSave(dto.getPosition());
@@ -216,7 +203,7 @@ public class UserServiceImpl implements UserService{
         optionalUser.get().updateUser(dto, position);
 
         // UserTechnicalStacks Delete & Save
-        if (userTechnicalStackRepository.findUserTechnicalStacksByUser(identificationUser.getNo()) != null)
+        if (userTechnicalStackRepository.findUserTechnicalStacksByUser(optionalUser.get().getNo()) != null)
             userTechnicalStackRepository.deleteAllByUser(optionalUser.get());
         if (!saveTechnicalStacksList.isEmpty()) {
             for (TechnicalStack t : saveTechnicalStacksList) {
@@ -235,10 +222,7 @@ public class UserServiceImpl implements UserService{
     public User userSignOut() {
         // Identification Check
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        User identificationUser = (User)auth.getPrincipal();
-
-        Optional<User> optionalUser = userRepository.findById(identificationUser.getNo());
-        //optionalUser.orElseThrow(() -> new CustomException(ErrorCode.NOT_REGISTERED_EMAIL_EXCEPTION));
+        Optional<User> optionalUser = Optional.ofNullable((User)auth.getPrincipal());
 
         if (optionalUser.get().isWithdrawal())
             throw new CustomException(ErrorCode.USER_ALREADY_WITHDRAWAL_EXCEPTION);

@@ -106,11 +106,11 @@ public class UserController {
 
     @GetMapping("/list")
     @ApiOperation(value = "회원 목록 조회 (관리자)")
-    public ResponseEntity<ResponseDto<List<UserSimpleInfoDto>>> userInfoList(@PageableDefault(size = 5) Pageable pageable, @Valid UserFilterDto userFilterDto) {
-        List<UserSimpleInfoDto> dtoList = userService.userInfoList(pageable, userFilterDto);
+    public ResponseEntity<ResponseDto<List<UserSimpleInfoDto>>> userInfoList(@Valid UserFilterDto userFilterDto,
+                                                                             @PageableDefault(size = 5) Pageable pageable) {
+        List<UserSimpleInfoDto> dtoList = userService.userInfoList(userFilterDto, pageable);
         return ResponseEntity.ok(new ResponseDto<>(null, dtoList));
     }
-
     @GetMapping("/block/{userNo}")
     @ApiOperation(value = "회원 차단 (관리자)")
     public ResponseEntity<ResponseDto<Boolean>> userBlock(@PathVariable Long userNo, @RequestBody String reason) {

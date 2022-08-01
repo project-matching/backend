@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Getter
 @Entity
 @NoArgsConstructor
-public class EmailAuth {
+public class EmailAuth extends BaseTimeEntity{
     private static final Long MAX_EXPIRE_TIME = 5L;
 
     @Id

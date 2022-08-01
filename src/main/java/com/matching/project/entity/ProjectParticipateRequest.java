@@ -1,15 +1,18 @@
 package com.matching.project.entity;
 
+import lombok.Builder;
+
 import javax.persistence.*;
 
 @Entity
-public class ProjectParticipateRequest {
+@Builder
+public class ProjectParticipateRequest extends BaseTimeEntity{
     @Id @GeneratedValue
-    private Long id;
+    private Long no;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_no")
-    private User userNo;
+    private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "project_position_no")

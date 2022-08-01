@@ -9,7 +9,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-public class UserTechnicalStack {
+public class UserTechnicalStack extends BaseTimeEntity{
     @Id @GeneratedValue
     private Long no;
 
