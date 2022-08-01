@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface PositionRepository extends JpaRepository<Position, Long> {
-    List<Position> findByNameIn(Collection<String> names);
+    List<Position> findByNoIn(Collection<Long> noList);
     Optional<Position> findAllByName(String position);
 
 }

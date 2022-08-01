@@ -10,12 +10,12 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
-@Entity
-@Getter
 @Builder
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Image {
+@Entity
+public class Image extends BaseTimeEntity{
     @Id @GeneratedValue
     private Long no;
 
@@ -24,4 +24,7 @@ public class Image {
 
     @Column(length = 255, nullable = false)
     private String physicalName;
+
+    @Column(length = 255, nullable = false)
+    private String url;
 }

@@ -6,7 +6,7 @@ import javax.persistence.*;
 
 @Entity
 @Builder
-public class ProjectParticipateRequest {
+public class ProjectParticipateRequest extends BaseTimeEntity{
     @Id @GeneratedValue
     private Long no;
 

@@ -15,13 +15,12 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class TechnicalStack {
+public class TechnicalStack extends BaseTimeEntity{
     @Id @GeneratedValue
     private Long no;
 
-    @Column(length = 20, nullable = false)
+    @Column(length = 50, nullable = false)
     private String name;
 
-    @Column(nullable = true)
     private Long imageNo;
 }

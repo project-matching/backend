@@ -1,14 +1,18 @@
 package com.matching.project.entity;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Builder
 @Getter
-public class BookMark {
+public class BookMark extends BaseTimeEntity{
     @Id @GeneratedValue
     private Long no;
 

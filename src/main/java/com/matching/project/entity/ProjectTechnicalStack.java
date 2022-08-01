@@ -13,7 +13,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProjectTechnicalStack {
+public class ProjectTechnicalStack extends BaseTimeEntity{
     @Id
     @GeneratedValue
     private Long no;
@@ -25,4 +25,9 @@ public class ProjectTechnicalStack {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "project_no")
     private Project project;
+
+    public void setProject(Project project) {
+        this.project = project;
+        project.getProjectTechnicalStackList().add(this);
+    }
 }

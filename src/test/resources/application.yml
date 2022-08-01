@@ -62,5 +62,14 @@ spring:
     ansi:
       enabled: always
 
-
-
+cloud:
+  aws:
+    credentials:
+      access-key: test
+      secret-key: test
+    s3:
+      bucket: project-matching-s3
+    region:
+      static: ap-northeast-2
+    stack:
+      auto: false

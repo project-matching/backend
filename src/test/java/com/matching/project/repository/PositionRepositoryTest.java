@@ -31,16 +31,16 @@ class PositionRepositoryTest {
         Position position3 = Position.builder()
                 .name("testPosition3")
                 .build();
-        positionRepository.save(position1);
-        positionRepository.save(position2);
-        positionRepository.save(position3);
+        Position savePosition1 = positionRepository.save(position1);
+        Position savePosition2 = positionRepository.save(position2);
+        Position savePosition3 = positionRepository.save(position3);
 
         // when
-        List<String> names = new ArrayList<>();
-        names.add("testPosition1");
-        names.add("testPosition2");
-        names.add("testPosition3");
-        List<Position> findPositionList = positionRepository.findByNameIn(names);
+        List<Long> noList = new ArrayList<>();
+        noList.add(savePosition1.getNo());
+        noList.add(savePosition2.getNo());
+        noList.add(savePosition3.getNo());
+        List<Position> findPositionList = positionRepository.findByNoIn(noList);
 
         // then
         assertEquals(findPositionList.size(), 3);

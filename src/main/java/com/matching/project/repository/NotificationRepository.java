@@ -1,7 +1,18 @@
 package com.matching.project.repository;
 
 import com.matching.project.entity.Notification;
+import com.matching.project.entity.User;
+import org.aspectj.weaver.ast.Not;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+
+import java.util.List;
+import java.util.Optional;
 
 public interface NotificationRepository extends JpaRepository<Notification, Long> {
+    @Query("select n from Notification n left join fetch n.user where n.no = ?1")
+    Optional<Notification> findByNoWithUserUsingLeftFetchJoin(Long notificationNo);
+
+    List<Notification> findByUserOrUserIsNullOrderByNoDesc(User user, Pageable pageable);
 }

@@ -49,7 +49,7 @@ public class ErrorResponse {
                                 .stream()
                                 .map(fieldError ->
                                         "[" + fieldError.getObjectName() + "] => "
-                                                + fieldError.getField() + " : " + fieldError.getDefaultMessage())
+                                        + fieldError.getField() + " : " + fieldError.getDefaultMessage())
                                 .collect(Collectors.toList()))
                         .build(), false));
     }

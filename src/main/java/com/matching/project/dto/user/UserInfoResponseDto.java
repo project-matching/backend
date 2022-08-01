@@ -1,20 +1,24 @@
 package com.matching.project.dto.user;
 
-import lombok.*;
+import com.matching.project.dto.enumerate.Role;
+import com.matching.project.dto.technicalstack.TechnicalStackDto;
+import com.matching.project.entity.User;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
 @Getter
-@Setter
 public class UserInfoResponseDto {
+    private Long no;
+    private Role role;
     private String name;
-    private char sex;
     private String email;
+    private String image;
     private String position;
-    private List<String> technicalStackList;
-    private String github;
-    private String selfIntroduction;
+    private List<TechnicalStackDto> technicalStackDtoList;
 }
