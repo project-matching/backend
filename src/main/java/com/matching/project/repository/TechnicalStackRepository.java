@@ -12,4 +12,6 @@ import java.util.Collection;
 
 public interface TechnicalStackRepository extends JpaRepository<TechnicalStack, Long> {
     public List<TechnicalStack> findByNoIn(Collection<Long> noList);
+
+    public List<TechnicalStack> findByNameIn(Collection<String> nameList);
 }

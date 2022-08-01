@@ -45,9 +45,17 @@ public enum ErrorCode {
     USER_ALREADY_BLOCKED_EXCEPTION(INTERNAL_SERVER_ERROR, "User already blocked"),
     USER_ALREADY_UNBLOCKED_EXCEPTION(INTERNAL_SERVER_ERROR, "User already unblocked"),
 
-    //Project
+    // ProjectPosition
+    PROJECT_POSITION_NO_SUCH_ELEMENT_EXCEPTION(INTERNAL_SERVER_ERROR, "ProjectPosition no such"),
+    PROJECT_POSITION_EXISTENCE_USER(INTERNAL_SERVER_ERROR, "ProjectPosition existence user"),
+
+    // TechnicalStack
+    TECHNICAL_STACK_NOT_FOUND(BAD_REQUEST, "TechnicalStack bad request"),
+
+    // Project
     PROJECT_NO_SUCH_ELEMENT_EXCEPTION(INTERNAL_SERVER_ERROR, "Project_no_such"),
     NOT_FIND_PROJECT_NO_EXCEPTION(INTERNAL_SERVER_ERROR, "Not Find Project No"),
+    PROJECT_NOT_REGISTER_USER(INTERNAL_SERVER_ERROR, "Project not register user"),
 
     //Comment
     NOT_FIND_COMMENT_NO_EXCEPTION(INTERNAL_SERVER_ERROR, "Not Find Comment No"),
