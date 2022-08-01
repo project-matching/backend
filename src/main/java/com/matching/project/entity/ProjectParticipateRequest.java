@@ -2,13 +2,12 @@ package com.matching.project.entity;
 
 import lombok.Builder;
 import lombok.Getter;
-
 import javax.persistence.*;
 
 @Entity
 @Getter
 @Builder
-public class ProjectParticipateRequest {
+public class ProjectParticipateRequest extends BaseTimeEntity{
     @Id @GeneratedValue
     private Long no;
 

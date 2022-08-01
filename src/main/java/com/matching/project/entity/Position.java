@@ -11,10 +11,14 @@ import javax.persistence.Id;
 @Getter
 @Builder
 @Entity
-public class Position {
+public class Position extends BaseTimeEntity {
     @Id @GeneratedValue
     private Long no;
 
     @Column(length = 20, nullable = false)
     private String name;
+
+    public void updatePositionName(String updatePositionName) {
+        this.name = updatePositionName;
+    }
 }

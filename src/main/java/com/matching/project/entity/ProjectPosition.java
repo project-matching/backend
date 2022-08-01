@@ -13,7 +13,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProjectPosition {
+public class ProjectPosition extends BaseTimeEntity{
     @Id
     @GeneratedValue
     private Long no;
@@ -35,6 +35,9 @@ public class ProjectPosition {
     private boolean creator;
 
     public void setProject(Project project) {
+        if(this.project != null) {
+            this.project.getProjectPositionList().remove(this);
+        }
         this.project = project;
         project.getProjectPositionList().add(this);
     }

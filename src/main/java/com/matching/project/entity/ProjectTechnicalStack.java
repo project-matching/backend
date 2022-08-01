@@ -13,7 +13,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProjectTechnicalStack {
+public class ProjectTechnicalStack extends BaseTimeEntity{
     @Id
     @GeneratedValue
     private Long no;
@@ -27,6 +27,9 @@ public class ProjectTechnicalStack {
     private Project project;
 
     public void setProject(Project project) {
+        if(this.project != null) {
+            this.project.getProjectTechnicalStackList().remove(this);
+        }
         this.project = project;
         project.getProjectTechnicalStackList().add(this);
     }

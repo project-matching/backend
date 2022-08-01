@@ -12,7 +12,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ParticipateRequestTechnicalStack {
+public class ParticipateRequestTechnicalStack extends BaseTimeEntity {
     @Id @GeneratedValue
     private Long no;
 

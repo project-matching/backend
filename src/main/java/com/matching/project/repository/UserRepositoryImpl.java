@@ -21,7 +21,7 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
 
-    public Page<User> findByNoUsingQueryDsl(Pageable pageable, UserFilterDto userFilterDto) {
+    public Page<User> findByNoUsingQueryDsl(UserFilterDto userFilterDto, Pageable pageable) {
         QUser user = QUser.user;
         BooleanBuilder builder = new BooleanBuilder();
 
