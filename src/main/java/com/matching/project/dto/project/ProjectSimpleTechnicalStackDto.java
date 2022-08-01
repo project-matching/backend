@@ -8,6 +8,7 @@ import lombok.Data;
 @Builder
 @AllArgsConstructor
 public class ProjectSimpleTechnicalStackDto {
+    private Long projectNo;
     private String image;
     private String technicalStackName;
 }

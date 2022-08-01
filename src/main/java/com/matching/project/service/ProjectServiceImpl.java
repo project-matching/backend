@@ -1,7 +1,6 @@
 package com.matching.project.service;
 
 import com.matching.project.dto.comment.CommentDto;
-import com.matching.project.dto.enumerate.Filter;
 import com.matching.project.dto.enumerate.Role;
 import com.matching.project.dto.project.*;
 import com.matching.project.dto.projectposition.ProjectPositionRegisterDto;
@@ -118,26 +117,85 @@ public class ProjectServiceImpl implements ProjectService {
 
         return project.getNo();
     }
-
+    
+    // 프로젝트 조회
     @Override
     public Page<ProjectSimpleDto> findProjectList(boolean state, boolean delete, ProjectSearchRequestDto projectSearchRequestDto, Pageable pageable) throws Exception {
-//        Page<ProjectSimpleDto> projectSimpleDtoPage = projectRepository.findProjectByStatus(pageable, state, delete, projectSearchRequestDto);
-//        List<ProjectSimpleDto> projectSimpleDtoPageContent = projectSimpleDtoPage.getContent();
-//
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//
-//        if (authentication.getAuthorities().contains(new SimpleGrantedAuthority(Role.ROLE_USER.toString()))) {
-//            Object principal = authentication.getPrincipal();
-//            User user = (User) principal;
-//            List<Long> bookMarkList = bookMarkRepository.findByUserNo(user.getNo()).stream().map(bookMark -> bookMark.getProject().getNo()).collect(Collectors.toList());
-//            for (ProjectSimpleDto projectSimpleDto : projectSimpleDtoPageContent) {
-//                projectSimpleDto.setBookMark(bookMarkList.contains(projectSimpleDto.getNo()));
-//            }
-//        }
-//        return projectSimpleDtoPage;
-        return null;
+        Page<ProjectSimpleDto> projectSimpleDtoPage = projectRepository.findProjectByStatusAndDelete(pageable, state, delete, projectSearchRequestDto);
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication.getAuthorities().contains(new SimpleGrantedAuthority(Role.ROLE_USER.toString()))) {
+            Object principal = authentication.getPrincipal();
+            User user = (User) principal;
+
+            // 유저 즐겨찾기 조회
+            findBookMark(projectSimpleDtoPage.getContent(), user);
+        }
+        return projectSimpleDtoPage;
+    }
+    
+    // 유저가 만든 프로젝트 조회
+    @Override
+    public Page<ProjectSimpleDto> findUserProjectList(boolean delete, Pageable pageable) throws Exception {
+        // 현재 로그인한 유저 정보 가져오기
+        User user = getUser();
+        
+        // 유저가 등록한 프로젝트 조회
+        Page<ProjectSimpleDto> projectSimpleDtoPage = projectRepository.findUserProjectByDelete(pageable, user, delete);
+
+        // 유저 즐겨찾기 조회
+        findBookMark(projectSimpleDtoPage.getContent(), user);
+
+        return projectSimpleDtoPage;
     }
 
+    // 참여중인 프로젝트 조회
+    @Override
+    public Page<ProjectSimpleDto> findParticipateProjectList(boolean delete, Pageable pageable) throws Exception {
+        // 현재 로그인한 유저 정보 가져오기
+        User user = getUser();
+
+        // 유저가 등록한 프로젝트 조회
+        Page<ProjectSimpleDto> projectSimpleDtoPage = projectRepository.findParticipateProjectByDelete(pageable, user, delete);
+        
+        // 유저 즐겨찾기 조회
+        findBookMark(projectSimpleDtoPage.getContent(), user);
+
+        return projectSimpleDtoPage;
+    }
+    
+    // 신청중인 프로젝트 조회
+    @Override
+    public Page<ProjectSimpleDto> findParticipateRequestProjectList(boolean delete, Pageable pageable) throws Exception {
+        // 현재 로그인한 유저 정보 가져오기
+        User user = getUser();
+
+        // 유저가 등록한 프로젝트 조회
+        Page<ProjectSimpleDto> projectSimpleDtoPage = projectRepository.findParticipateRequestProjectByDelete(pageable, user, delete);
+
+        // 유저 즐겨찾기 조회
+        findBookMark(projectSimpleDtoPage.getContent(), user);
+
+        return projectSimpleDtoPage;
+    }
+    
+    // 유저 즐겨찾기 조회
+    private void findBookMark(List<ProjectSimpleDto> projectSimpleDtoList, User user) {
+        List<Long> bookMarkList = bookMarkRepository.findByUserNo(user.getNo()).stream().map(bookMark -> bookMark.getProject().getNo()).collect(Collectors.toList());
+        for (ProjectSimpleDto projectSimpleDto : projectSimpleDtoList) {
+            projectSimpleDto.setBookMark(bookMarkList.contains(projectSimpleDto.getProjectNo()));
+        }
+    }
+    
+    // 현재 로그인한 유저 정보 가져오기
+    private User getUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Object principal = authentication.getPrincipal();
+
+        return (User) principal;
+    }
+    
     @Override
     public ProjectDto getProjectDetail(Long projectNo) {
 //        // 프로젝트 조회

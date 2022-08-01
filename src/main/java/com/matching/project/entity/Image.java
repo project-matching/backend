@@ -10,11 +10,11 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
+@Builder
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 @Entity
-@Getter
 public class Image extends BaseTimeEntity{
     @Id @GeneratedValue
     private Long no;
