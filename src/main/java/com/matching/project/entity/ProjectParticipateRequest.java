@@ -3,7 +3,7 @@ package com.matching.project.entity;
 import javax.persistence.*;
 
 @Entity
-public class ProjectParticipateRequest {
+public class ProjectParticipateRequest extends BaseTimeEntity{
     @Id @GeneratedValue
     private Long id;
 

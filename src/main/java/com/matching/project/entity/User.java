@@ -22,7 +22,7 @@ import java.util.Optional;
 @ToString
 @Entity
 @Table(name = "users")
-public class User implements UserDetails {
+public class User extends BaseTimeEntity implements UserDetails {
     private static final long serialVersionUID = 1L;
 
     @Id @GeneratedValue

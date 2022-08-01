@@ -15,7 +15,7 @@ import javax.persistence.Id;
 @Builder
 @Entity
 @Getter
-public class Image {
+public class Image extends BaseTimeEntity{
     @Id @GeneratedValue
     private Long no;
 

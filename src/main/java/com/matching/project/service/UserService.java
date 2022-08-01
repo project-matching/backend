@@ -11,7 +11,7 @@ public interface UserService {
     User userSignUp(SignUpRequestDto signUpRequestDto);
     UserInfoResponseDto getUserInfo();
     UserProfileInfoResponseDto userProfileInfo();
-    List<UserSimpleInfoDto> userInfoList(Pageable pageable, UserFilterDto userFilterDto);
+    List<UserSimpleInfoDto> userInfoList(UserFilterDto userFilterDto, Pageable pageable);
     User userUpdate(UserUpdateRequestDto userUpdateRequestDto, MultipartFile file);
     User userPasswordUpdate(PasswordUpdateRequestDto passwordUpdateRequestDto);
     User userSignOut();

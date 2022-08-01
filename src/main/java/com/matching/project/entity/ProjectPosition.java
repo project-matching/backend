@@ -13,7 +13,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProjectPosition {
+public class ProjectPosition extends BaseTimeEntity{
     @Id
     @GeneratedValue
     private Long no;
