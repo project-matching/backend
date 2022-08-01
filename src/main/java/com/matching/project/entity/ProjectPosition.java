@@ -35,6 +35,9 @@ public class ProjectPosition extends BaseTimeEntity{
     private boolean creator;
 
     public void setProject(Project project) {
+        if(this.project != null) {
+            this.project.getProjectPositionList().remove(this);
+        }
         this.project = project;
         project.getProjectPositionList().add(this);
     }

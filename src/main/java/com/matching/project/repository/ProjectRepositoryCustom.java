@@ -1,8 +1,6 @@
 package com.matching.project.repository;
 
-import com.matching.project.dto.project.ProjectSearchDto;
-import com.matching.project.dto.project.ProjectSearchRequestDto;
-import com.matching.project.dto.project.ProjectSimpleDto;
+import com.matching.project.dto.project.*;
 import com.matching.project.entity.Project;
 import com.matching.project.entity.User;
 import org.springframework.data.domain.Page;

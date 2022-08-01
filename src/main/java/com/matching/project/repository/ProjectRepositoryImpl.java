@@ -42,8 +42,7 @@ import static com.matching.project.entity.QUser.user;
 @RequiredArgsConstructor
 public class ProjectRepositoryImpl implements ProjectRepositoryCustom {
     private final JPAQueryFactory queryFactory;
-    private final EntityManager em;
-    
+   
     // Sort해주는 메소드
     private OrderSpecifier<?> projectSort(Pageable pageable) {
         if (!pageable.getSort().isEmpty()) {

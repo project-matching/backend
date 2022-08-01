@@ -84,8 +84,10 @@ public class ProjectController {
 
     @GetMapping("/{projectNo}/update")
     @ApiOperation(value = "프로젝트 수정 페이지 조회 (수정 완료)")
-    public ResponseEntity<ResponseDto<ProjectUpdateFormResponseDto>> projectUpdateForm(@PathVariable Long projectNo) {
-        return ResponseEntity.ok(new ResponseDto<>(null, new ProjectUpdateFormResponseDto()));
+    public ResponseEntity<ResponseDto<ProjectUpdateFormResponseDto>> projectUpdateForm(@PathVariable Long projectNo) throws Exception{
+        ProjectUpdateFormResponseDto projectUpdateFormResponseDto = projectService.getProjectUpdateForm(projectNo);
+
+        return ResponseEntity.ok(new ResponseDto<>(null, projectUpdateFormResponseDto));
     }
     
     @PatchMapping("/{projectNo}")

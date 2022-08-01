@@ -13,4 +13,5 @@ public interface ProjectService {
     public Page<ProjectSimpleDto> findParticipateProjectList(boolean delete, Pageable pageable) throws Exception;
     public Page<ProjectSimpleDto> findParticipateRequestProjectList(boolean delete, Pageable pageable) throws Exception;
     public ProjectDto getProjectDetail(Long projectNo) throws Exception;
+    public ProjectUpdateFormResponseDto getProjectUpdateForm(Long projectNo) throws Exception;
 }

@@ -1068,4 +1068,215 @@ class ProjectControllerTest {
                 .andExpect(jsonPath("$.data.totalElements").value(2))
                 .andExpect(status().isOk());
     }
+    
+    @Test
+    void 프로젝트_수정_폼_조회_테스트() throws Exception {
+        // given
+        User saveUser = saveUser();
+        
+        // 프로젝트 세팅
+        LocalDateTime createDate = LocalDateTime.now();
+        LocalDate startDate = LocalDate.of(2022, 06, 24);
+        LocalDate endDate = LocalDate.of(2022, 06, 28);
+        
+        Project project1 = Project.builder()
+                .name("testName1")
+                .createUserName("userName1")
+                .createDate(createDate)
+                .startDate(startDate)
+                .endDate(endDate)
+                .state(true)
+                .introduction("testIntroduction1")
+                .maxPeople(10)
+                .currentPeople(4)
+                .delete(false)
+                .deleteReason(null)
+                .viewCount(10)
+                .commentCount(10)
+                .build();
+        Project saveProject1 = projectRepository.save(project1);
+        
+        // 포지션 세팅
+        Position position1 = Position.builder()
+                .name("testPosition1")
+                .build();
+        Position position2 = Position.builder()
+                .name("testPosition2")
+                .build();
+
+        Position savePosition1 = positionRepository.save(position1);
+        Position savePosition2 = positionRepository.save(position2);
+
+        // 기술스택 세팅
+        TechnicalStack technicalStack1 = TechnicalStack.builder()
+                .name("testTechnicalStack1")
+                .build();
+        TechnicalStack technicalStack2 = TechnicalStack.builder()
+                .name("testTechnicalStack2")
+                .build();
+
+        TechnicalStack saveTechnicalStack1 = technicalStackRepository.save(technicalStack1);
+        TechnicalStack saveTechnicalStack2 = technicalStackRepository.save(technicalStack2);
+
+        // 프로젝트 포지션 세팅
+        ProjectPosition projectPosition1 = ProjectPosition.builder()
+                .state(true)
+                .project(project1)
+                .position(savePosition1)
+                .user(saveUser)
+                .build();
+
+        ProjectPosition projectPosition2 = ProjectPosition.builder()
+                .state(false)
+                .project(project1)
+                .position(savePosition1)
+                .user(null)
+                .build();
+        ProjectPosition saveProjectPosition1 = projectPositionRepository.save(projectPosition1);
+        ProjectPosition saveProjectPosition2 = projectPositionRepository.save(projectPosition2);
+
+        // 프로젝트 기술스택 세팅
+        ProjectTechnicalStack projectTechnicalStack1 = ProjectTechnicalStack.builder()
+                .project(project1)
+                .technicalStack(technicalStack1)
+                .build();
+
+        ProjectTechnicalStack projectTechnicalStack2 = ProjectTechnicalStack.builder()
+                .project(project1)
+                .technicalStack(technicalStack2)
+                .build();
+        ProjectTechnicalStack saveProjectTechnicalStack1 = projectTechnicalStackRepository.save(projectTechnicalStack1);
+        ProjectTechnicalStack saveProjectTechnicalStack2 = projectTechnicalStackRepository.save(projectTechnicalStack2);
+
+        // then
+        String token = jwtTokenService.createToken(new TokenDto(saveUser.getEmail()));
+
+        mvc.perform(get("/v1/project/"+ saveProject1.getNo() + "/update").contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", "Bearer " + token))
+                .andDo(print())
+                .andExpect(header().string("Content-type", "application/json"))
+                .andExpect(jsonPath("$.data.projectNo").value(project1.getNo()))
+                .andExpect(jsonPath("$.data.name").value(project1.getName()))
+                .andExpect(jsonPath("$.data.state").value(project1.isState()))
+                .andExpect(jsonPath("$.data.startDate").value(project1.getStartDate().toString()))
+                .andExpect(jsonPath("$.data.endDate").value(project1.getEndDate().toString()))
+                .andExpect(jsonPath("$.data.introduction").value(project1.getIntroduction()))
+
+                .andExpect(jsonPath("$.data.positionUpdateFormDtoList[0].no").value(savePosition1.getNo()))
+                .andExpect(jsonPath("$.data.positionUpdateFormDtoList[0].name").value(savePosition1.getName()))
+                .andExpect(jsonPath("$.data.positionUpdateFormDtoList[1].no").value(savePosition2.getNo()))
+                .andExpect(jsonPath("$.data.positionUpdateFormDtoList[1].name").value(savePosition2.getName()))
+
+                .andExpect(jsonPath("$.data.projectPositionUpdateFormDtoList[0].projectPositionNo").value(saveProjectPosition1.getNo()))
+                .andExpect(jsonPath("$.data.projectPositionUpdateFormDtoList[0].positionNo").value(saveProjectPosition1.getPosition().getNo()))
+                .andExpect(jsonPath("$.data.projectPositionUpdateFormDtoList[0].projectPositionName").value(saveProjectPosition1.getPosition().getName()))
+                .andExpect(jsonPath("$.data.projectPositionUpdateFormDtoList[0].projectUpdateFormUserDto.no").value(saveUser.getNo()))
+                .andExpect(jsonPath("$.data.projectPositionUpdateFormDtoList[1].projectPositionNo").value(saveProjectPosition2.getNo()))
+                .andExpect(jsonPath("$.data.projectPositionUpdateFormDtoList[1].positionNo").value(saveProjectPosition2.getPosition().getNo()))
+                .andExpect(jsonPath("$.data.projectPositionUpdateFormDtoList[1].projectPositionName").value(saveProjectPosition2.getPosition().getName()))
+                .andExpect(jsonPath("$.data.projectPositionUpdateFormDtoList[1].projectUpdateFormUserDto").isEmpty())
+
+                .andExpect(jsonPath("$.data.technicalStackUpdateFormDtoList[0].no").value(saveTechnicalStack1.getNo()))
+                .andExpect(jsonPath("$.data.technicalStackUpdateFormDtoList[0].name").value(saveTechnicalStack1.getName()))
+                .andExpect(jsonPath("$.data.technicalStackUpdateFormDtoList[1].no").value(saveTechnicalStack2.getNo()))
+                .andExpect(jsonPath("$.data.technicalStackUpdateFormDtoList[1].name").value(saveTechnicalStack2.getName()))
+
+                .andExpect(jsonPath("$.data.projectTechnicalStackList[0]").value(saveProjectTechnicalStack1.getTechnicalStack().getName()))
+                .andExpect(jsonPath("$.data.projectTechnicalStackList[1]").value(saveProjectTechnicalStack2.getTechnicalStack().getName()))
+
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void 프로젝트_수정_폼_조회_프로젝트_조회_실패_테스트() throws Exception {
+        // given
+        User saveUser = saveUser();
+
+        // 프로젝트 세팅
+        LocalDateTime createDate = LocalDateTime.now();
+        LocalDate startDate = LocalDate.of(2022, 06, 24);
+        LocalDate endDate = LocalDate.of(2022, 06, 28);
+
+        Project project1 = Project.builder()
+                .name("testName1")
+                .createUserName("userName1")
+                .createDate(createDate)
+                .startDate(startDate)
+                .endDate(endDate)
+                .state(true)
+                .introduction("testIntroduction1")
+                .maxPeople(10)
+                .currentPeople(4)
+                .delete(false)
+                .deleteReason(null)
+                .viewCount(10)
+                .commentCount(10)
+                .build();
+        Project saveProject1 = projectRepository.save(project1);
+
+        // 포지션 세팅
+        Position position1 = Position.builder()
+                .name("testPosition1")
+                .build();
+        Position position2 = Position.builder()
+                .name("testPosition2")
+                .build();
+
+        Position savePosition1 = positionRepository.save(position1);
+        Position savePosition2 = positionRepository.save(position2);
+
+        // 기술스택 세팅
+        TechnicalStack technicalStack1 = TechnicalStack.builder()
+                .name("testTechnicalStack1")
+                .build();
+        TechnicalStack technicalStack2 = TechnicalStack.builder()
+                .name("testTechnicalStack2")
+                .build();
+
+        TechnicalStack saveTechnicalStack1 = technicalStackRepository.save(technicalStack1);
+        TechnicalStack saveTechnicalStack2 = technicalStackRepository.save(technicalStack2);
+
+        // 프로젝트 포지션 세팅
+        ProjectPosition projectPosition1 = ProjectPosition.builder()
+                .state(true)
+                .project(project1)
+                .position(savePosition1)
+                .user(saveUser)
+                .build();
+
+        ProjectPosition projectPosition2 = ProjectPosition.builder()
+                .state(false)
+                .project(project1)
+                .position(savePosition1)
+                .user(null)
+                .build();
+        ProjectPosition saveProjectPosition1 = projectPositionRepository.save(projectPosition1);
+        ProjectPosition saveProjectPosition2 = projectPositionRepository.save(projectPosition2);
+
+        // 프로젝트 기술스택 세팅
+        ProjectTechnicalStack projectTechnicalStack1 = ProjectTechnicalStack.builder()
+                .project(project1)
+                .technicalStack(technicalStack1)
+                .build();
+
+        ProjectTechnicalStack projectTechnicalStack2 = ProjectTechnicalStack.builder()
+                .project(project1)
+                .technicalStack(technicalStack2)
+                .build();
+        ProjectTechnicalStack saveProjectTechnicalStack1 = projectTechnicalStackRepository.save(projectTechnicalStack1);
+        ProjectTechnicalStack saveProjectTechnicalStack2 = projectTechnicalStackRepository.save(projectTechnicalStack2);
+
+        // then
+        String token = jwtTokenService.createToken(new TokenDto(saveUser.getEmail()));
+
+        mvc.perform(get("/v1/project/"+ saveProject1.getNo() + 1 + "/update").contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", "Bearer " + token))
+                .andDo(print())
+                .andExpect(header().string("Content-type", "application/json"))
+                .andExpect(jsonPath("$.error.error").value(ErrorCode.PROJECT_NO_SUCH_ELEMENT_EXCEPTION.getHttpStatus().name()))
+                .andExpect(jsonPath("$.error.code").value(ErrorCode.PROJECT_NO_SUCH_ELEMENT_EXCEPTION.name()))
+                .andExpect(jsonPath("$.error.message[0]").value(ErrorCode.PROJECT_NO_SUCH_ELEMENT_EXCEPTION.getDetail()))
+                .andExpect(jsonPath("$.data").value(false))
+                .andExpect(status().is5xxServerError());
+    }
 }
