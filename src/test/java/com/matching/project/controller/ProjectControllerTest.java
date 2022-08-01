@@ -17,6 +17,7 @@ import com.matching.project.dto.projectposition.ProjectPositionRegisterDto;
 import com.matching.project.dto.user.ProjectRegisterUserDto;
 import com.matching.project.entity.*;
 import com.matching.project.entity.Image;
+import com.matching.project.error.ErrorCode;
 import com.matching.project.oauth.CustomOAuth2UserService;
 import com.matching.project.repository.*;
 import com.matching.project.service.JwtTokenService;
