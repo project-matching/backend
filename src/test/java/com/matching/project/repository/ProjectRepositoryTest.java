@@ -185,6 +185,7 @@ class ProjectRepositoryTest {
         Image image1 = Image.builder()
                 .logicalName("testLogicalName1")
                 .physicalName("testPhysicalName1")
+                .url("testUrl1")
                 .build();
         Image saveImage1 = imageRepository.save(image1);
         
@@ -421,6 +422,7 @@ class ProjectRepositoryTest {
         Image image1 = Image.builder()
                 .logicalName("testLogicalName1")
                 .physicalName("testPhysicalName1")
+                .url("testUrl1")
                 .build();
         Image saveImage1 = imageRepository.save(image1);
 
@@ -653,6 +655,7 @@ class ProjectRepositoryTest {
         Image image1 = Image.builder()
                 .logicalName("testLogicalName1")
                 .physicalName("testPhysicalName1")
+                .url("testUrl1")
                 .build();
         Image saveImage1 = imageRepository.save(image1);
 
@@ -905,6 +908,7 @@ class ProjectRepositoryTest {
         Image image1 = Image.builder()
                 .logicalName("testLogicalName1")
                 .physicalName("testPhysicalName1")
+                .url("testUrl1")
                 .build();
         Image saveImage1 = imageRepository.save(image1);
 
@@ -1160,6 +1164,7 @@ class ProjectRepositoryTest {
         Image image1 = Image.builder()
                 .logicalName("testLogicalName1")
                 .physicalName("testPhysicalName1")
+                .url("testUrl1")
                 .build();
         Image saveImage1 = imageRepository.save(image1);
 
@@ -1412,6 +1417,7 @@ class ProjectRepositoryTest {
         Image image1 = Image.builder()
                 .logicalName("testLogicalName1")
                 .physicalName("testPhysicalName1")
+                .url("testUrl1")
                 .build();
         Image saveImage1 = imageRepository.save(image1);
 
@@ -1682,6 +1688,7 @@ class ProjectRepositoryTest {
         Image image1 = Image.builder()
                 .logicalName("testLogicalName1")
                 .physicalName("testPhysicalName1")
+                .url("testUrl1")
                 .build();
         Image saveImage1 = imageRepository.save(image1);
 

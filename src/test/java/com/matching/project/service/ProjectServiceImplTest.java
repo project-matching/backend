@@ -544,7 +544,6 @@ class ProjectServiceImplTest {
                 .maxPeople(10)
                 .currentPeople(4)
                 .deleteReason(null)
-                .imageNo(0L)
                 .viewCount(10)
                 .commentCount(10)
                 .build();
@@ -759,7 +758,6 @@ class ProjectServiceImplTest {
                 .maxPeople(10)
                 .currentPeople(4)
                 .deleteReason(null)
-                .imageNo(0L)
                 .viewCount(10)
                 .commentCount(10)
                 .build();
@@ -974,7 +972,6 @@ class ProjectServiceImplTest {
                 .maxPeople(10)
                 .currentPeople(4)
                 .deleteReason(null)
-                .imageNo(0L)
                 .viewCount(10)
                 .commentCount(10)
                 .build();
@@ -1189,7 +1186,6 @@ class ProjectServiceImplTest {
                 .maxPeople(10)
                 .currentPeople(4)
                 .deleteReason(null)
-                .imageNo(0L)
                 .viewCount(10)
                 .commentCount(10)
                 .build();
