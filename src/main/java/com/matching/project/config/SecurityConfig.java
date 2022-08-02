@@ -86,9 +86,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 //.antMatchers("/v1/project/recruitment/complete/*").hasAnyRole("USER", "ADMIN", "ANONYMOUS")
 
                 //ProjectParticipateController
-                .antMatchers("/v1/participate").hasRole("USER")
-                .antMatchers("/v1/participate/*/permit").hasRole("USER")
-                .antMatchers("/v1/participate/*/refusal").hasRole("USER")
+                .antMatchers("/v1/participate").hasAnyRole("USER", "ADMIN")
+                .antMatchers("/v1/participate/*/permit").hasAnyRole("USER", "ADMIN")
+                .antMatchers("/v1/participate/*/refusal").hasAnyRole("USER", "ADMIN")
+
+                //TechnicalStackController
+                .antMatchers(HttpMethod.GET,"/v1/technicalStack").hasRole("ADMIN")
+                .antMatchers(HttpMethod.POST,"/v1/technicalStack").hasRole("ADMIN")
                 //AnyRequest
                 .anyRequest().permitAll()
 
