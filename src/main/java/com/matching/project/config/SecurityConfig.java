@@ -93,6 +93,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 //BookMarkController
                 .antMatchers(HttpMethod.POST,"/v1/bookmark/*").hasAnyRole("USER", "ADMIN")
                 .antMatchers(HttpMethod.DELETE,"/v1/bookmark/*").hasAnyRole("USER", "ADMIN")
+                .antMatchers(HttpMethod.GET,"/v1/bookmark").hasAnyRole("USER", "ADMIN")
 
                 //AnyRequest
                 .anyRequest().permitAll()
