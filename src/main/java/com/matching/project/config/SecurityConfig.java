@@ -89,6 +89,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/v1/participate").hasRole("USER")
                 .antMatchers("/v1/participate/*/permit").hasRole("USER")
                 .antMatchers("/v1/participate/*/refusal").hasRole("USER")
+
+                //BookMarkController
+                .antMatchers(HttpMethod.POST,"/v1/bookmark/*").hasAnyRole("USER", "ADMIN")
+                .antMatchers(HttpMethod.DELETE,"/v1/bookmark/*").hasAnyRole("USER", "ADMIN")
+
                 //AnyRequest
                 .anyRequest().permitAll()
 

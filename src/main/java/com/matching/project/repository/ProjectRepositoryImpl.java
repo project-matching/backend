@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static com.matching.project.entity.QBookMark.bookMark;
 import static com.matching.project.entity.QImage.image;
 import static com.matching.project.entity.QPosition.position;
 import static com.matching.project.entity.QProject.project;
@@ -232,6 +233,50 @@ public class ProjectRepositoryImpl implements ProjectRepositoryCustom {
                         .and(project.no.in(
                                 subQuery
                         )))
+                .fetch().size();
+
+        return new PageImpl<>(projectSimpleDtoList, pageable, totalSize);
+    }
+
+    @Override
+    public Page<ProjectSimpleDto> findBookMarkProjectByDelete(Pageable pageable, User user, boolean delete) {
+        JPQLQuery<Long> subQuery = JPAExpressions.selectDistinct(bookMark.project.no)
+                .from(bookMark)
+                .join(bookMark.user, QUser.user)
+                .join(bookMark.project, project)
+                .where(bookMark.user.eq(user));
+
+        List<ProjectSimpleDto> projectSimpleDtoList = queryFactory.select(Projections.constructor(ProjectSimpleDto.class,
+                        project.no,
+                        project.name,
+                        project.maxPeople,
+                        project.currentPeople,
+                        project.viewCount,
+                        project.createUserName))
+                .from(project)
+                .where(eqDelete(delete)
+                        .and(project.no.in(
+                                subQuery
+                        )))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .orderBy(projectSort(pageable))
+                .fetch();
+
+        // 북마크 세팅
+        projectSimpleDtoList.stream().forEach(projectSimpleDto -> projectSimpleDto.setBookMark(true));
+
+        // 프로젝트 연관 select
+        findProjectSimpleDtoListRelation(projectSimpleDtoList);
+
+        // count 쿼리
+        int totalSize = queryFactory
+                .selectFrom(project)
+                .where(
+                        eqDelete(delete)
+                                .and(project.no.in(
+                                        subQuery
+                                )))
                 .fetch().size();
 
         return new PageImpl<>(projectSimpleDtoList, pageable, totalSize);

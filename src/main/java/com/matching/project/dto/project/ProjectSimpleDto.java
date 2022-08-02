@@ -38,5 +38,6 @@ public class ProjectSimpleDto {
         this.register = register;
         this.bookMark = bookMark;
     }
+
 }
 
