@@ -92,7 +92,7 @@ public class ProjectServiceImpl implements ProjectService {
             if (projectPositionRegisterDto.getProjectRegisterUserDto() != null) {
                 projectPosition = ProjectPosition.builder()
                         .state(true)
-                        .position(positionList.stream().filter(position -> position.getNo() == projectPositionRegisterDto.getPositionNo()).findAny().orElseThrow())
+                        .position(positionList.stream().filter(position -> position.getNo().equals(projectPositionRegisterDto.getPositionNo())).findAny().orElseThrow())
                         .user(user)
                         .creator(true)
                         .build();
@@ -100,7 +100,7 @@ public class ProjectServiceImpl implements ProjectService {
             } else {
                 projectPosition = ProjectPosition.builder()
                         .state(false)
-                        .position(positionList.stream().filter(position -> position.getNo() == projectPositionRegisterDto.getPositionNo()).findAny().orElseThrow())
+                        .position(positionList.stream().filter(position -> position.getNo().equals(projectPositionRegisterDto.getPositionNo())).findAny().orElseThrow())
                         .user(null)
                         .build();
                 projectPosition.setProject(project);
@@ -113,7 +113,7 @@ public class ProjectServiceImpl implements ProjectService {
         List<TechnicalStack> technicalStackList = technicalStackRepository.findByNoIn(projectTechnicalStackNoList);
         for (Long no : projectTechnicalStackNoList) {
             ProjectTechnicalStack projectTechnicalStack = ProjectTechnicalStack.builder()
-                    .technicalStack(technicalStackList.stream().filter(technicalStack -> technicalStack.getNo() == no).findAny().orElseThrow())
+                    .technicalStack(technicalStackList.stream().filter(technicalStack -> technicalStack.getNo().equals(no)).findAny().orElseThrow())
                     .build();
             projectTechnicalStack.setProject(project);
             projectTechnicalStackRepository.save(projectTechnicalStack);

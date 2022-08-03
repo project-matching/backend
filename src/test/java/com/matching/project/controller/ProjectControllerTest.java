@@ -91,9 +91,6 @@ class ProjectControllerTest {
     UserRepository userRepository;
 
     @Autowired
-    CommentRepository commentRepository;
-
-    @Autowired
     PositionRepository positionRepository;
 
     @Autowired
