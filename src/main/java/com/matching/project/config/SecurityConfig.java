@@ -90,6 +90,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/v1/participate/*/permit").hasAnyRole("USER", "ADMIN")
                 .antMatchers("/v1/participate/*/refusal").hasAnyRole("USER", "ADMIN")
 
+                //BookMarkController
+                .antMatchers(HttpMethod.POST,"/v1/bookmark/*").hasAnyRole("USER", "ADMIN")
+                .antMatchers(HttpMethod.DELETE,"/v1/bookmark/*").hasAnyRole("USER", "ADMIN")
+                .antMatchers(HttpMethod.GET,"/v1/bookmark").hasAnyRole("USER", "ADMIN")
+
                 //TechnicalStackController
                 .antMatchers(HttpMethod.GET,"/v1/technicalStack").hasRole("ADMIN")
                 .antMatchers(HttpMethod.POST,"/v1/technicalStack").hasRole("ADMIN")
