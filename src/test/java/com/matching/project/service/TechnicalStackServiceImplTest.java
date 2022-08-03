@@ -108,13 +108,13 @@ class TechnicalStackServiceImplTest {
 
         assertEquals(technicalStackRegisterFormResponseDtoList.get(0).getTechnicalStackNo(), technicalStack1.getNo());
         assertEquals(technicalStackRegisterFormResponseDtoList.get(0).getTechnicalStackName(), technicalStack1.getName());
-        assertEquals(technicalStackRegisterFormResponseDtoList.get(0).getImage(), image1.getPhysicalName());
+        assertEquals(technicalStackRegisterFormResponseDtoList.get(0).getImage(), image1.getUrl());
         assertEquals(technicalStackRegisterFormResponseDtoList.get(1).getTechnicalStackNo(), technicalStack2.getNo());
         assertEquals(technicalStackRegisterFormResponseDtoList.get(1).getTechnicalStackName(), technicalStack2.getName());
-        assertEquals(technicalStackRegisterFormResponseDtoList.get(1).getImage(), image2.getPhysicalName());
+        assertEquals(technicalStackRegisterFormResponseDtoList.get(1).getImage(), image2.getUrl());
         assertEquals(technicalStackRegisterFormResponseDtoList.get(2).getTechnicalStackNo(), technicalStack3.getNo());
         assertEquals(technicalStackRegisterFormResponseDtoList.get(2).getTechnicalStackName(), technicalStack3.getName());
-        assertEquals(technicalStackRegisterFormResponseDtoList.get(2).getImage(), image3.getPhysicalName());
+        assertEquals(technicalStackRegisterFormResponseDtoList.get(2).getImage(), image3.getUrl());
     }
     
     @Test

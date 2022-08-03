@@ -116,13 +116,13 @@ class TechnicalStackControllerTest {
                 .andExpect(header().string("Content-type", "application/json"))
                 .andExpect(jsonPath("$.data[0].technicalStackNo").value(saveTechnicalStack1.getNo()))
                 .andExpect(jsonPath("$.data[0].technicalStackName").value(saveTechnicalStack1.getName()))
-                .andExpect(jsonPath("$.data[0].image").value(saveImage1.getPhysicalName()))
+                .andExpect(jsonPath("$.data[0].image").value(saveImage1.getUrl()))
                 .andExpect(jsonPath("$.data[1].technicalStackNo").value(saveTechnicalStack2.getNo()))
                 .andExpect(jsonPath("$.data[1].technicalStackName").value(saveTechnicalStack2.getName()))
-                .andExpect(jsonPath("$.data[1].image").value(saveImage2.getPhysicalName()))
+                .andExpect(jsonPath("$.data[1].image").value(saveImage2.getUrl()))
                 .andExpect(jsonPath("$.data[2].technicalStackNo").value(saveTechnicalStack3.getNo()))
                 .andExpect(jsonPath("$.data[2].technicalStackName").value(saveTechnicalStack3.getName()))
-                .andExpect(jsonPath("$.data[2].image").value(saveImage3.getPhysicalName()))
+                .andExpect(jsonPath("$.data[2].image").value(saveImage3.getUrl()))
                 .andExpect(status().isOk());
     }
 
