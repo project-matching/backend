@@ -23,6 +23,20 @@ public class ProjectDto {
     private Integer maxPeople;
     private boolean bookmark;
     private boolean applicationStatus;
-    private List<String> technicalStack = new ArrayList<>();
+    private List<String> technicalStackList = new ArrayList<>();
     private List<ProjectPositionDetailDto> projectPositionDetailDtoList = new ArrayList<>();
+
+    @Builder
+    public ProjectDto(Long projectNo, String name, LocalDate startDate, LocalDate endDate, boolean state, String introduction, Integer currentPeople, Integer maxPeople, boolean bookmark, boolean applicationStatus) {
+        this.projectNo = projectNo;
+        this.name = name;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.state = state;
+        this.introduction = introduction;
+        this.currentPeople = currentPeople;
+        this.maxPeople = maxPeople;
+        this.bookmark = bookmark;
+        this.applicationStatus = applicationStatus;
+    }
 }

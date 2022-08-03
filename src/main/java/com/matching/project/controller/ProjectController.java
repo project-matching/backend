@@ -77,9 +77,8 @@ public class ProjectController {
     @GetMapping("/{projectNo}")
     @ApiOperation(value = "프로젝트 상세 조회 (수정 완료)")
     public ResponseEntity<ResponseDto<ProjectDto>> projectInfo(@PathVariable Long projectNo) throws Exception{
-        ProjectDto projectDetail = projectService.getProjectDetail(projectNo);
 
-        return ResponseEntity.ok(new ResponseDto<>(null, projectDetail));
+        return ResponseEntity.ok(new ResponseDto<>(null, projectService.getProjectDetail(projectNo)));
     }
 
     @GetMapping("/{projectNo}/update")
