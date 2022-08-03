@@ -39,12 +39,11 @@ public class TechnicalStackServiceImpl implements TechnicalStackService {
                 .collect(Collectors.toMap(image -> image.getNo(), image -> image));
 
         // 이미지 매칭
-        // todo 추후 어떤 이미지 값을 넘길지 정해야함 현재는 physical
         List<TechnicalStackRegisterFormResponseDto> technicalStackRegisterFormResponseDtoList = new ArrayList<>();
         for (TechnicalStack technicalStack : technicalStackList) {
             TechnicalStackRegisterFormResponseDto technicalStackRegisterFormResponseDto;
             if (imageMap.containsKey(technicalStack.getImageNo())) {
-                technicalStackRegisterFormResponseDto = new TechnicalStackRegisterFormResponseDto(technicalStack.getNo(), technicalStack.getName(), imageMap.get(technicalStack.getImageNo()).getPhysicalName());
+                technicalStackRegisterFormResponseDto = new TechnicalStackRegisterFormResponseDto(technicalStack.getNo(), technicalStack.getName(), imageMap.get(technicalStack.getImageNo()).getUrl());
             } else {
                 technicalStackRegisterFormResponseDto = new TechnicalStackRegisterFormResponseDto(technicalStack.getNo(), technicalStack.getName(), null);
             }
