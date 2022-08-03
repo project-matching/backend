@@ -6,6 +6,7 @@ import com.matching.project.dto.project.*;
 import com.matching.project.dto.projectposition.ProjectPositionRegisterDto;
 import com.matching.project.dto.projectposition.ProjectPositionUpdateFormDto;
 import com.matching.project.dto.user.ProjectUpdateFormUserDto;
+import com.matching.project.dto.user.UserDto;
 import com.matching.project.entity.*;
 import com.matching.project.error.CustomException;
 import com.matching.project.error.ErrorCode;
@@ -248,66 +249,63 @@ public class ProjectServiceImpl implements ProjectService {
     
     @Override
     public ProjectDto getProjectDetail(Long projectNo) {
-//        // 프로젝트 조회
-//        Project project = projectRepository.findById(projectNo).orElseThrow(() -> new NoSuchElementException("프로젝트를 찾지 못했습니다."));
-//        // 포지션 조회
-//        List<ProjectPosition> projectPositionList = projectPositionRepository.findByProjectWithPositionAndProjectAndUserUsingLeftFetchJoin(project);
-//        // 댓글 조회
-//        List<Comment> commentList = commentRepository.findByProjectNo(project);
-//        // 기술 스택 조회
-//        List<ProjectTechnicalStack> projectTechnicalStackList = projectTechnicalStackRepository.findByProjectWithTechnicalStackAndProjectUsingFetchJoin(project);
-//
-//        ProjectDto projectDto = ProjectDto.builder()
-//                .name(project.getName())
-//                // 이미지 추가 필요
-//                .profile(null)
-//                .createDate(project.getCreateDate())
-//                .startDate(project.getStartDate())
-//                .endDate(project.getEndDate())
-//                .state(project.isState())
-//                .introduction(project.getIntroduction())
-//                .maxPeople(project.getMaxPeople())
-//                .bookmark(false)
-//                .register(project.getCreateUserName())
-//                .build();
-//
-//        // projectPositionDto로 변환
-//        List<ProjectPositionDetailDto> projectPositionDetailDtoList = projectPositionList.stream()
-//                .map(projectPosition ->
-//                        new ProjectPositionDetailDto(
-//                                projectPosition.getPosition().getName(),
-//                                projectPosition.getUser() == null ? null : projectPosition.getUser().getNo(),
-//                                projectPosition.getUser() == null ? null : projectPosition.getUser().getName(),
-//                                projectPosition.isState())
-//                ).collect(Collectors.toList());
-//        projectDto.setProjectPositionDetailDtoList(projectPositionDetailDtoList);
-//
-//        // commentDto로 변환
-//        List<CommentDto> commentDtoList = commentList.stream()
-//                .map(comment -> new CommentDto(
-//                                comment.getNo(),
-//                                comment.getUser().getName(),
-//                                comment.getContent()
-//                        )
-//                ).collect(Collectors.toList());
-//        projectDto.setCommentDtoList(commentDtoList);
-//
-//        // 기술스택 String으로 변환
-//        List<String> technicalStackList = projectTechnicalStackList.stream()
-//                .map(projectTechnicalStack -> projectTechnicalStack.getTechnicalStack().getName())
-//                .collect(Collectors.toList());
-//        projectDto.setTechnicalStack(technicalStackList);
-//
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//
-//        if (authentication.getAuthorities().contains(new SimpleGrantedAuthority(Role.ROLE_USER.toString()))) {
-//            Object principal = authentication.getPrincipal();
-//            User user = (User) principal;
-//            boolean bookMark = bookMarkRepository.existBookMark(user, project);
-//            projectDto.setBookmark(bookMark);
-//        }
-//
-//        return projectDto;
-        return null;
+        // 프로젝트 조회
+        Project project = projectRepository.findById(projectNo).orElseThrow(() -> new CustomException(ErrorCode.PROJECT_NO_SUCH_ELEMENT_EXCEPTION));
+
+        // 포지션 조회
+        List<ProjectPositionDetailDto> projectPositionDetailDtoList = projectPositionRepository.findProjectAndPositionAndUserUsingFetchJoinByProjectNo(project).stream()
+                .map(projectPosition -> new ProjectPositionDetailDto(
+                        projectPosition.getNo(),
+                        projectPosition.getPosition().getName(),
+                        projectPosition.getUser() == null ? null : new UserDto(projectPosition.getUser().getNo(),
+                                projectPosition.getUser().getName(),
+                                projectPosition.isCreator())
+                )).collect(Collectors.toList());
+
+        // 기술 스택 조회
+        List<String> technicalStackList = projectTechnicalStackRepository.findTechnicalStackAndProjectUsingFetchJoin(project).stream()
+                .map(projectTechnicalStack -> projectTechnicalStack.getTechnicalStack().getName())
+                .collect(Collectors.toList());
+
+        // Dto 세팅
+        ProjectDto projectDto = ProjectDto.builder()
+                .projectNo(project.getNo())
+                .name(project.getName())
+                .startDate(project.getStartDate())
+                .endDate(project.getEndDate())
+                .state(project.isState())
+                .introduction(project.getIntroduction())
+                .currentPeople(project.getCurrentPeople())
+                .maxPeople(project.getMaxPeople())
+                .bookmark(false)
+                .applicationStatus(false)
+                .build();
+        projectDto.setProjectPositionDetailDtoList(projectPositionDetailDtoList);
+        projectDto.setTechnicalStackList(technicalStackList);
+        
+        // 권한 가져오기
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        // 로그인한 유저인 경우(유저, 어드민)
+        if (authentication.getAuthorities().contains(new SimpleGrantedAuthority(Role.ROLE_USER.toString()))
+                || authentication.getAuthorities().contains(new SimpleGrantedAuthority(Role.ROLE_ADMIN.toString())) ) {
+            Object principal = authentication.getPrincipal();
+            User user = (User) principal;
+            
+            // 북마크 세팅
+            boolean bookMark = bookMarkRepository.existBookMark(user, project);
+            projectDto.setBookmark(bookMark);
+
+            // 프로젝트 참여 여부 판단
+            boolean applicationStatus = false;
+            for (ProjectPositionDetailDto projectPositionDetailDto : projectPositionDetailDtoList) {
+                if (projectPositionDetailDto.getUserDto() != null && projectPositionDetailDto.getUserDto().getNo().equals(user.getNo())) {
+                    applicationStatus = true;
+                    break;
+                }
+            }
+            projectDto.setApplicationStatus(applicationStatus);
+        }
+
+        return projectDto;
     }
 }
