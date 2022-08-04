@@ -22,7 +22,7 @@ import java.util.Map;
 @Slf4j
 @RequiredArgsConstructor
 @Component
-public class OAathSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
+public class OAuthSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
     private final JwtTokenService jwtTokenService;
 
     @Override
@@ -48,15 +48,6 @@ public class OAathSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
         log.info("{}", token);
 
         // api 리다이렉트에는 로그인 인증 후 jwt 토큰을 보낼 URI(react)가 설정되어야함.
-        // 해당부분은 추후 프론트엔드 담당자와 상의가 필요함
         getRedirectStrategy().sendRedirect(request, response, "http://localhost:3000/auth/success?token="+ token);
-//        String targetUrl;
-//        targetUrl = UriComponentsBuilder.fromUriString("/common/login/auth/success")
-//                .queryParam("token=" + token )
-//                .build().toUriString();
-//        getRedirectStrategy().sendRedirect(request, response, targetUrl);
     }
-
-
-
 }
