@@ -1,18 +1,20 @@
 package com.matching.project.config;
 
 import com.matching.project.oauth.CustomOAuth2UserService;
-import com.matching.project.oauth.OAathSuccessHandler;
+import com.matching.project.oauth.OAuthSuccessHandler;
 import com.matching.project.service.JwtTokenService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.header.writers.frameoptions.WhiteListedAllowFromStrategy;
 import org.springframework.security.web.header.writers.frameoptions.XFrameOptionsHeaderWriter;
@@ -25,7 +27,7 @@ import java.util.Arrays;
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final JwtTokenService jwtTokenService;
     private final CustomOAuth2UserService customOAuth2UserService;
-    private final OAathSuccessHandler oAathSuccessHandler;
+    private final OAuthSuccessHandler oAathSuccessHandler;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -41,10 +43,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
+
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenService),
                         UsernamePasswordAuthenticationFilter.class)
+
+                .exceptionHandling()
+                .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
+                .and()
+
                 .authorizeRequests()
-                
+
                 //ProjectController
                 .antMatchers(HttpMethod.POST, "/v1/project").hasAnyRole("USER", "ADMIN")
                 .antMatchers("/v1/project/create").hasAnyRole("USER", "ADMIN")
@@ -67,14 +75,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
                 //CommentController
                 .antMatchers(HttpMethod.POST,"/v1/comment/**").hasAnyRole("USER", "ADMIN")
-                .antMatchers(HttpMethod.GET,"/v1/comment/**").hasAnyRole("USER", "ADMIN")
+                .antMatchers(HttpMethod.GET,"/v1/comment/**").hasAnyRole("USER", "ADMIN", "ANONYMOUS")
                 .antMatchers(HttpMethod.PATCH,"/v1/comment/**").hasAnyRole("USER", "ADMIN")
                 .antMatchers(HttpMethod.DELETE,"/v1/comment/**").hasAnyRole("USER", "ADMIN")
 
                 //PositionController
-                .antMatchers(HttpMethod.POST,"/v1/position").hasAnyRole("USER", "ADMIN")
-                .antMatchers(HttpMethod.GET,"/v1/position").hasAnyRole("USER", "ADMIN")
-                .antMatchers(HttpMethod.PUT,"/v1/position").hasAnyRole("ADMIN")
+                .antMatchers(HttpMethod.POST,"/v1/position").hasAnyRole("ADMIN")
+                .antMatchers(HttpMethod.GET,"/v1/position").hasAnyRole("ADMIN")
+                .antMatchers(HttpMethod.PUT,"/v1/position/**").hasAnyRole("ADMIN")
 
                 //NotificationController
                 .antMatchers(HttpMethod.POST,"/v1/notification").hasAnyRole("ADMIN")
@@ -105,6 +113,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .successHandler(oAathSuccessHandler)
                 .userInfoEndpoint()
                 .userService(customOAuth2UserService);
+
 
         // Spring Security 와 h2-console 를 함께 쓰기위한 옵션
         http.

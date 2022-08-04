@@ -42,171 +42,176 @@ class CommonServiceImplTest {
     @InjectMocks
     private CommonServiceImpl commonService;
 
-    @DisplayName("노말 로그인 실패 : 이메일 인증을 받지 않은 로그인")
-    @Test
-    void normalLoginFail1() {
-        //given
-        String email = "test@naver.com";
-        String password = "test";
+    @Nested
+    @DisplayName("일반 로그인")
+    class NormalLogin {
 
-        NormalLoginRequestDto dto = NormalLoginRequestDto.builder()
-                .email(email)
-                .password(password)
-                .build();
+        @DisplayName("성공")
+        @Test
+        void success() {
+            //given
+            String email = "test@naver.com";
+            String password = "test";
 
-        User mockUser = User.builder()
-                .email(email)
-                .password(passwordEncoder.encode(password))
-                .email_auth(false)
-                .build();
+            NormalLoginRequestDto dto = NormalLoginRequestDto.builder()
+                    .email(email)
+                    .password(password)
+                    .build();
 
-        given((User) customUserDetailsService.loadUserByUsername(email)).willReturn(mockUser);
+            User mockUser = User.builder()
+                    .email(email)
+                    .password(passwordEncoder.encode(password))
+                    .email_auth(true)
+                    .build();
 
-        //when
-        CustomException e = Assertions.assertThrows(CustomException.class, () -> {
-            commonService.normalLogin(dto);
-        });
+            given((User) customUserDetailsService.loadUserByUsername(email)).willReturn(mockUser);
 
-        //then
-        assertThat(e.getErrorCode().getDetail()).isEqualTo("This is an unsigned email");
-    }
+            //when
+            User user = commonService.normalLogin(dto);
 
-    @DisplayName("노말 로그인 실패 : 존재하지 않는 이메일")
-    @Test
-    void normalLoginFail2() {
-        //given
-        String email = "test@naver.com";
-        String password = "test";
+            //then
+            assertThat(email).isEqualTo(user.getEmail());
+        }
 
-        NormalLoginRequestDto dto = NormalLoginRequestDto.builder()
-                .email(email)
-                .password(password)
-                .build();
+        @DisplayName("실패 : 이메일 인증을 받지 않은 로그인")
+        @Test
+        void fail1() {
+            //given
+            String email = "test@naver.com";
+            String password = "test";
 
-        given((User) customUserDetailsService.loadUserByUsername(email)).willThrow(new CustomException(ErrorCode.NOT_REGISTERED_EMAIL_EXCEPTION));
+            NormalLoginRequestDto dto = NormalLoginRequestDto.builder()
+                    .email(email)
+                    .password(password)
+                    .build();
 
-        //when
-        CustomException e = Assertions.assertThrows(CustomException.class, () -> {
-            commonService.normalLogin(dto);
-        });
+            User mockUser = User.builder()
+                    .email(email)
+                    .password(passwordEncoder.encode(password))
+                    .email_auth(false)
+                    .build();
 
-        //then
-        assertThat(e.getErrorCode().getDetail()).isEqualTo("This is not a registered email");
-    }
+            given((User) customUserDetailsService.loadUserByUsername(email)).willReturn(mockUser);
 
-    @DisplayName("노말 로그인 실패 : 패스워드가 틀림")
-    @Test
-    void normalLoginFail3() {
-        //given
-        String email = "test@naver.com";
-        String password = "test";
+            //when
+            CustomException e = Assertions.assertThrows(CustomException.class, () -> {
+                commonService.normalLogin(dto);
+            });
 
-        NormalLoginRequestDto dto = NormalLoginRequestDto.builder()
-                .email(email)
-                .password(password)
-                .build();
+            //then
+            assertThat(e.getErrorCode().getDetail()).isEqualTo("This is an unsigned email");
+        }
 
-        User mockUser = User.builder()
-                .email(email)
-                .password(passwordEncoder.encode("whowho"))
-                .email_auth(true)
-                .build();
-        given((User) customUserDetailsService.loadUserByUsername(email)).willReturn(mockUser);
+        @DisplayName("실패 : 존재하지 않는 이메일")
+        @Test
+        void fail2() {
+            //given
+            String email = "test@naver.com";
+            String password = "test";
 
-        //when
-        CustomException e = Assertions.assertThrows(CustomException.class, () -> {
-            commonService.normalLogin(dto);
-        });
+            NormalLoginRequestDto dto = NormalLoginRequestDto.builder()
+                    .email(email)
+                    .password(password)
+                    .build();
 
-        //then
-        assertThat(e.getErrorCode().getDetail()).isEqualTo("This is an incorrect password");
+            given((User) customUserDetailsService.loadUserByUsername(email)).willThrow(new CustomException(ErrorCode.NOT_REGISTERED_EMAIL_EXCEPTION));
 
-    }
+            //when
+            CustomException e = Assertions.assertThrows(CustomException.class, () -> {
+                commonService.normalLogin(dto);
+            });
 
-    @DisplayName("노말 로그인 실패 : 차단된 사용자")
-    @Test
-    void normalLoginFail4() {
-        //given
-        String email = "test@naver.com";
-        String password = "test";
+            //then
+            assertThat(e.getErrorCode().getDetail()).isEqualTo("This is not a registered email");
+        }
 
-        User mockUser = User.builder()
-                .email(email)
-                .password(passwordEncoder.encode(password))
-                .block(true)
-                .email_auth(false)
-                .build();
+        @DisplayName("실패 : 패스워드가 틀림")
+        @Test
+        void fail3() {
+            //given
+            String email = "test@naver.com";
+            String password = "test";
 
-        NormalLoginRequestDto dto = NormalLoginRequestDto.builder()
-                .email(email)
-                .password(password)
-                .build();
+            NormalLoginRequestDto dto = NormalLoginRequestDto.builder()
+                    .email(email)
+                    .password(password)
+                    .build();
 
-        given(customUserDetailsService.loadUserByUsername(email)).willReturn(mockUser);
+            User mockUser = User.builder()
+                    .email(email)
+                    .password(passwordEncoder.encode("whowho"))
+                    .email_auth(true)
+                    .build();
+            given((User) customUserDetailsService.loadUserByUsername(email)).willReturn(mockUser);
 
-        //when
-        CustomException e = Assertions.assertThrows(CustomException.class, () -> {
-            commonService.normalLogin(dto);
-        });
+            //when
+            CustomException e = Assertions.assertThrows(CustomException.class, () -> {
+                commonService.normalLogin(dto);
+            });
 
-        //then
-        assertThat(e.getErrorCode().getDetail()).isEqualTo("This is blocked User ID");
-    }
+            //then
+            assertThat(e.getErrorCode().getDetail()).isEqualTo("This is an incorrect password");
 
-    @DisplayName("노말 로그인 실패 : 탈퇴한 사용자")
-    @Test
-    void normalLoginFail5() {
-        //given
-        String email = "test@naver.com";
-        String password = "test";
+        }
 
-        User mockUser = User.builder()
-                .email(email)
-                .password(passwordEncoder.encode(password))
-                .withdrawal(true)
-                .email_auth(true)
-                .build();
+        @DisplayName("실패 : 차단된 사용자")
+        @Test
+        void fail4() {
+            //given
+            String email = "test@naver.com";
+            String password = "test";
 
-        NormalLoginRequestDto dto = NormalLoginRequestDto.builder()
-                .email(email)
-                .password(password)
-                .build();
+            User mockUser = User.builder()
+                    .email(email)
+                    .password(passwordEncoder.encode(password))
+                    .block(true)
+                    .email_auth(false)
+                    .build();
 
-        given(customUserDetailsService.loadUserByUsername(email)).willReturn(mockUser);
+            NormalLoginRequestDto dto = NormalLoginRequestDto.builder()
+                    .email(email)
+                    .password(password)
+                    .build();
 
-        //when
-        CustomException e = Assertions.assertThrows(CustomException.class, () -> {
-            commonService.normalLogin(dto);
-        });
+            given(customUserDetailsService.loadUserByUsername(email)).willReturn(mockUser);
 
-        //then
-        assertThat(e.getErrorCode().getDetail()).isEqualTo("This is withdrawal User ID");
-    }
+            //when
+            CustomException e = Assertions.assertThrows(CustomException.class, () -> {
+                commonService.normalLogin(dto);
+            });
 
-    @DisplayName("노말 로그인 성공")
-    @Test
-    void normalLoginSuccess() {
-        //given
-        String email = "test@naver.com";
-        String password = "test";
+            //then
+            assertThat(e.getErrorCode().getDetail()).isEqualTo("This is blocked User ID");
+        }
 
-        NormalLoginRequestDto dto = NormalLoginRequestDto.builder()
-                .email(email)
-                .password(password)
-                .build();
+        @DisplayName("실패 : 탈퇴한 사용자")
+        @Test
+        void fail5() {
+            //given
+            String email = "test@naver.com";
+            String password = "test";
 
-        User mockUser = User.builder()
-                .email(email)
-                .password(passwordEncoder.encode(password))
-                .email_auth(true)
-                .build();
+            User mockUser = User.builder()
+                    .email(email)
+                    .password(passwordEncoder.encode(password))
+                    .withdrawal(true)
+                    .email_auth(true)
+                    .build();
 
-        given((User) customUserDetailsService.loadUserByUsername(email)).willReturn(mockUser);
+            NormalLoginRequestDto dto = NormalLoginRequestDto.builder()
+                    .email(email)
+                    .password(password)
+                    .build();
 
-        //when
-        User user = commonService.normalLogin(dto);
+            given(customUserDetailsService.loadUserByUsername(email)).willReturn(mockUser);
 
-        //then
-        assertThat(email).isEqualTo(user.getEmail());
+            //when
+            CustomException e = Assertions.assertThrows(CustomException.class, () -> {
+                commonService.normalLogin(dto);
+            });
+
+            //then
+            assertThat(e.getErrorCode().getDetail()).isEqualTo("This is withdrawal User ID");
+        }
     }
 }

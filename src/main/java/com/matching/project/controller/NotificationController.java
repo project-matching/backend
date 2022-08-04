@@ -27,7 +27,7 @@ public class NotificationController {
     private final NotificationService notificationService;
 
     @PostMapping
-    @ApiOperation(value = "공지 알림 전송")
+    @ApiOperation(value = "공지 알림 전송 (관리자)")
     public ResponseEntity<ResponseDto<Boolean>> notificationSend(@RequestBody @Valid NotificationSendRequestDto notificationSendRequestDto) {
         notificationService.sendNotification(Type.NOTICE, null, notificationSendRequestDto.getTitle(), notificationSendRequestDto.getContent());
         return ResponseEntity.ok(new ResponseDto<>(null, true));

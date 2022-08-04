@@ -16,8 +16,6 @@ import java.util.List;
 @Getter
 public class UserUpdateRequestDto {
 
-    private String image;
-
     @NotBlank
     private String name;
 

@@ -10,6 +10,8 @@ import org.springframework.context.annotation.Import;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.*;
 @Import(QuerydslConfiguration.class)
 @DataJpaTest
@@ -48,5 +50,20 @@ class PositionRepositoryTest {
         assertEquals(findPositionList.get(0).getName(), position1.getName());
         assertEquals(findPositionList.get(1).getName(), position2.getName());
         assertEquals(findPositionList.get(2).getName(), position3.getName());
+    }
+
+    @Test
+    void findAllByName() {
+        // given
+        Position position = Position.builder()
+                .name("JPA")
+                .build();
+        positionRepository.save(position);
+
+        // when
+        Optional<Position> optionalPosition = positionRepository.findAllByName("JPA");
+
+        // then
+        assertEquals(optionalPosition.get().getName(), position.getName());
     }
 }
