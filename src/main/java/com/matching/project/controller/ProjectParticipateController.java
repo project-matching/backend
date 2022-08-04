@@ -5,7 +5,10 @@ import com.matching.project.dto.project.ProjectParticipatePermitRequestDto;
 import com.matching.project.dto.project.ProjectParticipateRefusalRequestDto;
 import com.matching.project.dto.project.ProjectParticipateRequestDto;
 import com.matching.project.dto.projectparticipate.ProjectParticipateFormResponseDto;
+import com.matching.project.error.CustomException;
+import com.matching.project.error.ErrorCode;
 import com.matching.project.service.ProjectParticipateRequestService;
+import com.matching.project.service.ProjectService;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -25,6 +28,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ProjectParticipateController {
     private final ProjectParticipateRequestService projectParticipateRequestService;
+    private final ProjectService projectService;
 
     @PostMapping
     @ApiOperation(value = "프로젝트 참가 신청")
@@ -35,6 +39,7 @@ public class ProjectParticipateController {
     @GetMapping("/{projectNo}")
     @ApiOperation(value = "프로젝트 신청 관리 페이지 (수정 완료)")
     public ResponseEntity<ResponseDto<Page<ProjectParticipateFormResponseDto>>> projectParticipateManagementForm(@PathVariable Long projectNo, @PageableDefault(size = 5, sort = "no", direction = Sort.Direction.DESC) Pageable pageable) throws Exception{
+
         Page<ProjectParticipateFormResponseDto> projectParticipateManagementForm = projectParticipateRequestService.findProjectParticipateManagementForm(projectNo, pageable);
 
         return ResponseEntity.ok(new ResponseDto(null, projectParticipateManagementForm));

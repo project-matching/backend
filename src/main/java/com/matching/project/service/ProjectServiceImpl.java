@@ -3,6 +3,8 @@ package com.matching.project.service;
 import com.matching.project.dto.comment.CommentDto;
 import com.matching.project.dto.enumerate.Role;
 import com.matching.project.dto.project.*;
+import com.matching.project.dto.projectposition.ProjectPositionAddDto;
+import com.matching.project.dto.projectposition.ProjectPositionDeleteDto;
 import com.matching.project.dto.projectposition.ProjectPositionRegisterDto;
 import com.matching.project.dto.projectposition.ProjectPositionUpdateFormDto;
 import com.matching.project.dto.user.ProjectUpdateFormUserDto;
@@ -23,10 +25,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.NoSuchElementException;
+import javax.persistence.EntityManager;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -42,6 +44,7 @@ public class ProjectServiceImpl implements ProjectService {
     private final CommentRepository commentRepository;
     private final PositionRepository positionRepository;
     private final TechnicalStackRepository technicalStackRepository;
+    private final EntityManager entityManager;
 
     private void positionValidation(List<Position> positionList, List<String> positionNameList) throws Exception{
         List<Position> filterPositionList = positionList.stream().filter(position -> positionNameList.contains(position.getName())).collect(Collectors.toList());
@@ -307,5 +310,78 @@ public class ProjectServiceImpl implements ProjectService {
         }
 
         return projectDto;
+    }
+
+    @Override
+    public Long projectUpdate(Long projectNo, ProjectUpdateRequestDto projectUpdateRequestDto) throws Exception {
+        // 자신이 만든 프로젝트인지 판단
+        if (!isRegisterProjectUser(projectNo)) {
+            throw new CustomException(ErrorCode.PROJECT_NOT_REGISTER_USER);
+        }
+
+        Project project = projectRepository.findById(projectNo).orElseThrow(() -> new CustomException(ErrorCode.PROJECT_NO_SUCH_ELEMENT_EXCEPTION));
+        LocalDate startDate = LocalDate.parse(projectUpdateRequestDto.getStartDate(), DateTimeFormatter.ISO_DATE);
+        LocalDate endDate = LocalDate.parse(projectUpdateRequestDto.getEndDate(), DateTimeFormatter.ISO_DATE);
+
+        // 프로젝트 업데이트
+        project.updateProject(projectUpdateRequestDto.getName(), startDate, endDate, projectUpdateRequestDto.getIntroduction());
+        entityManager.flush();
+        entityManager.clear();
+
+        // 프로젝트 포지션 삭제
+        if (projectUpdateRequestDto.getProjectPositionDeleteDtoList() != null) {
+            List<Long> projectPositionDeleteNos = projectUpdateRequestDto.getProjectPositionDeleteDtoList().stream()
+                    .map(projectPositionDeleteDto -> projectPositionDeleteDto.getProjectPositionNo()).collect(Collectors.toList());
+            projectPositionRepository.deleteByNoIn(projectPositionDeleteNos);
+        }
+
+        // 프로젝트 포지션 추가
+        if (projectUpdateRequestDto.getProjectPositionAddDtoList() != null) {
+            List<Long> positionNos = projectUpdateRequestDto.getProjectPositionAddDtoList().stream()
+                    .map(projectPositionAddDto -> projectPositionAddDto.getPositionNo()).distinct().collect(Collectors.toList());
+
+            Map<Long, Position> positionMap = positionRepository.findByNoIn(positionNos).stream()
+                    .collect(Collectors.toMap(Position::getNo, position -> position));
+
+            for (ProjectPositionAddDto projectPositionAddDto : projectUpdateRequestDto.getProjectPositionAddDtoList()) {
+                // count만큼 save
+                for (int i = 0 ; i < projectPositionAddDto.getCount() ; i++) {
+                    ProjectPosition projectPosition = ProjectPosition.builder()
+                            .project(project)
+                            .position(positionMap.get(projectPositionAddDto.getPositionNo()))
+                            .user(null)
+                            .creator(false)
+                            .state(false)
+                            .build();
+                    projectPositionRepository.saveAndFlush(projectPosition);
+                    entityManager.clear();
+                }
+            }
+        }
+
+        // 기존 기술스택 삭제
+        projectTechnicalStackRepository.deleteByProjectNo(project.getNo());
+
+        // 기술스택 추가
+        if (projectUpdateRequestDto.getProjectTechnicalStackNoList() != null) {
+            List<TechnicalStack> technicalStackList = technicalStackRepository.findByNoIn(projectUpdateRequestDto.getProjectTechnicalStackNoList()).stream()
+                    .collect(Collectors.toList());
+            for (TechnicalStack technicalStack : technicalStackList) {
+                ProjectTechnicalStack projectTechnicalStack = ProjectTechnicalStack.builder()
+                        .project(project)
+                        .technicalStack(technicalStack)
+                        .build();
+                projectTechnicalStack.setProject(project);
+                projectTechnicalStackRepository.saveAndFlush(projectTechnicalStack);
+                entityManager.clear();
+            }
+        }
+
+        return project.getNo();
+    }
+
+    // 유저가 만든 프로젝트인지 판단하는 메소드
+    private boolean isRegisterProjectUser(Long projectNo) throws Exception {
+        return projectRepository.existUserProjectByUser(getUser().getNo(), projectNo);
     }
 }

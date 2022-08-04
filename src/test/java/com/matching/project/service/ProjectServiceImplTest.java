@@ -3,6 +3,7 @@ package com.matching.project.service;
 import com.matching.project.dto.enumerate.OAuth;
 import com.matching.project.dto.enumerate.Role;
 import com.matching.project.dto.project.*;
+import com.matching.project.dto.projectposition.ProjectPositionAddDto;
 import com.matching.project.dto.projectposition.ProjectPositionRegisterDto;
 import com.matching.project.dto.user.ProjectRegisterUserDto;
 import com.matching.project.entity.*;
@@ -26,6 +27,7 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import javax.persistence.EntityManager;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -61,6 +63,9 @@ class ProjectServiceImplTest {
 
     @Mock
     CommentRepository commentRepository;
+
+    @Mock
+    EntityManager entityManager;
 
     @InjectMocks
     ProjectServiceImpl projectService;
@@ -1673,6 +1678,8 @@ class ProjectServiceImplTest {
 
         // when
         ProjectUpdateFormResponseDto projectUpdateFormResponseDto = null;
+        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(user1, "", user1.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(auth);
 
         try {
             projectUpdateFormResponseDto = projectService.getProjectUpdateForm(1L);
@@ -1735,5 +1742,112 @@ class ProjectServiceImplTest {
         // then
         assertEquals(e.getErrorCode().getHttpStatus(),ErrorCode.PROJECT_NO_SUCH_ELEMENT_EXCEPTION.getHttpStatus());
         assertEquals(e.getErrorCode().getDetail(),ErrorCode.PROJECT_NO_SUCH_ELEMENT_EXCEPTION.getDetail());
+    }
+
+    @Nested
+    @DisplayName("프로젝트 업데이트 테스트")
+    class testProjectUpdate {
+        @Test
+        @DisplayName("성공 테스트")
+        public void testSuccess() {
+            // given
+            LocalDateTime createDate = LocalDateTime.now();
+            LocalDate startDate = LocalDate.of(2022, 06, 24);
+            LocalDate endDate = LocalDate.of(2022, 06, 28);
+
+            // 프로젝트 객체
+            Project project1 = Project.builder()
+                    .no(1L)
+                    .name("testName1")
+                    .createUserName("user1")
+                    .createDate(createDate)
+                    .startDate(startDate)
+                    .endDate(endDate)
+                    .state(true)
+                    .introduction("testIntroduction1")
+                    .maxPeople(10)
+                    .currentPeople(4)
+                    .delete(false)
+                    .deleteReason(null)
+                    .viewCount(10)
+                    .commentCount(10)
+                    .build();
+
+            // 포지션 세팅
+            List<Position> positionList = new ArrayList<>();
+            Position position1 = Position.builder()
+                    .no(1L)
+                    .name("testPosition1")
+                    .build();
+            positionList.add(position1);
+
+            // 프로젝트 포지션 세팅
+            ProjectPosition projectPosition1 = ProjectPosition.builder()
+                    .no(1L)
+                    .state(false)
+                    .project(project1)
+                    .position(position1)
+                    .user(null)
+                    .creator(false)
+                    .build();
+            ProjectPosition projectPosition2 = ProjectPosition.builder()
+                    .no(2L)
+                    .state(false)
+                    .project(project1)
+                    .position(position1)
+                    .user(null)
+                    .creator(false)
+                    .build();
+
+            // 기술 스택 세팅
+            List<TechnicalStack> technicalStackList = new ArrayList<>();
+            TechnicalStack technicalStack1 = TechnicalStack.builder()
+                    .no(1L)
+                    .name("testTechnicalStack1")
+                    .build();
+            TechnicalStack technicalStack2 = TechnicalStack.builder()
+                    .no(2L)
+                    .name("testTechnicalStack2")
+                    .build();
+            technicalStackList.add(technicalStack1);
+            technicalStackList.add(technicalStack2);
+
+            // 프로젝트 기술 스택 세팅
+            ProjectTechnicalStack projectTechnicalStack1 = ProjectTechnicalStack.builder()
+                    .project(project1)
+                    .technicalStack(technicalStack1).build();
+            ProjectTechnicalStack projectTechnicalStack2 = ProjectTechnicalStack.builder()
+                    .project(project1)
+                    .technicalStack(technicalStack1).build();
+
+            given(projectRepository.existUserProjectByUser(any(Long.class), any(Long.class))).willReturn(true);
+            given(projectRepository.findById(any())).willReturn(Optional.of(project1));
+            given(positionRepository.findByNoIn(any())).willReturn(positionList);
+            given(projectPositionRepository.saveAndFlush(any())).willReturn(projectPosition1).willReturn(projectPosition2);
+            given(technicalStackRepository.findByNoIn(any())).willReturn(technicalStackList);
+            given(projectTechnicalStackRepository.saveAndFlush(any())).willReturn(projectTechnicalStack1).willReturn(projectTechnicalStack2);
+
+            // when
+            Long result = null;
+            List<ProjectPositionAddDto> projectPositionAddDtoList = new ArrayList<>();
+            ProjectPositionAddDto projectPositionAddDto = new ProjectPositionAddDto(1L, 2);
+            projectPositionAddDtoList.add(projectPositionAddDto);
+
+            String startDateRequest = "2022-08-03";
+            String endDateRequest = "2022-08-04";
+
+            List<Long> technicalStackNoList = new ArrayList<>();
+            technicalStackNoList.add(1L);
+            technicalStackNoList.add(2L);
+
+            ProjectUpdateRequestDto projectUpdateRequestDto = new ProjectUpdateRequestDto("testName", projectPositionAddDtoList, null, startDateRequest, endDateRequest, technicalStackNoList, "testIntroduction");
+            try {
+                result = projectService.projectUpdate(1L, projectUpdateRequestDto);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            assertEquals(result, project1.getNo());
+        }
     }
 }

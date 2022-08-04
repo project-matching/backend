@@ -107,4 +107,12 @@ public class Project extends BaseTimeEntity{
                 .user(user)
                 .build();
     }
+    
+    // 프로젝트 업데이트 메소드
+    public void updateProject(String name, LocalDate startDate, LocalDate endDate, String introduction) {
+        this.name = name;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.introduction = introduction;
+    }
 }
