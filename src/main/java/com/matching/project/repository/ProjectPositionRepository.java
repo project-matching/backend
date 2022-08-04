@@ -17,4 +17,8 @@ public interface ProjectPositionRepository extends JpaRepository<ProjectPosition
 
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     public void deleteByNoIn(Collection<Long> noList);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("delete from ProjectPosition pp where pp.project.no = :projectNo")
+    public void deleteByProjectNo(@Param("projectNo") Long projectNo);
 }

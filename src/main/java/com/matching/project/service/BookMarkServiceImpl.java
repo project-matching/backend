@@ -46,7 +46,7 @@ public class BookMarkServiceImpl implements BookMarkService{
 
     @Override
     public boolean bookMarkDelete(Long projectNo) throws Exception {
-        bookMarkRepository.deleteBookMarkByProjectNo(projectNo);
+        bookMarkRepository.deleteByProjectNo(projectNo);
 
         return true;
     }

@@ -44,6 +44,8 @@ public class ProjectServiceImpl implements ProjectService {
     private final CommentRepository commentRepository;
     private final PositionRepository positionRepository;
     private final TechnicalStackRepository technicalStackRepository;
+    private final ParticipateRequestTechnicalStackRepository participateRequestTechnicalStackRepository;
+    private final ProjectParticipateRequestRepository projectParticipateRequestRepository;
     private final EntityManager entityManager;
 
     private void positionValidation(List<Position> positionList, List<String> positionNameList) throws Exception{
@@ -378,6 +380,38 @@ public class ProjectServiceImpl implements ProjectService {
         }
 
         return project.getNo();
+    }
+
+    @Override
+    public boolean projectDelete(Long projectNo) throws Exception {
+        // 자신이 만든 프로젝트인지 판단
+        if (!isRegisterProjectUser(projectNo)) {
+            throw new CustomException(ErrorCode.PROJECT_NOT_REGISTER_USER);
+        }
+        // 프로젝트 관련 프로젝트 참여 신청 기술 삭제
+        participateRequestTechnicalStackRepository.deleteByProjectNo(projectNo);
+        
+        // 프로젝트 관련 프로젝트 신청 삭제
+        projectParticipateRequestRepository.deleteByProjectNo(projectNo);
+
+        // 프로젝트 관련 프로젝트 포지션 삭제
+        projectPositionRepository.deleteByProjectNo(projectNo);
+
+        // 프로젝트 관련 프로젝트 기술 삭제
+        projectTechnicalStackRepository.deleteByProjectNo(projectNo);
+        
+        // 프로젝트 관련 북마크 삭제
+        bookMarkRepository.deleteByProjectNo(projectNo);
+
+        // 프로젝트 관련 댓글 삭제
+        commentRepository.deleteByProjectNo(projectNo);
+
+        // 프로젝트 삭제
+        projectRepository.deleteById(projectNo);
+
+        entityManager.flush();
+        entityManager.clear();
+        return true;
     }
 
     // 유저가 만든 프로젝트인지 판단하는 메소드

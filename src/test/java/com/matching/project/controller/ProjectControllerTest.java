@@ -103,6 +103,12 @@ class ProjectControllerTest {
     BookMarkRepository bookMarkRepository;
 
     @Autowired
+    CommentRepository commentRepository;
+
+    @Autowired
+    ParticipateRequestTechnicalStackRepository participateRequestTechnicalStackRepository;
+
+    @Autowired
     ProjectParticipateRequestRepository projectParticipateRequestRepository;
 
     // 프로젝트, 유저 저장
@@ -1762,6 +1768,199 @@ class ProjectControllerTest {
                 assertEquals(technicalStackList.get(0).getTechnicalStack().getNo(), saveTechnicalStack1.getNo());
                 assertEquals(technicalStackList.get(1).getProject().getNo(), saveProject1.getNo());
                 assertEquals(technicalStackList.get(1).getTechnicalStack().getNo(), saveTechnicalStack2.getNo());
+            }
+        }
+    }
+
+    @Nested
+    @DisplayName("프로젝트 삭제 테스트")
+    class testProjectDelete {
+        @Nested
+        @DisplayName("비로그인시 테스트")
+        class testNotLogin {
+            @Test
+            @DisplayName("실패 테스트")
+            public void testFailure() throws Exception {
+                // 프로젝트 세팅
+                LocalDateTime createDate = LocalDateTime.now();
+                LocalDate startDate = LocalDate.of(2022, 06, 24);
+                LocalDate endDate = LocalDate.of(2022, 06, 28);
+
+                Project project1 = Project.builder()
+                        .name("testName1")
+                        .createUserName("userName1")
+                        .createDate(createDate)
+                        .startDate(startDate)
+                        .endDate(endDate)
+                        .state(true)
+                        .introduction("testIntroduction1")
+                        .maxPeople(10)
+                        .currentPeople(4)
+                        .delete(false)
+                        .deleteReason(null)
+                        .viewCount(10)
+                        .commentCount(10)
+                        .build();
+                Project saveProject1 = projectRepository.save(project1);
+
+                mvc.perform(delete("/v1/project/"+ saveProject1.getNo()).contentType(MediaType.APPLICATION_JSON))
+                        .andDo(print())
+                        .andExpect(status().is3xxRedirection());
+            }
+        }
+
+        @Nested
+        @DisplayName("로그인시 테스트")
+        class testLogin {
+            @Test
+            @DisplayName("성공 테스트")
+            public void testSuccess() throws Exception {
+                // given
+                User saveUser = saveUser();
+
+                // 프로젝트 세팅
+                LocalDateTime createDate = LocalDateTime.now();
+                LocalDate startDate = LocalDate.of(2022, 06, 24);
+                LocalDate endDate = LocalDate.of(2022, 06, 28);
+
+                Project project1 = Project.builder()
+                        .name("testName1")
+                        .createUserName("userName1")
+                        .createDate(createDate)
+                        .startDate(startDate)
+                        .endDate(endDate)
+                        .state(true)
+                        .introduction("testIntroduction1")
+                        .maxPeople(10)
+                        .currentPeople(4)
+                        .delete(false)
+                        .deleteReason(null)
+                        .viewCount(10)
+                        .commentCount(10)
+                        .user(saveUser)
+                        .build();
+                Project saveProject1 = projectRepository.save(project1);
+
+                // 포지션 세팅
+                Position position1 = Position.builder()
+                        .name("testPosition1")
+                        .build();
+                Position position2 = Position.builder()
+                        .name("testPosition2")
+                        .build();
+
+                Position savePosition1 = positionRepository.save(position1);
+                Position savePosition2 = positionRepository.save(position2);
+
+                // 기술스택 세팅
+                TechnicalStack technicalStack1 = TechnicalStack.builder()
+                        .name("testTechnicalStack1")
+                        .build();
+                TechnicalStack technicalStack2 = TechnicalStack.builder()
+                        .name("testTechnicalStack2")
+                        .build();
+
+                TechnicalStack saveTechnicalStack1 = technicalStackRepository.save(technicalStack1);
+                TechnicalStack saveTechnicalStack2 = technicalStackRepository.save(technicalStack2);
+
+                // 프로젝트 포지션 세팅
+                ProjectPosition projectPosition1 = ProjectPosition.builder()
+                        .state(true)
+                        .project(project1)
+                        .position(savePosition1)
+                        .user(saveUser)
+                        .build();
+
+                ProjectPosition projectPosition2 = ProjectPosition.builder()
+                        .state(false)
+                        .project(project1)
+                        .position(savePosition2)
+                        .user(null)
+                        .build();
+                ProjectPosition saveProjectPosition1 = projectPositionRepository.save(projectPosition1);
+                ProjectPosition saveProjectPosition2 = projectPositionRepository.save(projectPosition2);
+
+                // 프로젝트 기술스택 세팅
+                ProjectTechnicalStack projectTechnicalStack1 = ProjectTechnicalStack.builder()
+                        .project(project1)
+                        .technicalStack(technicalStack1)
+                        .build();
+
+                ProjectTechnicalStack projectTechnicalStack2 = ProjectTechnicalStack.builder()
+                        .project(project1)
+                        .technicalStack(technicalStack2)
+                        .build();
+                projectTechnicalStackRepository.save(projectTechnicalStack1);
+                projectTechnicalStackRepository.save(projectTechnicalStack2);
+                
+                // 프로젝트 참여신청 세팅
+                ProjectParticipateRequest projectParticipateRequest1 = ProjectParticipateRequest.builder()
+                        .user(saveUser)
+                        .projectPosition(saveProjectPosition1)
+                        .build();
+
+                ProjectParticipateRequest projectParticipateRequest2 = ProjectParticipateRequest.builder()
+                        .user(saveUser)
+                        .projectPosition(saveProjectPosition2)
+                        .build();
+                ProjectParticipateRequest saveProjectParticipateRequest1 = projectParticipateRequestRepository.save(projectParticipateRequest1);
+                ProjectParticipateRequest saveProjectParticipateRequest2 = projectParticipateRequestRepository.save(projectParticipateRequest2);
+
+                // 프로젝트 참여신청 기술스택 세팅
+                ParticipateRequestTechnicalStack participateRequestTechnicalStack1 = ParticipateRequestTechnicalStack.builder()
+                        .technicalStack(saveTechnicalStack1)
+                        .projectParticipateRequest(saveProjectParticipateRequest1).build();
+                ParticipateRequestTechnicalStack participateRequestTechnicalStack2 = ParticipateRequestTechnicalStack.builder()
+                        .technicalStack(saveTechnicalStack1)
+                        .projectParticipateRequest(saveProjectParticipateRequest2).build();
+                participateRequestTechnicalStackRepository.save(participateRequestTechnicalStack1);
+                participateRequestTechnicalStackRepository.save(participateRequestTechnicalStack2);
+
+                // 북마크 세팅
+                BookMark bookMark1 = BookMark.builder()
+                        .project(saveProject1)
+                        .user(saveUser)
+                        .build();
+                bookMarkRepository.save(bookMark1);
+                
+                // 댓글 세팅
+                Comment comment1 = Comment.builder()
+                        .project(saveProject1)
+                        .user(saveUser)
+                        .content("testContent1")
+                        .build();
+                Comment comment2 = Comment.builder()
+                        .project(saveProject1)
+                        .user(saveUser)
+                        .content("testContent2")
+                        .build();
+                commentRepository.save(comment1);
+                commentRepository.save(comment2);
+
+                // then
+                assertEquals(projectRepository.findAll().size(), 1);
+                assertEquals(projectPositionRepository.findAll().size(), 2);
+                assertEquals(projectTechnicalStackRepository.findAll().size(), 2);
+                assertEquals(bookMarkRepository.findAll().size(), 1);
+                assertEquals(commentRepository.findAll().size(), 2);
+                assertEquals(projectParticipateRequestRepository.findAll().size(), 2);
+                assertEquals(participateRequestTechnicalStackRepository.findAll().size(), 2);
+
+                String token = jwtTokenService.createToken(new TokenDto(saveUser.getEmail()));
+                mvc.perform(delete("/v1/project/"+ saveProject1.getNo()).contentType(MediaType.APPLICATION_JSON)
+                                .header("Authorization", "Bearer " + token))
+                        .andDo(print())
+                        .andExpect(header().string("Content-type", "application/json"))
+                        .andExpect(jsonPath("$.data").value(true))
+                        .andExpect(status().isOk());
+
+                assertEquals(projectRepository.findAll().size(), 0);
+                assertEquals(projectPositionRepository.findAll().size(), 0);
+                assertEquals(projectTechnicalStackRepository.findAll().size(), 0);
+                assertEquals(bookMarkRepository.findAll().size(), 0);
+                assertEquals(commentRepository.findAll().size(), 0);
+                assertEquals(projectParticipateRequestRepository.findAll().size(), 0);
+                assertEquals(participateRequestTechnicalStackRepository.findAll().size(), 0);
             }
         }
     }

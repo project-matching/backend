@@ -5,6 +5,8 @@ import com.matching.project.dto.enumerate.OAuth;
 import com.matching.project.dto.enumerate.Role;
 import com.matching.project.dto.projectparticipate.ProjectParticipateFormResponseDto;
 import com.matching.project.entity.*;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -446,5 +448,109 @@ class ProjectParticipateRequestRepositoryTest {
         // then
         Optional<ProjectParticipateRequest> result = projectParticipateRequestRepository.findById(saveProjectParticipateRequest1.getNo());
         assertEquals(result.isEmpty(), true);
+    }
+
+    @Nested
+    @DisplayName("프로젝트 포지션 번호 조건 삭제")
+    class testDeleteByProjectPositionNo {
+        @Test
+        @DisplayName("성공 테스트")
+        public void testSuccess() throws Exception {
+            // given
+            LocalDateTime createDate = LocalDateTime.now();
+            LocalDate startDate = LocalDate.of(2022, 06, 24);
+            LocalDate endDate = LocalDate.of(2022, 06, 28);
+
+            // 유저 세팅
+            User user1 = User.builder()
+                    .name("userName1")
+                    .sex("M")
+                    .email("wkemrm1@naver.com")
+                    .password("testPassword")
+                    .github("testGithub")
+                    .selfIntroduction("testSelfIntroduction")
+                    .block(false)
+                    .blockReason(null)
+                    .permission(Role.ROLE_USER)
+                    .oauthCategory(OAuth.NORMAL)
+                    .email_auth(false)
+                    .imageNo(0L)
+                    .position(null)
+                    .build();
+
+            User saveUser1 = userRepository.save(user1);
+
+            // 프로젝트 객체
+            Project project1 = Project.builder()
+                    .name("testName1")
+                    .createUserName("user1")
+                    .createDate(createDate.plusDays(1))
+                    .startDate(startDate)
+                    .endDate(endDate)
+                    .state(true)
+                    .introduction("testIntroduction1")
+                    .maxPeople(10)
+                    .currentPeople(4)
+                    .delete(false)
+                    .deleteReason(null)
+                    .viewCount(10)
+                    .user(saveUser1)
+                    .commentCount(10)
+                    .build();
+            Project saveProject1 = projectRepository.save(project1);
+
+            // 포지션 세팅
+            Position position1 = Position.builder()
+                    .name("testPosition1")
+                    .build();
+            Position position2 = Position.builder()
+                    .name("testPosition2")
+                    .build();
+            positionRepository.save(position1);
+            positionRepository.save(position2);
+
+            // 프로젝트 포지션 세팅
+            ProjectPosition projectPosition1 = ProjectPosition.builder()
+                    .state(true)
+                    .project(project1)
+                    .position(position1)
+                    .user(null)
+                    .creator(false)
+                    .build();
+            ProjectPosition projectPosition2 = ProjectPosition.builder()
+                    .state(false)
+                    .project(project1)
+                    .position(position2)
+                    .user(null)
+                    .creator(false)
+                    .build();
+            ProjectPosition saveProjectPosition1 = projectPositionRepository.save(projectPosition1);
+            ProjectPosition saveProjectPosition2 = projectPositionRepository.save(projectPosition2);
+
+            // 참여 신청 세팅
+            ProjectParticipateRequest projectParticipateRequest1 = ProjectParticipateRequest.builder()
+                    .user(saveUser1)
+                    .projectPosition(saveProjectPosition1)
+                    .motive("testMotive1")
+                    .github("testGitHub1")
+                    .build();
+            ProjectParticipateRequest projectParticipateRequest2 = ProjectParticipateRequest.builder()
+                    .user(saveUser1)
+                    .projectPosition(saveProjectPosition1)
+                    .motive("testMotive2")
+                    .github("testGitHub2")
+                    .build();
+
+            projectParticipateRequestRepository.save(projectParticipateRequest1);
+            projectParticipateRequestRepository.save(projectParticipateRequest2);
+
+            // when
+            assertEquals(projectParticipateRequestRepository.findAll().size(), 2);
+
+            projectParticipateRequestRepository.deleteByProjectNo(saveProject1.getNo());
+
+            // then
+            assertEquals(projectParticipateRequestRepository.findAll().size(), 0);
+        }
     }
 }

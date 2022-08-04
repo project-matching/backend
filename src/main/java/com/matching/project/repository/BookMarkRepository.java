@@ -27,5 +27,5 @@ public interface BookMarkRepository extends JpaRepository<BookMark, Long> {
 
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("delete from BookMark b where b.project.no = :projectNo")
-    public void deleteBookMarkByProjectNo(@Param("projectNo") Long projectNo);
+    public void deleteByProjectNo(@Param("projectNo") Long projectNo);
 }

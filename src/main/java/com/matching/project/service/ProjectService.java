@@ -15,4 +15,5 @@ public interface ProjectService {
     public ProjectDto getProjectDetail(Long projectNo) throws Exception;
     public ProjectUpdateFormResponseDto getProjectUpdateForm(Long projectNo) throws Exception;
     public Long projectUpdate(Long projectNo, ProjectUpdateRequestDto projectUpdateRequestDto) throws Exception;
+    public boolean projectDelete(Long projectNo) throws Exception;
 }

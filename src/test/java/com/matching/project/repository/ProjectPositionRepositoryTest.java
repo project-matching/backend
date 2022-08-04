@@ -8,6 +8,7 @@ import com.matching.project.entity.Project;
 import com.matching.project.entity.ProjectPosition;
 import com.matching.project.entity.User;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -186,5 +187,69 @@ class ProjectPositionRepositoryTest {
         // then
         List<ProjectPosition> afterProjectPositionList = projectPositionRepository.findAll();
         assertEquals(afterProjectPositionList.size(), 0);
+    }
+
+    @Nested
+    @DisplayName("프로젝트번호 조건 삭제")
+    class testDeleteByProjectNo {
+        @Test
+        @DisplayName("성공 테스트")
+        public void testSuccess() {
+            // given
+            LocalDateTime createDate = LocalDateTime.now();
+            LocalDate startDate = LocalDate.of(2022, 06, 24);
+            LocalDate endDate = LocalDate.of(2022, 06, 28);
+
+            Project project1 = Project.builder()
+                    .name("testName1")
+                    .createUserName("user1")
+                    .createDate(createDate)
+                    .startDate(startDate)
+                    .endDate(endDate)
+                    .state(true)
+                    .introduction("testIntroduction1")
+                    .maxPeople(10)
+                    .currentPeople(4)
+                    .delete(true)
+                    .deleteReason(null)
+                    .viewCount(10)
+                    .commentCount(10)
+                    .build();
+            Project saveProject1 = projectRepository.save(project1);
+
+            Position position1 = Position.builder()
+                    .name("testPosition1")
+                    .build();
+            Position position2 = Position.builder()
+                    .name("testPosition2")
+                    .build();
+            Position savePosition1 = positionRepository.save(position1);
+            Position savePosition2 = positionRepository.save(position2);
+
+            ProjectPosition projectPosition1 = ProjectPosition.builder()
+                    .state(true)
+                    .project(saveProject1)
+                    .position(savePosition1)
+                    .user(null)
+                    .creator(false)
+                    .build();
+            ProjectPosition projectPosition2 = ProjectPosition.builder()
+                    .state(false)
+                    .project(saveProject1)
+                    .position(savePosition2)
+                    .user(null)
+                    .creator(false)
+                    .build();
+            projectPositionRepository.save(projectPosition1);
+            projectPositionRepository.save(projectPosition2);
+
+            // when
+            assertEquals(projectPositionRepository.findAll().size(), 2);
+
+            projectPositionRepository.deleteByProjectNo(saveProject1.getNo());
+
+            // then
+            assertEquals(projectPositionRepository.findAll().size(), 0);
+        }
     }
 }

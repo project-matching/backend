@@ -146,7 +146,7 @@ class BookMarkServiceImplTest {
         }
 
         // then
-        verify(bookMarkRepository).deleteBookMarkByProjectNo(any());
+        verify(bookMarkRepository).deleteByProjectNo(any());
 
         assertEquals(result, true);
     }

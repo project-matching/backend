@@ -7,6 +7,8 @@ import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.JPAExpressions;
+import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -19,7 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static com.matching.project.entity.QParticipateRequestTechnicalStack.participateRequestTechnicalStack;
@@ -33,7 +34,7 @@ import static com.matching.project.entity.QUser.user;
 @Repository
 @Transactional
 @RequiredArgsConstructor
-public class ProjectParticipateRequestRepositoryImpl implements ProjectParticipateRequestCustom {
+public class ProjectParticipateRequestRepositoryImpl implements ProjectParticipateRequestRepositoryCustom {
     private final JPAQueryFactory queryFactory;
     private final EntityManager entityManager;
 
@@ -155,5 +156,21 @@ public class ProjectParticipateRequestRepositoryImpl implements ProjectParticipa
         entityManager.clear();
         
         return deleteNo;
+    }
+    
+    // projectNo와 관련된 projectParticipateRequest 모두 삭제
+    @Override
+    public void deleteByProjectNo(Long projectNo) throws Exception {
+        JPQLQuery<Long> subQuery = JPAExpressions.select(projectParticipateRequest.no)
+                .from(projectParticipateRequest)
+                .join(projectParticipateRequest.projectPosition, projectPosition)
+                .join(projectPosition.project, project)
+                .where(project.no.eq(projectNo));
+
+        queryFactory.delete(projectParticipateRequest)
+                .where(projectParticipateRequest.no.in(subQuery))
+                .execute();
+        entityManager.flush();
+        entityManager.clear();
     }
 }
