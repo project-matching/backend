@@ -5,6 +5,7 @@ import com.matching.project.dto.technicalstack.TechnicalStackRegisterFormRespons
 import com.matching.project.entity.Project;
 import com.matching.project.entity.TechnicalStack;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 

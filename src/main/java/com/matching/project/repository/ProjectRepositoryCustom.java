@@ -13,4 +13,5 @@ public interface ProjectRepositoryCustom {
     public Page<ProjectSimpleDto> findParticipateProjectByDelete(Pageable pageable, User user, boolean delete);
     public Page<ProjectSimpleDto> findParticipateRequestProjectByDelete(Pageable pageable, User user, boolean delete);
     public Page<ProjectSimpleDto> findBookMarkProjectByDelete(Pageable pageable, User user, boolean delete);
+    public boolean existUserProjectByUser(Long userNo, Long projectNo);
 }

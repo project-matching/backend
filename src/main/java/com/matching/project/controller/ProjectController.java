@@ -5,6 +5,8 @@ import com.matching.project.dto.enumerate.ProjectFilter;
 import com.matching.project.dto.project.*;
 import com.matching.project.dto.user.UserBlockResponseDto;
 import com.matching.project.entity.User;
+import com.matching.project.error.CustomException;
+import com.matching.project.error.ErrorCode;
 import com.matching.project.service.ProjectService;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -91,8 +93,9 @@ public class ProjectController {
     
     @PatchMapping("/{projectNo}")
     @ApiOperation(value = "프로젝트 수정")
-    public ResponseEntity<ResponseDto<Long>> projectUpdate(@PathVariable Long projectNo, ProjectUpdateRequestDto projectUpdateRequestDto) {
-        return ResponseEntity.ok(new ResponseDto<>(null, 1L));
+    public ResponseEntity<ResponseDto<Long>> projectUpdate(@PathVariable Long projectNo, @Valid @RequestBody ProjectUpdateRequestDto projectUpdateRequestDto) throws Exception {
+
+        return ResponseEntity.ok(new ResponseDto<>(null, projectService.projectUpdate(projectNo, projectUpdateRequestDto)));
     }
 
     @DeleteMapping("/{projectNo}")

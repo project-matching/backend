@@ -1,5 +1,6 @@
 package com.matching.project.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.google.gson.Gson;
@@ -13,6 +14,8 @@ import com.matching.project.dto.enumerate.Role;
 import com.matching.project.dto.project.ProjectPositionDto;
 import com.matching.project.dto.project.ProjectRegisterRequestDto;
 import com.matching.project.dto.project.ProjectSearchRequestDto;
+import com.matching.project.dto.project.ProjectUpdateRequestDto;
+import com.matching.project.dto.projectposition.ProjectPositionAddDto;
 import com.matching.project.dto.projectposition.ProjectPositionRegisterDto;
 import com.matching.project.dto.user.ProjectRegisterUserDto;
 import com.matching.project.entity.*;
@@ -61,8 +64,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -1516,6 +1518,250 @@ class ProjectControllerTest {
                         .andExpect(jsonPath("$.data.projectPositionDetailDtoList[1].userDto").isEmpty())
 
                         .andExpect(status().isOk());
+            }
+        }
+    }
+
+    @Nested
+    @DisplayName("프로젝트 수정 테스트")
+    class testProjectUpdate {
+        @Nested
+        @DisplayName("비로그인시 테스트")
+        class testNotLogin {
+            @Test
+            @DisplayName("실패 테스트")
+            public void testFailure() throws Exception {
+                // given
+                User saveUser = saveUser();
+
+                // 프로젝트 세팅
+                LocalDateTime createDate = LocalDateTime.now();
+                LocalDate startDate = LocalDate.of(2022, 06, 24);
+                LocalDate endDate = LocalDate.of(2022, 06, 28);
+
+                Project project1 = Project.builder()
+                        .name("testName1")
+                        .createUserName("userName1")
+                        .createDate(createDate)
+                        .startDate(startDate)
+                        .endDate(endDate)
+                        .state(true)
+                        .introduction("testIntroduction1")
+                        .maxPeople(10)
+                        .currentPeople(4)
+                        .delete(false)
+                        .deleteReason(null)
+                        .viewCount(10)
+                        .commentCount(10)
+                        .user(saveUser)
+                        .build();
+                Project saveProject1 = projectRepository.save(project1);
+
+                // 포지션 세팅
+                Position position1 = Position.builder()
+                        .name("testPosition1")
+                        .build();
+                Position position2 = Position.builder()
+                        .name("testPosition2")
+                        .build();
+
+                Position savePosition1 = positionRepository.save(position1);
+                Position savePosition2 = positionRepository.save(position2);
+
+                // 기술스택 세팅
+                TechnicalStack technicalStack1 = TechnicalStack.builder()
+                        .name("testTechnicalStack1")
+                        .build();
+                TechnicalStack technicalStack2 = TechnicalStack.builder()
+                        .name("testTechnicalStack2")
+                        .build();
+
+                TechnicalStack saveTechnicalStack1 = technicalStackRepository.save(technicalStack1);
+                TechnicalStack saveTechnicalStack2 = technicalStackRepository.save(technicalStack2);
+
+                // 프로젝트 포지션 세팅
+                ProjectPosition projectPosition1 = ProjectPosition.builder()
+                        .state(true)
+                        .project(project1)
+                        .position(savePosition1)
+                        .user(saveUser)
+                        .build();
+
+                ProjectPosition projectPosition2 = ProjectPosition.builder()
+                        .state(false)
+                        .project(project1)
+                        .position(savePosition2)
+                        .user(null)
+                        .build();
+                projectPositionRepository.save(projectPosition1);
+                projectPositionRepository.save(projectPosition2);
+
+                // 프로젝트 기술스택 세팅
+                ProjectTechnicalStack projectTechnicalStack1 = ProjectTechnicalStack.builder()
+                        .project(project1)
+                        .technicalStack(technicalStack1)
+                        .build();
+
+                ProjectTechnicalStack projectTechnicalStack2 = ProjectTechnicalStack.builder()
+                        .project(project1)
+                        .technicalStack(technicalStack2)
+                        .build();
+                projectTechnicalStackRepository.save(projectTechnicalStack1);
+                projectTechnicalStackRepository.save(projectTechnicalStack2);
+
+                // then
+                List<ProjectPositionAddDto> projectPositionAddDtoList = new ArrayList<>();
+                ProjectPositionAddDto projectPositionAddDto = new ProjectPositionAddDto(savePosition1.getNo(), 2);
+                projectPositionAddDtoList.add(projectPositionAddDto);
+
+                String startDateRequest = "2022-08-03";
+                String endDateRequest = "2022-08-04";
+
+                List<Long> technicalStackNoList = new ArrayList<>();
+                technicalStackNoList.add(saveTechnicalStack1.getNo());
+                technicalStackNoList.add(saveTechnicalStack2.getNo());
+
+                ProjectUpdateRequestDto projectUpdateRequestDto = new ProjectUpdateRequestDto("testName", projectPositionAddDtoList, null, startDateRequest, endDateRequest, technicalStackNoList, "testIntroduction");
+
+                mvc.perform(patch("/v1/project/"+ saveProject1.getNo()).contentType(MediaType.APPLICATION_JSON)
+                                .content(new ObjectMapper().registerModule(new JavaTimeModule()).writeValueAsString(projectUpdateRequestDto)))
+                        .andDo(print())
+                        .andExpect(status().is3xxRedirection());
+            }
+        }
+
+        @Nested
+        @DisplayName("로그인시 테스트")
+        class testLogin {
+            @Test
+            @DisplayName("성공 테스트")
+            public void testSuccess() throws Exception {
+                // given
+                User saveUser = saveUser();
+
+                // 프로젝트 세팅
+                LocalDateTime createDate = LocalDateTime.now();
+                LocalDate startDate = LocalDate.of(2022, 06, 24);
+                LocalDate endDate = LocalDate.of(2022, 06, 28);
+
+                Project project1 = Project.builder()
+                        .name("testName1")
+                        .createUserName("userName1")
+                        .createDate(createDate)
+                        .startDate(startDate)
+                        .endDate(endDate)
+                        .state(true)
+                        .introduction("testIntroduction1")
+                        .maxPeople(10)
+                        .currentPeople(4)
+                        .delete(false)
+                        .deleteReason(null)
+                        .viewCount(10)
+                        .commentCount(10)
+                        .user(saveUser)
+                        .build();
+                Project saveProject1 = projectRepository.save(project1);
+
+                // 포지션 세팅
+                Position position1 = Position.builder()
+                        .name("testPosition1")
+                        .build();
+                Position position2 = Position.builder()
+                        .name("testPosition2")
+                        .build();
+
+                Position savePosition1 = positionRepository.save(position1);
+                Position savePosition2 = positionRepository.save(position2);
+
+                // 기술스택 세팅
+                TechnicalStack technicalStack1 = TechnicalStack.builder()
+                        .name("testTechnicalStack1")
+                        .build();
+                TechnicalStack technicalStack2 = TechnicalStack.builder()
+                        .name("testTechnicalStack2")
+                        .build();
+
+                TechnicalStack saveTechnicalStack1 = technicalStackRepository.save(technicalStack1);
+                TechnicalStack saveTechnicalStack2 = technicalStackRepository.save(technicalStack2);
+
+                // 프로젝트 포지션 세팅
+                ProjectPosition projectPosition1 = ProjectPosition.builder()
+                        .state(true)
+                        .project(project1)
+                        .position(savePosition1)
+                        .user(saveUser)
+                        .build();
+
+                ProjectPosition projectPosition2 = ProjectPosition.builder()
+                        .state(false)
+                        .project(project1)
+                        .position(savePosition2)
+                        .user(null)
+                        .build();
+                projectPositionRepository.save(projectPosition1);
+                projectPositionRepository.save(projectPosition2);
+
+                // 프로젝트 기술스택 세팅
+                ProjectTechnicalStack projectTechnicalStack1 = ProjectTechnicalStack.builder()
+                        .project(project1)
+                        .technicalStack(technicalStack1)
+                        .build();
+
+                ProjectTechnicalStack projectTechnicalStack2 = ProjectTechnicalStack.builder()
+                        .project(project1)
+                        .technicalStack(technicalStack2)
+                        .build();
+                projectTechnicalStackRepository.save(projectTechnicalStack1);
+                projectTechnicalStackRepository.save(projectTechnicalStack2);
+
+                // then
+                String token = jwtTokenService.createToken(new TokenDto(saveUser.getEmail()));
+
+                List<ProjectPositionAddDto> projectPositionAddDtoList = new ArrayList<>();
+                ProjectPositionAddDto projectPositionAddDto = new ProjectPositionAddDto(savePosition1.getNo(), 2);
+                projectPositionAddDtoList.add(projectPositionAddDto);
+
+                String startDateRequest = "2022-08-03";
+                String endDateRequest = "2022-08-04";
+
+                List<Long> technicalStackNoList = new ArrayList<>();
+                technicalStackNoList.add(saveTechnicalStack1.getNo());
+                technicalStackNoList.add(saveTechnicalStack2.getNo());
+
+                ProjectUpdateRequestDto projectUpdateRequestDto = new ProjectUpdateRequestDto("testName", projectPositionAddDtoList, null, startDateRequest, endDateRequest, technicalStackNoList, "testIntroduction");
+
+                mvc.perform(patch("/v1/project/"+ saveProject1.getNo()).contentType(MediaType.APPLICATION_JSON)
+                                .header("Authorization", "Bearer " + token)
+                                .content(new ObjectMapper().registerModule(new JavaTimeModule()).writeValueAsString(projectUpdateRequestDto)))
+                        .andDo(print())
+                        .andExpect(header().string("Content-type", "application/json"))
+                        .andExpect(jsonPath("$.data").value(project1.getNo()))
+                        .andExpect(status().isOk());
+
+                Project project = projectRepository.findById(saveProject1.getNo()).get();
+                List<ProjectPosition> projectPositionList = projectPositionRepository.findProjectAndPositionAndUserUsingFetchJoinByProjectNo(project);
+                List<ProjectTechnicalStack> technicalStackList = projectTechnicalStackRepository.findTechnicalStackAndProjectUsingFetchJoin(project);
+
+                assertEquals(project.getName(), projectUpdateRequestDto.getName());
+                assertEquals(project.getStartDate().toString(), projectUpdateRequestDto.getStartDate());
+                assertEquals(project.getEndDate().toString(), projectUpdateRequestDto.getEndDate());
+                assertEquals(project.getIntroduction(), projectUpdateRequestDto.getIntroduction());
+
+                assertEquals(projectPositionList.size(), 4);
+                assertEquals(projectPositionList.get(0).getProject().getNo(), saveProject1.getNo());
+                assertEquals(projectPositionList.get(0).getPosition().getNo(), savePosition1.getNo());
+                assertEquals(projectPositionList.get(1).getProject().getNo(), saveProject1.getNo());
+                assertEquals(projectPositionList.get(1).getPosition().getNo(), savePosition2.getNo());
+                assertEquals(projectPositionList.get(2).getProject().getNo(), saveProject1.getNo());
+                assertEquals(projectPositionList.get(2).getPosition().getNo(), savePosition1.getNo());
+                assertEquals(projectPositionList.get(3).getProject().getNo(), saveProject1.getNo());
+                assertEquals(projectPositionList.get(3).getPosition().getNo(), savePosition1.getNo());
+
+                assertEquals(technicalStackList.size(), 2);
+                assertEquals(technicalStackList.get(0).getProject().getNo(), saveProject1.getNo());
+                assertEquals(technicalStackList.get(0).getTechnicalStack().getNo(), saveTechnicalStack1.getNo());
+                assertEquals(technicalStackList.get(1).getProject().getNo(), saveProject1.getNo());
+                assertEquals(technicalStackList.get(1).getTechnicalStack().getNo(), saveTechnicalStack2.getNo());
             }
         }
     }

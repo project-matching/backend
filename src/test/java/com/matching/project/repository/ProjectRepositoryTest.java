@@ -6,6 +6,8 @@ import com.matching.project.dto.enumerate.ProjectFilter;
 import com.matching.project.dto.enumerate.Role;
 import com.matching.project.dto.project.*;
 import com.matching.project.entity.*;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -2096,4 +2098,58 @@ class ProjectRepositoryTest {
         assertEquals(projectList.get(1).getProjectSimpleTechnicalStackDtoList().get(1).getImage(), null);
     }
 
+    @Nested
+    @DisplayName("프로젝트 유저 조인 유저 존재 확인")
+    class existUserProjectByUser {
+        @Test
+        @DisplayName("성공 테스트")
+        public void testSuccess() {
+            // given
+            LocalDateTime createDate = LocalDateTime.now();
+            LocalDate startDate = LocalDate.of(2022, 06, 24);
+            LocalDate endDate = LocalDate.of(2022, 06, 28);
+
+            User user1 = User.builder()
+                    .name("userName1")
+                    .sex("M")
+                    .email("wkemrm12@naver.com")
+                    .password("testPassword")
+                    .github("testGithub")
+                    .selfIntroduction("testSelfIntroduction")
+                    .block(false)
+                    .blockReason(null)
+                    .permission(Role.ROLE_USER)
+                    .oauthCategory(OAuth.NORMAL)
+                    .email_auth(false)
+                    .imageNo(0L)
+                    .position(null)
+                    .build();
+            User saveUser1 = userRepository.save(user1);
+
+            // 삭제된 프로젝트 객체
+            Project project1 = Project.builder()
+                    .name("testName1")
+                    .createUserName("user1")
+                    .createDate(createDate.plusDays(1))
+                    .startDate(startDate)
+                    .endDate(endDate)
+                    .state(true)
+                    .introduction("testIntroduction1")
+                    .maxPeople(10)
+                    .currentPeople(4)
+                    .delete(true)
+                    .deleteReason(null)
+                    .viewCount(10)
+                    .user(saveUser1)
+                    .commentCount(10)
+                    .build();
+            Project saveProject1 = projectRepository.save(project1);
+
+            // when
+            boolean result = projectRepository.existUserProjectByUser(saveUser1.getNo(), saveProject1.getNo());
+
+            // then
+            assertEquals(result, true);
+        }
+    }
 }

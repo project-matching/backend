@@ -416,4 +416,20 @@ public class ProjectRepositoryImpl implements ProjectRepositoryCustom {
         return imageList.stream()
                 .collect(Collectors.toMap(image -> image.getNo(), image -> image));
     }
+    
+    // 유저와 프로젝트를 조인하여 유저로 찾는 메소드
+    @Override
+    public boolean existUserProjectByUser(Long userNo, Long projectNo) {
+        List<Project> projectList = queryFactory.selectFrom(project)
+                .join(project.user, user)
+                .where(project.no.eq(projectNo))
+                .where(project.user.no.eq(userNo))
+                .fetch();
+
+        if (projectList.size() == 0) {
+            return false;
+        }
+
+        return true;
+    }
 }

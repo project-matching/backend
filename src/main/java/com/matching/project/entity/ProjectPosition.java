@@ -45,4 +45,5 @@ public class ProjectPosition extends BaseTimeEntity{
     public void changeUser(User user) {
         this.user = user;
     }
+
 }
