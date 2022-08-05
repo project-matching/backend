@@ -48,6 +48,8 @@ public enum ErrorCode {
     // ProjectPosition
     PROJECT_POSITION_NO_SUCH_ELEMENT_EXCEPTION(INTERNAL_SERVER_ERROR, "ProjectPosition no such"),
     PROJECT_POSITION_EXISTENCE_USER(INTERNAL_SERVER_ERROR, "ProjectPosition existence user"),
+    PROJECT_POSITION_NOT_EXISTENCE_USER(INTERNAL_SERVER_ERROR, "ProjectPosition not existence user"),
+    PROJECT_POSITION_NOT_EQUAL_USER(INTERNAL_SERVER_ERROR, "ProjectPosition not equal user"),
 
     // TechnicalStack
     TECHNICAL_STACK_NOT_FOUND(BAD_REQUEST, "TechnicalStack bad request"),
