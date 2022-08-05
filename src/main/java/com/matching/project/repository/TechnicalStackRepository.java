@@ -1,9 +1,11 @@
 package com.matching.project.repository;
 
 
+import com.matching.project.dto.technicalstack.TechnicalStackRegisterFormResponseDto;
 import com.matching.project.entity.Project;
 import com.matching.project.entity.TechnicalStack;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -12,4 +14,6 @@ import java.util.Collection;
 
 public interface TechnicalStackRepository extends JpaRepository<TechnicalStack, Long> {
     public List<TechnicalStack> findByNoIn(Collection<Long> noList);
+
+    public List<TechnicalStack> findByNameIn(Collection<String> nameList);
 }

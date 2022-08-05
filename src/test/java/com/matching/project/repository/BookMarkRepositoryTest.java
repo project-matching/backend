@@ -24,152 +24,72 @@ import static org.junit.jupiter.api.Assertions.*;
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Transactional
 class BookMarkRepositoryTest {
-//    @Autowired
-//    private UserRepository userRepository;
-//
-//    @Autowired
-//    private ProjectRepository projectRepository;
-//
-//    @Autowired
-//    private BookMarkRepository bookMarkRepository;
-//
-//    @Test
-//    public void 북마크_유저_조회_조인() {
-//        // given
-//        LocalDateTime createDate = LocalDateTime.of(2022, 06, 24, 10, 10, 10);
-//        LocalDate startDate = LocalDate.of(2022, 06, 24);
-//        LocalDate endDate = LocalDate.of(2022, 06, 28);
-//
-//        User user1 = User.builder()
-//                .name("testUser1")
-//                .sex('M')
-//                .email("testEmail1@test.com")
-//                .password("testPassword1")
-//                .github("testGithub1")
-//                .selfIntroduction("testSelfIntroduction1")
-//                .block(false)
-//                .blockReason("testBlockReason1")
-//                .permission(Role.ROLE_USER)
-//                .oauthCategory(OAuth.NORMAL)
-//                .email_auth(false)
-//                .imageNo(0L)
-//                .position(null)
-//                .build();
-//
-//        User saveUser1 = userRepository.save(user1);
-//
-//        Project project1 = Project.builder()
-//                .name("testProject1")
-//                .createUserName("testUser1")
-//                .createDate(createDate)
-//                .startDate(startDate)
-//                .endDate(endDate)
-//                .state(true)
-//                .introduction("testIntroduction1")
-//                .maxPeople(10)
-//                .currentPeople(4)
-//                .delete(false)
-//                .deleteReason(null)
-//                .imageNo(0L)
-//                .viewCount(0)
-//                .commentCount(0)
-//                .build();
-//
-//        Project project2 = Project.builder()
-//                .name("testProject2")
-//                .createUserName("testUser1")
-//                .createDate(createDate)
-//                .startDate(startDate)
-//                .endDate(endDate)
-//                .state(true)
-//                .introduction("testIntroduction2")
-//                .maxPeople(10)
-//                .currentPeople(4)
-//                .delete(false)
-//                .deleteReason(null)
-//                .imageNo(0L)
-//                .viewCount(0)
-//                .commentCount(0)
-//                .build();
-//
-//        Project saveProject1 = projectRepository.save(project1);
-//        Project saveProject2 = projectRepository.save(project2);
-//
-//        BookMark bookMark1 = BookMark.builder()
-//                .user(user1)
-//                .project(project1)
-//                .build();
-//
-//        BookMark bookMark2 = BookMark.builder()
-//                .user(user1)
-//                .project(project2)
-//                .build();
-//
-//        bookMarkRepository.save(bookMark1);
-//        bookMarkRepository.save(bookMark2);
-//
-//        // when
-//        List<BookMark> bookMarkList = bookMarkRepository.findByUserNo(saveUser1.getNo());
-//
-//        // then
-//        assertEquals(bookMarkList.size(), 2);
-//        assertEquals(bookMarkList.get(0).getUser(), saveUser1);
-//        assertEquals(bookMarkList.get(0).getProject(), saveProject1);
-//        assertEquals(bookMarkList.get(1).getUser(), saveUser1);
-//        assertEquals(bookMarkList.get(1).getProject(), saveProject2);
-//    }
-//
-//    @Test
-//    public void 북마크_존재_확인() {
-//        // given
-//        LocalDateTime createDate = LocalDateTime.of(2022, 06, 24, 10, 10, 10);
-//        LocalDate startDate = LocalDate.of(2022, 06, 24);
-//        LocalDate endDate = LocalDate.of(2022, 06, 28);
-//
-//        User user1 = User.builder()
-//                .no(1L)
-//                .name("testUser1")
-//                .sex('M')
-//                .email("testEmail1")
-//                .password("testPassword1")
-//                .github("testGithub1")
-//                .block(false)
-//                .blockReason(null)
-//                .permission(Role.ROLE_USER)
-//                .oauthCategory(OAuth.NORMAL)
-//                .email_auth(false)
-//                .imageNo(0L)
-//                .position(null)
-//                .build();
-//        User saveUser1 = userRepository.save(user1);
-//
-//        Project project1 = Project.builder()
-//                .name("testName1")
-//                .createUserName("user1")
-//                .createDate(createDate)
-//                .startDate(startDate)
-//                .endDate(endDate)
-//                .state(true)
-//                .introduction("testIntroduction1")
-//                .maxPeople(10)
-//                .currentPeople(4)
-//                .delete(true)
-//                .deleteReason(null)
-//                .viewCount(10)
-//                .commentCount(10)
-//                .build();
-//        Project saveProject1 = projectRepository.save(project1);
-//
-//        BookMark bookMark1 = BookMark.builder()
-//                .project(saveProject1)
-//                .user(saveUser1)
-//                .build();
-//        bookMarkRepository.save(bookMark1);
-//
-//        // when
-//        boolean result = bookMarkRepository.existBookMark(saveUser1, saveProject1);
-//
-//        // then
-//        assertEquals(result, true);
-//    }
+    @Autowired
+    UserRepository userRepository;
+
+    @Autowired
+    ProjectRepository projectRepository;
+
+    @Autowired
+    BookMarkRepository bookMarkRepository;
+
+    @Test
+    public void 북마크_삭제_테스트() {
+        // given
+        LocalDateTime createDate = LocalDateTime.now();
+        LocalDate startDate = LocalDate.of(2022, 06, 24);
+        LocalDate endDate = LocalDate.of(2022, 06, 28);
+
+        // 유저 세팅
+        User user1 = User.builder()
+                .name("userName1")
+                .sex("M")
+                .email("wkemrm12@naver.com")
+                .password("testPassword")
+                .github("testGithub")
+                .selfIntroduction("testSelfIntroduction")
+                .block(false)
+                .blockReason(null)
+                .permission(Role.ROLE_USER)
+                .oauthCategory(OAuth.NORMAL)
+                .email_auth(false)
+                .imageNo(0L)
+                .position(null)
+                .build();
+        User saveUser1 = userRepository.save(user1);
+        
+        // 프로젝트 세팅
+        Project project1 = Project.builder()
+                .name("testName1")
+                .createUserName("user1")
+                .createDate(createDate.plusDays(1))
+                .startDate(startDate)
+                .endDate(endDate)
+                .state(true)
+                .introduction("testIntroduction1")
+                .maxPeople(10)
+                .currentPeople(4)
+                .delete(false)
+                .deleteReason(null)
+                .viewCount(10)
+                .commentCount(10)
+                .build();
+        Project saveProject1 = projectRepository.save(project1);
+        
+        // 북마크 세팅
+        BookMark bookMark1 = BookMark.builder()
+                .user(saveUser1)
+                .project(saveProject1)
+                .build();
+
+        BookMark saveBookMark1 = bookMarkRepository.save(bookMark1);
+
+        // when
+        bookMarkRepository.deleteByProjectNo(saveProject1.getNo());
+
+        // then
+        List<BookMark> bookMarkList = bookMarkRepository.findAll();
+
+        assertEquals(bookMarkList.isEmpty(), true);
+    }
 }

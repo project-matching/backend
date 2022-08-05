@@ -1,6 +1,6 @@
 package com.matching.project.dto.project;
 
-import com.matching.project.dto.enumerate.Filter;
+import com.matching.project.dto.enumerate.ProjectFilter;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ProjectSearchDto {
     // 검색 필터
-    private Filter filter;
+    private ProjectFilter filter;
     // 검색 내용
     private String content;
 }
