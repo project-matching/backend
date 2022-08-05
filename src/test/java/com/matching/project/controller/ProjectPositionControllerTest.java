@@ -222,6 +222,7 @@ class ProjectPositionControllerTest {
                     .delete(true)
                     .deleteReason(null)
                     .viewCount(10)
+                    .user(saveUser)
                     .commentCount(10)
                     .build();
             Project saveProject1 = projectRepository.save(project1);
