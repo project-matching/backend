@@ -85,7 +85,7 @@ class BookMarkRepositoryTest {
         BookMark saveBookMark1 = bookMarkRepository.save(bookMark1);
 
         // when
-        bookMarkRepository.deleteBookMarkByProjectNo(saveProject1.getNo());
+        bookMarkRepository.deleteByProjectNo(saveProject1.getNo());
 
         // then
         List<BookMark> bookMarkList = bookMarkRepository.findAll();

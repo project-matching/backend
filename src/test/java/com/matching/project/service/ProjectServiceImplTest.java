@@ -65,6 +65,12 @@ class ProjectServiceImplTest {
     CommentRepository commentRepository;
 
     @Mock
+    ProjectParticipateRequestRepository projectParticipateRequestRepository;
+
+    @Mock
+    ParticipateRequestTechnicalStackRepository participateRequestTechnicalStackRepository;
+
+    @Mock
     EntityManager entityManager;
 
     @InjectMocks
@@ -1848,6 +1854,56 @@ class ProjectServiceImplTest {
             }
 
             assertEquals(result, project1.getNo());
+        }
+    }
+
+    @Nested
+    @DisplayName("프로젝트 삭제 테스트")
+    class testProjectDelete {
+        @Test
+        @DisplayName("성공 테스트")
+        public void testSuccess() throws Exception {
+            // given
+            // 유저 객체
+            User user1 = User.builder()
+                    .no(1L)
+                    .name("testUser1")
+                    .sex("M")
+                    .email("testEmail1")
+                    .password("testPassword1")
+                    .github("testGithub1")
+                    .block(false)
+                    .blockReason(null)
+                    .permission(Role.ROLE_USER)
+                    .oauthCategory(OAuth.NORMAL)
+                    .email_auth(false)
+                    .imageNo(0L)
+                    .position(null)
+                    .build();
+
+            given(projectRepository.existUserProjectByUser(any(Long.class), any(Long.class))).willReturn(true);
+
+            // when
+            boolean result = false;
+            UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(user1, "", user1.getAuthorities());
+            SecurityContextHolder.getContext().setAuthentication(auth);
+            try {
+                result = projectService.projectDelete(1L);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            // then
+            verify(projectRepository).existUserProjectByUser(any(Long.class), any(Long.class));
+            verify(participateRequestTechnicalStackRepository).deleteByProjectNo(any());
+            verify(projectParticipateRequestRepository).deleteByProjectNo(any());
+            verify(projectPositionRepository).deleteByProjectNo(any());
+            verify(projectTechnicalStackRepository).deleteByProjectNo(any());
+            verify(bookMarkRepository).deleteByProjectNo(any());
+            verify(commentRepository).deleteByProjectNo(any());
+            verify(projectRepository).deleteById(any());
+
+            assertEquals(result, true);
         }
     }
 }

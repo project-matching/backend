@@ -100,8 +100,8 @@ public class ProjectController {
 
     @DeleteMapping("/{projectNo}")
     @ApiOperation(value = "프로젝트 삭제")
-    public ResponseEntity<ResponseDto<Boolean>> projectDelete(@PathVariable Long projectNo) {
-        return ResponseEntity.ok(new ResponseDto<>(null, true));
+    public ResponseEntity<ResponseDto<Boolean>> projectDelete(@PathVariable Long projectNo) throws Exception {
+        return ResponseEntity.ok(new ResponseDto<>(null, projectService.projectDelete(projectNo)));
     }
 
     @GetMapping("/block/{projectNo}")

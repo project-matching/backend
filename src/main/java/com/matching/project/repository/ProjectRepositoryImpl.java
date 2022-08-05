@@ -282,7 +282,7 @@ public class ProjectRepositoryImpl implements ProjectRepositoryCustom {
         return new PageImpl<>(projectSimpleDtoList, pageable, totalSize);
     }
 
-    // 프로젝트 연관 조회 메소드(포지션, 기술스택)
+    // 프로젝트 연관 조회 메소드(프로젝트 포지션, 프로젝트 기술스택)
     private void findProjectSimpleDtoListRelation(List<ProjectSimpleDto> projectSimpleDtoList) {
         // projectPosition map 조회
         Map<Long, List<ProjectSimplePositionDto>> projectPositionMap = findProjectPositionMap(toProjectNo(projectSimpleDtoList));

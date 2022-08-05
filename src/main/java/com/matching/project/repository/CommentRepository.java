@@ -5,6 +5,7 @@ import com.matching.project.entity.Project;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -16,4 +17,8 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 
     @Query("select c from Comment c join fetch c.user u join fetch c.project p where p = :project order by c.no asc")
     List<Comment> findByProjectNoUsingPaging(@Param("project") Project project, Pageable pageable);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("delete from Comment c where c.project.no = :projectNo")
+    public void deleteByProjectNo(@Param("projectNo") Long projectNo);
 }

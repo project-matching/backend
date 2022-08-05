@@ -56,6 +56,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .hasAnyRole("USER", "ADMIN", "ANONYMOUS")
                 .antMatchers(HttpMethod.PATCH,"/v1/project/*")
                 .hasAnyRole("USER", "ADMIN")
+                .antMatchers(HttpMethod.DELETE,"/v1/project/*")
+                .hasAnyRole("USER", "ADMIN")
 
                 //CommonController
                 .antMatchers("/v1/common/logout").hasAnyRole("USER", "ADMIN")

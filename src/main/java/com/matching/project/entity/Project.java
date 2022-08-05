@@ -68,7 +68,7 @@ public class Project extends BaseTimeEntity{
     private List<ProjectPosition> projectPositionList = new ArrayList<>();
 
     @OneToMany(mappedBy = "project")
-    private List<ProjectTechnicalStack> ProjectTechnicalStackList = new ArrayList<>();
+    private List<ProjectTechnicalStack> projectTechnicalStackList = new ArrayList<>();
 
     @Builder
     public Project(Long no, String name, String createUserName, LocalDateTime createDate, LocalDate startDate, LocalDate endDate, boolean state, String introduction, Integer maxPeople, Integer currentPeople, boolean delete, String deleteReason, Integer viewCount, Integer commentCount, User user) {
