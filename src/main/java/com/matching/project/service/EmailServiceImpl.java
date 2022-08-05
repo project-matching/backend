@@ -1,7 +1,6 @@
 package com.matching.project.service;
 
 import com.matching.project.dto.common.PasswordInitRequestDto;
-import com.matching.project.dto.common.TokenDto;
 import com.matching.project.dto.enumerate.EmailAuthPurpose;
 import com.matching.project.dto.enumerate.OAuth;
 import com.matching.project.dto.user.EmailAuthRequestDto;
@@ -48,7 +47,7 @@ public class EmailServiceImpl implements EmailService {
     }
 
     public void emailAuthValidCheck(String email, String authToken, EmailAuthPurpose purpose) {
-        Optional<EmailAuth> emailAuth = emailAuthRepository.findByEmailAndAndAuthTokenAndPurpose(
+        Optional<EmailAuth> emailAuth = emailAuthRepository.findByEmailAndAuthTokenAndPurpose(
                 email, authToken, purpose);
         if (emailAuth.isEmpty())
             throw new CustomException(ErrorCode.NOT_FOUND_AUTH_TOKEN_EXCEPTION);
@@ -108,7 +107,7 @@ public class EmailServiceImpl implements EmailService {
         smm.setTo(email);
         smm.setSubject("회원가입 이메일 인증");
         // 임시 -> 프론트 주소로 바뀌여야함.
-        smm.setText("http://localhost:8080/v1/user/confirm?email="+email+"&authToken="+authToken);
+        smm.setText("http://localhost:3000/auth/signup?email="+email+"&authToken="+authToken);
 
         javaMailSender.send(smm);
         log.info("회원가입 이메일 전송 to {}", email);
@@ -139,7 +138,7 @@ public class EmailServiceImpl implements EmailService {
         smm.setTo(email);
         smm.setSubject("비밀번호 재발급 요청하기");
         // 임시 -> 프론트 주소로 바뀌여야함.
-        smm.setText("http://localhost:8080/v1/common/password/confirm?email="+email+"&authToken="+authToken);
+        smm.setText("http://localhost:3000/auth/pwd?email="+email+"&authToken="+authToken);
 
         javaMailSender.send(smm);
         log.info("비밀번호 재발급 요청 to {}", email);

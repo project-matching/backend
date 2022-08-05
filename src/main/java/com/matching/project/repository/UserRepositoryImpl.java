@@ -21,7 +21,7 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
 
-    public Page<User> findByNoUsingQueryDsl(UserFilterDto userFilterDto, Pageable pageable) {
+    public Page<User> findByNoOrderByNoDescUsingQueryDsl(UserFilterDto userFilterDto, Pageable pageable) {
         QUser user = QUser.user;
         BooleanBuilder builder = new BooleanBuilder();
 
@@ -34,6 +34,7 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
         List<User> fetch = queryFactory
                 .selectFrom(user)
                 .where(builder)
+                .orderBy(user.no.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();

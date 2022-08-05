@@ -23,21 +23,21 @@ public class PositionController {
     private final PositionService positionService;
 
     @GetMapping
-    @ApiOperation(value = "포지션 추가 FORM")
+    @ApiOperation(value = "포지션 추가 FORM (관리자)")
     public ResponseEntity<ResponseDto<List<PositionRegisterFormResponseDto>>> positionRegisterForm() {
         List<PositionRegisterFormResponseDto> positionRegisterFormResponseDtos = positionService.positionList();
         return ResponseEntity.ok(new ResponseDto<>(null, positionRegisterFormResponseDtos));
     }
 
     @PostMapping
-    @ApiOperation(value = "포지션 추가")
+    @ApiOperation(value = "포지션 추가 (관리자)")
     public ResponseEntity<ResponseDto<Boolean>> positionRegister(@RequestBody @Valid PositionRequestDto dto) {
         Position position = positionService.positionRegister(dto.getPositionName());
         return ResponseEntity.ok(new ResponseDto<>(null, true));
     }
 
     @PutMapping("/{positionNo}")
-    @ApiOperation(value = "포지션 수정")
+    @ApiOperation(value = "포지션 수정 (관리자)")
     public ResponseEntity<ResponseDto<Boolean>> positionUpdate(@PathVariable Long positionNo, @RequestBody @Valid PositionRequestDto dto) {
         Position position = positionService.positionUpdate(positionNo, dto.getPositionName());
         return ResponseEntity.ok(new ResponseDto<>(null, true));

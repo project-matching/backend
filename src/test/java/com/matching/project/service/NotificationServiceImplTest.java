@@ -13,6 +13,7 @@ import com.matching.project.repository.UserRepository;
 import org.aspectj.weaver.ast.Not;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -44,245 +45,257 @@ class NotificationServiceImplTest {
     @InjectMocks
     private NotificationServiceImpl notificationService;
 
-    @DisplayName("알림 전송 실패 : 받는 사용자가 없는 경우")
-    @Test
-    void sendNotificationFail1() {
-        //given
-        Long notificationNo = 2L;
-        Type type = Type.PROJECT_PARTICIPATION_REFUSE;
-        String receiver = "leeworld9@gmail.com";
-        String title = "테스트 알림";
-        String content = "상세내역";
+    @Nested
+    @DisplayName("알림 전송")
+    class SendNotification {
+        @DisplayName("성공")
+        @Test
+        void success() {
+            //given
+            Long notificationNo = 2L;
+            Type type = Type.PROJECT_PARTICIPATION_REFUSE;
+            String receiver = "leeworld9@gmail.com";
+            String title = "테스트 알림";
+            String content = "상세내역";
 
-        Long userNo = 1L;
-        String userName = "관리자";
-        String userEmail = "admin@admin.com";
-        Role userRole = Role.ROLE_ADMIN;
+            Long userNo = 1L;
+            String userName = "관리자";
+            String userEmail = "admin@admin.com";
+            Role userRole = Role.ROLE_ADMIN;
 
-        User user = User.builder()
-                .no(userNo)
-                .name(userName)
-                .email(userEmail)
-                .permission(userRole)
-                .build();
+            User user = User.builder()
+                    .no(userNo)
+                    .name(userName)
+                    .email(userEmail)
+                    .permission(userRole)
+                    .build();
 
-        SecurityContext context = SecurityContextHolder.getContext();
-        context.setAuthentication(new UsernamePasswordAuthenticationToken(user, user.getEmail(), user.getAuthorities()));
+            Long receiverUserNo = 2L;
+            String receiverUserName = "테스터";
+            String receiverUserEmail = "leeworld9@gmail.com";
+            Role receiverUserRole = Role.ROLE_USER;
 
-        given(userRepository.findByEmail(receiver)).willReturn(Optional.empty());
+            User receiverUser = User.builder()
+                    .no(receiverUserNo)
+                    .name(receiverUserName)
+                    .email(receiverUserEmail)
+                    .permission(receiverUserRole)
+                    .build();
 
-        //when
-        CustomException e = Assertions.assertThrows(CustomException.class, () -> {
+            SecurityContext context = SecurityContextHolder.getContext();
+            context.setAuthentication(new UsernamePasswordAuthenticationToken(user, user.getEmail(), user.getAuthorities()));
+
+            given(userRepository.findByEmail(receiver)).willReturn(Optional.ofNullable(receiverUser));
+
+            //when
             Notification notification = notificationService.sendNotification(type, receiver, title, content);
-        });
 
-
-        //then
-        assertThat(e.getErrorCode().getDetail()).isEqualTo("This is not a registered email");
-    }
-
-    @DisplayName("알림 전송 성공")
-    @Test
-    void sendNotificationSuccess() {
-        //given
-        Long notificationNo = 2L;
-        Type type = Type.PROJECT_PARTICIPATION_REFUSE;
-        String receiver = "leeworld9@gmail.com";
-        String title = "테스트 알림";
-        String content = "상세내역";
-
-        Long userNo = 1L;
-        String userName = "관리자";
-        String userEmail = "admin@admin.com";
-        Role userRole = Role.ROLE_ADMIN;
-
-        User user = User.builder()
-                .no(userNo)
-                .name(userName)
-                .email(userEmail)
-                .permission(userRole)
-                .build();
-
-        Long receiverUserNo = 2L;
-        String receiverUserName = "테스터";
-        String receiverUserEmail = "leeworld9@gmail.com";
-        Role receiverUserRole = Role.ROLE_USER;
-
-        User receiverUser = User.builder()
-                .no(receiverUserNo)
-                .name(receiverUserName)
-                .email(receiverUserEmail)
-                .permission(receiverUserRole)
-                .build();
-
-        SecurityContext context = SecurityContextHolder.getContext();
-        context.setAuthentication(new UsernamePasswordAuthenticationToken(user, user.getEmail(), user.getAuthorities()));
-
-        given(userRepository.findByEmail(receiver)).willReturn(Optional.ofNullable(receiverUser));
-
-        //when
-        Notification notification = notificationService.sendNotification(type, receiver, title, content);
-
-        //then
-        assertThat(notification.getType()).isEqualTo(type);
-        assertThat(notification.getUser().getEmail()).isEqualTo(receiver);
-        assertThat(notification.getTitle()).isEqualTo(title);
-        assertThat(notification.getContent()).isEqualTo(content);
-    }
-    
-    @DisplayName("알림 리스트 조회 성공")
-    @Test
-    void notificationListSuccess() {
-        Long userNo = 1L;
-        String userName = "테스터";
-        String userEmail = "leeworld9@gmail.com";
-        Role userRole = Role.ROLE_USER;
-
-        User user = User.builder()
-                .no(userNo)
-                .name(userName)
-                .email(userEmail)
-                .permission(userRole)
-                .build();
-
-        SecurityContext context = SecurityContextHolder.getContext();
-        context.setAuthentication(new UsernamePasswordAuthenticationToken(user, user.getEmail(), user.getAuthorities()));
-
-        List<Notification> notificationList = new ArrayList<>();
-        for (int i = 0 ; i < 10 ; i++) {
-            notificationList.add(Notification.builder()
-                            .no(Integer.toUnsignedLong(i))
-                            .type(Type.NOTICE)
-                            .title("title" + i)
-                            .content("content" + i)
-                            .read(false)
-                            .user(null)
-                            .build()
-            );
+            //then
+            assertThat(notification.getType()).isEqualTo(type);
+            assertThat(notification.getUser().getEmail()).isEqualTo(receiver);
+            assertThat(notification.getTitle()).isEqualTo(title);
+            assertThat(notification.getContent()).isEqualTo(content);
         }
 
-        int page = 1;
-        int size = 3;
-        Pageable pageable = PageRequest.of(page, size, Sort.by("no").ascending());
-        int start = (int)pageable.getOffset();
-        int end = (start + pageable.getPageSize()) > notificationList.size() ? notificationList.size() : (start + pageable.getPageSize());
-        Page<Notification> notifications = new PageImpl<>(notificationList.subList(start, end), pageable, notificationList.size());
+        @DisplayName("실패 : 받는 사용자가 없는 경우")
+        @Test
+        void fail1() {
+            //given
+            Long notificationNo = 2L;
+            Type type = Type.PROJECT_PARTICIPATION_REFUSE;
+            String receiver = "leeworld9@gmail.com";
+            String title = "테스트 알림";
+            String content = "상세내역";
 
-        given(notificationRepository.findByUserOrUserIsNullOrderByNoDesc(user, pageable)).willReturn(notifications.stream().collect(Collectors.toList()));
+            Long userNo = 1L;
+            String userName = "관리자";
+            String userEmail = "admin@admin.com";
+            Role userRole = Role.ROLE_ADMIN;
 
-        //when
-        List<NotificationSimpleInfoDto> dtos = notificationService.notificationList(pageable);
+            User user = User.builder()
+                    .no(userNo)
+                    .name(userName)
+                    .email(userEmail)
+                    .permission(userRole)
+                    .build();
 
-        //then
-        assertThat(dtos.get(0).getNo()).isEqualTo(Integer.toUnsignedLong(3));
-        assertThat(dtos.get(0).getTitle()).isEqualTo("title" + 3);
-        assertThat(dtos.get(1).getNo()).isEqualTo(Integer.toUnsignedLong(4));
-        assertThat(dtos.get(1).getTitle()).isEqualTo("title" + 4);
-        assertThat(dtos.get(2).getNo()).isEqualTo(Integer.toUnsignedLong(5));
-        assertThat(dtos.get(2).getTitle()).isEqualTo("title" + 5);
+            SecurityContext context = SecurityContextHolder.getContext();
+            context.setAuthentication(new UsernamePasswordAuthenticationToken(user, user.getEmail(), user.getAuthorities()));
+
+            given(userRepository.findByEmail(receiver)).willReturn(Optional.empty());
+
+            //when
+            CustomException e = Assertions.assertThrows(CustomException.class, () -> {
+                Notification notification = notificationService.sendNotification(type, receiver, title, content);
+            });
+
+
+            //then
+            assertThat(e.getErrorCode().getDetail()).isEqualTo("This is not a registered email");
+        }
     }
 
-    @DisplayName("알림 상세 조회 실패 : 다른 사용자의 알림내역에 접근(공지사항 제외)")
-    @Test
-    void notificationInfoFail1() {
-        //given
-        Long notificationNo = 2L;
-        Type type = Type.PROJECT_PARTICIPATION_REFUSE;
-        String receiver = "leeworld9@gmail.com";
-        String title = "테스트 알림";
-        String content = "상세내역";
+    @Nested
+    @DisplayName("알림 리스트 조회")
+    class NotificationList {
+        @DisplayName("성공")
+        @Test
+        void success() {
+            Long userNo = 1L;
+            String userName = "테스터";
+            String userEmail = "leeworld9@gmail.com";
+            Role userRole = Role.ROLE_USER;
 
+            User user = User.builder()
+                    .no(userNo)
+                    .name(userName)
+                    .email(userEmail)
+                    .permission(userRole)
+                    .build();
 
-        Long userNo = 1L;
-        String userName = "테스터1";
-        String userEmail = "leeworld9@github.com";
-        Role userRole = Role.ROLE_USER;
+            SecurityContext context = SecurityContextHolder.getContext();
+            context.setAuthentication(new UsernamePasswordAuthenticationToken(user, user.getEmail(), user.getAuthorities()));
 
-        User user = User.builder()
-                .no(userNo)
-                .name(userName)
-                .email(userEmail)
-                .permission(userRole)
-                .build();
+            List<Notification> notificationList = new ArrayList<>();
+            for (int i = 0 ; i < 10 ; i++) {
+                notificationList.add(Notification.builder()
+                        .no(Integer.toUnsignedLong(i))
+                        .type(Type.NOTICE)
+                        .title("title" + i)
+                        .content("content" + i)
+                        .read(false)
+                        .user(null)
+                        .build()
+                );
+            }
 
-        Long receiverUserNo = 2L;
-        String receiverUserName = "테스터2";
-        String receiverUserEmail = "leeworld9@gmail.com";
-        Role receiverUserRole = Role.ROLE_USER;
+            int page = 1;
+            int size = 3;
+            Pageable pageable = PageRequest.of(page, size, Sort.by("no").ascending());
+            int start = (int)pageable.getOffset();
+            int end = (start + pageable.getPageSize()) > notificationList.size() ? notificationList.size() : (start + pageable.getPageSize());
+            Page<Notification> notifications = new PageImpl<>(notificationList.subList(start, end), pageable, notificationList.size());
 
-        User receiverUser = User.builder()
-                .no(receiverUserNo)
-                .name(receiverUserName)
-                .email(receiverUserEmail)
-                .permission(receiverUserRole)
-                .build();
+            given(notificationRepository.findByUserOrUserIsNullOrderByNoDesc(user, pageable)).willReturn(notifications.stream().collect(Collectors.toList()));
 
-        Notification notification =  Notification.builder()
-                .no(notificationNo)
-                .type(type)
-                .title(title)
-                .content(content)
-                .user(receiverUser)
-                .read(false)
-                .build();
+            //when
+            List<NotificationSimpleInfoDto> dtos = notificationService.notificationList(pageable);
 
-        SecurityContext context = SecurityContextHolder.getContext();
-        context.setAuthentication(new UsernamePasswordAuthenticationToken(user, user.getEmail(), user.getAuthorities()));
+            //then
+            assertThat(dtos.get(0).getNo()).isEqualTo(Integer.toUnsignedLong(3));
+            assertThat(dtos.get(0).getTitle()).isEqualTo("title" + 3);
+            assertThat(dtos.get(1).getNo()).isEqualTo(Integer.toUnsignedLong(4));
+            assertThat(dtos.get(1).getTitle()).isEqualTo("title" + 4);
+            assertThat(dtos.get(2).getNo()).isEqualTo(Integer.toUnsignedLong(5));
+            assertThat(dtos.get(2).getTitle()).isEqualTo("title" + 5);
+        }
+    }
 
-        given(notificationRepository.findByNoWithUserUsingLeftFetchJoin(notificationNo)).willReturn(Optional.ofNullable(notification));
+    @Nested
+    @DisplayName("알림 상세 조회")
+    class NotificationInfo {
+        @DisplayName("성공")
+        @Test
+        void success() {
+            //given
+            Long notificationNo = 2L;
+            Type type = Type.PROJECT_PARTICIPATION_REFUSE;
+            String receiver = "leeworld9@gmail.com";
+            String title = "테스트 알림";
+            String content = "상세내역";
 
-        //when
-        CustomException e = Assertions.assertThrows(CustomException.class, () -> {
+            Long userNo = 1L;
+            String userName = "테스터";
+            String userEmail = "leeworld9@gmail.com";
+            Role userRole = Role.ROLE_USER;
+
+            User user = User.builder()
+                    .no(userNo)
+                    .name(userName)
+                    .email(userEmail)
+                    .permission(userRole)
+                    .build();
+
+            Notification notification =  Notification.builder()
+                    .no(notificationNo)
+                    .type(type)
+                    .title(title)
+                    .content(content)
+                    .user(user)
+                    .read(false)
+                    .build();
+
+            SecurityContext context = SecurityContextHolder.getContext();
+            context.setAuthentication(new UsernamePasswordAuthenticationToken(user, user.getEmail(), user.getAuthorities()));
+
+            given(notificationRepository.findByNoWithUserUsingLeftFetchJoin(notificationNo)).willReturn(Optional.ofNullable(notification));
+
+            //when
             NotificationDto dto = notificationService.notificationInfo(notificationNo);
-        });
 
-        //then
-        assertThat(e.getErrorCode().getDetail()).isEqualTo("Unauthorized User Access");
+            //then
+            assertThat(dto.getType()).isEqualTo(type);
+            assertThat(dto.getTitle()).isEqualTo(title);
+            assertThat(dto.getContent()).isEqualTo(content);
+        }
 
-    }
+        @DisplayName("실패 : 다른 사용자의 알림내역에 접근 (공지사항 제외)")
+        @Test
+        void fail1() {
+            //given
+            Long notificationNo = 2L;
+            Type type = Type.PROJECT_PARTICIPATION_REFUSE;
+            String receiver = "leeworld9@gmail.com";
+            String title = "테스트 알림";
+            String content = "상세내역";
 
-    @DisplayName("알림 상세 조회 성공")
-    @Test
-    void notificationInfoSuccess() {
-        //given
-        Long notificationNo = 2L;
-        Type type = Type.PROJECT_PARTICIPATION_REFUSE;
-        String receiver = "leeworld9@gmail.com";
-        String title = "테스트 알림";
-        String content = "상세내역";
 
-        Long userNo = 1L;
-        String userName = "테스터";
-        String userEmail = "leeworld9@gmail.com";
-        Role userRole = Role.ROLE_USER;
+            Long userNo = 1L;
+            String userName = "테스터1";
+            String userEmail = "leeworld9@github.com";
+            Role userRole = Role.ROLE_USER;
 
-        User user = User.builder()
-                .no(userNo)
-                .name(userName)
-                .email(userEmail)
-                .permission(userRole)
-                .build();
+            User user = User.builder()
+                    .no(userNo)
+                    .name(userName)
+                    .email(userEmail)
+                    .permission(userRole)
+                    .build();
 
-        Notification notification =  Notification.builder()
-                .no(notificationNo)
-                .type(type)
-                .title(title)
-                .content(content)
-                .user(user)
-                .read(false)
-                .build();
+            Long receiverUserNo = 2L;
+            String receiverUserName = "테스터2";
+            String receiverUserEmail = "leeworld9@gmail.com";
+            Role receiverUserRole = Role.ROLE_USER;
 
-        SecurityContext context = SecurityContextHolder.getContext();
-        context.setAuthentication(new UsernamePasswordAuthenticationToken(user, user.getEmail(), user.getAuthorities()));
+            User receiverUser = User.builder()
+                    .no(receiverUserNo)
+                    .name(receiverUserName)
+                    .email(receiverUserEmail)
+                    .permission(receiverUserRole)
+                    .build();
 
-        given(notificationRepository.findByNoWithUserUsingLeftFetchJoin(notificationNo)).willReturn(Optional.ofNullable(notification));
+            Notification notification =  Notification.builder()
+                    .no(notificationNo)
+                    .type(type)
+                    .title(title)
+                    .content(content)
+                    .user(receiverUser)
+                    .read(false)
+                    .build();
 
-        //when
-        NotificationDto dto = notificationService.notificationInfo(notificationNo);
+            SecurityContext context = SecurityContextHolder.getContext();
+            context.setAuthentication(new UsernamePasswordAuthenticationToken(user, user.getEmail(), user.getAuthorities()));
 
-        //then
-        assertThat(dto.getType()).isEqualTo(type);
-        assertThat(dto.getTitle()).isEqualTo(title);
-        assertThat(dto.getContent()).isEqualTo(content);
+            given(notificationRepository.findByNoWithUserUsingLeftFetchJoin(notificationNo)).willReturn(Optional.ofNullable(notification));
+
+            //when
+            CustomException e = Assertions.assertThrows(CustomException.class, () -> {
+                NotificationDto dto = notificationService.notificationInfo(notificationNo);
+            });
+
+            //then
+            assertThat(e.getErrorCode().getDetail()).isEqualTo("Unauthorized User Access");
+
+        }
     }
 }

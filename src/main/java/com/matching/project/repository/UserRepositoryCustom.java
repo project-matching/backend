@@ -8,5 +8,5 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 public interface UserRepositoryCustom {
-    Page<User> findByNoUsingQueryDsl(UserFilterDto userFilterDto, Pageable pageable);
+    Page<User> findByNoOrderByNoDescUsingQueryDsl(UserFilterDto userFilterDto, Pageable pageable);
 }

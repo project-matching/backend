@@ -11,16 +11,22 @@ import com.matching.project.service.JwtTokenService;
 import com.matching.project.service.UserService;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.util.List;
 
+@Slf4j
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/v1/user")
@@ -37,7 +43,7 @@ public class UserController {
     }
 
     @PostMapping
-    @ApiOperation(value = "회원가입")
+    @ApiOperation(value = "회원 가입")
     public ResponseEntity<ResponseDto<Boolean>> signUp(@RequestBody @Valid SignUpRequestDto signUpRequestDto) {
         User user = userService.userSignUp(signUpRequestDto);
 
@@ -51,8 +57,8 @@ public class UserController {
     }
 
     @ApiOperation(value = "이메일 인증")
-    @GetMapping("/confirm")
-    public ResponseEntity<ResponseDto<String>> confirmEmail(@Valid EmailAuthRequestDto dto) {
+    @PostMapping("/confirm")
+    public ResponseEntity<ResponseDto<String>> confirmEmail(@RequestBody @Valid EmailAuthRequestDto dto) {
         User user = emailService.checkConfirmEmail(dto, EmailAuthPurpose.EMAIL_AUTHENTICATION);
         TokenDto tokenDto = TokenDto.builder()
                 .email(user.getEmail())
@@ -96,7 +102,6 @@ public class UserController {
         return ResponseEntity.ok(new ResponseDto<>(null, true));
     }
 
-
     @DeleteMapping
     @ApiOperation(value = "회원 탈퇴")
     public ResponseEntity<ResponseDto<Boolean>> userSingOut() {
@@ -111,14 +116,15 @@ public class UserController {
         List<UserSimpleInfoDto> dtoList = userService.userInfoList(userFilterDto, pageable);
         return ResponseEntity.ok(new ResponseDto<>(null, dtoList));
     }
-    @GetMapping("/block/{userNo}")
+
+    @PatchMapping("/block/{userNo}")
     @ApiOperation(value = "회원 차단 (관리자)")
-    public ResponseEntity<ResponseDto<Boolean>> userBlock(@PathVariable Long userNo, @RequestBody String reason) {
-        User user = userService.userBlock(userNo, reason);
+    public ResponseEntity<ResponseDto<Boolean>> userBlock(@PathVariable Long userNo, @RequestBody UserBlockRequestDto userBlockRequestDto) {
+        User user = userService.userBlock(userNo, userBlockRequestDto.getBlockReason());
         return ResponseEntity.ok(new ResponseDto<>(null, true));
     }
 
-    @GetMapping("/unblock/{userNo}")
+    @PatchMapping("/unblock/{userNo}")
     @ApiOperation(value = "회원 차단 해제 (관리자)")
     public ResponseEntity<ResponseDto<Boolean>> userUnBlock(@PathVariable Long userNo) {
         User user = userService.userUnBlock(userNo);

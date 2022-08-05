@@ -8,9 +8,7 @@ import com.matching.project.error.CustomException;
 import com.matching.project.error.ErrorCode;
 import com.matching.project.repository.CommentRepository;
 import com.matching.project.repository.ProjectRepository;
-import com.matching.project.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -41,7 +39,7 @@ public class CommentServiceImpl implements CommentService {
         Optional<Project> optionalProject = projectRepository.findById(projectNo);
         optionalProject.orElseThrow(() -> new CustomException(ErrorCode.NOT_FIND_PROJECT_NO_EXCEPTION));
 
-        List<Comment> commentPage = commentRepository.findByProjectNoUsingPaging(optionalProject.get(), pageable);
+        List<Comment> commentPage = commentRepository.findByProjectOrderByNoDescUsingPaging(optionalProject.get(), pageable);
 
         return commentPage.stream().map(CommentDto::toCommentDto).collect(Collectors.toList());
     }

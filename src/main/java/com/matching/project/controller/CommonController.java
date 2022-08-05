@@ -60,7 +60,7 @@ public class CommonController {
 
     @PatchMapping("/password/confirm")
     @ApiOperation(value = "비밀번호 초기화 페이지")
-    public ResponseEntity<ResponseDto<String>> passwordReissue(@RequestBody @Valid PasswordInitRequestDto dto) {
+    public ResponseEntity<ResponseDto<String>> passwordInit(@RequestBody @Valid PasswordInitRequestDto dto) {
         User user = emailService.checkPasswordInitEmail(dto, EmailAuthPurpose.PASSWORD_INIT);
 
         // Jwt Token Create

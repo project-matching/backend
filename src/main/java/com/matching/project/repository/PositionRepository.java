@@ -10,5 +10,4 @@ import java.util.Optional;
 public interface PositionRepository extends JpaRepository<Position, Long> {
     List<Position> findByNoIn(Collection<Long> noList);
     Optional<Position> findAllByName(String position);
-
 }
