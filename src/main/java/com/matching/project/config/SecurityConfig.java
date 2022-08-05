@@ -114,6 +114,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.POST,"/v1/technicalStack").hasRole("ADMIN")
                 .antMatchers(HttpMethod.PUT,"/v1/technicalStack/*").hasRole("ADMIN")
 
+                //ProjectPositionController
+                .antMatchers(HttpMethod.DELETE, "/v1/projectposition/*/withdrawal").hasAnyRole("USER", "ADMIN")
+                .antMatchers(HttpMethod.DELETE, "/v1/projectposition/*/expulsion").hasAnyRole("USER", "ADMIN")
+
                 //AnyRequest
                 .anyRequest().permitAll()
 

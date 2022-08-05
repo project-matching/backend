@@ -7,6 +7,8 @@ import com.matching.project.entity.Position;
 import com.matching.project.entity.Project;
 import com.matching.project.entity.ProjectPosition;
 import com.matching.project.entity.User;
+import com.matching.project.error.CustomException;
+import com.matching.project.error.ErrorCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -252,4 +254,60 @@ class ProjectPositionRepositoryTest {
             assertEquals(projectPositionRepository.findAll().size(), 0);
         }
     }
+
+    @Nested
+    @DisplayName("유저 조인 프로젝트포지션 번호 조건 조회")
+    class testFindUserFetchJoinByProjectPositionNo {
+        @Test
+        @DisplayName("성공 테스트")
+        public void testSuccess() {
+            // given
+            LocalDateTime createDate = LocalDateTime.now();
+            LocalDate startDate = LocalDate.of(2022, 06, 24);
+            LocalDate endDate = LocalDate.of(2022, 06, 28);
+
+            Project project1 = Project.builder()
+                    .name("testName1")
+                    .createUserName("user1")
+                    .createDate(createDate)
+                    .startDate(startDate)
+                    .endDate(endDate)
+                    .state(true)
+                    .introduction("testIntroduction1")
+                    .maxPeople(10)
+                    .currentPeople(4)
+                    .delete(true)
+                    .deleteReason(null)
+                    .viewCount(10)
+                    .commentCount(10)
+                    .build();
+            Project saveProject1 = projectRepository.save(project1);
+
+            Position position1 = Position.builder()
+                    .name("testPosition1")
+                    .build();
+            Position savePosition1 = positionRepository.save(position1);
+
+            ProjectPosition projectPosition1 = ProjectPosition.builder()
+                    .state(true)
+                    .project(saveProject1)
+                    .position(savePosition1)
+                    .user(null)
+                    .creator(false)
+                    .build();
+            ProjectPosition saveProjectPosition1 = projectPositionRepository.save(projectPosition1);
+
+            // when
+            ProjectPosition projectPosition = projectPositionRepository.findUserFetchJoinByProjectPositionNo(saveProjectPosition1.getNo()).orElseThrow(() -> new CustomException(ErrorCode.PROJECT_POSITION_NO_SUCH_ELEMENT_EXCEPTION));
+
+            // then
+            assertEquals(projectPosition.getNo(), saveProjectPosition1.getNo());
+            assertEquals(projectPosition.isState(), saveProjectPosition1.isState());
+            assertEquals(projectPosition.getProject(), saveProjectPosition1.getProject());
+            assertEquals(projectPosition.getPosition(), saveProjectPosition1.getPosition());
+            assertEquals(projectPosition.getUser(), saveProjectPosition1.getUser());
+            assertEquals(projectPosition.isCreator(), saveProjectPosition1.isCreator());
+        }
+    }
+
 }
