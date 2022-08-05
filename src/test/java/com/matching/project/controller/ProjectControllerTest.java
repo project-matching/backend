@@ -1632,7 +1632,7 @@ class ProjectControllerTest {
                 mvc.perform(patch("/v1/project/"+ saveProject1.getNo()).contentType(MediaType.APPLICATION_JSON)
                                 .content(new ObjectMapper().registerModule(new JavaTimeModule()).writeValueAsString(projectUpdateRequestDto)))
                         .andDo(print())
-                        .andExpect(status().is3xxRedirection());
+                        .andExpect(status().isUnauthorized());
             }
         }
 
@@ -1805,7 +1805,7 @@ class ProjectControllerTest {
 
                 mvc.perform(delete("/v1/project/"+ saveProject1.getNo()).contentType(MediaType.APPLICATION_JSON))
                         .andDo(print())
-                        .andExpect(status().is3xxRedirection());
+                        .andExpect(status().isUnauthorized());
             }
         }
 
