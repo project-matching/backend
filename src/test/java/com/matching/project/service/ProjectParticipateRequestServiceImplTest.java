@@ -485,7 +485,7 @@ class ProjectParticipateRequestServiceImplTest {
         Authentication auth = new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(auth);
 
-        Page<ProjectParticipateFormResponseDto> result = null;
+        List<ProjectParticipateFormResponseDto> result = null;
         try {
             result = projectParticipateRequestService.findProjectParticipateManagementForm(project1.getNo(), pageable);
         } catch (Exception e) {
@@ -496,14 +496,12 @@ class ProjectParticipateRequestServiceImplTest {
         verify(projectRepository).findProjectWithUserUsingFetchJoinByProjectNo(any());
         verify(projectParticipateRequestRepository).findProjectParticipateRequestByProjectNo(any(), any());
 
-        List<ProjectParticipateFormResponseDto> content = result.getContent();
-
-        assertEquals(content.get(0).getProjectParticipateNo(), projectParticipateFormResponseDtoList.get(0).getProjectParticipateNo());
-        assertEquals(content.get(0).getTechnicalStackList().get(0), projectParticipateFormResponseDtoList.get(0).getTechnicalStackList().get(0));
-        assertEquals(content.get(0).getTechnicalStackList().get(1), projectParticipateFormResponseDtoList.get(0).getTechnicalStackList().get(1));
-        assertEquals(content.get(0).getPositionName(), projectParticipateFormResponseDtoList.get(0).getPositionName());
-        assertEquals(content.get(0).getUserName(), projectParticipateFormResponseDtoList.get(0).getUserName());
-        assertEquals(content.get(0).getMotive(), projectParticipateFormResponseDtoList.get(0).getMotive());
+        assertEquals(result.get(0).getProjectParticipateNo(), projectParticipateFormResponseDtoList.get(0).getProjectParticipateNo());
+        assertEquals(result.get(0).getTechnicalStackList().get(0), projectParticipateFormResponseDtoList.get(0).getTechnicalStackList().get(0));
+        assertEquals(result.get(0).getTechnicalStackList().get(1), projectParticipateFormResponseDtoList.get(0).getTechnicalStackList().get(1));
+        assertEquals(result.get(0).getPositionName(), projectParticipateFormResponseDtoList.get(0).getPositionName());
+        assertEquals(result.get(0).getUserName(), projectParticipateFormResponseDtoList.get(0).getUserName());
+        assertEquals(result.get(0).getMotive(), projectParticipateFormResponseDtoList.get(0).getMotive());
     }
 
     @Test
