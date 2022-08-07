@@ -29,9 +29,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -80,11 +79,11 @@ class ProjectPositionControllerTest {
     }
 
     @Nested
-    @DisplayName("프로젝트 탈퇴 테스트")
-    class testProjectPositionWithdraw {
+    @DisplayName("프로젝트 탈퇴")
+    class projectPositionWithdraw {
         @Test
-        @DisplayName("성공 테스트")
-        public void testSuccess() throws Exception {
+        @DisplayName("성공")
+        public void success() throws Exception {
             // given
             // 유저 세팅
             User saveUser = saveUser();
@@ -143,49 +142,10 @@ class ProjectPositionControllerTest {
         }
 
         @Test
-        @DisplayName("실패 테스트 : 비로그인한 경우")
-        public void testFailure() throws Exception {
-            // given
-            LocalDateTime createDate = LocalDateTime.now();
-            LocalDate startDate = LocalDate.of(2022, 06, 24);
-            LocalDate endDate = LocalDate.of(2022, 06, 28);
-
-            // 프로젝트 세팅
-            Project project1 = Project.builder()
-                    .name("testName1")
-                    .createUserName("user1")
-                    .createDate(createDate)
-                    .startDate(startDate)
-                    .endDate(endDate)
-                    .state(true)
-                    .introduction("testIntroduction1")
-                    .maxPeople(10)
-                    .currentPeople(4)
-                    .delete(true)
-                    .deleteReason(null)
-                    .viewCount(10)
-                    .commentCount(10)
-                    .build();
-            Project saveProject1 = projectRepository.save(project1);
-
-            // 포지션 세팅
-            Position position1 = Position.builder()
-                    .name("testPosition1")
-                    .build();
-            Position savePosition1 = positionRepository.save(position1);
-
-            // 프로젝트 포지션 세팅
-            ProjectPosition projectPosition1 = ProjectPosition.builder()
-                    .state(true)
-                    .project(saveProject1)
-                    .position(savePosition1)
-                    .user(null)
-                    .creator(false)
-                    .build();
-            ProjectPosition saveProjectPosition1 = projectPositionRepository.save(projectPosition1);
-
+        @DisplayName("실패 : 비로그인 유저")
+        public void fail1() throws Exception {
             // when
-            ResultActions resultActions = mvc.perform(delete("/v1/projectposition/" + saveProjectPosition1.getNo() + "/withdrawal")
+            ResultActions resultActions = mvc.perform(delete("/v1/projectposition/1/withdrawal")
                     .contentType(MediaType.APPLICATION_JSON_VALUE));
 
             // then
@@ -195,11 +155,11 @@ class ProjectPositionControllerTest {
     }
 
     @Nested
-    @DisplayName("프로젝트 추방 테스트")
-    class testProjectPositionExpulsion {
+    @DisplayName("프로젝트 추방")
+    class projectPositionExpulsion {
         @Test
-        @DisplayName("성공 테스트")
-        public void testSuccess() throws Exception {
+        @DisplayName("성공")
+        public void success() throws Exception {
             // given
             // 유저 세팅
             User saveUser = saveUser();
@@ -245,6 +205,7 @@ class ProjectPositionControllerTest {
 
             // when
             String token = jwtTokenService.createToken(new TokenDto(saveUser.getEmail()));
+
             ResultActions resultActions = mvc.perform(delete("/v1/projectposition/" + saveProjectPosition1.getNo() + "/expulsion")
                     .header("Authorization", "Bearer " + token)
                     .content(new ObjectMapper().writeValueAsString("testReason"))
@@ -260,49 +221,10 @@ class ProjectPositionControllerTest {
         }
 
         @Test
-        @DisplayName("실패 테스트 : 비로그인한 경우")
-        public void testFailure() throws Exception {
-            // given
-            LocalDateTime createDate = LocalDateTime.now();
-            LocalDate startDate = LocalDate.of(2022, 06, 24);
-            LocalDate endDate = LocalDate.of(2022, 06, 28);
-
-            // 프로젝트 세팅
-            Project project1 = Project.builder()
-                    .name("testName1")
-                    .createUserName("user1")
-                    .createDate(createDate)
-                    .startDate(startDate)
-                    .endDate(endDate)
-                    .state(true)
-                    .introduction("testIntroduction1")
-                    .maxPeople(10)
-                    .currentPeople(4)
-                    .delete(true)
-                    .deleteReason(null)
-                    .viewCount(10)
-                    .commentCount(10)
-                    .build();
-            Project saveProject1 = projectRepository.save(project1);
-
-            // 포지션 세팅
-            Position position1 = Position.builder()
-                    .name("testPosition1")
-                    .build();
-            Position savePosition1 = positionRepository.save(position1);
-
-            // 프로젝트 포지션 세팅
-            ProjectPosition projectPosition1 = ProjectPosition.builder()
-                    .state(true)
-                    .project(saveProject1)
-                    .position(savePosition1)
-                    .user(null)
-                    .creator(false)
-                    .build();
-            ProjectPosition saveProjectPosition1 = projectPositionRepository.save(projectPosition1);
-
+        @DisplayName("실패 : 비로그인 유저")
+        public void fail1() throws Exception {
             // when
-            ResultActions resultActions = mvc.perform(delete("/v1/projectposition/" + saveProjectPosition1.getNo() + "/expulsion")
+            ResultActions resultActions = mvc.perform(delete("/v1/projectposition/1/expulsion")
                     .contentType(MediaType.APPLICATION_JSON_VALUE));
 
             // then
