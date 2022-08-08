@@ -49,11 +49,11 @@ class ProjectPositionServiceImplTest {
     ProjectPositionServiceImpl projectPositionService;
 
     @Nested
-    @DisplayName("프로젝트 탈퇴 테스트")
+    @DisplayName("프로젝트 탈퇴")
     class testProjectPositionWithdraw {
         @Test
-        @DisplayName("성공 테스트")
-        public void testSuccess() {
+        @DisplayName("성공")
+        public void success() {
             // given
             User user1 = User.builder()
                     .no(1L)
@@ -125,8 +125,8 @@ class ProjectPositionServiceImplTest {
         }
 
         @Test
-        @DisplayName("실패 테스트 : 프로젝트 포지션이 null일 경우")
-        public void testFailure1() {
+        @DisplayName("실패 : 프로젝트 포지션이 null일 경우")
+        public void fail1() {
             // given
             User user1 = User.builder()
                     .no(1L)
@@ -160,8 +160,8 @@ class ProjectPositionServiceImplTest {
         }
         
         @Test
-        @DisplayName("실패 테스트 : 프로젝트 포지션 유저가 null일 경우")
-        public void testFailure2() {
+        @DisplayName("실패 : 프로젝트 포지션 유저가 null일 경우")
+        public void fail2() {
             // given
             User user1 = User.builder()
                     .no(1L)
@@ -230,8 +230,8 @@ class ProjectPositionServiceImplTest {
         }
 
         @Test
-        @DisplayName("실패 테스트 : 프로젝트 포지션 유저가 다를 경우")
-        public void testFailure3() {
+        @DisplayName("실패 : 프로젝트 포지션 유저가 다를 경우")
+        public void fail3() {
             // given
             User user1 = User.builder()
                     .no(1L)
@@ -317,11 +317,11 @@ class ProjectPositionServiceImplTest {
     }
 
     @Nested
-    @DisplayName("프로젝트 추방 테스트")
+    @DisplayName("프로젝트 추방")
     class testProjectPositionExpulsion {
         @Test
-        @DisplayName("성공 테스트")
-        public void testSuccess() {
+        @DisplayName("성공")
+        public void success() {
             // given
             User user1 = User.builder()
                     .no(1L)
@@ -394,8 +394,8 @@ class ProjectPositionServiceImplTest {
         }
 
         @Test
-        @DisplayName("실패 테스트 : 프로젝트 포지션이 null일 경우")
-        public void testFailure1() {
+        @DisplayName("실패 : 프로젝트 포지션이 null일 경우")
+        public void fail1() {
             // given
             User user1 = User.builder()
                     .no(1L)
@@ -429,8 +429,8 @@ class ProjectPositionServiceImplTest {
         }
 
         @Test
-        @DisplayName("실패 테스트 : 프로젝트 포지션 유저가 null일 경우")
-        public void testFailure2() {
+        @DisplayName("실패 : 프로젝트 포지션 유저가 null일 경우")
+        public void fail2() {
             // given
             User user1 = User.builder()
                     .no(1L)
@@ -501,8 +501,8 @@ class ProjectPositionServiceImplTest {
         }
 
         @Test
-        @DisplayName("실패 테스트 : 프로젝트 포지션 유저가 null일 경우")
-        public void testFailure3() {
+        @DisplayName("실패 : 프로젝트 포지션 유저가 null일 경우")
+        public void fail3() {
             // given
             User user1 = User.builder()
                     .no(1L)

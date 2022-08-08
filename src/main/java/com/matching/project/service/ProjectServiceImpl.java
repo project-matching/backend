@@ -130,7 +130,7 @@ public class ProjectServiceImpl implements ProjectService {
     
     // 프로젝트 조회
     @Override
-    public Page<ProjectSimpleDto> findProjectList(boolean state, boolean delete, ProjectSearchRequestDto projectSearchRequestDto, Pageable pageable) throws Exception {
+    public List<ProjectSimpleDto> findProjectList(boolean state, boolean delete, ProjectSearchRequestDto projectSearchRequestDto, Pageable pageable) throws Exception {
         Page<ProjectSimpleDto> projectSimpleDtoPage = projectRepository.findProjectByStatusAndDelete(pageable, state, delete, projectSearchRequestDto);
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -142,12 +142,12 @@ public class ProjectServiceImpl implements ProjectService {
             // 유저 즐겨찾기 조회
             findBookMark(projectSimpleDtoPage.getContent(), user);
         }
-        return projectSimpleDtoPage;
+        return projectSimpleDtoPage.getContent();
     }
     
     // 유저가 만든 프로젝트 조회
     @Override
-    public Page<ProjectSimpleDto> findUserProjectList(boolean delete, Pageable pageable) throws Exception {
+    public List<ProjectSimpleDto> findUserProjectList(boolean delete, Pageable pageable) throws Exception {
         // 현재 로그인한 유저 정보 가져오기
         User user = getUser();
         
@@ -157,7 +157,7 @@ public class ProjectServiceImpl implements ProjectService {
         // 유저 즐겨찾기 조회
         findBookMark(projectSimpleDtoPage.getContent(), user);
 
-        return projectSimpleDtoPage;
+        return projectSimpleDtoPage.getContent();
     }
     
     // 프로젝트 수정 폼 조회
@@ -208,7 +208,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     // 참여중인 프로젝트 조회
     @Override
-    public Page<ProjectSimpleDto> findParticipateProjectList(boolean delete, Pageable pageable) throws Exception {
+    public List<ProjectSimpleDto> findParticipateProjectList(boolean delete, Pageable pageable) throws Exception {
         // 현재 로그인한 유저 정보 가져오기
         User user = getUser();
 
@@ -218,12 +218,12 @@ public class ProjectServiceImpl implements ProjectService {
         // 유저 즐겨찾기 조회
         findBookMark(projectSimpleDtoPage.getContent(), user);
 
-        return projectSimpleDtoPage;
+        return projectSimpleDtoPage.getContent();
     }
     
     // 신청중인 프로젝트 조회
     @Override
-    public Page<ProjectSimpleDto> findParticipateRequestProjectList(boolean delete, Pageable pageable) throws Exception {
+    public List<ProjectSimpleDto> findParticipateRequestProjectList(boolean delete, Pageable pageable) throws Exception {
         // 현재 로그인한 유저 정보 가져오기
         User user = getUser();
 
@@ -233,7 +233,7 @@ public class ProjectServiceImpl implements ProjectService {
         // 유저 즐겨찾기 조회
         findBookMark(projectSimpleDtoPage.getContent(), user);
 
-        return projectSimpleDtoPage;
+        return projectSimpleDtoPage.getContent();
     }
     
     // 유저 즐겨찾기 조회

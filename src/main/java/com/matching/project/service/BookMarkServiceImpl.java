@@ -17,6 +17,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -40,8 +42,8 @@ public class BookMarkServiceImpl implements BookMarkService{
     }
 
     @Override
-    public Page<ProjectSimpleDto> findBookMarkProject(Pageable pageable) throws Exception {
-        return projectRepository.findBookMarkProjectByDelete(pageable, getUser(), false);
+    public List<ProjectSimpleDto> findBookMarkProject(Pageable pageable) throws Exception {
+        return projectRepository.findBookMarkProjectByDelete(pageable, getUser(), false).getContent();
     }
 
     @Override

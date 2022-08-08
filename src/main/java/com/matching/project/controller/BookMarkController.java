@@ -32,8 +32,8 @@ public class BookMarkController {
 
     @GetMapping
     @ApiOperation(value = "즐겨찾기 프로젝트 목록 조회")
-    public ResponseEntity<ResponseDto<Page<ProjectSimpleDto>>> bookMarkList(@PageableDefault(size = 5, sort = "createDate", direction = Sort.Direction.DESC) Pageable pageable) throws Exception{
-        return ResponseEntity.ok(new ResponseDto<Page<ProjectSimpleDto>>(null, bookMarkService.findBookMarkProject(pageable)));
+    public ResponseEntity<ResponseDto<List<ProjectSimpleDto>>> bookMarkList(@PageableDefault(size = 5, sort = "createDate", direction = Sort.Direction.DESC) Pageable pageable) throws Exception{
+        return ResponseEntity.ok(new ResponseDto<List<ProjectSimpleDto>>(null, bookMarkService.findBookMarkProject(pageable)));
     }
 
     @DeleteMapping("/{projectNo}")

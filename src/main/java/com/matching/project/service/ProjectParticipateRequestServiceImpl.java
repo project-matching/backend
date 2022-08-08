@@ -74,7 +74,7 @@ public class ProjectParticipateRequestServiceImpl implements ProjectParticipateR
     
     // 프로젝트 참가 신청 폼 조회
     @Override
-    public Page<ProjectParticipateFormResponseDto> findProjectParticipateManagementForm(Long projectNo, Pageable pageable) throws Exception {
+    public List<ProjectParticipateFormResponseDto> findProjectParticipateManagementForm(Long projectNo, Pageable pageable) throws Exception {
         // 현재 유저 가져오기
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) authentication.getPrincipal();
@@ -83,7 +83,7 @@ public class ProjectParticipateRequestServiceImpl implements ProjectParticipateR
         Project project = projectRepository.findProjectWithUserUsingFetchJoinByProjectNo(projectNo);
         isCreatedProject(user, project);
 
-        return projectParticipateRequestRepository.findProjectParticipateRequestByProjectNo(projectNo, pageable);
+        return projectParticipateRequestRepository.findProjectParticipateRequestByProjectNo(projectNo, pageable).getContent();
     }
     
     // 프로젝트 참가 신청 수락

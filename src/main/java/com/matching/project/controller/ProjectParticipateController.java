@@ -38,11 +38,9 @@ public class ProjectParticipateController {
 
     @GetMapping("/{projectNo}")
     @ApiOperation(value = "프로젝트 신청 관리 페이지 (수정 완료)")
-    public ResponseEntity<ResponseDto<Page<ProjectParticipateFormResponseDto>>> projectParticipateManagementForm(@PathVariable Long projectNo, @PageableDefault(size = 5, sort = "no", direction = Sort.Direction.DESC) Pageable pageable) throws Exception{
+    public ResponseEntity<ResponseDto<List<ProjectParticipateFormResponseDto>>> projectParticipateManagementForm(@PathVariable Long projectNo, @PageableDefault(size = 5, sort = "no", direction = Sort.Direction.DESC) Pageable pageable) throws Exception{
 
-        Page<ProjectParticipateFormResponseDto> projectParticipateManagementForm = projectParticipateRequestService.findProjectParticipateManagementForm(projectNo, pageable);
-
-        return ResponseEntity.ok(new ResponseDto(null, projectParticipateManagementForm));
+        return ResponseEntity.ok(new ResponseDto(null, projectParticipateRequestService.findProjectParticipateManagementForm(projectNo, pageable)));
     }
 
     // 프로젝트 참가 허가
