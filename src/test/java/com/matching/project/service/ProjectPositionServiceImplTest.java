@@ -71,7 +71,6 @@ class ProjectPositionServiceImplTest {
                     .position(null)
                     .build();
 
-            LocalDateTime createDate = LocalDateTime.now();
             LocalDate startDate = LocalDate.of(2022, 06, 24);
             LocalDate endDate = LocalDate.of(2022, 06, 28);
 
@@ -79,15 +78,12 @@ class ProjectPositionServiceImplTest {
                     .no(1L)
                     .name("testName1")
                     .createUserName("user1")
-                    .createDate(createDate)
                     .startDate(startDate)
                     .endDate(endDate)
                     .state(true)
                     .introduction("testIntroduction1")
                     .maxPeople(10)
                     .currentPeople(4)
-                    .delete(true)
-                    .deleteReason(null)
                     .viewCount(10)
                     .commentCount(10)
                     .build();
@@ -179,7 +175,6 @@ class ProjectPositionServiceImplTest {
                     .position(null)
                     .build();
 
-            LocalDateTime createDate = LocalDateTime.now();
             LocalDate startDate = LocalDate.of(2022, 06, 24);
             LocalDate endDate = LocalDate.of(2022, 06, 28);
 
@@ -187,15 +182,12 @@ class ProjectPositionServiceImplTest {
                     .no(1L)
                     .name("testName1")
                     .createUserName("user1")
-                    .createDate(createDate)
                     .startDate(startDate)
                     .endDate(endDate)
                     .state(true)
                     .introduction("testIntroduction1")
                     .maxPeople(10)
                     .currentPeople(4)
-                    .delete(true)
-                    .deleteReason(null)
                     .viewCount(10)
                     .commentCount(10)
                     .build();
@@ -265,7 +257,6 @@ class ProjectPositionServiceImplTest {
                     .position(null)
                     .build();
 
-            LocalDateTime createDate = LocalDateTime.now();
             LocalDate startDate = LocalDate.of(2022, 06, 24);
             LocalDate endDate = LocalDate.of(2022, 06, 28);
 
@@ -273,15 +264,12 @@ class ProjectPositionServiceImplTest {
                     .no(1L)
                     .name("testName1")
                     .createUserName("user1")
-                    .createDate(createDate)
                     .startDate(startDate)
                     .endDate(endDate)
                     .state(true)
                     .introduction("testIntroduction1")
                     .maxPeople(10)
                     .currentPeople(4)
-                    .delete(true)
-                    .deleteReason(null)
                     .viewCount(10)
                     .commentCount(10)
                     .build();
@@ -339,7 +327,6 @@ class ProjectPositionServiceImplTest {
                     .position(null)
                     .build();
 
-            LocalDateTime createDate = LocalDateTime.now();
             LocalDate startDate = LocalDate.of(2022, 06, 24);
             LocalDate endDate = LocalDate.of(2022, 06, 28);
 
@@ -347,15 +334,12 @@ class ProjectPositionServiceImplTest {
                     .no(1L)
                     .name("testName1")
                     .createUserName("user1")
-                    .createDate(createDate)
                     .startDate(startDate)
                     .endDate(endDate)
                     .state(true)
                     .introduction("testIntroduction1")
                     .maxPeople(10)
                     .currentPeople(4)
-                    .delete(true)
-                    .deleteReason(null)
                     .viewCount(10)
                     .commentCount(10)
                     .user(user1)
@@ -448,7 +432,6 @@ class ProjectPositionServiceImplTest {
                     .position(null)
                     .build();
 
-            LocalDateTime createDate = LocalDateTime.now();
             LocalDate startDate = LocalDate.of(2022, 06, 24);
             LocalDate endDate = LocalDate.of(2022, 06, 28);
 
@@ -456,15 +439,12 @@ class ProjectPositionServiceImplTest {
                     .no(1L)
                     .name("testName1")
                     .createUserName("user1")
-                    .createDate(createDate)
                     .startDate(startDate)
                     .endDate(endDate)
                     .state(true)
                     .introduction("testIntroduction1")
                     .maxPeople(10)
                     .currentPeople(4)
-                    .delete(true)
-                    .deleteReason(null)
                     .viewCount(10)
                     .commentCount(10)
                     .user(user1)
@@ -520,7 +500,6 @@ class ProjectPositionServiceImplTest {
                     .position(null)
                     .build();
 
-            LocalDateTime createDate = LocalDateTime.now();
             LocalDate startDate = LocalDate.of(2022, 06, 24);
             LocalDate endDate = LocalDate.of(2022, 06, 28);
 
@@ -528,15 +507,12 @@ class ProjectPositionServiceImplTest {
                     .no(1L)
                     .name("testName1")
                     .createUserName("user1")
-                    .createDate(createDate)
                     .startDate(startDate)
                     .endDate(endDate)
                     .state(true)
                     .introduction("testIntroduction1")
                     .maxPeople(10)
                     .currentPeople(4)
-                    .delete(true)
-                    .deleteReason(null)
                     .viewCount(10)
                     .commentCount(10)
                     .user(null)

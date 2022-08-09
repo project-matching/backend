@@ -96,22 +96,18 @@ class ProjectParticipateControllerTest {
             User saveUser = saveUser();
 
             // 프로젝트 세팅
-            LocalDateTime createDate = LocalDateTime.now();
             LocalDate startDate = LocalDate.of(2022, 06, 24);
             LocalDate endDate = LocalDate.of(2022, 06, 28);
 
             Project project = Project.builder()
                     .name("testName1")
                     .createUserName("user")
-                    .createDate(createDate)
                     .startDate(startDate)
                     .endDate(endDate)
                     .state(true)
                     .introduction("testIntroduction1")
                     .maxPeople(10)
                     .currentPeople(4)
-                    .delete(false)
-                    .deleteReason(null)
                     .viewCount(10)
                     .commentCount(10)
                     .build();
@@ -213,22 +209,18 @@ class ProjectParticipateControllerTest {
             User saveUser = saveUser();
 
             // 프로젝트 세팅
-            LocalDateTime createDate = LocalDateTime.now();
             LocalDate startDate = LocalDate.of(2022, 06, 24);
             LocalDate endDate = LocalDate.of(2022, 06, 28);
 
             Project project = Project.builder()
                     .name("testName1")
                     .createUserName("user")
-                    .createDate(createDate)
                     .startDate(startDate)
                     .endDate(endDate)
                     .state(true)
                     .introduction("testIntroduction1")
                     .maxPeople(10)
                     .currentPeople(4)
-                    .delete(false)
-                    .deleteReason(null)
                     .viewCount(10)
                     .commentCount(10)
                     .build();
@@ -367,22 +359,18 @@ class ProjectParticipateControllerTest {
             User saveUser3 = userRepository.save(user3);
 
             // 프로젝트 세팅
-            LocalDateTime createDate = LocalDateTime.now();
             LocalDate startDate = LocalDate.of(2022, 06, 24);
             LocalDate endDate = LocalDate.of(2022, 06, 28);
 
             Project project = Project.builder()
                     .name("testName1")
                     .createUserName("user")
-                    .createDate(createDate)
                     .startDate(startDate)
                     .endDate(endDate)
                     .state(true)
                     .introduction("testIntroduction1")
                     .maxPeople(10)
                     .currentPeople(4)
-                    .delete(false)
-                    .deleteReason(null)
                     .viewCount(10)
                     .commentCount(10)
                     .user(saveUser1)
@@ -558,22 +546,18 @@ class ProjectParticipateControllerTest {
             User saveUser3 = userRepository.save(user3);
 
             // 프로젝트 세팅
-            LocalDateTime createDate = LocalDateTime.now();
             LocalDate startDate = LocalDate.of(2022, 06, 24);
             LocalDate endDate = LocalDate.of(2022, 06, 28);
 
             Project project = Project.builder()
                     .name("testName1")
                     .createUserName("user")
-                    .createDate(createDate)
                     .startDate(startDate)
                     .endDate(endDate)
                     .state(true)
                     .introduction("testIntroduction1")
                     .maxPeople(10)
                     .currentPeople(4)
-                    .delete(false)
-                    .deleteReason(null)
                     .viewCount(10)
                     .commentCount(10)
                     .user(saveUser1)
@@ -714,22 +698,18 @@ class ProjectParticipateControllerTest {
             User saveUser2 = userRepository.save(user2);
 
             // 프로젝트 세팅
-            LocalDateTime createDate = LocalDateTime.now();
             LocalDate startDate = LocalDate.of(2022, 06, 24);
             LocalDate endDate = LocalDate.of(2022, 06, 28);
 
             Project project = Project.builder()
                     .name("testName1")
                     .createUserName("user")
-                    .createDate(createDate)
                     .startDate(startDate)
                     .endDate(endDate)
                     .state(true)
                     .introduction("testIntroduction1")
                     .maxPeople(10)
                     .currentPeople(4)
-                    .delete(false)
-                    .deleteReason(null)
                     .viewCount(10)
                     .commentCount(10)
                     .user(saveUser1)
@@ -893,22 +873,18 @@ class ProjectParticipateControllerTest {
             User saveUser2 = userRepository.save(user2);
 
             // 프로젝트 세팅
-            LocalDateTime createDate = LocalDateTime.now();
             LocalDate startDate = LocalDate.of(2022, 06, 24);
             LocalDate endDate = LocalDate.of(2022, 06, 28);
 
             Project project = Project.builder()
                     .name("testName1")
                     .createUserName("user")
-                    .createDate(createDate)
                     .startDate(startDate)
                     .endDate(endDate)
                     .state(true)
                     .introduction("testIntroduction1")
                     .maxPeople(10)
                     .currentPeople(4)
-                    .delete(false)
-                    .deleteReason(null)
                     .viewCount(10)
                     .commentCount(10)
                     .user(saveUser1)
@@ -1041,22 +1017,18 @@ class ProjectParticipateControllerTest {
             User saveUser2 = userRepository.save(user2);
 
             // 프로젝트 세팅
-            LocalDateTime createDate = LocalDateTime.now();
             LocalDate startDate = LocalDate.of(2022, 06, 24);
             LocalDate endDate = LocalDate.of(2022, 06, 28);
 
             Project project = Project.builder()
                     .name("testName1")
                     .createUserName("user")
-                    .createDate(createDate)
                     .startDate(startDate)
                     .endDate(endDate)
                     .state(true)
                     .introduction("testIntroduction1")
                     .maxPeople(10)
                     .currentPeople(4)
-                    .delete(false)
-                    .deleteReason(null)
                     .viewCount(10)
                     .commentCount(10)
                     .user(saveUser1)
@@ -1202,22 +1174,18 @@ class ProjectParticipateControllerTest {
             User saveUser2 = userRepository.save(user2);
 
             // 프로젝트 세팅
-            LocalDateTime createDate = LocalDateTime.now();
             LocalDate startDate = LocalDate.of(2022, 06, 24);
             LocalDate endDate = LocalDate.of(2022, 06, 28);
 
             Project project = Project.builder()
                     .name("testName1")
                     .createUserName("user")
-                    .createDate(createDate)
                     .startDate(startDate)
                     .endDate(endDate)
                     .state(true)
                     .introduction("testIntroduction1")
                     .maxPeople(10)
                     .currentPeople(4)
-                    .delete(false)
-                    .deleteReason(null)
                     .viewCount(10)
                     .commentCount(10)
                     .user(saveUser1)

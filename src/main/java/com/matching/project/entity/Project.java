@@ -26,9 +26,6 @@ public class Project extends BaseTimeEntity{
     private String createUserName;
 
     @Column(nullable = false)
-    private LocalDateTime createDate;
-
-    @Column(nullable = false)
     private LocalDate startDate;
 
     @Column(nullable = false)
@@ -45,12 +42,6 @@ public class Project extends BaseTimeEntity{
 
     @Column(nullable = false)
     private Integer currentPeople;
-
-    @Column(nullable = false, name = "delete_state")
-    private boolean delete;
-
-    @Column(length = 255)
-    private String deleteReason;
 
     @Column(nullable = false)
     @ColumnDefault("0")
@@ -71,19 +62,16 @@ public class Project extends BaseTimeEntity{
     private List<ProjectTechnicalStack> projectTechnicalStackList = new ArrayList<>();
 
     @Builder
-    public Project(Long no, String name, String createUserName, LocalDateTime createDate, LocalDate startDate, LocalDate endDate, boolean state, String introduction, Integer maxPeople, Integer currentPeople, boolean delete, String deleteReason, Integer viewCount, Integer commentCount, User user) {
+    public Project(Long no, String name, String createUserName, LocalDate startDate, LocalDate endDate, boolean state, String introduction, Integer maxPeople, Integer currentPeople, Integer viewCount, Integer commentCount, User user) {
         this.no = no;
         this.name = name;
         this.createUserName = createUserName;
-        this.createDate = createDate;
         this.startDate = startDate;
         this.endDate = endDate;
         this.state = state;
         this.introduction = introduction;
         this.maxPeople = maxPeople;
         this.currentPeople = currentPeople;
-        this.delete = delete;
-        this.deleteReason = deleteReason;
         this.viewCount = viewCount;
         this.commentCount = commentCount;
         this.user = user;
@@ -93,15 +81,12 @@ public class Project extends BaseTimeEntity{
         return Project.builder()
                 .name(projectRegisterRequestDto.getName())
                 .createUserName(user.getName())
-                .createDate(LocalDateTime.now())
                 .startDate(projectRegisterRequestDto.getStartDate())
                 .endDate(projectRegisterRequestDto.getEndDate())
                 .state(true)
                 .introduction(projectRegisterRequestDto.getIntroduction())
                 .maxPeople(projectRegisterRequestDto.getProjectPositionRegisterDtoList().size())
                 .currentPeople(1)
-                .delete(false)
-                .deleteReason(null)
                 .viewCount(0)
                 .commentCount(0)
                 .user(user)

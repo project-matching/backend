@@ -129,7 +129,6 @@ class ProjectServiceImplTest {
         @DisplayName("성공")
         public void success() {
             // given
-            LocalDateTime createDate = LocalDateTime.now();
             LocalDate startDate = LocalDate.of(2022, 06, 24);
             LocalDate endDate = LocalDate.of(2022, 06, 28);
 
@@ -137,15 +136,12 @@ class ProjectServiceImplTest {
                     .no(1L)
                     .name("testProject1")
                     .createUserName("user1")
-                    .createDate(createDate)
                     .startDate(startDate)
                     .endDate(endDate)
                     .state(true)
                     .introduction("testIntroduction1")
                     .maxPeople(10)
                     .currentPeople(1)
-                    .delete(false)
-                    .deleteReason(null)
                     .viewCount(0)
                     .commentCount(0)
                     .build();
@@ -373,12 +369,12 @@ class ProjectServiceImplTest {
 
 
             // List to Page
-            Pageable pageable = PageRequest.of(0, 5, Sort.by("createDate").descending());
+            Pageable pageable = PageRequest.of(0, 5, Sort.by("createdDate").descending());
             int start = (int)pageable.getOffset();
             int end = (start + pageable.getPageSize()) > projectSimpleDtoList.size() ? projectSimpleDtoList.size() : (start + pageable.getPageSize());
             Page<ProjectSimpleDto> projectPage = new PageImpl<>(projectSimpleDtoList.subList(start, end), pageable, projectSimpleDtoList.size());
 
-            given(projectRepository.findProjectByStatusAndDelete(any(Pageable.class), any(Boolean.class), any(Boolean.class), any())).willReturn(projectPage);
+            given(projectRepository.findProjectByStatus(any(Pageable.class), any(Boolean.class), any())).willReturn(projectPage);
 
 
             List<ProjectSimpleDto> result = null;
@@ -386,12 +382,12 @@ class ProjectServiceImplTest {
             Authentication auth = new AnonymousAuthenticationToken("key", "principle", Arrays.asList(new SimpleGrantedAuthority(Role.ROLE_ANONYMOUS.toString())));
             SecurityContextHolder.getContext().setAuthentication(auth);
             try {
-                result = projectService.findProjectList(true, false, null, pageable);
+                result = projectService.findProjectList(true, null, pageable);
             } catch (Exception e) {
 
             }
 
-            verify(projectRepository, times(1)).findProjectByStatusAndDelete(any(Pageable.class), any(Boolean.class), any(Boolean.class), any());
+            verify(projectRepository, times(1)).findProjectByStatus(any(Pageable.class), any(Boolean.class), any());
 
             assertEquals(result.size(), 2);
             assertEquals(result.get(0).getProjectNo(), projectSimpleDto1.getProjectNo());
@@ -442,7 +438,6 @@ class ProjectServiceImplTest {
         @Test
         @DisplayName("성공 : 로그인 유저")
         public void success2() {
-            LocalDateTime createDate = LocalDateTime.now();
             LocalDate startDate = LocalDate.of(2022, 06, 24);
             LocalDate endDate = LocalDate.of(2022, 06, 28);
 
@@ -563,18 +558,17 @@ class ProjectServiceImplTest {
 
             // bookMark 세팅
             List<BookMark> bookMarkList = new ArrayList<>();
+
             Project project1 = Project.builder()
                     .no(1L)
                     .name("testName1")
                     .createUserName("testUser1")
-                    .createDate(createDate)
                     .startDate(startDate)
                     .endDate(endDate)
                     .state(true)
                     .introduction("testIntroduction1")
                     .maxPeople(10)
                     .currentPeople(4)
-                    .deleteReason(null)
                     .viewCount(10)
                     .commentCount(10)
                     .build();
@@ -586,12 +580,12 @@ class ProjectServiceImplTest {
             bookMarkList.add(bookMark1);
 
             // List to Page
-            Pageable pageable = PageRequest.of(0, 5, Sort.by("createDate").descending());
+            Pageable pageable = PageRequest.of(0, 5, Sort.by("createdDate").descending());
             int start = (int)pageable.getOffset();
             int end = (start + pageable.getPageSize()) > projectSimpleDtoList.size() ? projectSimpleDtoList.size() : (start + pageable.getPageSize());
             Page<ProjectSimpleDto> projectPage = new PageImpl<>(projectSimpleDtoList.subList(start, end), pageable, projectSimpleDtoList.size());
 
-            given(projectRepository.findProjectByStatusAndDelete(any(Pageable.class), any(Boolean.class), any(Boolean.class), any())).willReturn(projectPage);
+            given(projectRepository.findProjectByStatus(any(Pageable.class), any(Boolean.class), any())).willReturn(projectPage);
             given(bookMarkRepository.findByUserNo(any())).willReturn(bookMarkList);
 
             List<ProjectSimpleDto> result = null;
@@ -599,12 +593,12 @@ class ProjectServiceImplTest {
             UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(user1, "", user1.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(auth);
             try {
-                result = projectService.findProjectList(true, false, null, pageable);
+                result = projectService.findProjectList(true, null, pageable);
             } catch (Exception e) {
                 e.printStackTrace();
             }
 
-            verify(projectRepository, times(1)).findProjectByStatusAndDelete(any(Pageable.class), any(Boolean.class), any(Boolean.class), any());
+            verify(projectRepository, times(1)).findProjectByStatus(any(Pageable.class), any(Boolean.class), any());
             verify(bookMarkRepository, times(1)).findByUserNo(any());
 
             assertEquals(result.size(), 2);
@@ -661,7 +655,6 @@ class ProjectServiceImplTest {
         @DisplayName("성공")
         public void success() {
             // given
-            LocalDateTime createDate = LocalDateTime.now();
             LocalDate startDate = LocalDate.of(2022, 06, 24);
             LocalDate endDate = LocalDate.of(2022, 06, 28);
 
@@ -786,14 +779,12 @@ class ProjectServiceImplTest {
                     .no(1L)
                     .name("testName1")
                     .createUserName("testUser1")
-                    .createDate(createDate)
                     .startDate(startDate)
                     .endDate(endDate)
                     .state(true)
                     .introduction("testIntroduction1")
                     .maxPeople(10)
                     .currentPeople(4)
-                    .deleteReason(null)
                     .viewCount(10)
                     .commentCount(10)
                     .build();
@@ -805,12 +796,12 @@ class ProjectServiceImplTest {
             bookMarkList.add(bookMark1);
 
             // List to Page
-            Pageable pageable = PageRequest.of(0, 5, Sort.by("createDate").descending());
+            Pageable pageable = PageRequest.of(0, 5, Sort.by("createdDate").descending());
             int start = (int)pageable.getOffset();
             int end = (start + pageable.getPageSize()) > projectSimpleDtoList.size() ? projectSimpleDtoList.size() : (start + pageable.getPageSize());
             Page<ProjectSimpleDto> projectPage = new PageImpl<>(projectSimpleDtoList.subList(start, end), pageable, projectSimpleDtoList.size());
 
-            given(projectRepository.findUserProjectByDelete(any(Pageable.class), any(User.class), any(Boolean.class))).willReturn(projectPage);
+            given(projectRepository.findUserProject(any(Pageable.class), any(User.class))).willReturn(projectPage);
             given(bookMarkRepository.findByUserNo(any())).willReturn(bookMarkList);
 
             // when
@@ -819,13 +810,13 @@ class ProjectServiceImplTest {
             UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(user1, "", user1.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(auth);
             try {
-                result = projectService.findUserProjectList(false, pageable);
+                result = projectService.findUserProjectList(pageable);
             } catch (Exception e) {
                 e.printStackTrace();
             }
 
             // then
-            verify(projectRepository, times(1)).findUserProjectByDelete(any(Pageable.class), any(User.class), any(Boolean.class));
+            verify(projectRepository, times(1)).findUserProject(any(Pageable.class), any(User.class));
             verify(bookMarkRepository, times(1)).findByUserNo(any());
 
             assertEquals(result.size(), 2);
@@ -882,7 +873,6 @@ class ProjectServiceImplTest {
         @DisplayName("성공")
         public void success() {
             // given
-            LocalDateTime createDate = LocalDateTime.now();
             LocalDate startDate = LocalDate.of(2022, 06, 24);
             LocalDate endDate = LocalDate.of(2022, 06, 28);
 
@@ -1007,14 +997,12 @@ class ProjectServiceImplTest {
                     .no(1L)
                     .name("testName1")
                     .createUserName("testUser1")
-                    .createDate(createDate)
                     .startDate(startDate)
                     .endDate(endDate)
                     .state(true)
                     .introduction("testIntroduction1")
                     .maxPeople(10)
                     .currentPeople(4)
-                    .deleteReason(null)
                     .viewCount(10)
                     .commentCount(10)
                     .build();
@@ -1026,12 +1014,12 @@ class ProjectServiceImplTest {
             bookMarkList.add(bookMark1);
 
             // List to Page
-            Pageable pageable = PageRequest.of(0, 5, Sort.by("createDate").descending());
+            Pageable pageable = PageRequest.of(0, 5, Sort.by("createdDate").descending());
             int start = (int)pageable.getOffset();
             int end = (start + pageable.getPageSize()) > projectSimpleDtoList.size() ? projectSimpleDtoList.size() : (start + pageable.getPageSize());
             Page<ProjectSimpleDto> projectPage = new PageImpl<>(projectSimpleDtoList.subList(start, end), pageable, projectSimpleDtoList.size());
 
-            given(projectRepository.findParticipateProjectByDelete(any(Pageable.class), any(User.class), any(Boolean.class))).willReturn(projectPage);
+            given(projectRepository.findParticipateProject(any(Pageable.class), any(User.class))).willReturn(projectPage);
             given(bookMarkRepository.findByUserNo(any())).willReturn(bookMarkList);
 
             // when
@@ -1040,13 +1028,13 @@ class ProjectServiceImplTest {
             UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(user1, "", user1.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(auth);
             try {
-                result = projectService.findParticipateProjectList(false, pageable);
+                result = projectService.findParticipateProjectList(pageable);
             } catch (Exception e) {
                 e.printStackTrace();
             }
 
             // then
-            verify(projectRepository, times(1)).findParticipateProjectByDelete(any(Pageable.class), any(User.class), any(Boolean.class));
+            verify(projectRepository, times(1)).findParticipateProject(any(Pageable.class), any(User.class));
             verify(bookMarkRepository, times(1)).findByUserNo(any());
 
             assertEquals(result.size(), 2);
@@ -1103,7 +1091,6 @@ class ProjectServiceImplTest {
         @DisplayName("성공")
         public void success() {
             // given
-            LocalDateTime createDate = LocalDateTime.now();
             LocalDate startDate = LocalDate.of(2022, 06, 24);
             LocalDate endDate = LocalDate.of(2022, 06, 28);
 
@@ -1228,14 +1215,12 @@ class ProjectServiceImplTest {
                     .no(1L)
                     .name("testName1")
                     .createUserName("testUser1")
-                    .createDate(createDate)
                     .startDate(startDate)
                     .endDate(endDate)
                     .state(true)
                     .introduction("testIntroduction1")
                     .maxPeople(10)
                     .currentPeople(4)
-                    .deleteReason(null)
                     .viewCount(10)
                     .commentCount(10)
                     .build();
@@ -1247,12 +1232,12 @@ class ProjectServiceImplTest {
             bookMarkList.add(bookMark1);
 
             // List to Page
-            Pageable pageable = PageRequest.of(0, 5, Sort.by("createDate").descending());
+            Pageable pageable = PageRequest.of(0, 5, Sort.by("createdDate").descending());
             int start = (int)pageable.getOffset();
             int end = (start + pageable.getPageSize()) > projectSimpleDtoList.size() ? projectSimpleDtoList.size() : (start + pageable.getPageSize());
             Page<ProjectSimpleDto> projectPage = new PageImpl<>(projectSimpleDtoList.subList(start, end), pageable, projectSimpleDtoList.size());
 
-            given(projectRepository.findParticipateRequestProjectByDelete(any(Pageable.class), any(User.class), any(Boolean.class))).willReturn(projectPage);
+            given(projectRepository.findParticipateRequestProject(any(Pageable.class), any(User.class))).willReturn(projectPage);
             given(bookMarkRepository.findByUserNo(any())).willReturn(bookMarkList);
 
             // when
@@ -1261,13 +1246,13 @@ class ProjectServiceImplTest {
             UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(user1, "", user1.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(auth);
             try {
-                result = projectService.findParticipateRequestProjectList(false, pageable);
+                result = projectService.findParticipateRequestProjectList(pageable);
             } catch (Exception e) {
                 e.printStackTrace();
             }
 
             // then
-            verify(projectRepository, times(1)).findParticipateRequestProjectByDelete(any(Pageable.class), any(User.class), any(Boolean.class));
+            verify(projectRepository, times(1)).findParticipateRequestProject(any(Pageable.class), any(User.class));
             verify(bookMarkRepository, times(1)).findByUserNo(any());
 
             assertEquals(result.size(), 2);
@@ -1324,7 +1309,6 @@ class ProjectServiceImplTest {
         @DisplayName("성공 : 비로그인 유저")
         public void success1() {
             // given
-            LocalDateTime createDate = LocalDateTime.of(2022, 06, 24, 10, 10, 10);
             LocalDate startDate = LocalDate.of(2022, 06, 24);
             LocalDate endDate = LocalDate.of(2022, 06, 28);
 
@@ -1350,15 +1334,12 @@ class ProjectServiceImplTest {
                     .no(1L)
                     .name("testName1")
                     .createUserName("user1")
-                    .createDate(createDate)
                     .startDate(startDate)
                     .endDate(endDate)
                     .state(true)
                     .introduction("testIntroduction1")
                     .maxPeople(10)
                     .currentPeople(4)
-                    .delete(false)
-                    .deleteReason(null)
                     .viewCount(10)
                     .commentCount(10)
                     .build();
@@ -1464,7 +1445,6 @@ class ProjectServiceImplTest {
         @DisplayName("성공 : 로그인 유저")
         public void success2() {
             // given
-            LocalDateTime createDate = LocalDateTime.of(2022, 06, 24, 10, 10, 10);
             LocalDate startDate = LocalDate.of(2022, 06, 24);
             LocalDate endDate = LocalDate.of(2022, 06, 28);
 
@@ -1490,15 +1470,12 @@ class ProjectServiceImplTest {
                     .no(1L)
                     .name("testName1")
                     .createUserName("user1")
-                    .createDate(createDate)
                     .startDate(startDate)
                     .endDate(endDate)
                     .state(true)
                     .introduction("testIntroduction1")
                     .maxPeople(10)
                     .currentPeople(4)
-                    .delete(false)
-                    .deleteReason(null)
                     .viewCount(10)
                     .commentCount(10)
                     .build();
@@ -1607,7 +1584,6 @@ class ProjectServiceImplTest {
         @DisplayName("성공")
         public void success() {
             // given
-            LocalDateTime createDate = LocalDateTime.now();
             LocalDate startDate = LocalDate.of(2022, 06, 24);
             LocalDate endDate = LocalDate.of(2022, 06, 28);
 
@@ -1633,15 +1609,12 @@ class ProjectServiceImplTest {
                     .no(1L)
                     .name("testName1")
                     .createUserName("user1")
-                    .createDate(createDate)
                     .startDate(startDate)
                     .endDate(endDate)
                     .state(true)
                     .introduction("testIntroduction1")
                     .maxPeople(10)
                     .currentPeople(4)
-                    .delete(false)
-                    .deleteReason(null)
                     .viewCount(10)
                     .commentCount(10)
                     .build();
@@ -1791,7 +1764,6 @@ class ProjectServiceImplTest {
         @DisplayName("성공")
         public void success() {
             // given
-            LocalDateTime createDate = LocalDateTime.now();
             LocalDate startDate = LocalDate.of(2022, 06, 24);
             LocalDate endDate = LocalDate.of(2022, 06, 28);
 
@@ -1800,15 +1772,12 @@ class ProjectServiceImplTest {
                     .no(1L)
                     .name("testName1")
                     .createUserName("user1")
-                    .createDate(createDate)
                     .startDate(startDate)
                     .endDate(endDate)
                     .state(true)
                     .introduction("testIntroduction1")
                     .maxPeople(10)
                     .currentPeople(4)
-                    .delete(false)
-                    .deleteReason(null)
                     .viewCount(10)
                     .commentCount(10)
                     .build();

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.matching.project.config.JpaConfig;
 import com.matching.project.dto.ResponseDto;
 import com.matching.project.dto.common.TokenDto;
 import com.matching.project.dto.enumerate.OAuth;
@@ -23,6 +24,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -101,128 +103,92 @@ class ProjectControllerTest {
                 .position(null)
                 .build();
 
-        return userRepository.save(user1);
+        return userRepository.saveAndFlush(user1);
     }
 
     /**
-     * 0 ~ 2 까지 모집중이면서 삭제 안된 프로젝트
-     * 3 모집중이면서 삭제된 프로젝트
+     * 0 ~ 3 까지 모집중인 프로젝트
      */
-    List<Project> saveRecruitmentProject(){
+    List<Project> saveRecruitmentProject() throws InterruptedException {
         List<Project> projectList = new ArrayList<>();
 
-        LocalDateTime createDate = LocalDateTime.now();
         LocalDate startDate = LocalDate.of(2022, 06, 24);
         LocalDate endDate = LocalDate.of(2022, 06, 28);
 
         for (int i = 0 ; i < 4 ; i++) {
-            boolean state = true;
-            boolean delete = false;
-            String deleteReason = null;
-
-            if (i == 3) {
-                delete = true;
-                deleteReason = "testDeleteReason" + i;
-            }
-
             Project project = Project.builder()
                     .name("testName" + i)
                     .createUserName("user")
-                    .createDate(createDate.plusDays(i))
                     .startDate(startDate)
                     .endDate(endDate)
-                    .state(state)
+                    .state(true)
                     .introduction("testIntroduction" + i)
                     .maxPeople(10)
                     .currentPeople(4)
-                    .delete(delete)
-                    .deleteReason(deleteReason)
                     .viewCount(10)
                     .commentCount(10)
                     .build();
-            projectList.add(projectRepository.save(project));
+            Project saveProject = projectRepository.saveAndFlush(project);
+            Thread.sleep(100);
+            projectList.add(saveProject);
         }
         return projectList;
     }
+
     /**
-     * 4 ~ 6 까지 모집완료이면서 삭제 안된 프로젝트
-     * 7 모집완료이면서 삭제된 프로젝트
+     * 4 ~ 7 까지 모집완료인 프로젝트
      */
-    List<Project> saveRecruitmentCompleteProject(){
+    List<Project> saveRecruitmentCompleteProject() throws InterruptedException {
         List<Project> projectList = new ArrayList<>();
 
-        LocalDateTime createDate = LocalDateTime.now();
         LocalDate startDate = LocalDate.of(2022, 06, 24);
         LocalDate endDate = LocalDate.of(2022, 06, 28);
 
         for (int i = 4 ; i < 8 ; i++) {
-            boolean state = false;
-            boolean delete = false;
-            String deleteReason = null;
-
-            if (i == 7) {
-                delete = true;
-                deleteReason = "testDeleteReason" + i;
-            }
-
             Project project = Project.builder()
                     .name("testName" + i)
                     .createUserName("user")
-                    .createDate(createDate.plusDays(i))
                     .startDate(startDate)
                     .endDate(endDate)
-                    .state(state)
+                    .state(false)
                     .introduction("testIntroduction" + i)
                     .maxPeople(10)
                     .currentPeople(4)
-                    .delete(delete)
-                    .deleteReason(deleteReason)
                     .viewCount(10)
                     .commentCount(10)
                     .build();
-            projectList.add(projectRepository.save(project));
+            Project saveProject = projectRepository.saveAndFlush(project);
+            Thread.sleep(100);
+            projectList.add(saveProject);
         }
         return projectList;
     }
 
     /**
-     * 8 ~ 9 까지 내가 만든 프로젝트이면서 삭제 안된 프로젝트
-     * 10 내가 만든 프로젝트이면서 삭제된 프로젝트
+     * 8 ~ 10 까지 내가 만든 프로젝트이면서 삭제 안된 프로젝트
      */
-    List<Project> saveCreateSelfProject(User user) {
+    List<Project> saveCreateSelfProject(User user) throws InterruptedException {
         List<Project> projectList = new ArrayList<>();
 
-        LocalDateTime createDate = LocalDateTime.now();
         LocalDate startDate = LocalDate.of(2022, 06, 24);
         LocalDate endDate = LocalDate.of(2022, 06, 28);
 
         for (int i = 8 ; i < 11 ; i++) {
-            boolean state = false;
-            boolean delete = false;
-            String deleteReason = null;
-
-            if (i == 10) {
-                delete = true;
-                deleteReason = "testDeleteReason" + i;
-            }
-
             Project project = Project.builder()
                     .name("testName" + i)
                     .createUserName("userName1")
-                    .createDate(createDate.plusDays(i))
                     .startDate(startDate)
                     .endDate(endDate)
-                    .state(state)
+                    .state(false)
                     .introduction("testIntroduction" + i)
                     .maxPeople(10)
                     .currentPeople(4)
-                    .delete(delete)
-                    .deleteReason(deleteReason)
                     .viewCount(10)
                     .commentCount(10)
                     .user(user)
                     .build();
-            projectList.add(projectRepository.save(project));
+            Project saveProject = projectRepository.saveAndFlush(project);
+            projectList.add(saveProject);
         }
         return projectList;
     }
@@ -378,8 +344,6 @@ class ProjectControllerTest {
             assertEquals(project.isState(), true);
             assertEquals(project.getIntroduction(), projectRegisterRequestDto.getIntroduction());
             assertEquals(project.getMaxPeople(), projectRegisterRequestDto.getProjectPositionRegisterDtoList().size());
-            assertEquals(project.isDelete(), false);
-            assertEquals(project.getDeleteReason(), null);
             assertEquals(project.getViewCount(), 0);
             assertEquals(project.getCommentCount(), 0);
             assertEquals(project.getUser(), saveUser);
@@ -491,39 +455,46 @@ class ProjectControllerTest {
             saveBookMark(saveUser, saveRecruitmentProject.get(1));
 
             // when
-            ResultActions resultActions = mvc.perform(get("/v1/project/recruitment?page=0&size=5&sortBy=createDate,desc").contentType(MediaType.APPLICATION_JSON));
+            ResultActions resultActions = mvc.perform(get("/v1/project/recruitment?page=0&size=5&sortBy=createdDate,desc").contentType(MediaType.APPLICATION_JSON));
 
             // then
             resultActions
                     .andDo(print())
                     .andExpect(header().string("Content-type", "application/json"))
-                    .andExpect(jsonPath("$.data.length()").value(3))
-                    .andExpect(jsonPath("$.data[0].name").value("testName2"))
-                    .andExpect(jsonPath("$.data[0].maxPeople").value(10))
-                    .andExpect(jsonPath("$.data[0].currentPeople").value(4))
-                    .andExpect(jsonPath("$.data[0].viewCount").value(10))
-                    .andExpect(jsonPath("$.data[0].register").value("user"))
+                    .andExpect(jsonPath("$.data.length()").value(4))
+                    .andExpect(jsonPath("$.data[0].name").value(saveRecruitmentProject.get(3).getName()))
+                    .andExpect(jsonPath("$.data[0].maxPeople").value(saveRecruitmentProject.get(3).getMaxPeople()))
+                    .andExpect(jsonPath("$.data[0].currentPeople").value(saveRecruitmentProject.get(3).getCurrentPeople()))
+                    .andExpect(jsonPath("$.data[0].viewCount").value(saveRecruitmentProject.get(3).getViewCount()))
+                    .andExpect(jsonPath("$.data[0].register").value(saveRecruitmentProject.get(3).getCreateUserName()))
                     .andExpect(jsonPath("$.data[0].bookMark").value(false))
 
-                    .andExpect(jsonPath("$.data[1].name").value("testName1"))
-                    .andExpect(jsonPath("$.data[1].maxPeople").value(10))
-                    .andExpect(jsonPath("$.data[1].currentPeople").value(4))
-                    .andExpect(jsonPath("$.data[1].viewCount").value(10))
-                    .andExpect(jsonPath("$.data[1].register").value("user"))
+                    .andExpect(jsonPath("$.data[1].name").value(saveRecruitmentProject.get(2).getName()))
+                    .andExpect(jsonPath("$.data[1].maxPeople").value(saveRecruitmentProject.get(2).getMaxPeople()))
+                    .andExpect(jsonPath("$.data[1].currentPeople").value(saveRecruitmentProject.get(2).getCurrentPeople()))
+                    .andExpect(jsonPath("$.data[1].viewCount").value(saveRecruitmentProject.get(2).getViewCount()))
+                    .andExpect(jsonPath("$.data[1].register").value(saveRecruitmentProject.get(2).getCreateUserName()))
                     .andExpect(jsonPath("$.data[1].bookMark").value(false))
 
-                    .andExpect(jsonPath("$.data[2].name").value("testName0"))
-                    .andExpect(jsonPath("$.data[2].maxPeople").value(10))
-                    .andExpect(jsonPath("$.data[2].currentPeople").value(4))
-                    .andExpect(jsonPath("$.data[2].viewCount").value(10))
-                    .andExpect(jsonPath("$.data[2].register").value("user"))
+                    .andExpect(jsonPath("$.data[2].name").value(saveRecruitmentProject.get(1).getName()))
+                    .andExpect(jsonPath("$.data[2].maxPeople").value(saveRecruitmentProject.get(1).getMaxPeople()))
+                    .andExpect(jsonPath("$.data[2].currentPeople").value(saveRecruitmentProject.get(1).getCurrentPeople()))
+                    .andExpect(jsonPath("$.data[2].viewCount").value(saveRecruitmentProject.get(1).getViewCount()))
+                    .andExpect(jsonPath("$.data[2].register").value(saveRecruitmentProject.get(1).getCreateUserName()))
                     .andExpect(jsonPath("$.data[2].bookMark").value(false))
-                    .andExpect(jsonPath("$.data[2].projectSimplePositionDtoList[0].projectNo").value(saveProjectPosition1.getProject().getNo()))
-                    .andExpect(jsonPath("$.data[2].projectSimplePositionDtoList[0].positionNo").value(saveProjectPosition1.getPosition().getNo()))
-                    .andExpect(jsonPath("$.data[2].projectSimplePositionDtoList[0].positionName").value(saveProjectPosition1.getPosition().getName()))
-                    .andExpect(jsonPath("$.data[2].projectSimpleTechnicalStackDtoList[0].projectNo").value(saveProjectTechnicalStack1.getProject().getNo()))
-                    .andExpect(jsonPath("$.data[2].projectSimpleTechnicalStackDtoList[0].image").value(saveImage1.getLogicalName()))
-                    .andExpect(jsonPath("$.data[2].projectSimpleTechnicalStackDtoList[0].technicalStackName").value(saveProjectTechnicalStack1.getTechnicalStack().getName()))
+
+                    .andExpect(jsonPath("$.data[3].name").value(saveRecruitmentProject.get(0).getName()))
+                    .andExpect(jsonPath("$.data[3].maxPeople").value(saveRecruitmentProject.get(0).getMaxPeople()))
+                    .andExpect(jsonPath("$.data[3].currentPeople").value(saveRecruitmentProject.get(0).getCurrentPeople()))
+                    .andExpect(jsonPath("$.data[3].viewCount").value(saveRecruitmentProject.get(0).getViewCount()))
+                    .andExpect(jsonPath("$.data[3].register").value(saveRecruitmentProject.get(0).getCreateUserName()))
+                    .andExpect(jsonPath("$.data[3].bookMark").value(false))
+                    .andExpect(jsonPath("$.data[3].projectSimplePositionDtoList[0].projectNo").value(saveProjectPosition1.getProject().getNo()))
+                    .andExpect(jsonPath("$.data[3].projectSimplePositionDtoList[0].positionNo").value(saveProjectPosition1.getPosition().getNo()))
+                    .andExpect(jsonPath("$.data[3].projectSimplePositionDtoList[0].positionName").value(saveProjectPosition1.getPosition().getName()))
+                    .andExpect(jsonPath("$.data[3].projectSimpleTechnicalStackDtoList[0].projectNo").value(saveProjectTechnicalStack1.getProject().getNo()))
+                    .andExpect(jsonPath("$.data[3].projectSimpleTechnicalStackDtoList[0].image").value(saveImage1.getLogicalName()))
+                    .andExpect(jsonPath("$.data[3].projectSimpleTechnicalStackDtoList[0].technicalStackName").value(saveProjectTechnicalStack1.getTechnicalStack().getName()))
 
                     .andExpect(status().isOk());
         }
@@ -575,7 +546,7 @@ class ProjectControllerTest {
             // when
             String token = jwtTokenService.createToken(new TokenDto(saveUser.getEmail()));
 
-            ResultActions resultActions = mvc.perform(get("/v1/project/recruitment?page=0&size=5&sortBy=createDate,desc")
+            ResultActions resultActions = mvc.perform(get("/v1/project/recruitment?page=0&size=5&sortBy=createdDate,desc")
                             .contentType(MediaType.APPLICATION_JSON)
                             .header("Authorization", "Bearer " + token));
 
@@ -583,33 +554,40 @@ class ProjectControllerTest {
             resultActions
                     .andDo(print())
                     .andExpect(header().string("Content-type", "application/json"))
-                    .andExpect(jsonPath("$.data.length()").value(3))
-                    .andExpect(jsonPath("$.data[0].name").value("testName2"))
-                    .andExpect(jsonPath("$.data[0].maxPeople").value(10))
-                    .andExpect(jsonPath("$.data[0].currentPeople").value(4))
-                    .andExpect(jsonPath("$.data[0].viewCount").value(10))
-                    .andExpect(jsonPath("$.data[0].register").value("user"))
+                    .andExpect(jsonPath("$.data.length()").value(4))
+                    .andExpect(jsonPath("$.data[0].name").value(saveRecruitmentProject.get(3).getName()))
+                    .andExpect(jsonPath("$.data[0].maxPeople").value(saveRecruitmentProject.get(3).getMaxPeople()))
+                    .andExpect(jsonPath("$.data[0].currentPeople").value(saveRecruitmentProject.get(3).getCurrentPeople()))
+                    .andExpect(jsonPath("$.data[0].viewCount").value(saveRecruitmentProject.get(3).getViewCount()))
+                    .andExpect(jsonPath("$.data[0].register").value(saveRecruitmentProject.get(3).getCreateUserName()))
                     .andExpect(jsonPath("$.data[0].bookMark").value(false))
 
-                    .andExpect(jsonPath("$.data[1].name").value("testName1"))
-                    .andExpect(jsonPath("$.data[1].maxPeople").value(10))
-                    .andExpect(jsonPath("$.data[1].currentPeople").value(4))
-                    .andExpect(jsonPath("$.data[1].viewCount").value(10))
-                    .andExpect(jsonPath("$.data[1].register").value("user"))
-                    .andExpect(jsonPath("$.data[1].bookMark").value(true))
+                    .andExpect(jsonPath("$.data[1].name").value(saveRecruitmentProject.get(2).getName()))
+                    .andExpect(jsonPath("$.data[1].maxPeople").value(saveRecruitmentProject.get(2).getMaxPeople()))
+                    .andExpect(jsonPath("$.data[1].currentPeople").value(saveRecruitmentProject.get(2).getCurrentPeople()))
+                    .andExpect(jsonPath("$.data[1].viewCount").value(saveRecruitmentProject.get(2).getViewCount()))
+                    .andExpect(jsonPath("$.data[1].register").value(saveRecruitmentProject.get(2).getCreateUserName()))
+                    .andExpect(jsonPath("$.data[1].bookMark").value(false))
 
-                    .andExpect(jsonPath("$.data[2].name").value("testName0"))
-                    .andExpect(jsonPath("$.data[2].maxPeople").value(10))
-                    .andExpect(jsonPath("$.data[2].currentPeople").value(4))
-                    .andExpect(jsonPath("$.data[2].viewCount").value(10))
-                    .andExpect(jsonPath("$.data[2].register").value("user"))
+                    .andExpect(jsonPath("$.data[2].name").value(saveRecruitmentProject.get(1).getName()))
+                    .andExpect(jsonPath("$.data[2].maxPeople").value(saveRecruitmentProject.get(1).getMaxPeople()))
+                    .andExpect(jsonPath("$.data[2].currentPeople").value(saveRecruitmentProject.get(1).getCurrentPeople()))
+                    .andExpect(jsonPath("$.data[2].viewCount").value(saveRecruitmentProject.get(1).getViewCount()))
+                    .andExpect(jsonPath("$.data[2].register").value(saveRecruitmentProject.get(1).getCreateUserName()))
                     .andExpect(jsonPath("$.data[2].bookMark").value(true))
-                    .andExpect(jsonPath("$.data[2].projectSimplePositionDtoList[0].projectNo").value(saveProjectPosition1.getProject().getNo()))
-                    .andExpect(jsonPath("$.data[2].projectSimplePositionDtoList[0].positionNo").value(saveProjectPosition1.getPosition().getNo()))
-                    .andExpect(jsonPath("$.data[2].projectSimplePositionDtoList[0].positionName").value(saveProjectPosition1.getPosition().getName()))
-                    .andExpect(jsonPath("$.data[2].projectSimpleTechnicalStackDtoList[0].projectNo").value(saveProjectTechnicalStack1.getProject().getNo()))
-                    .andExpect(jsonPath("$.data[2].projectSimpleTechnicalStackDtoList[0].image").value(saveImage1.getLogicalName()))
-                    .andExpect(jsonPath("$.data[2].projectSimpleTechnicalStackDtoList[0].technicalStackName").value(saveProjectTechnicalStack1.getTechnicalStack().getName()))
+
+                    .andExpect(jsonPath("$.data[3].name").value(saveRecruitmentProject.get(0).getName()))
+                    .andExpect(jsonPath("$.data[3].maxPeople").value(saveRecruitmentProject.get(0).getMaxPeople()))
+                    .andExpect(jsonPath("$.data[3].currentPeople").value(saveRecruitmentProject.get(0).getCurrentPeople()))
+                    .andExpect(jsonPath("$.data[3].viewCount").value(saveRecruitmentProject.get(0).getViewCount()))
+                    .andExpect(jsonPath("$.data[3].register").value(saveRecruitmentProject.get(0).getCreateUserName()))
+                    .andExpect(jsonPath("$.data[3].bookMark").value(true))
+                    .andExpect(jsonPath("$.data[3].projectSimplePositionDtoList[0].projectNo").value(saveProjectPosition1.getProject().getNo()))
+                    .andExpect(jsonPath("$.data[3].projectSimplePositionDtoList[0].positionNo").value(saveProjectPosition1.getPosition().getNo()))
+                    .andExpect(jsonPath("$.data[3].projectSimplePositionDtoList[0].positionName").value(saveProjectPosition1.getPosition().getName()))
+                    .andExpect(jsonPath("$.data[3].projectSimpleTechnicalStackDtoList[0].projectNo").value(saveProjectTechnicalStack1.getProject().getNo()))
+                    .andExpect(jsonPath("$.data[3].projectSimpleTechnicalStackDtoList[0].image").value(saveImage1.getLogicalName()))
+                    .andExpect(jsonPath("$.data[3].projectSimpleTechnicalStackDtoList[0].technicalStackName").value(saveProjectTechnicalStack1.getTechnicalStack().getName()))
 
                     .andExpect(status().isOk());
         }
@@ -664,39 +642,46 @@ class ProjectControllerTest {
             saveBookMark(saveUser, saveRecruitmentCompleteProject.get(1));
 
             // when
-            ResultActions resultActions = mvc.perform(get("/v1/project/recruitment/complete?page=0&size=5&sortBy=createDate,desc").contentType(MediaType.APPLICATION_JSON));
+            ResultActions resultActions = mvc.perform(get("/v1/project/recruitment/complete?page=0&size=5&sortBy=createdDate,desc").contentType(MediaType.APPLICATION_JSON));
 
             // then
             resultActions
                     .andDo(print())
                     .andExpect(header().string("Content-type", "application/json"))
-                    .andExpect(jsonPath("$.data.length()").value(3))
-                    .andExpect(jsonPath("$.data[0].name").value("testName6"))
-                    .andExpect(jsonPath("$.data[0].maxPeople").value(10))
-                    .andExpect(jsonPath("$.data[0].currentPeople").value(4))
-                    .andExpect(jsonPath("$.data[0].viewCount").value(10))
-                    .andExpect(jsonPath("$.data[0].register").value("user"))
+                    .andExpect(jsonPath("$.data.length()").value(4))
+                    .andExpect(jsonPath("$.data[0].name").value(saveRecruitmentCompleteProject.get(3).getName()))
+                    .andExpect(jsonPath("$.data[0].maxPeople").value(saveRecruitmentCompleteProject.get(3).getMaxPeople()))
+                    .andExpect(jsonPath("$.data[0].currentPeople").value(saveRecruitmentCompleteProject.get(3).getCurrentPeople()))
+                    .andExpect(jsonPath("$.data[0].viewCount").value(saveRecruitmentCompleteProject.get(3).getViewCount()))
+                    .andExpect(jsonPath("$.data[0].register").value(saveRecruitmentCompleteProject.get(3).getCreateUserName()))
                     .andExpect(jsonPath("$.data[0].bookMark").value(false))
 
-                    .andExpect(jsonPath("$.data[1].name").value("testName5"))
-                    .andExpect(jsonPath("$.data[1].maxPeople").value(10))
-                    .andExpect(jsonPath("$.data[1].currentPeople").value(4))
-                    .andExpect(jsonPath("$.data[1].viewCount").value(10))
-                    .andExpect(jsonPath("$.data[1].register").value("user"))
+                    .andExpect(jsonPath("$.data[1].name").value(saveRecruitmentCompleteProject.get(2).getName()))
+                    .andExpect(jsonPath("$.data[1].maxPeople").value(saveRecruitmentCompleteProject.get(2).getMaxPeople()))
+                    .andExpect(jsonPath("$.data[1].currentPeople").value(saveRecruitmentCompleteProject.get(2).getCurrentPeople()))
+                    .andExpect(jsonPath("$.data[1].viewCount").value(saveRecruitmentCompleteProject.get(2).getViewCount()))
+                    .andExpect(jsonPath("$.data[1].register").value(saveRecruitmentCompleteProject.get(2).getCreateUserName()))
                     .andExpect(jsonPath("$.data[1].bookMark").value(false))
 
-                    .andExpect(jsonPath("$.data[2].name").value("testName4"))
-                    .andExpect(jsonPath("$.data[2].maxPeople").value(10))
-                    .andExpect(jsonPath("$.data[2].currentPeople").value(4))
-                    .andExpect(jsonPath("$.data[2].viewCount").value(10))
-                    .andExpect(jsonPath("$.data[2].register").value("user"))
+                    .andExpect(jsonPath("$.data[2].name").value(saveRecruitmentCompleteProject.get(1).getName()))
+                    .andExpect(jsonPath("$.data[2].maxPeople").value(saveRecruitmentCompleteProject.get(1).getMaxPeople()))
+                    .andExpect(jsonPath("$.data[2].currentPeople").value(saveRecruitmentCompleteProject.get(1).getCurrentPeople()))
+                    .andExpect(jsonPath("$.data[2].viewCount").value(saveRecruitmentCompleteProject.get(1).getViewCount()))
+                    .andExpect(jsonPath("$.data[2].register").value(saveRecruitmentCompleteProject.get(1).getCreateUserName()))
                     .andExpect(jsonPath("$.data[2].bookMark").value(false))
-                    .andExpect(jsonPath("$.data[2].projectSimplePositionDtoList[0].projectNo").value(saveProjectPosition1.getProject().getNo()))
-                    .andExpect(jsonPath("$.data[2].projectSimplePositionDtoList[0].positionNo").value(saveProjectPosition1.getPosition().getNo()))
-                    .andExpect(jsonPath("$.data[2].projectSimplePositionDtoList[0].positionName").value(saveProjectPosition1.getPosition().getName()))
-                    .andExpect(jsonPath("$.data[2].projectSimpleTechnicalStackDtoList[0].projectNo").value(saveProjectTechnicalStack1.getProject().getNo()))
-                    .andExpect(jsonPath("$.data[2].projectSimpleTechnicalStackDtoList[0].image").value(saveImage1.getLogicalName()))
-                    .andExpect(jsonPath("$.data[2].projectSimpleTechnicalStackDtoList[0].technicalStackName").value(saveProjectTechnicalStack1.getTechnicalStack().getName()))
+
+                    .andExpect(jsonPath("$.data[3].name").value(saveRecruitmentCompleteProject.get(0).getName()))
+                    .andExpect(jsonPath("$.data[3].maxPeople").value(saveRecruitmentCompleteProject.get(0).getMaxPeople()))
+                    .andExpect(jsonPath("$.data[3].currentPeople").value(saveRecruitmentCompleteProject.get(0).getCurrentPeople()))
+                    .andExpect(jsonPath("$.data[3].viewCount").value(saveRecruitmentCompleteProject.get(0).getViewCount()))
+                    .andExpect(jsonPath("$.data[3].register").value(saveRecruitmentCompleteProject.get(0).getCreateUserName()))
+                    .andExpect(jsonPath("$.data[3].bookMark").value(false))
+                    .andExpect(jsonPath("$.data[3].projectSimplePositionDtoList[0].projectNo").value(saveProjectPosition1.getProject().getNo()))
+                    .andExpect(jsonPath("$.data[3].projectSimplePositionDtoList[0].positionNo").value(saveProjectPosition1.getPosition().getNo()))
+                    .andExpect(jsonPath("$.data[3].projectSimplePositionDtoList[0].positionName").value(saveProjectPosition1.getPosition().getName()))
+                    .andExpect(jsonPath("$.data[3].projectSimpleTechnicalStackDtoList[0].projectNo").value(saveProjectTechnicalStack1.getProject().getNo()))
+                    .andExpect(jsonPath("$.data[3].projectSimpleTechnicalStackDtoList[0].image").value(saveImage1.getLogicalName()))
+                    .andExpect(jsonPath("$.data[3].projectSimpleTechnicalStackDtoList[0].technicalStackName").value(saveProjectTechnicalStack1.getTechnicalStack().getName()))
 
                     .andExpect(status().isOk());
         }
@@ -749,7 +734,7 @@ class ProjectControllerTest {
             // when
             String token = jwtTokenService.createToken(new TokenDto(saveUser.getEmail()));
 
-            ResultActions resultActions = mvc.perform(get("/v1/project/recruitment/complete?page=0&size=5&sortBy=createDate,desc")
+            ResultActions resultActions = mvc.perform(get("/v1/project/recruitment/complete?page=0&size=5&sortBy=createdDate,desc")
                             .contentType(MediaType.APPLICATION_JSON)
                             .header("Authorization", "Bearer " + token));
 
@@ -757,33 +742,40 @@ class ProjectControllerTest {
             resultActions
                     .andDo(print())
                     .andExpect(header().string("Content-type", "application/json"))
-                    .andExpect(jsonPath("$.data.length()").value(3))
-                    .andExpect(jsonPath("$.data[0].name").value("testName6"))
-                    .andExpect(jsonPath("$.data[0].maxPeople").value(10))
-                    .andExpect(jsonPath("$.data[0].currentPeople").value(4))
-                    .andExpect(jsonPath("$.data[0].viewCount").value(10))
-                    .andExpect(jsonPath("$.data[0].register").value("user"))
+                    .andExpect(jsonPath("$.data.length()").value(4))
+                    .andExpect(jsonPath("$.data[0].name").value(saveRecruitmentCompleteProject.get(3).getName()))
+                    .andExpect(jsonPath("$.data[0].maxPeople").value(saveRecruitmentCompleteProject.get(3).getMaxPeople()))
+                    .andExpect(jsonPath("$.data[0].currentPeople").value(saveRecruitmentCompleteProject.get(3).getCurrentPeople()))
+                    .andExpect(jsonPath("$.data[0].viewCount").value(saveRecruitmentCompleteProject.get(3).getViewCount()))
+                    .andExpect(jsonPath("$.data[0].register").value(saveRecruitmentCompleteProject.get(3).getCreateUserName()))
                     .andExpect(jsonPath("$.data[0].bookMark").value(false))
 
-                    .andExpect(jsonPath("$.data[1].name").value("testName5"))
-                    .andExpect(jsonPath("$.data[1].maxPeople").value(10))
-                    .andExpect(jsonPath("$.data[1].currentPeople").value(4))
-                    .andExpect(jsonPath("$.data[1].viewCount").value(10))
-                    .andExpect(jsonPath("$.data[1].register").value("user"))
-                    .andExpect(jsonPath("$.data[1].bookMark").value(true))
+                    .andExpect(jsonPath("$.data[1].name").value(saveRecruitmentCompleteProject.get(2).getName()))
+                    .andExpect(jsonPath("$.data[1].maxPeople").value(saveRecruitmentCompleteProject.get(2).getMaxPeople()))
+                    .andExpect(jsonPath("$.data[1].currentPeople").value(saveRecruitmentCompleteProject.get(2).getCurrentPeople()))
+                    .andExpect(jsonPath("$.data[1].viewCount").value(saveRecruitmentCompleteProject.get(2).getViewCount()))
+                    .andExpect(jsonPath("$.data[1].register").value(saveRecruitmentCompleteProject.get(2).getCreateUserName()))
+                    .andExpect(jsonPath("$.data[1].bookMark").value(false))
 
-                    .andExpect(jsonPath("$.data[2].name").value("testName4"))
-                    .andExpect(jsonPath("$.data[2].maxPeople").value(10))
-                    .andExpect(jsonPath("$.data[2].currentPeople").value(4))
-                    .andExpect(jsonPath("$.data[2].viewCount").value(10))
-                    .andExpect(jsonPath("$.data[2].register").value("user"))
+                    .andExpect(jsonPath("$.data[2].name").value(saveRecruitmentCompleteProject.get(1).getName()))
+                    .andExpect(jsonPath("$.data[2].maxPeople").value(saveRecruitmentCompleteProject.get(1).getMaxPeople()))
+                    .andExpect(jsonPath("$.data[2].currentPeople").value(saveRecruitmentCompleteProject.get(1).getCurrentPeople()))
+                    .andExpect(jsonPath("$.data[2].viewCount").value(saveRecruitmentCompleteProject.get(1).getViewCount()))
+                    .andExpect(jsonPath("$.data[2].register").value(saveRecruitmentCompleteProject.get(1).getCreateUserName()))
                     .andExpect(jsonPath("$.data[2].bookMark").value(true))
-                    .andExpect(jsonPath("$.data[2].projectSimplePositionDtoList[0].projectNo").value(saveProjectPosition1.getProject().getNo()))
-                    .andExpect(jsonPath("$.data[2].projectSimplePositionDtoList[0].positionNo").value(saveProjectPosition1.getPosition().getNo()))
-                    .andExpect(jsonPath("$.data[2].projectSimplePositionDtoList[0].positionName").value(saveProjectPosition1.getPosition().getName()))
-                    .andExpect(jsonPath("$.data[2].projectSimpleTechnicalStackDtoList[0].projectNo").value(saveProjectTechnicalStack1.getProject().getNo()))
-                    .andExpect(jsonPath("$.data[2].projectSimpleTechnicalStackDtoList[0].image").value(saveImage1.getLogicalName()))
-                    .andExpect(jsonPath("$.data[2].projectSimpleTechnicalStackDtoList[0].technicalStackName").value(saveProjectTechnicalStack1.getTechnicalStack().getName()))
+
+                    .andExpect(jsonPath("$.data[3].name").value(saveRecruitmentCompleteProject.get(0).getName()))
+                    .andExpect(jsonPath("$.data[3].maxPeople").value(saveRecruitmentCompleteProject.get(0).getMaxPeople()))
+                    .andExpect(jsonPath("$.data[3].currentPeople").value(saveRecruitmentCompleteProject.get(0).getCurrentPeople()))
+                    .andExpect(jsonPath("$.data[3].viewCount").value(saveRecruitmentCompleteProject.get(0).getViewCount()))
+                    .andExpect(jsonPath("$.data[3].register").value(saveRecruitmentCompleteProject.get(0).getCreateUserName()))
+                    .andExpect(jsonPath("$.data[3].bookMark").value(true))
+                    .andExpect(jsonPath("$.data[3].projectSimplePositionDtoList[0].projectNo").value(saveProjectPosition1.getProject().getNo()))
+                    .andExpect(jsonPath("$.data[3].projectSimplePositionDtoList[0].positionNo").value(saveProjectPosition1.getPosition().getNo()))
+                    .andExpect(jsonPath("$.data[3].projectSimplePositionDtoList[0].positionName").value(saveProjectPosition1.getPosition().getName()))
+                    .andExpect(jsonPath("$.data[3].projectSimpleTechnicalStackDtoList[0].projectNo").value(saveProjectTechnicalStack1.getProject().getNo()))
+                    .andExpect(jsonPath("$.data[3].projectSimpleTechnicalStackDtoList[0].image").value(saveImage1.getLogicalName()))
+                    .andExpect(jsonPath("$.data[3].projectSimpleTechnicalStackDtoList[0].technicalStackName").value(saveProjectTechnicalStack1.getTechnicalStack().getName()))
 
                     .andExpect(status().isOk());
         }
@@ -840,7 +832,7 @@ class ProjectControllerTest {
             // when
             String token = jwtTokenService.createToken(new TokenDto(saveUser.getEmail()));
 
-            ResultActions resultActions = mvc.perform(get("/v1/project/create/self?page=0&size=5&sortBy=createDate,desc")
+            ResultActions resultActions = mvc.perform(get("/v1/project/create/self?page=0&size=5&sortBy=createdDate,desc")
                             .contentType(MediaType.APPLICATION_JSON)
                             .header("Authorization", "Bearer " + token));
 
@@ -848,26 +840,33 @@ class ProjectControllerTest {
             resultActions
                     .andDo(print())
                     .andExpect(header().string("Content-type", "application/json"))
-                    .andExpect(jsonPath("$.data.length()").value(2))
-                    .andExpect(jsonPath("$.data[0].name").value("testName9"))
-                    .andExpect(jsonPath("$.data[0].maxPeople").value(10))
-                    .andExpect(jsonPath("$.data[0].currentPeople").value(4))
-                    .andExpect(jsonPath("$.data[0].viewCount").value(10))
-                    .andExpect(jsonPath("$.data[0].register").value(saveUser.getName()))
+                    .andExpect(jsonPath("$.data.length()").value(3))
+                    .andExpect(jsonPath("$.data[0].name").value(saveCreateSelfProject.get(2).getName()))
+                    .andExpect(jsonPath("$.data[0].maxPeople").value(saveCreateSelfProject.get(2).getMaxPeople()))
+                    .andExpect(jsonPath("$.data[0].currentPeople").value(saveCreateSelfProject.get(2).getCurrentPeople()))
+                    .andExpect(jsonPath("$.data[0].viewCount").value(saveCreateSelfProject.get(2).getViewCount()))
+                    .andExpect(jsonPath("$.data[0].register").value(saveCreateSelfProject.get(2).getCreateUserName()))
                     .andExpect(jsonPath("$.data[0].bookMark").value(false))
 
-                    .andExpect(jsonPath("$.data[1].name").value("testName8"))
-                    .andExpect(jsonPath("$.data[1].maxPeople").value(10))
-                    .andExpect(jsonPath("$.data[1].currentPeople").value(4))
-                    .andExpect(jsonPath("$.data[1].viewCount").value(10))
-                    .andExpect(jsonPath("$.data[1].register").value(saveUser.getName()))
-                    .andExpect(jsonPath("$.data[1].bookMark").value(true))
-                    .andExpect(jsonPath("$.data[1].projectSimplePositionDtoList[0].projectNo").value(saveProjectPosition1.getProject().getNo()))
-                    .andExpect(jsonPath("$.data[1].projectSimplePositionDtoList[0].positionNo").value(saveProjectPosition1.getPosition().getNo()))
-                    .andExpect(jsonPath("$.data[1].projectSimplePositionDtoList[0].positionName").value(saveProjectPosition1.getPosition().getName()))
-                    .andExpect(jsonPath("$.data[1].projectSimpleTechnicalStackDtoList[0].projectNo").value(saveProjectTechnicalStack1.getProject().getNo()))
-                    .andExpect(jsonPath("$.data[1].projectSimpleTechnicalStackDtoList[0].image").value(saveImage1.getLogicalName()))
-                    .andExpect(jsonPath("$.data[1].projectSimpleTechnicalStackDtoList[0].technicalStackName").value(saveProjectTechnicalStack1.getTechnicalStack().getName()))
+                    .andExpect(jsonPath("$.data[1].name").value(saveCreateSelfProject.get(1).getName()))
+                    .andExpect(jsonPath("$.data[1].maxPeople").value(saveCreateSelfProject.get(1).getMaxPeople()))
+                    .andExpect(jsonPath("$.data[1].currentPeople").value(saveCreateSelfProject.get(1).getCurrentPeople()))
+                    .andExpect(jsonPath("$.data[1].viewCount").value(saveCreateSelfProject.get(1).getViewCount()))
+                    .andExpect(jsonPath("$.data[1].register").value(saveCreateSelfProject.get(1).getCreateUserName()))
+                    .andExpect(jsonPath("$.data[1].bookMark").value(false))
+
+                    .andExpect(jsonPath("$.data[2].name").value(saveCreateSelfProject.get(0).getName()))
+                    .andExpect(jsonPath("$.data[2].maxPeople").value(saveCreateSelfProject.get(0).getMaxPeople()))
+                    .andExpect(jsonPath("$.data[2].currentPeople").value(saveCreateSelfProject.get(0).getCurrentPeople()))
+                    .andExpect(jsonPath("$.data[2].viewCount").value(saveCreateSelfProject.get(0).getViewCount()))
+                    .andExpect(jsonPath("$.data[2].register").value(saveCreateSelfProject.get(0).getCreateUserName()))
+                    .andExpect(jsonPath("$.data[2].bookMark").value(true))
+                    .andExpect(jsonPath("$.data[2].projectSimplePositionDtoList[0].projectNo").value(saveProjectPosition1.getProject().getNo()))
+                    .andExpect(jsonPath("$.data[2].projectSimplePositionDtoList[0].positionNo").value(saveProjectPosition1.getPosition().getNo()))
+                    .andExpect(jsonPath("$.data[2].projectSimplePositionDtoList[0].positionName").value(saveProjectPosition1.getPosition().getName()))
+                    .andExpect(jsonPath("$.data[2].projectSimpleTechnicalStackDtoList[0].projectNo").value(saveProjectTechnicalStack1.getProject().getNo()))
+                    .andExpect(jsonPath("$.data[2].projectSimpleTechnicalStackDtoList[0].image").value(saveImage1.getLogicalName()))
+                    .andExpect(jsonPath("$.data[2].projectSimpleTechnicalStackDtoList[0].technicalStackName").value(saveProjectTechnicalStack1.getTechnicalStack().getName()))
 
                     .andExpect(status().isOk());
         }
@@ -876,7 +875,7 @@ class ProjectControllerTest {
         @DisplayName("실패 : 비로그인 유저")
         public void fail1() throws Exception {
             // when
-            ResultActions resultActions = mvc.perform(get("/v1/project/create/self?page=0&size=5&sortBy=createDate,desc")
+            ResultActions resultActions = mvc.perform(get("/v1/project/create/self?page=0&size=5&sortBy=createdDate,desc")
                     .contentType(MediaType.APPLICATION_JSON));
 
             // then
@@ -954,7 +953,7 @@ class ProjectControllerTest {
             // when
             String token = jwtTokenService.createToken(new TokenDto(saveUser.getEmail()));
 
-            ResultActions resultActions = mvc.perform(get("/v1/project/participate?page=0&size=5&sortBy=createDate,desc")
+            ResultActions resultActions = mvc.perform(get("/v1/project/participate?page=0&size=5&sortBy=createdDate,desc")
                     .contentType(MediaType.APPLICATION_JSON)
                     .header("Authorization", "Bearer " + token));
 
@@ -963,11 +962,11 @@ class ProjectControllerTest {
                     .andDo(print())
                     .andExpect(header().string("Content-type", "application/json"))
                     .andExpect(jsonPath("$.data.length()").value(2))
-                    .andExpect(jsonPath("$.data[0].name").value("testName4"))
-                    .andExpect(jsonPath("$.data[0].maxPeople").value(10))
-                    .andExpect(jsonPath("$.data[0].currentPeople").value(4))
-                    .andExpect(jsonPath("$.data[0].viewCount").value(10))
-                    .andExpect(jsonPath("$.data[0].register").value("user"))
+                    .andExpect(jsonPath("$.data[0].name").value(saveRecruitmentCompleteProjectList.get(0).getName()))
+                    .andExpect(jsonPath("$.data[0].maxPeople").value(saveRecruitmentCompleteProjectList.get(0).getMaxPeople()))
+                    .andExpect(jsonPath("$.data[0].currentPeople").value(saveRecruitmentCompleteProjectList.get(0).getCurrentPeople()))
+                    .andExpect(jsonPath("$.data[0].viewCount").value(saveRecruitmentCompleteProjectList.get(0).getViewCount()))
+                    .andExpect(jsonPath("$.data[0].register").value(saveRecruitmentCompleteProjectList.get(0).getCreateUserName()))
                     .andExpect(jsonPath("$.data[0].bookMark").value(false))
                     .andExpect(jsonPath("$.data[0].projectSimplePositionDtoList[0].projectNo").value(saveProjectPosition2.getProject().getNo()))
                     .andExpect(jsonPath("$.data[0].projectSimplePositionDtoList[0].positionNo").value(saveProjectPosition2.getPosition().getNo()))
@@ -976,11 +975,11 @@ class ProjectControllerTest {
                     .andExpect(jsonPath("$.data[0].projectSimpleTechnicalStackDtoList[0].image").value(saveImage1.getLogicalName()))
                     .andExpect(jsonPath("$.data[0].projectSimpleTechnicalStackDtoList[0].technicalStackName").value(saveProjectTechnicalStack2.getTechnicalStack().getName()))
 
-                    .andExpect(jsonPath("$.data[1].name").value("testName0"))
-                    .andExpect(jsonPath("$.data[1].maxPeople").value(10))
-                    .andExpect(jsonPath("$.data[1].currentPeople").value(4))
-                    .andExpect(jsonPath("$.data[1].viewCount").value(10))
-                    .andExpect(jsonPath("$.data[1].register").value("user"))
+                    .andExpect(jsonPath("$.data[1].name").value(saveRecruitmentProjectList.get(0).getName()))
+                    .andExpect(jsonPath("$.data[1].maxPeople").value(saveRecruitmentProjectList.get(0).getMaxPeople()))
+                    .andExpect(jsonPath("$.data[1].currentPeople").value(saveRecruitmentProjectList.get(0).getCurrentPeople()))
+                    .andExpect(jsonPath("$.data[1].viewCount").value(saveRecruitmentProjectList.get(0).getViewCount()))
+                    .andExpect(jsonPath("$.data[1].register").value(saveRecruitmentProjectList.get(0).getCreateUserName()))
                     .andExpect(jsonPath("$.data[1].bookMark").value(true))
                     .andExpect(jsonPath("$.data[1].projectSimplePositionDtoList[0].projectNo").value(saveProjectPosition1.getProject().getNo()))
                     .andExpect(jsonPath("$.data[1].projectSimplePositionDtoList[0].positionNo").value(saveProjectPosition1.getPosition().getNo()))
@@ -996,7 +995,7 @@ class ProjectControllerTest {
         @DisplayName("실패 : 비로그인 유저")
         public void fail1() throws Exception {
             // when
-            ResultActions resultActions = mvc.perform(get("/v1/project/participate?page=0&size=5&sortBy=createDate,desc")
+            ResultActions resultActions = mvc.perform(get("/v1/project/participate?page=0&size=5&sortBy=createdDate,desc")
                     .contentType(MediaType.APPLICATION_JSON));
 
             // then
@@ -1089,7 +1088,7 @@ class ProjectControllerTest {
             // when
             String token = jwtTokenService.createToken(new TokenDto(saveUser.getEmail()));
 
-            ResultActions resultActions = mvc.perform(get("/v1/project/application?page=0&size=5&sortBy=createDate,desc")
+            ResultActions resultActions = mvc.perform(get("/v1/project/application?page=0&size=5&sortBy=createdDate,desc")
                     .contentType(MediaType.APPLICATION_JSON)
                     .header("Authorization", "Bearer " + token));
 
@@ -1098,11 +1097,11 @@ class ProjectControllerTest {
                     .andDo(print())
                     .andExpect(header().string("Content-type", "application/json"))
                     .andExpect(jsonPath("$.data.length()").value(2))
-                    .andExpect(jsonPath("$.data[0].name").value("testName4"))
-                    .andExpect(jsonPath("$.data[0].maxPeople").value(10))
-                    .andExpect(jsonPath("$.data[0].currentPeople").value(4))
-                    .andExpect(jsonPath("$.data[0].viewCount").value(10))
-                    .andExpect(jsonPath("$.data[0].register").value("user"))
+                    .andExpect(jsonPath("$.data[0].name").value(saveRecruitmentCompleteProjectList.get(0).getName()))
+                    .andExpect(jsonPath("$.data[0].maxPeople").value(saveRecruitmentCompleteProjectList.get(0).getMaxPeople()))
+                    .andExpect(jsonPath("$.data[0].currentPeople").value(saveRecruitmentCompleteProjectList.get(0).getCurrentPeople()))
+                    .andExpect(jsonPath("$.data[0].viewCount").value(saveRecruitmentCompleteProjectList.get(0).getViewCount()))
+                    .andExpect(jsonPath("$.data[0].register").value(saveRecruitmentCompleteProjectList.get(0).getCreateUserName()))
                     .andExpect(jsonPath("$.data[0].bookMark").value(false))
                     .andExpect(jsonPath("$.data[0].projectSimplePositionDtoList[0].projectNo").value(saveProjectPosition2.getProject().getNo()))
                     .andExpect(jsonPath("$.data[0].projectSimplePositionDtoList[0].positionNo").value(saveProjectPosition2.getPosition().getNo()))
@@ -1111,11 +1110,11 @@ class ProjectControllerTest {
                     .andExpect(jsonPath("$.data[0].projectSimpleTechnicalStackDtoList[0].image").value(saveImage1.getLogicalName()))
                     .andExpect(jsonPath("$.data[0].projectSimpleTechnicalStackDtoList[0].technicalStackName").value(saveProjectTechnicalStack2.getTechnicalStack().getName()))
 
-                    .andExpect(jsonPath("$.data[1].name").value("testName0"))
-                    .andExpect(jsonPath("$.data[1].maxPeople").value(10))
-                    .andExpect(jsonPath("$.data[1].currentPeople").value(4))
-                    .andExpect(jsonPath("$.data[1].viewCount").value(10))
-                    .andExpect(jsonPath("$.data[1].register").value("user"))
+                    .andExpect(jsonPath("$.data[1].name").value(saveRecruitmentProjectList.get(0).getName()))
+                    .andExpect(jsonPath("$.data[1].maxPeople").value(saveRecruitmentProjectList.get(0).getMaxPeople()))
+                    .andExpect(jsonPath("$.data[1].currentPeople").value(saveRecruitmentProjectList.get(0).getCurrentPeople()))
+                    .andExpect(jsonPath("$.data[1].viewCount").value(saveRecruitmentProjectList.get(0).getViewCount()))
+                    .andExpect(jsonPath("$.data[1].register").value(saveRecruitmentProjectList.get(0).getCreateUserName()))
                     .andExpect(jsonPath("$.data[1].bookMark").value(true))
                     .andExpect(jsonPath("$.data[1].projectSimplePositionDtoList[0].projectNo").value(saveProjectPosition1.getProject().getNo()))
                     .andExpect(jsonPath("$.data[1].projectSimplePositionDtoList[0].positionNo").value(saveProjectPosition1.getPosition().getNo()))
@@ -1131,7 +1130,7 @@ class ProjectControllerTest {
         @DisplayName("실패 : 비로그인 유저")
         public void fail1() throws Exception {
             // when
-            ResultActions resultActions = mvc.perform(get("/v1/project/application?page=0&size=5&sortBy=createDate,desc")
+            ResultActions resultActions = mvc.perform(get("/v1/project/application?page=0&size=5&sortBy=createdDate,desc")
                     .contentType(MediaType.APPLICATION_JSON));
 
             // then
@@ -1151,22 +1150,18 @@ class ProjectControllerTest {
             User saveUser = saveUser();
 
             // 프로젝트 세팅
-            LocalDateTime createDate = LocalDateTime.now();
             LocalDate startDate = LocalDate.of(2022, 06, 24);
             LocalDate endDate = LocalDate.of(2022, 06, 28);
 
             Project project1 = Project.builder()
                     .name("testName1")
                     .createUserName("userName1")
-                    .createDate(createDate)
                     .startDate(startDate)
                     .endDate(endDate)
                     .state(true)
                     .introduction("testIntroduction1")
                     .maxPeople(10)
                     .currentPeople(4)
-                    .delete(false)
-                    .deleteReason(null)
                     .viewCount(10)
                     .commentCount(10)
                     .build();
@@ -1285,22 +1280,18 @@ class ProjectControllerTest {
             User saveUser = saveUser();
 
             // 프로젝트 세팅
-            LocalDateTime createDate = LocalDateTime.now();
             LocalDate startDate = LocalDate.of(2022, 06, 24);
             LocalDate endDate = LocalDate.of(2022, 06, 28);
 
             Project project1 = Project.builder()
                     .name("testName1")
                     .createUserName("userName1")
-                    .createDate(createDate)
                     .startDate(startDate)
                     .endDate(endDate)
                     .state(true)
                     .introduction("testIntroduction1")
                     .maxPeople(10)
                     .currentPeople(4)
-                    .delete(false)
-                    .deleteReason(null)
                     .viewCount(10)
                     .commentCount(10)
                     .build();
@@ -1386,22 +1377,18 @@ class ProjectControllerTest {
             User saveUser = saveUser();
 
             // 프로젝트 세팅
-            LocalDateTime createDate = LocalDateTime.now();
             LocalDate startDate = LocalDate.of(2022, 06, 24);
             LocalDate endDate = LocalDate.of(2022, 06, 28);
 
             Project project1 = Project.builder()
                     .name("testName1")
                     .createUserName("userName1")
-                    .createDate(createDate)
                     .startDate(startDate)
                     .endDate(endDate)
                     .state(true)
                     .introduction("testIntroduction1")
                     .maxPeople(10)
                     .currentPeople(4)
-                    .delete(false)
-                    .deleteReason(null)
                     .viewCount(10)
                     .commentCount(10)
                     .build();
@@ -1500,22 +1487,18 @@ class ProjectControllerTest {
             User saveUser = saveUser();
 
             // 프로젝트 세팅
-            LocalDateTime createDate = LocalDateTime.now();
             LocalDate startDate = LocalDate.of(2022, 06, 24);
             LocalDate endDate = LocalDate.of(2022, 06, 28);
 
             Project project1 = Project.builder()
                     .name("testName1")
                     .createUserName("userName1")
-                    .createDate(createDate)
                     .startDate(startDate)
                     .endDate(endDate)
                     .state(true)
                     .introduction("testIntroduction1")
                     .maxPeople(10)
                     .currentPeople(4)
-                    .delete(false)
-                    .deleteReason(null)
                     .viewCount(10)
                     .commentCount(10)
                     .build();
@@ -1628,22 +1611,18 @@ class ProjectControllerTest {
             User saveUser = saveUser();
 
             // 프로젝트 세팅
-            LocalDateTime createDate = LocalDateTime.now();
             LocalDate startDate = LocalDate.of(2022, 06, 24);
             LocalDate endDate = LocalDate.of(2022, 06, 28);
 
             Project project1 = Project.builder()
                     .name("testName1")
                     .createUserName("userName1")
-                    .createDate(createDate)
                     .startDate(startDate)
                     .endDate(endDate)
                     .state(true)
                     .introduction("testIntroduction1")
                     .maxPeople(10)
                     .currentPeople(4)
-                    .delete(false)
-                    .deleteReason(null)
                     .viewCount(10)
                     .commentCount(10)
                     .user(saveUser)
@@ -1778,22 +1757,18 @@ class ProjectControllerTest {
             User saveUser = saveUser();
 
             // 프로젝트 세팅
-            LocalDateTime createDate = LocalDateTime.now();
             LocalDate startDate = LocalDate.of(2022, 06, 24);
             LocalDate endDate = LocalDate.of(2022, 06, 28);
 
             Project project1 = Project.builder()
                     .name("testName1")
                     .createUserName("userName1")
-                    .createDate(createDate)
                     .startDate(startDate)
                     .endDate(endDate)
                     .state(true)
                     .introduction("testIntroduction1")
                     .maxPeople(10)
                     .currentPeople(4)
-                    .delete(false)
-                    .deleteReason(null)
                     .viewCount(10)
                     .commentCount(10)
                     .user(saveUser)

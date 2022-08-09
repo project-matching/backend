@@ -88,7 +88,6 @@ class ProjectPositionControllerTest {
             // 유저 세팅
             User saveUser = saveUser();
 
-            LocalDateTime createDate = LocalDateTime.now();
             LocalDate startDate = LocalDate.of(2022, 06, 24);
             LocalDate endDate = LocalDate.of(2022, 06, 28);
             
@@ -96,15 +95,12 @@ class ProjectPositionControllerTest {
             Project project1 = Project.builder()
                     .name("testName1")
                     .createUserName("user1")
-                    .createDate(createDate)
                     .startDate(startDate)
                     .endDate(endDate)
                     .state(true)
                     .introduction("testIntroduction1")
                     .maxPeople(10)
                     .currentPeople(4)
-                    .delete(true)
-                    .deleteReason(null)
                     .viewCount(10)
                     .commentCount(10)
                     .build();
@@ -164,7 +160,6 @@ class ProjectPositionControllerTest {
             // 유저 세팅
             User saveUser = saveUser();
 
-            LocalDateTime createDate = LocalDateTime.now();
             LocalDate startDate = LocalDate.of(2022, 06, 24);
             LocalDate endDate = LocalDate.of(2022, 06, 28);
 
@@ -172,15 +167,12 @@ class ProjectPositionControllerTest {
             Project project1 = Project.builder()
                     .name("testName1")
                     .createUserName("user1")
-                    .createDate(createDate)
                     .startDate(startDate)
                     .endDate(endDate)
                     .state(true)
                     .introduction("testIntroduction1")
                     .maxPeople(10)
                     .currentPeople(4)
-                    .delete(true)
-                    .deleteReason(null)
                     .viewCount(10)
                     .user(saveUser)
                     .commentCount(10)

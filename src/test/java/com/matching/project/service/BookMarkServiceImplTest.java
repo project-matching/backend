@@ -53,7 +53,6 @@ class BookMarkServiceImplTest {
         @DisplayName("성공")
         public void success() {
             // given
-            LocalDateTime createDate = LocalDateTime.now();
             LocalDate startDate = LocalDate.of(2022, 06, 24);
             LocalDate endDate = LocalDate.of(2022, 06, 28);
 
@@ -79,15 +78,12 @@ class BookMarkServiceImplTest {
                     .no(1L)
                     .name("testName1")
                     .createUserName("testUser1")
-                    .createDate(createDate)
                     .startDate(startDate)
                     .endDate(endDate)
                     .state(true)
                     .introduction("testIntroduction1")
                     .maxPeople(10)
                     .currentPeople(4)
-                    .delete(false)
-                    .deleteReason(null)
                     .viewCount(10)
                     .commentCount(10)
                     .build();
@@ -290,7 +286,7 @@ class BookMarkServiceImplTest {
             int end = (start + pageable.getPageSize()) > projectSimpleDtoList.size() ? projectSimpleDtoList.size() : (start + pageable.getPageSize());
             Page<ProjectSimpleDto> projectPage = new PageImpl<>(projectSimpleDtoList.subList(start, end), pageable, projectSimpleDtoList.size());
 
-            given(projectRepository.findBookMarkProjectByDelete(any(Pageable.class),any(User.class), any(Boolean.class))).willReturn(projectPage);
+            given(projectRepository.findBookMarkProject(any(Pageable.class),any(User.class))).willReturn(projectPage);
 
             List<ProjectSimpleDto> result = null;
 
@@ -302,7 +298,7 @@ class BookMarkServiceImplTest {
                 e.printStackTrace();
             }
 
-            verify(projectRepository).findBookMarkProjectByDelete(any(Pageable.class),any(User.class), any(Boolean.class));
+            verify(projectRepository).findBookMarkProject(any(Pageable.class),any(User.class));
 
             assertEquals(result.size(), 2);
             assertEquals(result.get(0).getProjectNo(), projectSimpleDto1.getProjectNo());

@@ -35,22 +35,18 @@ class ProjectTechnicalStackRepositoryTest {
     @Test
     public void 프로젝트_기술스택_프로젝트_조회() {
         // given
-        LocalDateTime createDate = LocalDateTime.of(2022, 06, 24, 10, 10, 10);
         LocalDate startDate = LocalDate.of(2022, 06, 24);
         LocalDate endDate = LocalDate.of(2022, 06, 28);
 
         Project project1 = Project.builder()
                 .name("testName1")
                 .createUserName("user1")
-                .createDate(createDate)
                 .startDate(startDate)
                 .endDate(endDate)
                 .state(true)
                 .introduction("testIntroduction1")
                 .maxPeople(10)
                 .currentPeople(4)
-                .delete(true)
-                .deleteReason(null)
                 .viewCount(10)
                 .commentCount(10)
                 .build();
@@ -93,22 +89,18 @@ class ProjectTechnicalStackRepositoryTest {
     @DisplayName("프로젝트에 들어있는 프로젝트 기술스택 삭제")
     public void testDeleteByProjectNo() {
         // given
-        LocalDateTime createDate = LocalDateTime.of(2022, 06, 24, 10, 10, 10);
         LocalDate startDate = LocalDate.of(2022, 06, 24);
         LocalDate endDate = LocalDate.of(2022, 06, 28);
 
         Project project1 = Project.builder()
                 .name("testName1")
                 .createUserName("user1")
-                .createDate(createDate)
                 .startDate(startDate)
                 .endDate(endDate)
                 .state(true)
                 .introduction("testIntroduction1")
                 .maxPeople(10)
                 .currentPeople(4)
-                .delete(true)
-                .deleteReason(null)
                 .viewCount(10)
                 .commentCount(10)
                 .build();

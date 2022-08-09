@@ -67,7 +67,7 @@ class BookMarkControllerTest {
         @DisplayName("성공")
         public void success() throws Exception {
             // given
-            LocalDateTime createDate = LocalDateTime.now();
+            LocalDateTime createdDate = LocalDateTime.now();
             LocalDate startDate = LocalDate.of(2022, 06, 24);
             LocalDate endDate = LocalDate.of(2022, 06, 28);
 
@@ -93,15 +93,12 @@ class BookMarkControllerTest {
             Project project1 = Project.builder()
                     .name("testName1")
                     .createUserName("user1")
-                    .createDate(createDate.plusDays(1))
                     .startDate(startDate)
                     .endDate(endDate)
                     .state(true)
                     .introduction("testIntroduction1")
                     .maxPeople(10)
                     .currentPeople(4)
-                    .delete(false)
-                    .deleteReason(null)
                     .viewCount(10)
                     .commentCount(10)
                     .build();
@@ -145,7 +142,6 @@ class BookMarkControllerTest {
         @DisplayName("성공")
         public void success() throws Exception {
             // given
-            LocalDateTime createDate = LocalDateTime.now();
             LocalDate startDate = LocalDate.of(2022, 06, 24);
             LocalDate endDate = LocalDate.of(2022, 06, 28);
 
@@ -171,15 +167,12 @@ class BookMarkControllerTest {
             Project project1 = Project.builder()
                     .name("testName1")
                     .createUserName("user1")
-                    .createDate(createDate.plusDays(1))
                     .startDate(startDate)
                     .endDate(endDate)
                     .state(true)
                     .introduction("testIntroduction1")
                     .maxPeople(10)
                     .currentPeople(4)
-                    .delete(false)
-                    .deleteReason(null)
                     .viewCount(10)
                     .commentCount(10)
                     .build();
@@ -187,15 +180,12 @@ class BookMarkControllerTest {
             Project project2 = Project.builder()
                     .name("testName2")
                     .createUserName("user2")
-                    .createDate(createDate.plusDays(1))
                     .startDate(startDate)
                     .endDate(endDate)
                     .state(true)
                     .introduction("testIntroduction2")
                     .maxPeople(10)
                     .currentPeople(4)
-                    .delete(false)
-                    .deleteReason(null)
                     .viewCount(10)
                     .commentCount(10)
                     .build();
@@ -299,7 +289,7 @@ class BookMarkControllerTest {
             // when
             String token = jwtTokenService.createToken(new TokenDto(saveUser1.getEmail()));
 
-            ResultActions resultActions = mvc.perform(get("/v1/bookmark?page=0&size=5&sortBy=createDate,desc")
+            ResultActions resultActions = mvc.perform(get("/v1/bookmark?page=0&size=5&sortBy=createdDate,desc")
                     .contentType(MediaType.APPLICATION_JSON)
                     .header("Authorization", "Bearer " + token));
 
@@ -353,7 +343,7 @@ class BookMarkControllerTest {
         @DisplayName("성공")
         public void success() throws Exception {
             // given
-            LocalDateTime createDate = LocalDateTime.now();
+            LocalDateTime createdDate = LocalDateTime.now();
             LocalDate startDate = LocalDate.of(2022, 06, 24);
             LocalDate endDate = LocalDate.of(2022, 06, 28);
 
@@ -379,15 +369,12 @@ class BookMarkControllerTest {
             Project project1 = Project.builder()
                     .name("testName1")
                     .createUserName("user1")
-                    .createDate(createDate.plusDays(1))
                     .startDate(startDate)
                     .endDate(endDate)
                     .state(true)
                     .introduction("testIntroduction1")
                     .maxPeople(10)
                     .currentPeople(4)
-                    .delete(false)
-                    .deleteReason(null)
                     .viewCount(10)
                     .commentCount(10)
                     .build();

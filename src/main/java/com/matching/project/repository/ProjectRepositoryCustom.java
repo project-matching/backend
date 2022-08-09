@@ -8,10 +8,10 @@ import org.springframework.data.domain.Pageable;
 
 public interface ProjectRepositoryCustom {
     public Project findProjectWithUserUsingFetchJoinByProjectNo(Long projectNo);
-    public Page<ProjectSimpleDto> findProjectByStatusAndDelete(Pageable pageable, boolean status, boolean delete, ProjectSearchRequestDto projectSearchRequestDto);
-    public Page<ProjectSimpleDto> findUserProjectByDelete(Pageable pageable, User user, boolean delete);
-    public Page<ProjectSimpleDto> findParticipateProjectByDelete(Pageable pageable, User user, boolean delete);
-    public Page<ProjectSimpleDto> findParticipateRequestProjectByDelete(Pageable pageable, User user, boolean delete);
-    public Page<ProjectSimpleDto> findBookMarkProjectByDelete(Pageable pageable, User user, boolean delete);
+    public Page<ProjectSimpleDto> findProjectByStatus(Pageable pageable, boolean status, ProjectSearchRequestDto projectSearchRequestDto);
+    public Page<ProjectSimpleDto> findUserProject(Pageable pageable, User user);
+    public Page<ProjectSimpleDto> findParticipateProject(Pageable pageable, User user);
+    public Page<ProjectSimpleDto> findParticipateRequestProject(Pageable pageable, User user);
+    public Page<ProjectSimpleDto> findBookMarkProject(Pageable pageable, User user);
     public boolean existUserProjectByUser(Long userNo, Long projectNo);
 }

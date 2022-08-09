@@ -1,5 +1,6 @@
 package com.matching.project.repository;
 
+import com.matching.project.config.JpaConfig;
 import com.matching.project.config.QuerydslConfiguration;
 import com.matching.project.dto.enumerate.OAuth;
 import com.matching.project.dto.enumerate.ProjectFilter;
@@ -26,7 +27,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@Import(QuerydslConfiguration.class)
+@Import({QuerydslConfiguration.class})
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Transactional
@@ -62,23 +63,19 @@ class ProjectRepositoryTest {
     @Test
     public void 프로젝트_탐색() {
         // given
-        LocalDateTime createDate = LocalDateTime.now();
         LocalDate startDate = LocalDate.of(2022, 06, 24);
         LocalDate endDate = LocalDate.of(2022, 06, 28);
 
-        // 삭제된 프로젝트 객체
+        // 모집 중인 프로젝트 객체
         Project project1 = Project.builder()
                 .name("testName1")
                 .createUserName("user1")
-                .createDate(createDate.plusDays(1))
                 .startDate(startDate)
                 .endDate(endDate)
                 .state(true)
                 .introduction("testIntroduction1")
                 .maxPeople(10)
                 .currentPeople(4)
-                .delete(true)
-                .deleteReason(null)
                 .viewCount(10)
                 .commentCount(10)
                 .build();
@@ -87,61 +84,36 @@ class ProjectRepositoryTest {
         Project project2 = Project.builder()
                 .name("testName2")
                 .createUserName("user1")
-                .createDate(createDate.plusDays(2))
                 .startDate(startDate)
                 .endDate(endDate)
                 .state(true)
                 .introduction("testIntroduction2")
                 .maxPeople(10)
                 .currentPeople(4)
-                .delete(false)
-                .deleteReason(null)
-                .viewCount(10)
-                .commentCount(10)
-                .build();
-
-        // 모집 중인 프로젝트 객체
-        Project project3 = Project.builder()
-                .name("testName3")
-                .createUserName("user1")
-                .createDate(createDate.plusDays(3))
-                .startDate(startDate)
-                .endDate(endDate)
-                .state(true)
-                .introduction("testIntroduction3")
-                .maxPeople(10)
-                .currentPeople(4)
-                .delete(false)
-                .deleteReason(null)
                 .viewCount(10)
                 .commentCount(10)
                 .build();
 
         // 모집 완료된 프로젝트 객체
-        Project project4 = Project.builder()
-                .name("testName4")
+        Project project3 = Project.builder()
+                .name("testName3")
                 .createUserName("user1")
-                .createDate(createDate.plusDays(4))
                 .startDate(startDate)
                 .endDate(endDate)
                 .state(false)
-                .introduction("testIntroduction4")
+                .introduction("testIntroduction3")
                 .maxPeople(10)
                 .currentPeople(4)
-                .delete(false)
-                .deleteReason(null)
                 .viewCount(10)
                 .commentCount(10)
                 .build();
 
-        // 삭제된 프로젝트
-        projectRepository.save(project1);
         // 모집 중인 프로젝트
-        Project saveProject2 = projectRepository.save(project2);
+        Project saveProject1 = projectRepository.saveAndFlush(project1);
         // 모집 중인 프로젝트
-        Project saveProject3 = projectRepository.save(project3);
+        Project saveProject2 = projectRepository.saveAndFlush(project2);
         // 모집 완료된 프로젝트
-        Project saveProject4 = projectRepository.save(project4);
+        Project saveProject3 = projectRepository.saveAndFlush(project3);
 
         // 포지션 세팅
         Position position1 = Position.builder()
@@ -155,28 +127,28 @@ class ProjectRepositoryTest {
 
         ProjectPosition projectPosition1 = ProjectPosition.builder()
                 .state(true)
-                .project(project2)
+                .project(project1)
                 .position(position1)
                 .user(null)
                 .creator(false)
                 .build();
         ProjectPosition projectPosition2 = ProjectPosition.builder()
                 .state(false)
-                .project(project2)
+                .project(project1)
                 .position(position2)
                 .user(null)
                 .creator(false)
                 .build();
         ProjectPosition projectPosition3 = ProjectPosition.builder()
                 .state(true)
-                .project(project3)
+                .project(project2)
                 .position(position1)
                 .user(null)
                 .creator(false)
                 .build();
         ProjectPosition projectPosition4 = ProjectPosition.builder()
                 .state(false)
-                .project(project3)
+                .project(project2)
                 .position(position2)
                 .user(null)
                 .creator(false)
@@ -208,19 +180,19 @@ class ProjectRepositoryTest {
 
 
         ProjectTechnicalStack projectTechnicalStack1 = ProjectTechnicalStack.builder()
-                .project(project2)
+                .project(project1)
                 .technicalStack(technicalStack1)
                 .build();
         ProjectTechnicalStack projectTechnicalStack2 = ProjectTechnicalStack.builder()
-                .project(project2)
+                .project(project1)
                 .technicalStack(technicalStack2)
                 .build();
         ProjectTechnicalStack projectTechnicalStack3 = ProjectTechnicalStack.builder()
-                .project(project3)
+                .project(project2)
                 .technicalStack(technicalStack1)
                 .build();
         ProjectTechnicalStack projectTechnicalStack4 = ProjectTechnicalStack.builder()
-                .project(project3)
+                .project(project2)
                 .technicalStack(technicalStack2)
                 .build();
         ProjectTechnicalStack saveProjectTechnicalStack1 = projectTechnicalStackRepository.save(projectTechnicalStack1);
@@ -229,12 +201,12 @@ class ProjectRepositoryTest {
         ProjectTechnicalStack saveProjectTechnicalStack4 = projectTechnicalStackRepository.save(projectTechnicalStack4);
 
         // when
-        Pageable pageable = PageRequest.of(0, 5, Sort.by("createDate").descending());
+        Pageable pageable = PageRequest.of(0, 5, Sort.by("createdDate").descending());
 
         // 모집 중이고, 삭제되지 않은 프로젝트 탐색
         Page<ProjectSimpleDto> projectSimpleDtoPage = null;
         try {
-            projectSimpleDtoPage = projectRepository.findProjectByStatusAndDelete(pageable, true, false, new ProjectSearchRequestDto(ProjectFilter.PROJECT_NAME_AND_CONTENT, null));
+            projectSimpleDtoPage = projectRepository.findProjectByStatus(pageable, true, new ProjectSearchRequestDto(ProjectFilter.PROJECT_NAME_AND_CONTENT, null));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -251,12 +223,12 @@ class ProjectRepositoryTest {
         assertEquals(projectSimpleDtoPage.hasContent(), true);
 
         assertEquals(projectList.size(), 2);
-        assertEquals(projectList.get(0).getProjectNo(), saveProject3.getNo());
-        assertEquals(projectList.get(0).getName(), saveProject3.getName());
-        assertEquals(projectList.get(0).getMaxPeople(), saveProject3.getMaxPeople());
-        assertEquals(projectList.get(0).getCurrentPeople(), saveProject3.getCurrentPeople());
-        assertEquals(projectList.get(0).getViewCount(), saveProject3.getViewCount());
-        assertEquals(projectList.get(0).getRegister(), saveProject3.getCreateUserName());
+        assertEquals(projectList.get(0).getProjectNo(), saveProject2.getNo());
+        assertEquals(projectList.get(0).getName(), saveProject2.getName());
+        assertEquals(projectList.get(0).getMaxPeople(), saveProject2.getMaxPeople());
+        assertEquals(projectList.get(0).getCurrentPeople(), saveProject2.getCurrentPeople());
+        assertEquals(projectList.get(0).getViewCount(), saveProject2.getViewCount());
+        assertEquals(projectList.get(0).getRegister(), saveProject2.getCreateUserName());
         assertEquals(projectList.get(0).isBookMark(), false);
 
         assertEquals(projectList.get(0).getProjectSimplePositionDtoList().get(0).getProjectNo(), saveProjectPosition3.getProject().getNo());
@@ -273,12 +245,12 @@ class ProjectRepositoryTest {
         assertEquals(projectList.get(0).getProjectSimpleTechnicalStackDtoList().get(1).getTechnicalStackName(), saveProjectTechnicalStack4.getTechnicalStack().getName());
         assertEquals(projectList.get(0).getProjectSimpleTechnicalStackDtoList().get(1).getImage(), null);
 
-        assertEquals(projectList.get(1).getProjectNo(), saveProject2.getNo());
-        assertEquals(projectList.get(1).getName(), saveProject2.getName());
-        assertEquals(projectList.get(1).getMaxPeople(), saveProject2.getMaxPeople());
-        assertEquals(projectList.get(1).getCurrentPeople(), saveProject2.getCurrentPeople());
-        assertEquals(projectList.get(1).getViewCount(), saveProject2.getViewCount());
-        assertEquals(projectList.get(1).getRegister(), saveProject2.getCreateUserName());
+        assertEquals(projectList.get(1).getProjectNo(), saveProject1.getNo());
+        assertEquals(projectList.get(1).getName(), saveProject1.getName());
+        assertEquals(projectList.get(1).getMaxPeople(), saveProject1.getMaxPeople());
+        assertEquals(projectList.get(1).getCurrentPeople(), saveProject1.getCurrentPeople());
+        assertEquals(projectList.get(1).getViewCount(), saveProject1.getViewCount());
+        assertEquals(projectList.get(1).getRegister(), saveProject1.getCreateUserName());
         assertEquals(projectList.get(1).isBookMark(), false);
 
         assertEquals(projectList.get(1).getProjectSimplePositionDtoList().get(0).getProjectNo(), saveProjectPosition1.getProject().getNo());
@@ -299,23 +271,19 @@ class ProjectRepositoryTest {
     @Test
     public void 프로젝트_검색() {
         // given
-        LocalDateTime createDate = LocalDateTime.now();
         LocalDate startDate = LocalDate.of(2022, 06, 24);
         LocalDate endDate = LocalDate.of(2022, 06, 28);
 
-        // 삭제된 프로젝트 객체
+        // 모집 중인 프로젝트 객체
         Project project1 = Project.builder()
                 .name("testName1")
                 .createUserName("user1")
-                .createDate(createDate.plusDays(1))
                 .startDate(startDate)
                 .endDate(endDate)
                 .state(true)
                 .introduction("testIntroduction1")
                 .maxPeople(10)
                 .currentPeople(4)
-                .delete(true)
-                .deleteReason(null)
                 .viewCount(10)
                 .commentCount(10)
                 .build();
@@ -324,61 +292,36 @@ class ProjectRepositoryTest {
         Project project2 = Project.builder()
                 .name("testName2")
                 .createUserName("user1")
-                .createDate(createDate.plusDays(2))
                 .startDate(startDate)
                 .endDate(endDate)
                 .state(true)
                 .introduction("testIntroduction2")
                 .maxPeople(10)
                 .currentPeople(4)
-                .delete(false)
-                .deleteReason(null)
-                .viewCount(10)
-                .commentCount(10)
-                .build();
-
-        // 모집 중인 프로젝트 객체
-        Project project3 = Project.builder()
-                .name("testName3")
-                .createUserName("user1")
-                .createDate(createDate.plusDays(3))
-                .startDate(startDate)
-                .endDate(endDate)
-                .state(true)
-                .introduction("testIntroduction3")
-                .maxPeople(10)
-                .currentPeople(4)
-                .delete(false)
-                .deleteReason(null)
                 .viewCount(10)
                 .commentCount(10)
                 .build();
 
         // 모집 완료된 프로젝트 객체
-        Project project4 = Project.builder()
-                .name("testName4")
+        Project project3 = Project.builder()
+                .name("testName3")
                 .createUserName("user1")
-                .createDate(createDate.plusDays(4))
                 .startDate(startDate)
                 .endDate(endDate)
                 .state(false)
-                .introduction("testIntroduction4")
+                .introduction("testIntroduction3")
                 .maxPeople(10)
                 .currentPeople(4)
-                .delete(false)
-                .deleteReason(null)
                 .viewCount(10)
                 .commentCount(10)
                 .build();
 
-        // 삭제된 프로젝트
-        projectRepository.save(project1);
         // 모집 중인 프로젝트
-        projectRepository.save(project2);
+        Project saveProject1 = projectRepository.saveAndFlush(project1);
         // 모집 중인 프로젝트
-        Project saveProject3 = projectRepository.save(project3);
+        Project saveProject2 = projectRepository.saveAndFlush(project2);
         // 모집 완료된 프로젝트
-        projectRepository.save(project4);
+        projectRepository.saveAndFlush(project3);
 
         // 포지션 세팅
         Position position1 = Position.builder()
@@ -392,28 +335,28 @@ class ProjectRepositoryTest {
 
         ProjectPosition projectPosition1 = ProjectPosition.builder()
                 .state(true)
-                .project(project2)
+                .project(project1)
                 .position(position1)
                 .user(null)
                 .creator(false)
                 .build();
         ProjectPosition projectPosition2 = ProjectPosition.builder()
                 .state(false)
-                .project(project2)
+                .project(project1)
                 .position(position2)
                 .user(null)
                 .creator(false)
                 .build();
         ProjectPosition projectPosition3 = ProjectPosition.builder()
                 .state(true)
-                .project(project3)
+                .project(project2)
                 .position(position1)
                 .user(null)
                 .creator(false)
                 .build();
         ProjectPosition projectPosition4 = ProjectPosition.builder()
                 .state(false)
-                .project(project3)
+                .project(project2)
                 .position(position2)
                 .user(null)
                 .creator(false)
@@ -443,19 +386,19 @@ class ProjectRepositoryTest {
         technicalStackRepository.save(technicalStack2);
 
         ProjectTechnicalStack projectTechnicalStack1 = ProjectTechnicalStack.builder()
-                .project(project2)
+                .project(project1)
                 .technicalStack(technicalStack1)
                 .build();
         ProjectTechnicalStack projectTechnicalStack2 = ProjectTechnicalStack.builder()
-                .project(project2)
+                .project(project1)
                 .technicalStack(technicalStack2)
                 .build();
         ProjectTechnicalStack projectTechnicalStack3 = ProjectTechnicalStack.builder()
-                .project(project3)
+                .project(project2)
                 .technicalStack(technicalStack1)
                 .build();
         ProjectTechnicalStack projectTechnicalStack4 = ProjectTechnicalStack.builder()
-                .project(project3)
+                .project(project2)
                 .technicalStack(technicalStack2)
                 .build();
         projectTechnicalStackRepository.save(projectTechnicalStack1);
@@ -464,12 +407,12 @@ class ProjectRepositoryTest {
         ProjectTechnicalStack saveProjectTechnicalStack4 = projectTechnicalStackRepository.save(projectTechnicalStack4);
 
         // when
-        Pageable pageable = PageRequest.of(0, 5, Sort.by("createDate").descending());
+        Pageable pageable = PageRequest.of(0, 5, Sort.by("createdDate").descending());
 
-        // 모집 중이고, 삭제되지 않은 프로젝트 중 Name3을 포함하고있는 리스트 탐색
+        // 모집 중이고, 삭제되지 않은 프로젝트 중 Name2을 포함하고있는 리스트 탐색
         Page<ProjectSimpleDto> projectSimpleDtoPage = null;
         try {
-            projectSimpleDtoPage = projectRepository.findProjectByStatusAndDelete(pageable, true, false, new ProjectSearchRequestDto(ProjectFilter.PROJECT_NAME_AND_CONTENT, "Name3"));
+            projectSimpleDtoPage = projectRepository.findProjectByStatus(pageable, true, new ProjectSearchRequestDto(ProjectFilter.PROJECT_NAME_AND_CONTENT, "Name2"));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -486,12 +429,12 @@ class ProjectRepositoryTest {
         assertEquals(projectSimpleDtoPage.hasContent(), true);
 
         assertEquals(projectList.size(), 1);
-        assertEquals(projectList.get(0).getProjectNo(), saveProject3.getNo());
-        assertEquals(projectList.get(0).getName(), saveProject3.getName());
-        assertEquals(projectList.get(0).getMaxPeople(), saveProject3.getMaxPeople());
-        assertEquals(projectList.get(0).getCurrentPeople(), saveProject3.getCurrentPeople());
-        assertEquals(projectList.get(0).getViewCount(), saveProject3.getViewCount());
-        assertEquals(projectList.get(0).getRegister(), saveProject3.getCreateUserName());
+        assertEquals(projectList.get(0).getProjectNo(), saveProject2.getNo());
+        assertEquals(projectList.get(0).getName(), saveProject2.getName());
+        assertEquals(projectList.get(0).getMaxPeople(), saveProject2.getMaxPeople());
+        assertEquals(projectList.get(0).getCurrentPeople(), saveProject2.getCurrentPeople());
+        assertEquals(projectList.get(0).getViewCount(), saveProject2.getViewCount());
+        assertEquals(projectList.get(0).getRegister(), saveProject2.getCreateUserName());
         assertEquals(projectList.get(0).isBookMark(), false);
 
         assertEquals(projectList.get(0).getProjectSimplePositionDtoList().get(0).getProjectNo(), saveProjectPosition3.getProject().getNo());
@@ -512,7 +455,6 @@ class ProjectRepositoryTest {
     @Test
     public void 내가_등록한_프로젝트_탐색() {
         // given
-        LocalDateTime createDate = LocalDateTime.now();
         LocalDate startDate = LocalDate.of(2022, 06, 24);
         LocalDate endDate = LocalDate.of(2022, 06, 28);
 
@@ -533,37 +475,31 @@ class ProjectRepositoryTest {
                 .build();
         User saveUser1 = userRepository.save(user1);
 
-        // 삭제된 프로젝트 객체
+        // 모집 중인 프로젝트 객체
         Project project1 = Project.builder()
                 .name("testName1")
                 .createUserName("user1")
-                .createDate(createDate.plusDays(1))
                 .startDate(startDate)
                 .endDate(endDate)
                 .state(true)
                 .introduction("testIntroduction1")
                 .maxPeople(10)
                 .currentPeople(4)
-                .delete(true)
-                .deleteReason(null)
                 .viewCount(10)
-                .user(saveUser1)
                 .commentCount(10)
+                .user(saveUser1)
                 .build();
 
-        // 모집 중인 프로젝트 객체
+        // 모집 완료된 프로젝트 객체
         Project project2 = Project.builder()
                 .name("testName2")
                 .createUserName("user1")
-                .createDate(createDate.plusDays(2))
                 .startDate(startDate)
                 .endDate(endDate)
-                .state(true)
+                .state(false)
                 .introduction("testIntroduction2")
                 .maxPeople(10)
                 .currentPeople(4)
-                .delete(false)
-                .deleteReason(null)
                 .viewCount(10)
                 .commentCount(10)
                 .user(saveUser1)
@@ -573,45 +509,22 @@ class ProjectRepositoryTest {
         Project project3 = Project.builder()
                 .name("testName3")
                 .createUserName("user1")
-                .createDate(createDate.plusDays(3))
                 .startDate(startDate)
                 .endDate(endDate)
                 .state(false)
                 .introduction("testIntroduction3")
                 .maxPeople(10)
                 .currentPeople(4)
-                .delete(false)
-                .deleteReason(null)
-                .viewCount(10)
-                .commentCount(10)
-                .user(saveUser1)
-                .build();
-
-        // 모집 완료된 프로젝트 객체
-        Project project4 = Project.builder()
-                .name("testName4")
-                .createUserName("user1")
-                .createDate(createDate.plusDays(4))
-                .startDate(startDate)
-                .endDate(endDate)
-                .state(false)
-                .introduction("testIntroduction4")
-                .maxPeople(10)
-                .currentPeople(4)
-                .delete(false)
-                .deleteReason(null)
                 .viewCount(10)
                 .commentCount(10)
                 .build();
 
-        // 삭제된 프로젝트 (유저가 만든 프로젝트)
-        projectRepository.save(project1);
         // 모집 중인 프로젝트 (유저가 만든 프로젝트)
-        Project saveProject2 = projectRepository.save(project2);
+        Project saveProject1 = projectRepository.saveAndFlush(project1);
         // 모집 완료된 프로젝트 (유저가 만든 프로젝트)
-        Project saveProject3 = projectRepository.save(project3);
+        Project saveProject2 = projectRepository.saveAndFlush(project2);
         // 모집 완료된 프로젝트
-        projectRepository.save(project4);
+        projectRepository.saveAndFlush(project3);
 
         // 포지션 세팅
         Position position1 = Position.builder()
@@ -625,28 +538,28 @@ class ProjectRepositoryTest {
 
         ProjectPosition projectPosition1 = ProjectPosition.builder()
                 .state(true)
-                .project(project2)
+                .project(project1)
                 .position(position1)
                 .user(null)
                 .creator(false)
                 .build();
         ProjectPosition projectPosition2 = ProjectPosition.builder()
                 .state(false)
-                .project(project2)
+                .project(project1)
                 .position(position2)
                 .user(null)
                 .creator(false)
                 .build();
         ProjectPosition projectPosition3 = ProjectPosition.builder()
                 .state(true)
-                .project(project3)
+                .project(project2)
                 .position(position1)
                 .user(null)
                 .creator(false)
                 .build();
         ProjectPosition projectPosition4 = ProjectPosition.builder()
                 .state(false)
-                .project(project3)
+                .project(project2)
                 .position(position2)
                 .user(null)
                 .creator(false)
@@ -676,19 +589,19 @@ class ProjectRepositoryTest {
         technicalStackRepository.save(technicalStack2);
 
         ProjectTechnicalStack projectTechnicalStack1 = ProjectTechnicalStack.builder()
-                .project(project2)
+                .project(project1)
                 .technicalStack(technicalStack1)
                 .build();
         ProjectTechnicalStack projectTechnicalStack2 = ProjectTechnicalStack.builder()
-                .project(project2)
+                .project(project1)
                 .technicalStack(technicalStack2)
                 .build();
         ProjectTechnicalStack projectTechnicalStack3 = ProjectTechnicalStack.builder()
-                .project(project3)
+                .project(project2)
                 .technicalStack(technicalStack1)
                 .build();
         ProjectTechnicalStack projectTechnicalStack4 = ProjectTechnicalStack.builder()
-                .project(project3)
+                .project(project2)
                 .technicalStack(technicalStack2)
                 .build();
         ProjectTechnicalStack saveProjectTechnicalStack1 = projectTechnicalStackRepository.save(projectTechnicalStack1);
@@ -697,12 +610,12 @@ class ProjectRepositoryTest {
         ProjectTechnicalStack saveProjectTechnicalStack4 = projectTechnicalStackRepository.save(projectTechnicalStack4);
 
         // when
-        Pageable pageable = PageRequest.of(0, 5, Sort.by("createDate").descending());
+        Pageable pageable = PageRequest.of(0, 5, Sort.by("createdDate").descending());
 
         // 유저가 만든, 삭제되지 않은 프로젝트 탐색
         Page<ProjectSimpleDto> projectSimpleDtoPage = null;
         try {
-            projectSimpleDtoPage = projectRepository.findUserProjectByDelete(pageable, saveUser1, false);
+            projectSimpleDtoPage = projectRepository.findUserProject(pageable, saveUser1);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -719,12 +632,12 @@ class ProjectRepositoryTest {
         assertEquals(projectSimpleDtoPage.hasContent(), true);
 
         assertEquals(projectList.size(), 2);
-        assertEquals(projectList.get(0).getProjectNo(), saveProject3.getNo());
-        assertEquals(projectList.get(0).getName(), saveProject3.getName());
-        assertEquals(projectList.get(0).getMaxPeople(), saveProject3.getMaxPeople());
-        assertEquals(projectList.get(0).getCurrentPeople(), saveProject3.getCurrentPeople());
-        assertEquals(projectList.get(0).getViewCount(), saveProject3.getViewCount());
-        assertEquals(projectList.get(0).getRegister(), saveProject3.getCreateUserName());
+        assertEquals(projectList.get(0).getProjectNo(), saveProject2.getNo());
+        assertEquals(projectList.get(0).getName(), saveProject2.getName());
+        assertEquals(projectList.get(0).getMaxPeople(), saveProject2.getMaxPeople());
+        assertEquals(projectList.get(0).getCurrentPeople(), saveProject2.getCurrentPeople());
+        assertEquals(projectList.get(0).getViewCount(), saveProject2.getViewCount());
+        assertEquals(projectList.get(0).getRegister(), saveProject2.getCreateUserName());
         assertEquals(projectList.get(0).isBookMark(), false);
 
         assertEquals(projectList.get(0).getProjectSimplePositionDtoList().get(0).getProjectNo(), saveProjectPosition3.getProject().getNo());
@@ -741,12 +654,12 @@ class ProjectRepositoryTest {
         assertEquals(projectList.get(0).getProjectSimpleTechnicalStackDtoList().get(1).getTechnicalStackName(), saveProjectTechnicalStack4.getTechnicalStack().getName());
         assertEquals(projectList.get(0).getProjectSimpleTechnicalStackDtoList().get(1).getImage(), null);
 
-        assertEquals(projectList.get(1).getProjectNo(), saveProject2.getNo());
-        assertEquals(projectList.get(1).getName(), saveProject2.getName());
-        assertEquals(projectList.get(1).getMaxPeople(), saveProject2.getMaxPeople());
-        assertEquals(projectList.get(1).getCurrentPeople(), saveProject2.getCurrentPeople());
-        assertEquals(projectList.get(1).getViewCount(), saveProject2.getViewCount());
-        assertEquals(projectList.get(1).getRegister(), saveProject2.getCreateUserName());
+        assertEquals(projectList.get(1).getProjectNo(), saveProject1.getNo());
+        assertEquals(projectList.get(1).getName(), saveProject1.getName());
+        assertEquals(projectList.get(1).getMaxPeople(), saveProject1.getMaxPeople());
+        assertEquals(projectList.get(1).getCurrentPeople(), saveProject1.getCurrentPeople());
+        assertEquals(projectList.get(1).getViewCount(), saveProject1.getViewCount());
+        assertEquals(projectList.get(1).getRegister(), saveProject1.getCreateUserName());
         assertEquals(projectList.get(1).isBookMark(), false);
 
         assertEquals(projectList.get(1).getProjectSimplePositionDtoList().get(0).getProjectNo(), saveProjectPosition1.getProject().getNo());
@@ -767,7 +680,6 @@ class ProjectRepositoryTest {
     @Test
     public void 참여중인_프로젝트_탐색() {
         // given
-        LocalDateTime createDate = LocalDateTime.now();
         LocalDate startDate = LocalDate.of(2022, 06, 24);
         LocalDate endDate = LocalDate.of(2022, 06, 28);
 
@@ -788,37 +700,30 @@ class ProjectRepositoryTest {
                 .build();
         User saveUser1 = userRepository.save(user1);
 
-        // 삭제된 프로젝트 객체
+        // 모집 중인 프로젝트 객체
         Project project1 = Project.builder()
                 .name("testName1")
                 .createUserName("user1")
-                .createDate(createDate.plusDays(1))
                 .startDate(startDate)
                 .endDate(endDate)
                 .state(true)
                 .introduction("testIntroduction1")
                 .maxPeople(10)
                 .currentPeople(4)
-                .delete(true)
-                .deleteReason(null)
                 .viewCount(10)
-                .user(saveUser1)
                 .commentCount(10)
                 .build();
 
-        // 모집 중인 프로젝트 객체
+        // 모집 완료된 프로젝트 객체
         Project project2 = Project.builder()
                 .name("testName2")
                 .createUserName("user1")
-                .createDate(createDate.plusDays(2))
                 .startDate(startDate)
                 .endDate(endDate)
-                .state(true)
+                .state(false)
                 .introduction("testIntroduction2")
                 .maxPeople(10)
                 .currentPeople(4)
-                .delete(false)
-                .deleteReason(null)
                 .viewCount(10)
                 .commentCount(10)
                 .build();
@@ -827,44 +732,22 @@ class ProjectRepositoryTest {
         Project project3 = Project.builder()
                 .name("testName3")
                 .createUserName("user1")
-                .createDate(createDate.plusDays(3))
                 .startDate(startDate)
                 .endDate(endDate)
                 .state(false)
                 .introduction("testIntroduction3")
                 .maxPeople(10)
                 .currentPeople(4)
-                .delete(false)
-                .deleteReason(null)
                 .viewCount(10)
                 .commentCount(10)
                 .build();
 
-        // 모집 완료된 프로젝트 객체
-        Project project4 = Project.builder()
-                .name("testName4")
-                .createUserName("user1")
-                .createDate(createDate.plusDays(4))
-                .startDate(startDate)
-                .endDate(endDate)
-                .state(false)
-                .introduction("testIntroduction4")
-                .maxPeople(10)
-                .currentPeople(4)
-                .delete(false)
-                .deleteReason(null)
-                .viewCount(10)
-                .commentCount(10)
-                .build();
-
-        // 삭제된 프로젝트
-        projectRepository.save(project1);
         // 모집 중인 프로젝트 (참여중인 프로젝트)
-        Project saveProject2 = projectRepository.save(project2);
+        Project saveProject1 = projectRepository.saveAndFlush(project1);
         // 모집 완료된 프로젝트 (참여중인 프로젝트)
-        Project saveProject3 = projectRepository.save(project3);
+        Project saveProject2 = projectRepository.saveAndFlush(project2);
         // 모집 완료된 프로젝트
-        projectRepository.save(project4);
+        projectRepository.saveAndFlush(project3);
 
         // 포지션 세팅
         Position position1 = Position.builder()
@@ -878,28 +761,28 @@ class ProjectRepositoryTest {
 
         ProjectPosition projectPosition1 = ProjectPosition.builder()
                 .state(true)
-                .project(project2)
+                .project(project1)
                 .position(position1)
                 .user(saveUser1)
                 .creator(false)
                 .build();
         ProjectPosition projectPosition2 = ProjectPosition.builder()
                 .state(false)
-                .project(project2)
+                .project(project1)
                 .position(position2)
                 .user(null)
                 .creator(false)
                 .build();
         ProjectPosition projectPosition3 = ProjectPosition.builder()
                 .state(true)
-                .project(project3)
+                .project(project2)
                 .position(position1)
                 .user(saveUser1)
                 .creator(false)
                 .build();
         ProjectPosition projectPosition4 = ProjectPosition.builder()
                 .state(false)
-                .project(project3)
+                .project(project2)
                 .position(position2)
                 .user(null)
                 .creator(false)
@@ -929,19 +812,19 @@ class ProjectRepositoryTest {
         technicalStackRepository.save(technicalStack2);
 
         ProjectTechnicalStack projectTechnicalStack1 = ProjectTechnicalStack.builder()
-                .project(project2)
+                .project(project1)
                 .technicalStack(technicalStack1)
                 .build();
         ProjectTechnicalStack projectTechnicalStack2 = ProjectTechnicalStack.builder()
-                .project(project2)
+                .project(project1)
                 .technicalStack(technicalStack2)
                 .build();
         ProjectTechnicalStack projectTechnicalStack3 = ProjectTechnicalStack.builder()
-                .project(project3)
+                .project(project2)
                 .technicalStack(technicalStack1)
                 .build();
         ProjectTechnicalStack projectTechnicalStack4 = ProjectTechnicalStack.builder()
-                .project(project3)
+                .project(project2)
                 .technicalStack(technicalStack2)
                 .build();
         ProjectTechnicalStack saveProjectTechnicalStack1 = projectTechnicalStackRepository.save(projectTechnicalStack1);
@@ -950,12 +833,12 @@ class ProjectRepositoryTest {
         ProjectTechnicalStack saveProjectTechnicalStack4 = projectTechnicalStackRepository.save(projectTechnicalStack4);
 
         // when
-        Pageable pageable = PageRequest.of(0, 5, Sort.by("createDate").descending());
+        Pageable pageable = PageRequest.of(0, 5, Sort.by("createdDate").descending());
 
         // 참여중인 프로젝트 조회
         Page<ProjectSimpleDto> projectSimpleDtoPage = null;
         try {
-            projectSimpleDtoPage = projectRepository.findParticipateProjectByDelete(pageable, saveUser1, false);
+            projectSimpleDtoPage = projectRepository.findParticipateProject(pageable, saveUser1);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -972,12 +855,12 @@ class ProjectRepositoryTest {
         assertEquals(projectSimpleDtoPage.hasContent(), true);
 
         assertEquals(projectList.size(), 2);
-        assertEquals(projectList.get(0).getProjectNo(), saveProject3.getNo());
-        assertEquals(projectList.get(0).getName(), saveProject3.getName());
-        assertEquals(projectList.get(0).getMaxPeople(), saveProject3.getMaxPeople());
-        assertEquals(projectList.get(0).getCurrentPeople(), saveProject3.getCurrentPeople());
-        assertEquals(projectList.get(0).getViewCount(), saveProject3.getViewCount());
-        assertEquals(projectList.get(0).getRegister(), saveProject3.getCreateUserName());
+        assertEquals(projectList.get(0).getProjectNo(), saveProject2.getNo());
+        assertEquals(projectList.get(0).getName(), saveProject2.getName());
+        assertEquals(projectList.get(0).getMaxPeople(), saveProject2.getMaxPeople());
+        assertEquals(projectList.get(0).getCurrentPeople(), saveProject2.getCurrentPeople());
+        assertEquals(projectList.get(0).getViewCount(), saveProject2.getViewCount());
+        assertEquals(projectList.get(0).getRegister(), saveProject2.getCreateUserName());
         assertEquals(projectList.get(0).isBookMark(), false);
 
         assertEquals(projectList.get(0).getProjectSimplePositionDtoList().get(0).getProjectNo(), saveProjectPosition3.getProject().getNo());
@@ -994,12 +877,12 @@ class ProjectRepositoryTest {
         assertEquals(projectList.get(0).getProjectSimpleTechnicalStackDtoList().get(1).getTechnicalStackName(), saveProjectTechnicalStack4.getTechnicalStack().getName());
         assertEquals(projectList.get(0).getProjectSimpleTechnicalStackDtoList().get(1).getImage(), null);
 
-        assertEquals(projectList.get(1).getProjectNo(), saveProject2.getNo());
-        assertEquals(projectList.get(1).getName(), saveProject2.getName());
-        assertEquals(projectList.get(1).getMaxPeople(), saveProject2.getMaxPeople());
-        assertEquals(projectList.get(1).getCurrentPeople(), saveProject2.getCurrentPeople());
-        assertEquals(projectList.get(1).getViewCount(), saveProject2.getViewCount());
-        assertEquals(projectList.get(1).getRegister(), saveProject2.getCreateUserName());
+        assertEquals(projectList.get(1).getProjectNo(), saveProject1.getNo());
+        assertEquals(projectList.get(1).getName(), saveProject1.getName());
+        assertEquals(projectList.get(1).getMaxPeople(), saveProject1.getMaxPeople());
+        assertEquals(projectList.get(1).getCurrentPeople(), saveProject1.getCurrentPeople());
+        assertEquals(projectList.get(1).getViewCount(), saveProject1.getViewCount());
+        assertEquals(projectList.get(1).getRegister(), saveProject1.getCreateUserName());
         assertEquals(projectList.get(1).isBookMark(), false);
 
         assertEquals(projectList.get(1).getProjectSimplePositionDtoList().get(0).getProjectNo(), saveProjectPosition1.getProject().getNo());
@@ -1023,7 +906,6 @@ class ProjectRepositoryTest {
     @Test
     public void 참여중인_프로젝트_탐색_복수_포지션() {
         // given
-        LocalDateTime createDate = LocalDateTime.now();
         LocalDate startDate = LocalDate.of(2022, 06, 24);
         LocalDate endDate = LocalDate.of(2022, 06, 28);
 
@@ -1044,37 +926,30 @@ class ProjectRepositoryTest {
                 .build();
         User saveUser1 = userRepository.save(user1);
 
-        // 삭제된 프로젝트 객체
+        // 모집 중인 프로젝트 객체
         Project project1 = Project.builder()
                 .name("testName1")
                 .createUserName("user1")
-                .createDate(createDate.plusDays(1))
                 .startDate(startDate)
                 .endDate(endDate)
                 .state(true)
                 .introduction("testIntroduction1")
                 .maxPeople(10)
                 .currentPeople(4)
-                .delete(true)
-                .deleteReason(null)
                 .viewCount(10)
-                .user(saveUser1)
                 .commentCount(10)
                 .build();
 
-        // 모집 중인 프로젝트 객체
+        // 모집 완료된 프로젝트 객체
         Project project2 = Project.builder()
                 .name("testName2")
                 .createUserName("user1")
-                .createDate(createDate.plusDays(2))
                 .startDate(startDate)
                 .endDate(endDate)
-                .state(true)
+                .state(false)
                 .introduction("testIntroduction2")
                 .maxPeople(10)
                 .currentPeople(4)
-                .delete(false)
-                .deleteReason(null)
                 .viewCount(10)
                 .commentCount(10)
                 .build();
@@ -1083,44 +958,22 @@ class ProjectRepositoryTest {
         Project project3 = Project.builder()
                 .name("testName3")
                 .createUserName("user1")
-                .createDate(createDate.plusDays(3))
                 .startDate(startDate)
                 .endDate(endDate)
                 .state(false)
                 .introduction("testIntroduction3")
                 .maxPeople(10)
                 .currentPeople(4)
-                .delete(false)
-                .deleteReason(null)
                 .viewCount(10)
                 .commentCount(10)
                 .build();
 
-        // 모집 완료된 프로젝트 객체
-        Project project4 = Project.builder()
-                .name("testName4")
-                .createUserName("user1")
-                .createDate(createDate.plusDays(4))
-                .startDate(startDate)
-                .endDate(endDate)
-                .state(false)
-                .introduction("testIntroduction4")
-                .maxPeople(10)
-                .currentPeople(4)
-                .delete(false)
-                .deleteReason(null)
-                .viewCount(10)
-                .commentCount(10)
-                .build();
-
-        // 삭제된 프로젝트
-        projectRepository.save(project1);
         // 모집 중인 프로젝트 (참여중인 프로젝트)
-        Project saveProject2 = projectRepository.save(project2);
+        Project saveProject1 = projectRepository.saveAndFlush(project1);
         // 모집 완료된 프로젝트 (참여중인 프로젝트)
-        Project saveProject3 = projectRepository.save(project3);
+        Project saveProject2 = projectRepository.saveAndFlush(project2);
         // 모집 완료된 프로젝트
-        projectRepository.save(project4);
+        projectRepository.saveAndFlush(project3);
 
         // 포지션 세팅
         Position position1 = Position.builder()
@@ -1134,28 +987,28 @@ class ProjectRepositoryTest {
 
         ProjectPosition projectPosition1 = ProjectPosition.builder()
                 .state(true)
-                .project(project2)
+                .project(project1)
                 .position(position1)
                 .user(saveUser1)
                 .creator(false)
                 .build();
         ProjectPosition projectPosition2 = ProjectPosition.builder()
                 .state(false)
-                .project(project2)
+                .project(project1)
                 .position(position2)
                 .user(saveUser1)
                 .creator(false)
                 .build();
         ProjectPosition projectPosition3 = ProjectPosition.builder()
                 .state(true)
-                .project(project3)
+                .project(project2)
                 .position(position1)
                 .user(saveUser1)
                 .creator(false)
                 .build();
         ProjectPosition projectPosition4 = ProjectPosition.builder()
                 .state(false)
-                .project(project3)
+                .project(project2)
                 .position(position2)
                 .user(null)
                 .creator(false)
@@ -1185,19 +1038,19 @@ class ProjectRepositoryTest {
         technicalStackRepository.save(technicalStack2);
 
         ProjectTechnicalStack projectTechnicalStack1 = ProjectTechnicalStack.builder()
-                .project(project2)
+                .project(project1)
                 .technicalStack(technicalStack1)
                 .build();
         ProjectTechnicalStack projectTechnicalStack2 = ProjectTechnicalStack.builder()
-                .project(project2)
+                .project(project1)
                 .technicalStack(technicalStack2)
                 .build();
         ProjectTechnicalStack projectTechnicalStack3 = ProjectTechnicalStack.builder()
-                .project(project3)
+                .project(project2)
                 .technicalStack(technicalStack1)
                 .build();
         ProjectTechnicalStack projectTechnicalStack4 = ProjectTechnicalStack.builder()
-                .project(project3)
+                .project(project2)
                 .technicalStack(technicalStack2)
                 .build();
         ProjectTechnicalStack saveProjectTechnicalStack1 = projectTechnicalStackRepository.save(projectTechnicalStack1);
@@ -1206,12 +1059,12 @@ class ProjectRepositoryTest {
         ProjectTechnicalStack saveProjectTechnicalStack4 = projectTechnicalStackRepository.save(projectTechnicalStack4);
 
         // when
-        Pageable pageable = PageRequest.of(0, 5, Sort.by("createDate").descending());
+        Pageable pageable = PageRequest.of(0, 5, Sort.by("createdDate").descending());
 
         // 참여중인 프로젝트 조회
         Page<ProjectSimpleDto> projectSimpleDtoPage = null;
         try {
-            projectSimpleDtoPage = projectRepository.findParticipateProjectByDelete(pageable, saveUser1, false);
+            projectSimpleDtoPage = projectRepository.findParticipateProject(pageable, saveUser1);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -1228,12 +1081,12 @@ class ProjectRepositoryTest {
         assertEquals(projectSimpleDtoPage.hasContent(), true);
 
         assertEquals(projectList.size(), 2);
-        assertEquals(projectList.get(0).getProjectNo(), saveProject3.getNo());
-        assertEquals(projectList.get(0).getName(), saveProject3.getName());
-        assertEquals(projectList.get(0).getMaxPeople(), saveProject3.getMaxPeople());
-        assertEquals(projectList.get(0).getCurrentPeople(), saveProject3.getCurrentPeople());
-        assertEquals(projectList.get(0).getViewCount(), saveProject3.getViewCount());
-        assertEquals(projectList.get(0).getRegister(), saveProject3.getCreateUserName());
+        assertEquals(projectList.get(0).getProjectNo(), saveProject2.getNo());
+        assertEquals(projectList.get(0).getName(), saveProject2.getName());
+        assertEquals(projectList.get(0).getMaxPeople(), saveProject2.getMaxPeople());
+        assertEquals(projectList.get(0).getCurrentPeople(), saveProject2.getCurrentPeople());
+        assertEquals(projectList.get(0).getViewCount(), saveProject2.getViewCount());
+        assertEquals(projectList.get(0).getRegister(), saveProject2.getCreateUserName());
         assertEquals(projectList.get(0).isBookMark(), false);
 
         assertEquals(projectList.get(0).getProjectSimplePositionDtoList().get(0).getProjectNo(), saveProjectPosition3.getProject().getNo());
@@ -1250,12 +1103,12 @@ class ProjectRepositoryTest {
         assertEquals(projectList.get(0).getProjectSimpleTechnicalStackDtoList().get(1).getTechnicalStackName(), saveProjectTechnicalStack4.getTechnicalStack().getName());
         assertEquals(projectList.get(0).getProjectSimpleTechnicalStackDtoList().get(1).getImage(), null);
 
-        assertEquals(projectList.get(1).getProjectNo(), saveProject2.getNo());
-        assertEquals(projectList.get(1).getName(), saveProject2.getName());
-        assertEquals(projectList.get(1).getMaxPeople(), saveProject2.getMaxPeople());
-        assertEquals(projectList.get(1).getCurrentPeople(), saveProject2.getCurrentPeople());
-        assertEquals(projectList.get(1).getViewCount(), saveProject2.getViewCount());
-        assertEquals(projectList.get(1).getRegister(), saveProject2.getCreateUserName());
+        assertEquals(projectList.get(1).getProjectNo(), saveProject1.getNo());
+        assertEquals(projectList.get(1).getName(), saveProject1.getName());
+        assertEquals(projectList.get(1).getMaxPeople(), saveProject1.getMaxPeople());
+        assertEquals(projectList.get(1).getCurrentPeople(), saveProject1.getCurrentPeople());
+        assertEquals(projectList.get(1).getViewCount(), saveProject1.getViewCount());
+        assertEquals(projectList.get(1).getRegister(), saveProject1.getCreateUserName());
         assertEquals(projectList.get(1).isBookMark(), false);
 
         assertEquals(projectList.get(1).getProjectSimplePositionDtoList().get(0).getProjectNo(), saveProjectPosition1.getProject().getNo());
@@ -1276,7 +1129,6 @@ class ProjectRepositoryTest {
     @Test
     public void 신청중인_프로젝트_탐색() {
         // given
-        LocalDateTime createDate = LocalDateTime.now();
         LocalDate startDate = LocalDate.of(2022, 06, 24);
         LocalDate endDate = LocalDate.of(2022, 06, 28);
 
@@ -1297,37 +1149,30 @@ class ProjectRepositoryTest {
                 .build();
         User saveUser1 = userRepository.save(user1);
 
-        // 삭제된 프로젝트 객체
+        // 모집 중인 프로젝트 객체
         Project project1 = Project.builder()
                 .name("testName1")
                 .createUserName("user1")
-                .createDate(createDate.plusDays(1))
                 .startDate(startDate)
                 .endDate(endDate)
                 .state(true)
                 .introduction("testIntroduction1")
                 .maxPeople(10)
                 .currentPeople(4)
-                .delete(true)
-                .deleteReason(null)
                 .viewCount(10)
-                .user(saveUser1)
                 .commentCount(10)
                 .build();
 
-        // 모집 중인 프로젝트 객체
+        // 모집 완료된 프로젝트 객체
         Project project2 = Project.builder()
                 .name("testName2")
                 .createUserName("user1")
-                .createDate(createDate.plusDays(2))
                 .startDate(startDate)
                 .endDate(endDate)
-                .state(true)
+                .state(false)
                 .introduction("testIntroduction2")
                 .maxPeople(10)
                 .currentPeople(4)
-                .delete(false)
-                .deleteReason(null)
                 .viewCount(10)
                 .commentCount(10)
                 .build();
@@ -1336,44 +1181,22 @@ class ProjectRepositoryTest {
         Project project3 = Project.builder()
                 .name("testName3")
                 .createUserName("user1")
-                .createDate(createDate.plusDays(3))
                 .startDate(startDate)
                 .endDate(endDate)
                 .state(false)
                 .introduction("testIntroduction3")
                 .maxPeople(10)
                 .currentPeople(4)
-                .delete(false)
-                .deleteReason(null)
                 .viewCount(10)
                 .commentCount(10)
                 .build();
 
-        // 모집 완료된 프로젝트 객체
-        Project project4 = Project.builder()
-                .name("testName4")
-                .createUserName("user1")
-                .createDate(createDate.plusDays(4))
-                .startDate(startDate)
-                .endDate(endDate)
-                .state(false)
-                .introduction("testIntroduction4")
-                .maxPeople(10)
-                .currentPeople(4)
-                .delete(false)
-                .deleteReason(null)
-                .viewCount(10)
-                .commentCount(10)
-                .build();
-
-        // 삭제된 프로젝트
-        projectRepository.save(project1);
         // 모집 중인 프로젝트 (신청중인 프로젝트)
-        Project saveProject2 = projectRepository.save(project2);
+        Project saveProject1 = projectRepository.saveAndFlush(project1);
         // 모집 완료된 프로젝트 (신청중인 프로젝트)
-        Project saveProject3 = projectRepository.save(project3);
+        Project saveProject2 = projectRepository.saveAndFlush(project2);
         // 모집 완료된 프로젝트
-        projectRepository.save(project4);
+        projectRepository.saveAndFlush(project3);
 
         // 포지션 세팅
         Position position1 = Position.builder()
@@ -1387,28 +1210,28 @@ class ProjectRepositoryTest {
 
         ProjectPosition projectPosition1 = ProjectPosition.builder()
                 .state(true)
-                .project(project2)
+                .project(project1)
                 .position(position1)
                 .user(null)
                 .creator(false)
                 .build();
         ProjectPosition projectPosition2 = ProjectPosition.builder()
                 .state(false)
-                .project(project2)
+                .project(project1)
                 .position(position2)
                 .user(null)
                 .creator(false)
                 .build();
         ProjectPosition projectPosition3 = ProjectPosition.builder()
                 .state(true)
-                .project(project3)
+                .project(project2)
                 .position(position1)
                 .user(null)
                 .creator(false)
                 .build();
         ProjectPosition projectPosition4 = ProjectPosition.builder()
                 .state(false)
-                .project(project3)
+                .project(project2)
                 .position(position2)
                 .user(null)
                 .creator(false)
@@ -1438,19 +1261,19 @@ class ProjectRepositoryTest {
         technicalStackRepository.save(technicalStack2);
 
         ProjectTechnicalStack projectTechnicalStack1 = ProjectTechnicalStack.builder()
-                .project(project2)
+                .project(project1)
                 .technicalStack(technicalStack1)
                 .build();
         ProjectTechnicalStack projectTechnicalStack2 = ProjectTechnicalStack.builder()
-                .project(project2)
+                .project(project1)
                 .technicalStack(technicalStack2)
                 .build();
         ProjectTechnicalStack projectTechnicalStack3 = ProjectTechnicalStack.builder()
-                .project(project3)
+                .project(project2)
                 .technicalStack(technicalStack1)
                 .build();
         ProjectTechnicalStack projectTechnicalStack4 = ProjectTechnicalStack.builder()
-                .project(project3)
+                .project(project2)
                 .technicalStack(technicalStack2)
                 .build();
         ProjectTechnicalStack saveProjectTechnicalStack1 = projectTechnicalStackRepository.save(projectTechnicalStack1);
@@ -1477,12 +1300,12 @@ class ProjectRepositoryTest {
         projectParticipateRequestRepository.save(projectParticipateRequest2);
 
         // when
-        Pageable pageable = PageRequest.of(0, 5, Sort.by("createDate").descending());
+        Pageable pageable = PageRequest.of(0, 5, Sort.by("createdDate").descending());
 
         // 참여중인 프로젝트 조회
         Page<ProjectSimpleDto> projectSimpleDtoPage = null;
         try {
-            projectSimpleDtoPage = projectRepository.findParticipateRequestProjectByDelete(pageable, saveUser1, false);
+            projectSimpleDtoPage = projectRepository.findParticipateRequestProject(pageable, saveUser1);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -1499,12 +1322,12 @@ class ProjectRepositoryTest {
         assertEquals(projectSimpleDtoPage.hasContent(), true);
 
         assertEquals(projectList.size(), 2);
-        assertEquals(projectList.get(0).getProjectNo(), saveProject3.getNo());
-        assertEquals(projectList.get(0).getName(), saveProject3.getName());
-        assertEquals(projectList.get(0).getMaxPeople(), saveProject3.getMaxPeople());
-        assertEquals(projectList.get(0).getCurrentPeople(), saveProject3.getCurrentPeople());
-        assertEquals(projectList.get(0).getViewCount(), saveProject3.getViewCount());
-        assertEquals(projectList.get(0).getRegister(), saveProject3.getCreateUserName());
+        assertEquals(projectList.get(0).getProjectNo(), saveProject2.getNo());
+        assertEquals(projectList.get(0).getName(), saveProject2.getName());
+        assertEquals(projectList.get(0).getMaxPeople(), saveProject2.getMaxPeople());
+        assertEquals(projectList.get(0).getCurrentPeople(), saveProject2.getCurrentPeople());
+        assertEquals(projectList.get(0).getViewCount(), saveProject2.getViewCount());
+        assertEquals(projectList.get(0).getRegister(), saveProject2.getCreateUserName());
         assertEquals(projectList.get(0).isBookMark(), false);
 
         assertEquals(projectList.get(0).getProjectSimplePositionDtoList().get(0).getProjectNo(), saveProjectPosition3.getProject().getNo());
@@ -1521,12 +1344,12 @@ class ProjectRepositoryTest {
         assertEquals(projectList.get(0).getProjectSimpleTechnicalStackDtoList().get(1).getTechnicalStackName(), saveProjectTechnicalStack4.getTechnicalStack().getName());
         assertEquals(projectList.get(0).getProjectSimpleTechnicalStackDtoList().get(1).getImage(), null);
 
-        assertEquals(projectList.get(1).getProjectNo(), saveProject2.getNo());
-        assertEquals(projectList.get(1).getName(), saveProject2.getName());
-        assertEquals(projectList.get(1).getMaxPeople(), saveProject2.getMaxPeople());
-        assertEquals(projectList.get(1).getCurrentPeople(), saveProject2.getCurrentPeople());
-        assertEquals(projectList.get(1).getViewCount(), saveProject2.getViewCount());
-        assertEquals(projectList.get(1).getRegister(), saveProject2.getCreateUserName());
+        assertEquals(projectList.get(1).getProjectNo(), saveProject1.getNo());
+        assertEquals(projectList.get(1).getName(), saveProject1.getName());
+        assertEquals(projectList.get(1).getMaxPeople(), saveProject1.getMaxPeople());
+        assertEquals(projectList.get(1).getCurrentPeople(), saveProject1.getCurrentPeople());
+        assertEquals(projectList.get(1).getViewCount(), saveProject1.getViewCount());
+        assertEquals(projectList.get(1).getRegister(), saveProject1.getCreateUserName());
         assertEquals(projectList.get(1).isBookMark(), false);
 
         assertEquals(projectList.get(1).getProjectSimplePositionDtoList().get(0).getProjectNo(), saveProjectPosition1.getProject().getNo());
@@ -1547,7 +1370,6 @@ class ProjectRepositoryTest {
     @Test
     public void 신청중인_프로젝트_탐색_복수_참여_신청() {
         // given
-        LocalDateTime createDate = LocalDateTime.now();
         LocalDate startDate = LocalDate.of(2022, 06, 24);
         LocalDate endDate = LocalDate.of(2022, 06, 28);
 
@@ -1568,37 +1390,30 @@ class ProjectRepositoryTest {
                 .build();
         User saveUser1 = userRepository.save(user1);
 
-        // 삭제된 프로젝트 객체
+        // 모집 중인 프로젝트 객체
         Project project1 = Project.builder()
                 .name("testName1")
                 .createUserName("user1")
-                .createDate(createDate.plusDays(1))
                 .startDate(startDate)
                 .endDate(endDate)
                 .state(true)
                 .introduction("testIntroduction1")
                 .maxPeople(10)
                 .currentPeople(4)
-                .delete(true)
-                .deleteReason(null)
                 .viewCount(10)
-                .user(saveUser1)
                 .commentCount(10)
                 .build();
 
-        // 모집 중인 프로젝트 객체
+        // 모집 완료된 프로젝트 객체
         Project project2 = Project.builder()
                 .name("testName2")
                 .createUserName("user1")
-                .createDate(createDate.plusDays(2))
                 .startDate(startDate)
                 .endDate(endDate)
-                .state(true)
+                .state(false)
                 .introduction("testIntroduction2")
                 .maxPeople(10)
                 .currentPeople(4)
-                .delete(false)
-                .deleteReason(null)
                 .viewCount(10)
                 .commentCount(10)
                 .build();
@@ -1607,44 +1422,22 @@ class ProjectRepositoryTest {
         Project project3 = Project.builder()
                 .name("testName3")
                 .createUserName("user1")
-                .createDate(createDate.plusDays(3))
                 .startDate(startDate)
                 .endDate(endDate)
                 .state(false)
                 .introduction("testIntroduction3")
                 .maxPeople(10)
                 .currentPeople(4)
-                .delete(false)
-                .deleteReason(null)
                 .viewCount(10)
                 .commentCount(10)
                 .build();
 
-        // 모집 완료된 프로젝트 객체
-        Project project4 = Project.builder()
-                .name("testName4")
-                .createUserName("user1")
-                .createDate(createDate.plusDays(4))
-                .startDate(startDate)
-                .endDate(endDate)
-                .state(false)
-                .introduction("testIntroduction4")
-                .maxPeople(10)
-                .currentPeople(4)
-                .delete(false)
-                .deleteReason(null)
-                .viewCount(10)
-                .commentCount(10)
-                .build();
-
-        // 삭제된 프로젝트
-        projectRepository.save(project1);
         // 모집 중인 프로젝트 (신청중인 프로젝트)
-        Project saveProject2 = projectRepository.save(project2);
+        Project saveProject1 = projectRepository.saveAndFlush(project1);
         // 모집 완료된 프로젝트 (신청중인 프로젝트)
-        Project saveProject3 = projectRepository.save(project3);
+        Project saveProject2 = projectRepository.saveAndFlush(project2);
         // 모집 완료된 프로젝트
-        projectRepository.save(project4);
+        projectRepository.saveAndFlush(project3);
 
         // 포지션 세팅
         Position position1 = Position.builder()
@@ -1658,28 +1451,28 @@ class ProjectRepositoryTest {
 
         ProjectPosition projectPosition1 = ProjectPosition.builder()
                 .state(true)
-                .project(project2)
+                .project(project1)
                 .position(position1)
                 .user(null)
                 .creator(false)
                 .build();
         ProjectPosition projectPosition2 = ProjectPosition.builder()
                 .state(false)
-                .project(project2)
+                .project(project1)
                 .position(position2)
                 .user(null)
                 .creator(false)
                 .build();
         ProjectPosition projectPosition3 = ProjectPosition.builder()
                 .state(true)
-                .project(project3)
+                .project(project2)
                 .position(position1)
                 .user(null)
                 .creator(false)
                 .build();
         ProjectPosition projectPosition4 = ProjectPosition.builder()
                 .state(false)
-                .project(project3)
+                .project(project2)
                 .position(position2)
                 .user(null)
                 .creator(false)
@@ -1709,19 +1502,19 @@ class ProjectRepositoryTest {
         technicalStackRepository.save(technicalStack2);
 
         ProjectTechnicalStack projectTechnicalStack1 = ProjectTechnicalStack.builder()
-                .project(project2)
+                .project(project1)
                 .technicalStack(technicalStack1)
                 .build();
         ProjectTechnicalStack projectTechnicalStack2 = ProjectTechnicalStack.builder()
-                .project(project2)
+                .project(project1)
                 .technicalStack(technicalStack2)
                 .build();
         ProjectTechnicalStack projectTechnicalStack3 = ProjectTechnicalStack.builder()
-                .project(project3)
+                .project(project2)
                 .technicalStack(technicalStack1)
                 .build();
         ProjectTechnicalStack projectTechnicalStack4 = ProjectTechnicalStack.builder()
-                .project(project3)
+                .project(project2)
                 .technicalStack(technicalStack2)
                 .build();
         ProjectTechnicalStack saveProjectTechnicalStack1 = projectTechnicalStackRepository.save(projectTechnicalStack1);
@@ -1764,12 +1557,12 @@ class ProjectRepositoryTest {
         projectParticipateRequestRepository.save(projectParticipateRequest4);
 
         // when
-        Pageable pageable = PageRequest.of(0, 5, Sort.by("createDate").descending());
+        Pageable pageable = PageRequest.of(0, 5, Sort.by("createdDate").descending());
 
         // 참여중인 프로젝트 조회
         Page<ProjectSimpleDto> projectSimpleDtoPage = null;
         try {
-            projectSimpleDtoPage = projectRepository.findParticipateRequestProjectByDelete(pageable, saveUser1, false);
+            projectSimpleDtoPage = projectRepository.findParticipateRequestProject(pageable, saveUser1);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -1786,12 +1579,12 @@ class ProjectRepositoryTest {
         assertEquals(projectSimpleDtoPage.hasContent(), true);
 
         assertEquals(projectList.size(), 2);
-        assertEquals(projectList.get(0).getProjectNo(), saveProject3.getNo());
-        assertEquals(projectList.get(0).getName(), saveProject3.getName());
-        assertEquals(projectList.get(0).getMaxPeople(), saveProject3.getMaxPeople());
-        assertEquals(projectList.get(0).getCurrentPeople(), saveProject3.getCurrentPeople());
-        assertEquals(projectList.get(0).getViewCount(), saveProject3.getViewCount());
-        assertEquals(projectList.get(0).getRegister(), saveProject3.getCreateUserName());
+        assertEquals(projectList.get(0).getProjectNo(), saveProject2.getNo());
+        assertEquals(projectList.get(0).getName(), saveProject2.getName());
+        assertEquals(projectList.get(0).getMaxPeople(), saveProject2.getMaxPeople());
+        assertEquals(projectList.get(0).getCurrentPeople(), saveProject2.getCurrentPeople());
+        assertEquals(projectList.get(0).getViewCount(), saveProject2.getViewCount());
+        assertEquals(projectList.get(0).getRegister(), saveProject2.getCreateUserName());
         assertEquals(projectList.get(0).isBookMark(), false);
 
         assertEquals(projectList.get(0).getProjectSimplePositionDtoList().get(0).getProjectNo(), saveProjectPosition3.getProject().getNo());
@@ -1808,12 +1601,12 @@ class ProjectRepositoryTest {
         assertEquals(projectList.get(0).getProjectSimpleTechnicalStackDtoList().get(1).getTechnicalStackName(), saveProjectTechnicalStack4.getTechnicalStack().getName());
         assertEquals(projectList.get(0).getProjectSimpleTechnicalStackDtoList().get(1).getImage(), null);
 
-        assertEquals(projectList.get(1).getProjectNo(), saveProject2.getNo());
-        assertEquals(projectList.get(1).getName(), saveProject2.getName());
-        assertEquals(projectList.get(1).getMaxPeople(), saveProject2.getMaxPeople());
-        assertEquals(projectList.get(1).getCurrentPeople(), saveProject2.getCurrentPeople());
-        assertEquals(projectList.get(1).getViewCount(), saveProject2.getViewCount());
-        assertEquals(projectList.get(1).getRegister(), saveProject2.getCreateUserName());
+        assertEquals(projectList.get(1).getProjectNo(), saveProject1.getNo());
+        assertEquals(projectList.get(1).getName(), saveProject1.getName());
+        assertEquals(projectList.get(1).getMaxPeople(), saveProject1.getMaxPeople());
+        assertEquals(projectList.get(1).getCurrentPeople(), saveProject1.getCurrentPeople());
+        assertEquals(projectList.get(1).getViewCount(), saveProject1.getViewCount());
+        assertEquals(projectList.get(1).getRegister(), saveProject1.getCreateUserName());
         assertEquals(projectList.get(1).isBookMark(), false);
 
         assertEquals(projectList.get(1).getProjectSimplePositionDtoList().get(0).getProjectNo(), saveProjectPosition1.getProject().getNo());
@@ -1834,7 +1627,6 @@ class ProjectRepositoryTest {
     @Test
     public void 즐겨찾기중인_프로젝트_탐색() {
         // given
-        LocalDateTime createDate = LocalDateTime.now();
         LocalDate startDate = LocalDate.of(2022, 06, 24);
         LocalDate endDate = LocalDate.of(2022, 06, 28);
 
@@ -1855,37 +1647,30 @@ class ProjectRepositoryTest {
                 .build();
         User saveUser1 = userRepository.save(user1);
 
-        // 삭제된 프로젝트 객체
+        // 모집 중인 프로젝트 객체
         Project project1 = Project.builder()
                 .name("testName1")
                 .createUserName("user1")
-                .createDate(createDate.plusDays(1))
                 .startDate(startDate)
                 .endDate(endDate)
                 .state(true)
                 .introduction("testIntroduction1")
                 .maxPeople(10)
                 .currentPeople(4)
-                .delete(true)
-                .deleteReason(null)
                 .viewCount(10)
-                .user(saveUser1)
                 .commentCount(10)
                 .build();
 
-        // 모집 중인 프로젝트 객체
+        // 모집 완료된 프로젝트 객체
         Project project2 = Project.builder()
                 .name("testName2")
                 .createUserName("user1")
-                .createDate(createDate.plusDays(2))
                 .startDate(startDate)
                 .endDate(endDate)
-                .state(true)
+                .state(false)
                 .introduction("testIntroduction2")
                 .maxPeople(10)
                 .currentPeople(4)
-                .delete(false)
-                .deleteReason(null)
                 .viewCount(10)
                 .commentCount(10)
                 .build();
@@ -1894,44 +1679,22 @@ class ProjectRepositoryTest {
         Project project3 = Project.builder()
                 .name("testName3")
                 .createUserName("user1")
-                .createDate(createDate.plusDays(3))
                 .startDate(startDate)
                 .endDate(endDate)
                 .state(false)
                 .introduction("testIntroduction3")
                 .maxPeople(10)
                 .currentPeople(4)
-                .delete(false)
-                .deleteReason(null)
                 .viewCount(10)
                 .commentCount(10)
                 .build();
 
-        // 모집 완료된 프로젝트 객체
-        Project project4 = Project.builder()
-                .name("testName4")
-                .createUserName("user1")
-                .createDate(createDate.plusDays(4))
-                .startDate(startDate)
-                .endDate(endDate)
-                .state(false)
-                .introduction("testIntroduction4")
-                .maxPeople(10)
-                .currentPeople(4)
-                .delete(false)
-                .deleteReason(null)
-                .viewCount(10)
-                .commentCount(10)
-                .build();
-
-        // 삭제된 프로젝트
-        projectRepository.save(project1);
         // 모집 중인 프로젝트 (즐겨찾기중인 프로젝트)
-        Project saveProject2 = projectRepository.save(project2);
+        Project saveProject1 = projectRepository.saveAndFlush(project1);
         // 모집 완료된 프로젝트 (즐겨찾기중인 프로젝트)
-        Project saveProject3 = projectRepository.save(project3);
+        Project saveProject2 = projectRepository.saveAndFlush(project2);
         // 모집 완료된 프로젝트
-        projectRepository.save(project4);
+        projectRepository.saveAndFlush(project3);
 
         // 포지션 세팅
         Position position1 = Position.builder()
@@ -1945,28 +1708,28 @@ class ProjectRepositoryTest {
 
         ProjectPosition projectPosition1 = ProjectPosition.builder()
                 .state(true)
-                .project(project2)
+                .project(project1)
                 .position(position1)
                 .user(null)
                 .creator(false)
                 .build();
         ProjectPosition projectPosition2 = ProjectPosition.builder()
                 .state(false)
-                .project(project2)
+                .project(project1)
                 .position(position2)
                 .user(null)
                 .creator(false)
                 .build();
         ProjectPosition projectPosition3 = ProjectPosition.builder()
                 .state(true)
-                .project(project3)
+                .project(project2)
                 .position(position1)
                 .user(null)
                 .creator(false)
                 .build();
         ProjectPosition projectPosition4 = ProjectPosition.builder()
                 .state(false)
-                .project(project3)
+                .project(project2)
                 .position(position2)
                 .user(null)
                 .creator(false)
@@ -1996,19 +1759,19 @@ class ProjectRepositoryTest {
         technicalStackRepository.save(technicalStack2);
 
         ProjectTechnicalStack projectTechnicalStack1 = ProjectTechnicalStack.builder()
-                .project(project2)
+                .project(project1)
                 .technicalStack(technicalStack1)
                 .build();
         ProjectTechnicalStack projectTechnicalStack2 = ProjectTechnicalStack.builder()
-                .project(project2)
+                .project(project1)
                 .technicalStack(technicalStack2)
                 .build();
         ProjectTechnicalStack projectTechnicalStack3 = ProjectTechnicalStack.builder()
-                .project(project3)
+                .project(project2)
                 .technicalStack(technicalStack1)
                 .build();
         ProjectTechnicalStack projectTechnicalStack4 = ProjectTechnicalStack.builder()
-                .project(project3)
+                .project(project2)
                 .technicalStack(technicalStack2)
                 .build();
         ProjectTechnicalStack saveProjectTechnicalStack1 = projectTechnicalStackRepository.save(projectTechnicalStack1);
@@ -2018,12 +1781,12 @@ class ProjectRepositoryTest {
 
         // 참여 신청 요청 세팅
         BookMark bookMark1 = BookMark.builder()
-                .project(saveProject2)
+                .project(saveProject1)
                 .user(saveUser1)
                 .build();
 
         BookMark bookMark2 = BookMark.builder()
-                .project(saveProject3)
+                .project(saveProject2)
                 .user(saveUser1)
                 .build();
 
@@ -2031,12 +1794,12 @@ class ProjectRepositoryTest {
         BookMark saveBookMark2 = bookMarkRepository.save(bookMark2);
 
         // when
-        Pageable pageable = PageRequest.of(0, 5, Sort.by("createDate").descending());
+        Pageable pageable = PageRequest.of(0, 5, Sort.by("createdDate").descending());
 
         // 참여중인 프로젝트 조회
         Page<ProjectSimpleDto> projectSimpleDtoPage = null;
         try {
-            projectSimpleDtoPage = projectRepository.findBookMarkProjectByDelete(pageable, saveUser1, false);
+            projectSimpleDtoPage = projectRepository.findBookMarkProject(pageable, saveUser1);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -2053,12 +1816,12 @@ class ProjectRepositoryTest {
         assertEquals(projectSimpleDtoPage.hasContent(), true);
 
         assertEquals(projectList.size(), 2);
-        assertEquals(projectList.get(0).getProjectNo(), saveProject3.getNo());
-        assertEquals(projectList.get(0).getName(), saveProject3.getName());
-        assertEquals(projectList.get(0).getMaxPeople(), saveProject3.getMaxPeople());
-        assertEquals(projectList.get(0).getCurrentPeople(), saveProject3.getCurrentPeople());
-        assertEquals(projectList.get(0).getViewCount(), saveProject3.getViewCount());
-        assertEquals(projectList.get(0).getRegister(), saveProject3.getCreateUserName());
+        assertEquals(projectList.get(0).getProjectNo(), saveProject2.getNo());
+        assertEquals(projectList.get(0).getName(), saveProject2.getName());
+        assertEquals(projectList.get(0).getMaxPeople(), saveProject2.getMaxPeople());
+        assertEquals(projectList.get(0).getCurrentPeople(), saveProject2.getCurrentPeople());
+        assertEquals(projectList.get(0).getViewCount(), saveProject2.getViewCount());
+        assertEquals(projectList.get(0).getRegister(), saveProject2.getCreateUserName());
         assertEquals(projectList.get(0).isBookMark(), true);
 
         assertEquals(projectList.get(0).getProjectSimplePositionDtoList().get(0).getProjectNo(), saveProjectPosition3.getProject().getNo());
@@ -2075,12 +1838,12 @@ class ProjectRepositoryTest {
         assertEquals(projectList.get(0).getProjectSimpleTechnicalStackDtoList().get(1).getTechnicalStackName(), saveProjectTechnicalStack4.getTechnicalStack().getName());
         assertEquals(projectList.get(0).getProjectSimpleTechnicalStackDtoList().get(1).getImage(), null);
 
-        assertEquals(projectList.get(1).getProjectNo(), saveProject2.getNo());
-        assertEquals(projectList.get(1).getName(), saveProject2.getName());
-        assertEquals(projectList.get(1).getMaxPeople(), saveProject2.getMaxPeople());
-        assertEquals(projectList.get(1).getCurrentPeople(), saveProject2.getCurrentPeople());
-        assertEquals(projectList.get(1).getViewCount(), saveProject2.getViewCount());
-        assertEquals(projectList.get(1).getRegister(), saveProject2.getCreateUserName());
+        assertEquals(projectList.get(1).getProjectNo(), saveProject1.getNo());
+        assertEquals(projectList.get(1).getName(), saveProject1.getName());
+        assertEquals(projectList.get(1).getMaxPeople(), saveProject1.getMaxPeople());
+        assertEquals(projectList.get(1).getCurrentPeople(), saveProject1.getCurrentPeople());
+        assertEquals(projectList.get(1).getViewCount(), saveProject1.getViewCount());
+        assertEquals(projectList.get(1).getRegister(), saveProject1.getCreateUserName());
         assertEquals(projectList.get(1).isBookMark(), true);
 
         assertEquals(projectList.get(1).getProjectSimplePositionDtoList().get(0).getProjectNo(), saveProjectPosition1.getProject().getNo());
@@ -2105,7 +1868,6 @@ class ProjectRepositoryTest {
         @DisplayName("성공 테스트")
         public void testSuccess() {
             // given
-            LocalDateTime createDate = LocalDateTime.now();
             LocalDate startDate = LocalDate.of(2022, 06, 24);
             LocalDate endDate = LocalDate.of(2022, 06, 28);
 
@@ -2126,24 +1888,21 @@ class ProjectRepositoryTest {
                     .build();
             User saveUser1 = userRepository.save(user1);
 
-            // 삭제된 프로젝트 객체
+            // 모집중 프로젝트 객체
             Project project1 = Project.builder()
                     .name("testName1")
                     .createUserName("user1")
-                    .createDate(createDate.plusDays(1))
                     .startDate(startDate)
                     .endDate(endDate)
                     .state(true)
                     .introduction("testIntroduction1")
                     .maxPeople(10)
                     .currentPeople(4)
-                    .delete(true)
-                    .deleteReason(null)
                     .viewCount(10)
                     .user(saveUser1)
                     .commentCount(10)
                     .build();
-            Project saveProject1 = projectRepository.save(project1);
+            Project saveProject1 = projectRepository.saveAndFlush(project1);
 
             // when
             boolean result = projectRepository.existUserProjectByUser(saveUser1.getNo(), saveProject1.getNo());

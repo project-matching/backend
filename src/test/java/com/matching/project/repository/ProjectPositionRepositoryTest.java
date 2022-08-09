@@ -45,7 +45,6 @@ class ProjectPositionRepositoryTest {
     @Test
     public void 프로젝트_포지션_프로젝트_조회() {
         // given
-        LocalDateTime createDate = LocalDateTime.now();
         LocalDate startDate = LocalDate.of(2022, 06, 24);
         LocalDate endDate = LocalDate.of(2022, 06, 28);
 
@@ -69,15 +68,12 @@ class ProjectPositionRepositoryTest {
         Project project1 = Project.builder()
                 .name("testName1")
                 .createUserName("user1")
-                .createDate(createDate)
                 .startDate(startDate)
                 .endDate(endDate)
                 .state(true)
                 .introduction("testIntroduction1")
                 .maxPeople(10)
                 .currentPeople(4)
-                .delete(true)
-                .deleteReason(null)
                 .viewCount(10)
                 .commentCount(10)
                 .build();
@@ -130,22 +126,18 @@ class ProjectPositionRepositoryTest {
     @DisplayName("프로젝트 포지션 IN 삭제")
     public void testDeleteByNoIn() {
         // given
-        LocalDateTime createDate = LocalDateTime.now();
         LocalDate startDate = LocalDate.of(2022, 06, 24);
         LocalDate endDate = LocalDate.of(2022, 06, 28);
 
         Project project1 = Project.builder()
                 .name("testName1")
                 .createUserName("user1")
-                .createDate(createDate)
                 .startDate(startDate)
                 .endDate(endDate)
                 .state(true)
                 .introduction("testIntroduction1")
                 .maxPeople(10)
                 .currentPeople(4)
-                .delete(true)
-                .deleteReason(null)
                 .viewCount(10)
                 .commentCount(10)
                 .build();
@@ -198,22 +190,18 @@ class ProjectPositionRepositoryTest {
         @DisplayName("성공 테스트")
         public void testSuccess() {
             // given
-            LocalDateTime createDate = LocalDateTime.now();
             LocalDate startDate = LocalDate.of(2022, 06, 24);
             LocalDate endDate = LocalDate.of(2022, 06, 28);
 
             Project project1 = Project.builder()
                     .name("testName1")
                     .createUserName("user1")
-                    .createDate(createDate)
                     .startDate(startDate)
                     .endDate(endDate)
                     .state(true)
                     .introduction("testIntroduction1")
                     .maxPeople(10)
                     .currentPeople(4)
-                    .delete(true)
-                    .deleteReason(null)
                     .viewCount(10)
                     .commentCount(10)
                     .build();
@@ -262,22 +250,18 @@ class ProjectPositionRepositoryTest {
         @DisplayName("성공 테스트")
         public void testSuccess() {
             // given
-            LocalDateTime createDate = LocalDateTime.now();
             LocalDate startDate = LocalDate.of(2022, 06, 24);
             LocalDate endDate = LocalDate.of(2022, 06, 28);
 
             Project project1 = Project.builder()
                     .name("testName1")
                     .createUserName("user1")
-                    .createDate(createDate)
                     .startDate(startDate)
                     .endDate(endDate)
                     .state(true)
                     .introduction("testIntroduction1")
                     .maxPeople(10)
                     .currentPeople(4)
-                    .delete(true)
-                    .deleteReason(null)
                     .viewCount(10)
                     .commentCount(10)
                     .build();

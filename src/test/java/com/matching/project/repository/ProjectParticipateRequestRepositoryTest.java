@@ -60,7 +60,6 @@ class ProjectParticipateRequestRepositoryTest {
     @Test
     public void 프로젝트_신청_페이지_조회() {
         // given
-        LocalDateTime createDate = LocalDateTime.now();
         LocalDate startDate = LocalDate.of(2022, 06, 24);
         LocalDate endDate = LocalDate.of(2022, 06, 28);
         
@@ -118,15 +117,12 @@ class ProjectParticipateRequestRepositoryTest {
         Project project1 = Project.builder()
                 .name("testName1")
                 .createUserName("user1")
-                .createDate(createDate.plusDays(1))
                 .startDate(startDate)
                 .endDate(endDate)
                 .state(true)
                 .introduction("testIntroduction1")
                 .maxPeople(10)
                 .currentPeople(4)
-                .delete(false)
-                .deleteReason(null)
                 .viewCount(10)
                 .user(saveUser1)
                 .commentCount(10)
@@ -258,7 +254,6 @@ class ProjectParticipateRequestRepositoryTest {
     @Test
     public void 프로젝트_프로젝트포지션_유저_조인_조회() {
         // given
-        LocalDateTime createDate = LocalDateTime.now();
         LocalDate startDate = LocalDate.of(2022, 06, 24);
         LocalDate endDate = LocalDate.of(2022, 06, 28);
 
@@ -285,15 +280,12 @@ class ProjectParticipateRequestRepositoryTest {
         Project project1 = Project.builder()
                 .name("testName1")
                 .createUserName("user1")
-                .createDate(createDate.plusDays(1))
                 .startDate(startDate)
                 .endDate(endDate)
                 .state(true)
                 .introduction("testIntroduction1")
                 .maxPeople(10)
                 .currentPeople(4)
-                .delete(false)
-                .deleteReason(null)
                 .viewCount(10)
                 .user(saveUser1)
                 .commentCount(10)
@@ -358,7 +350,6 @@ class ProjectParticipateRequestRepositoryTest {
     @Test
     public void 프로젝트_신청_삭제() {
         // given
-        LocalDateTime createDate = LocalDateTime.now();
         LocalDate startDate = LocalDate.of(2022, 06, 24);
         LocalDate endDate = LocalDate.of(2022, 06, 28);
 
@@ -385,15 +376,12 @@ class ProjectParticipateRequestRepositoryTest {
         Project project1 = Project.builder()
                 .name("testName1")
                 .createUserName("user1")
-                .createDate(createDate.plusDays(1))
                 .startDate(startDate)
                 .endDate(endDate)
                 .state(true)
                 .introduction("testIntroduction1")
                 .maxPeople(10)
                 .currentPeople(4)
-                .delete(false)
-                .deleteReason(null)
                 .viewCount(10)
                 .user(saveUser1)
                 .commentCount(10)
@@ -457,7 +445,6 @@ class ProjectParticipateRequestRepositoryTest {
         @DisplayName("성공 테스트")
         public void testSuccess() throws Exception {
             // given
-            LocalDateTime createDate = LocalDateTime.now();
             LocalDate startDate = LocalDate.of(2022, 06, 24);
             LocalDate endDate = LocalDate.of(2022, 06, 28);
 
@@ -484,15 +471,12 @@ class ProjectParticipateRequestRepositoryTest {
             Project project1 = Project.builder()
                     .name("testName1")
                     .createUserName("user1")
-                    .createDate(createDate.plusDays(1))
                     .startDate(startDate)
                     .endDate(endDate)
                     .state(true)
                     .introduction("testIntroduction1")
                     .maxPeople(10)
                     .currentPeople(4)
-                    .delete(false)
-                    .deleteReason(null)
                     .viewCount(10)
                     .user(saveUser1)
                     .commentCount(10)

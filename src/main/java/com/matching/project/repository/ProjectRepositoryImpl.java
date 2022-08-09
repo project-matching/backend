@@ -58,8 +58,8 @@ public class ProjectRepositoryImpl implements ProjectRepositoryCustom {
                         return new OrderSpecifier(direction, project.name);
                     case "createUserName":
                         return new OrderSpecifier(direction, project.createUserName);
-                    case "createDate":
-                        return new OrderSpecifier(direction, project.createDate);
+                    case "createdDate":
+                        return new OrderSpecifier(direction, project.createdDate);
                     case "startDate":
                         return new OrderSpecifier(direction, project.startDate);
                     case "endDate":
@@ -68,8 +68,6 @@ public class ProjectRepositoryImpl implements ProjectRepositoryCustom {
                         return new OrderSpecifier(direction, project.introduction);
                     case "maxPeople":
                         return new OrderSpecifier(direction, project.maxPeople);
-                    case "deleteReason":
-                        return new OrderSpecifier(direction, project.deleteReason);
                     case "viewCount":
                         return new OrderSpecifier(direction, project.viewCount);
                     case "commentCount":
@@ -80,9 +78,9 @@ public class ProjectRepositoryImpl implements ProjectRepositoryCustom {
         return null;
     }
     
-    // 모집 상태와 삭제 상태로 검색하는 메소드
+    // 모집 상태 검색하는 메소드
     @Override
-    public Page<ProjectSimpleDto> findProjectByStatusAndDelete(Pageable pageable, boolean state, boolean delete, ProjectSearchRequestDto projectSearchRequestDto){
+    public Page<ProjectSimpleDto> findProjectByStatus(Pageable pageable, boolean state, ProjectSearchRequestDto projectSearchRequestDto){
         List<ProjectSimpleDto> projectSimpleDtoList = queryFactory.select(Projections.constructor(ProjectSimpleDto.class,
                         project.no,
                         project.name,
@@ -93,7 +91,6 @@ public class ProjectRepositoryImpl implements ProjectRepositoryCustom {
                 .from(project)
                 .where(
                         eqStatus(state),
-                        eqDelete(delete),
                         search(projectSearchRequestDto))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -107,8 +104,8 @@ public class ProjectRepositoryImpl implements ProjectRepositoryCustom {
         int totalSize = queryFactory
                 .selectFrom(project)
                 .where(
-                        eqStatus(state),
-                        eqDelete(delete))
+                        eqStatus(state)
+                )
                 .fetch().size();
 
         return new PageImpl<>(projectSimpleDtoList, pageable, totalSize);
@@ -116,7 +113,7 @@ public class ProjectRepositoryImpl implements ProjectRepositoryCustom {
     
     // 유저가 등록한 프로젝트 조회(모집중, 모집완료 포함)
     @Override
-    public Page<ProjectSimpleDto> findUserProjectByDelete(Pageable pageable, User user, boolean delete) {
+    public Page<ProjectSimpleDto> findUserProject(Pageable pageable, User user) {
         List<ProjectSimpleDto> projectSimpleDtoList = queryFactory.select(Projections.constructor(ProjectSimpleDto.class,
                         project.no,
                         project.name,
@@ -127,8 +124,8 @@ public class ProjectRepositoryImpl implements ProjectRepositoryCustom {
                 .from(project)
                 .join(project.user, QUser.user)
                 .where(
-                        eqProjectUser(user),
-                        eqDelete(delete))
+                        eqProjectUser(user)
+                )
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .orderBy(projectSort(pageable))
@@ -142,8 +139,8 @@ public class ProjectRepositoryImpl implements ProjectRepositoryCustom {
                 .selectFrom(project)
                 .join(project.user, QUser.user)
                 .where(
-                        eqProjectUser(user),
-                        eqDelete(delete))
+                        eqProjectUser(user)
+                )
                 .fetch().size();
 
         return new PageImpl<>(projectSimpleDtoList, pageable, totalSize);
@@ -151,7 +148,7 @@ public class ProjectRepositoryImpl implements ProjectRepositoryCustom {
     
     // 유저가 참여중인 프로젝트 조회
     @Override
-    public Page<ProjectSimpleDto> findParticipateProjectByDelete(Pageable pageable, User user, boolean delete) {
+    public Page<ProjectSimpleDto> findParticipateProject(Pageable pageable, User user) {
         
         // 유저가 참여한 프로젝트를 중복제거한 상태로 가져오는 서브쿼리
         JPQLQuery<Long> subQuery = JPAExpressions.selectDistinct(project.no)
@@ -168,10 +165,10 @@ public class ProjectRepositoryImpl implements ProjectRepositoryCustom {
                         project.viewCount,
                         project.createUserName))
                 .from(project)
-                .where(eqDelete(delete)
-                        .and(project.no.in(
+                .where(
+                        project.no.in(
                                 subQuery
-                        )))
+                        ))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .orderBy(projectSort(pageable))
@@ -184,8 +181,7 @@ public class ProjectRepositoryImpl implements ProjectRepositoryCustom {
         int totalSize = queryFactory
                 .selectFrom(project)
                 .where(
-                        eqDelete(delete)
-                        .and(project.no.in(
+                        (project.no.in(
                                 subQuery
                         )))
                 .fetch().size();
@@ -195,7 +191,7 @@ public class ProjectRepositoryImpl implements ProjectRepositoryCustom {
 
     // 유저가 신청중인 프로젝트 조회
     @Override
-    public Page<ProjectSimpleDto> findParticipateRequestProjectByDelete(Pageable pageable, User user, boolean delete) {
+    public Page<ProjectSimpleDto> findParticipateRequestProject(Pageable pageable, User user) {
         
         // 신청중인 프로젝트 no를 중복제거한 상태로 가져오는 서브쿼리
         JPQLQuery<Long> subQuery = JPAExpressions.selectDistinct(project.no)
@@ -213,10 +209,10 @@ public class ProjectRepositoryImpl implements ProjectRepositoryCustom {
                         project.viewCount,
                         project.createUserName))
                 .from(project)
-                .where(eqDelete(delete)
-                        .and(project.no.in(
+                .where(
+                        project.no.in(
                                 subQuery
-                        )))
+                        ))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .orderBy(projectSort(pageable))
@@ -229,17 +225,16 @@ public class ProjectRepositoryImpl implements ProjectRepositoryCustom {
         int totalSize = queryFactory
                 .selectFrom(project)
                 .where(
-                        eqDelete(delete)
-                        .and(project.no.in(
+                        project.no.in(
                                 subQuery
-                        )))
+                        ))
                 .fetch().size();
 
         return new PageImpl<>(projectSimpleDtoList, pageable, totalSize);
     }
 
     @Override
-    public Page<ProjectSimpleDto> findBookMarkProjectByDelete(Pageable pageable, User user, boolean delete) {
+    public Page<ProjectSimpleDto> findBookMarkProject(Pageable pageable, User user) {
         JPQLQuery<Long> subQuery = JPAExpressions.selectDistinct(bookMark.project.no)
                 .from(bookMark)
                 .join(bookMark.user, QUser.user)
@@ -254,10 +249,10 @@ public class ProjectRepositoryImpl implements ProjectRepositoryCustom {
                         project.viewCount,
                         project.createUserName))
                 .from(project)
-                .where(eqDelete(delete)
-                        .and(project.no.in(
+                .where(
+                        project.no.in(
                                 subQuery
-                        )))
+                        ))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .orderBy(projectSort(pageable))
@@ -273,10 +268,9 @@ public class ProjectRepositoryImpl implements ProjectRepositoryCustom {
         int totalSize = queryFactory
                 .selectFrom(project)
                 .where(
-                        eqDelete(delete)
-                                .and(project.no.in(
-                                        subQuery
-                                )))
+                        project.no.in(
+                                subQuery
+                        ))
                 .fetch().size();
 
         return new PageImpl<>(projectSimpleDtoList, pageable, totalSize);
@@ -317,10 +311,6 @@ public class ProjectRepositoryImpl implements ProjectRepositoryCustom {
 
     private BooleanExpression eqStatus(boolean state) {
         return project.state.eq(state);
-    }
-
-    private BooleanExpression eqDelete(boolean delete) {
-        return project.delete.eq(delete);
     }
 
     private BooleanExpression eqProjectUser(User user) {

@@ -66,15 +66,12 @@ class CommentRepositoryTest {
         Project project = Project.builder()
                 .name("testProject")
                 .createUserName(user.getName())
-                .createDate(LocalDateTime.now())
                 .startDate(LocalDate.now())
                 .endDate(LocalDate.now().plusDays(5))
                 .state(true)
                 .introduction(null)
                 .maxPeople(4)
                 .currentPeople(1)
-                .delete(false)
-                .deleteReason(null)
                 .viewCount(0)
                 .commentCount(0)
                 .build();
@@ -149,22 +146,18 @@ class CommentRepositoryTest {
             User saveUser1 = userRepository.save(user1);
             
             // 프로젝트 세팅
-            LocalDateTime createDate = LocalDateTime.now();
             LocalDate startDate = LocalDate.of(2022, 06, 24);
             LocalDate endDate = LocalDate.of(2022, 06, 28);
 
             Project project1 = Project.builder()
                     .name("testName1")
                     .createUserName("user1")
-                    .createDate(createDate)
                     .startDate(startDate)
                     .endDate(endDate)
                     .state(true)
                     .introduction("testIntroduction1")
                     .maxPeople(10)
                     .currentPeople(4)
-                    .delete(true)
-                    .deleteReason(null)
                     .viewCount(10)
                     .commentCount(10)
                     .build();

@@ -62,7 +62,6 @@ class ProjectParticipateRequestServiceImplTest {
         @DisplayName("성공")
         public void success() {
             // given
-            LocalDateTime createDate = LocalDateTime.now();
             LocalDate startDate = LocalDate.of(2022, 06, 24);
             LocalDate endDate = LocalDate.of(2022, 06, 28);
 
@@ -88,15 +87,12 @@ class ProjectParticipateRequestServiceImplTest {
                     .no(1L)
                     .name("testProject1")
                     .createUserName("user1")
-                    .createDate(createDate)
                     .startDate(startDate)
                     .endDate(endDate)
                     .state(true)
                     .introduction("testIntroduction1")
                     .maxPeople(10)
                     .currentPeople(1)
-                    .delete(false)
-                    .deleteReason(null)
                     .viewCount(0)
                     .commentCount(0)
                     .build();
@@ -190,7 +186,6 @@ class ProjectParticipateRequestServiceImplTest {
         @DisplayName("실패 : 잘못된 기술스택 요청")
         public void fail1() {
             // given
-            LocalDateTime createDate = LocalDateTime.now();
             LocalDate startDate = LocalDate.of(2022, 06, 24);
             LocalDate endDate = LocalDate.of(2022, 06, 28);
 
@@ -216,15 +211,12 @@ class ProjectParticipateRequestServiceImplTest {
                     .no(1L)
                     .name("testProject1")
                     .createUserName("user1")
-                    .createDate(createDate)
                     .startDate(startDate)
                     .endDate(endDate)
                     .state(true)
                     .introduction("testIntroduction1")
                     .maxPeople(10)
                     .currentPeople(1)
-                    .delete(false)
-                    .deleteReason(null)
                     .viewCount(0)
                     .commentCount(0)
                     .build();
@@ -313,7 +305,6 @@ class ProjectParticipateRequestServiceImplTest {
         @DisplayName("실패 : 해당 프로젝트 포지션에 유저가 존재하는 경우")
         public void fail2() {
             // given
-            LocalDateTime createDate = LocalDateTime.now();
             LocalDate startDate = LocalDate.of(2022, 06, 24);
             LocalDate endDate = LocalDate.of(2022, 06, 28);
 
@@ -339,15 +330,12 @@ class ProjectParticipateRequestServiceImplTest {
                     .no(1L)
                     .name("testProject1")
                     .createUserName("user1")
-                    .createDate(createDate)
                     .startDate(startDate)
                     .endDate(endDate)
                     .state(true)
                     .introduction("testIntroduction1")
                     .maxPeople(10)
                     .currentPeople(1)
-                    .delete(false)
-                    .deleteReason(null)
                     .viewCount(0)
                     .commentCount(0)
                     .build();
@@ -434,7 +422,6 @@ class ProjectParticipateRequestServiceImplTest {
         @DisplayName("성공")
         public void success() throws Exception {
             // given
-            LocalDateTime createDate = LocalDateTime.now();
             LocalDate startDate = LocalDate.of(2022, 06, 24);
             LocalDate endDate = LocalDate.of(2022, 06, 28);
 
@@ -460,15 +447,12 @@ class ProjectParticipateRequestServiceImplTest {
                     .no(1L)
                     .name("testProject1")
                     .createUserName("user1")
-                    .createDate(createDate)
                     .startDate(startDate)
                     .endDate(endDate)
                     .state(true)
                     .introduction("testIntroduction1")
                     .maxPeople(10)
                     .currentPeople(1)
-                    .delete(false)
-                    .deleteReason(null)
                     .viewCount(0)
                     .user(user1)
                     .commentCount(0)
@@ -519,7 +503,6 @@ class ProjectParticipateRequestServiceImplTest {
         @DisplayName("실패 : 내가 만든 프로젝트가 아닌 경우")
         public void fail1() {
             // given
-            LocalDateTime createDate = LocalDateTime.now();
             LocalDate startDate = LocalDate.of(2022, 06, 24);
             LocalDate endDate = LocalDate.of(2022, 06, 28);
 
@@ -545,15 +528,12 @@ class ProjectParticipateRequestServiceImplTest {
                     .no(1L)
                     .name("testProject1")
                     .createUserName("user1")
-                    .createDate(createDate)
                     .startDate(startDate)
                     .endDate(endDate)
                     .state(true)
                     .introduction("testIntroduction1")
                     .maxPeople(10)
                     .currentPeople(1)
-                    .delete(false)
-                    .deleteReason(null)
                     .viewCount(0)
                     .commentCount(0)
                     .build();
@@ -621,7 +601,6 @@ class ProjectParticipateRequestServiceImplTest {
                     .build();
 
             // 프로젝트 세팅
-            LocalDateTime createDate = LocalDateTime.now();
             LocalDate startDate = LocalDate.of(2022, 06, 24);
             LocalDate endDate = LocalDate.of(2022, 06, 28);
 
@@ -629,15 +608,12 @@ class ProjectParticipateRequestServiceImplTest {
                     .no(1L)
                     .name("testProject1")
                     .createUserName("user1")
-                    .createDate(createDate)
                     .startDate(startDate)
                     .endDate(endDate)
                     .state(true)
                     .introduction("testIntroduction1")
                     .maxPeople(10)
                     .currentPeople(1)
-                    .delete(false)
-                    .deleteReason(null)
                     .viewCount(0)
                     .user(user1)
                     .commentCount(0)
@@ -722,7 +698,6 @@ class ProjectParticipateRequestServiceImplTest {
                     .build();
 
             // 프로젝트 세팅
-            LocalDateTime createDate = LocalDateTime.now();
             LocalDate startDate = LocalDate.of(2022, 06, 24);
             LocalDate endDate = LocalDate.of(2022, 06, 28);
 
@@ -730,15 +705,12 @@ class ProjectParticipateRequestServiceImplTest {
                     .no(1L)
                     .name("testProject1")
                     .createUserName("user1")
-                    .createDate(createDate)
                     .startDate(startDate)
                     .endDate(endDate)
                     .state(true)
                     .introduction("testIntroduction1")
                     .maxPeople(10)
                     .currentPeople(1)
-                    .delete(false)
-                    .deleteReason(null)
                     .viewCount(0)
                     .commentCount(0)
                     .build();
@@ -819,7 +791,6 @@ class ProjectParticipateRequestServiceImplTest {
                     .build();
 
             // 프로젝트 세팅
-            LocalDateTime createDate = LocalDateTime.now();
             LocalDate startDate = LocalDate.of(2022, 06, 24);
             LocalDate endDate = LocalDate.of(2022, 06, 28);
 
@@ -827,15 +798,12 @@ class ProjectParticipateRequestServiceImplTest {
                     .no(1L)
                     .name("testProject1")
                     .createUserName("user1")
-                    .createDate(createDate)
                     .startDate(startDate)
                     .endDate(endDate)
                     .state(true)
                     .introduction("testIntroduction1")
                     .maxPeople(10)
                     .currentPeople(1)
-                    .delete(false)
-                    .deleteReason(null)
                     .viewCount(0)
                     .user(user1)
                     .commentCount(0)
@@ -918,7 +886,6 @@ class ProjectParticipateRequestServiceImplTest {
                     .build();
 
             // 프로젝트 세팅
-            LocalDateTime createDate = LocalDateTime.now();
             LocalDate startDate = LocalDate.of(2022, 06, 24);
             LocalDate endDate = LocalDate.of(2022, 06, 28);
 
@@ -926,15 +893,12 @@ class ProjectParticipateRequestServiceImplTest {
                     .no(1L)
                     .name("testProject1")
                     .createUserName("user1")
-                    .createDate(createDate)
                     .startDate(startDate)
                     .endDate(endDate)
                     .state(true)
                     .introduction("testIntroduction1")
                     .maxPeople(10)
                     .currentPeople(1)
-                    .delete(false)
-                    .deleteReason(null)
                     .viewCount(0)
                     .commentCount(0)
                     .build();

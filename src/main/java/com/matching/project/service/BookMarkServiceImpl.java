@@ -43,7 +43,7 @@ public class BookMarkServiceImpl implements BookMarkService{
 
     @Override
     public List<ProjectSimpleDto> findBookMarkProject(Pageable pageable) throws Exception {
-        return projectRepository.findBookMarkProjectByDelete(pageable, getUser(), false).getContent();
+        return projectRepository.findBookMarkProject(pageable, getUser()).getContent();
     }
 
     @Override
