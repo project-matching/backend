@@ -1,6 +1,7 @@
 package com.matching.project.repository;
 
 import com.matching.project.config.QuerydslConfiguration;
+import com.matching.project.dto.SliceDto;
 import com.matching.project.dto.enumerate.OAuth;
 import com.matching.project.dto.enumerate.Role;
 import com.matching.project.entity.Comment;
@@ -16,6 +17,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -82,7 +84,7 @@ class CommentRepositoryTest {
     }
 
     @Test
-    void findByProjectNoUsingPaging() {
+    void findByProjectOrderByNoDescUsingPaging() {
         //given
         User user1 = saveUser("test1@test.com");
         User user2 = saveUser("test2@test.com");
@@ -113,14 +115,15 @@ class CommentRepositoryTest {
         Pageable pageable = PageRequest.of(0, 2);
 
         //then;
-        List<Comment> commentList = commentRepository.findByProjectOrderByNoDescUsingPaging(project, pageable);
+        Slice<Comment> commentList = commentRepository.findByProjectOrderByNoDescUsingPaging(project, Long.MAX_VALUE, pageable);
 
         //when
-        assertThat(commentList.size()).isEqualTo(2);
-        assertThat(commentList.get(0).getUser().getName()).isEqualTo(comment3.getUser().getName());
-        assertThat(commentList.get(0).getContent()).isEqualTo(comment3.getContent());
-        assertThat(commentList.get(1).getUser().getName()).isEqualTo(comment2.getUser().getName());
-        assertThat(commentList.get(1).getContent()).isEqualTo(comment2.getContent());
+        assertThat(commentList.getContent().size()).isEqualTo(2);
+        assertThat(commentList.getContent().get(0).getUser().getName()).isEqualTo(comment3.getUser().getName());
+        assertThat(commentList.getContent().get(0).getContent()).isEqualTo(comment3.getContent());
+        assertThat(commentList.getContent().get(1).getUser().getName()).isEqualTo(comment2.getUser().getName());
+        assertThat(commentList.getContent().get(1).getContent()).isEqualTo(comment2.getContent());
+        assertThat(commentList.isLast()).isFalse();
     }
 
     @Nested

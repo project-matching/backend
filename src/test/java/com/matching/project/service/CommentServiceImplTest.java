@@ -1,5 +1,6 @@
 package com.matching.project.service;
 
+import com.matching.project.dto.SliceDto;
 import com.matching.project.dto.comment.CommentDto;
 import com.matching.project.dto.enumerate.Role;
 import com.matching.project.entity.Comment;
@@ -76,36 +77,41 @@ class CommentServiceImplTest {
             given(projectRepository.findById(projectNo)).willReturn(Optional.ofNullable(project));
 
             String commentContent = "코멘트 테스트";
+            Long commentNo = 3L;
 
             List<Comment> commentList = new ArrayList<>();
             for (int i = 0 ; i < 10 ; i++) {
                 commentList.add(Comment.builder()
-                        .no(Integer.toUnsignedLong(i))
+                        .no(Integer.toUnsignedLong(i+1))
                         .user(user)
                         .project(project)
-                        .content(commentContent + i)
+                        .content(commentContent + Integer.toUnsignedLong(i+1))
                         .build());
             }
 
-            int page = 1;
+            int page = 0;
             int size = 3;
-            Pageable pageable = PageRequest.of(page, size, Sort.by("no").ascending());
-            int start = (int)pageable.getOffset();
-            int end = (start + pageable.getPageSize()) > commentList.size() ? commentList.size() : (start + pageable.getPageSize());
-            Page<Comment> users = new PageImpl<>(commentList.subList(start, end), pageable, commentList.size());
+            Pageable pageable = PageRequest.of(page, size, Sort.by("no").descending());
+            int start = Math.toIntExact(commentNo) - 1;
+            int end = Math.min((start + pageable.getPageSize()), commentList.size());
+            boolean hasNext = commentList.size() >= start + pageable.getPageSize() + 1;
+            Slice<Comment> comments = new SliceImpl<>(commentList.subList(start, end), pageable, hasNext);
 
-            given(commentRepository.findByProjectOrderByNoDescUsingPaging(project, pageable)).willReturn(users.stream().collect(Collectors.toList()));
+            given(commentRepository.findByProjectOrderByNoDescUsingPaging(project, commentNo, pageable))
+                    .willReturn(comments);
 
             //when
-            List<CommentDto> commentDtoList = commentService.commentList(projectNo, pageable);
+            SliceDto<CommentDto> commentDtoList = commentService.commentList(projectNo, commentNo, pageable);
 
             //then
-            assertThat(commentDtoList.get(0).getCommentNo()).isEqualTo(Integer.toUnsignedLong(3));
-            assertThat(commentDtoList.get(0).getContent()).isEqualTo(commentContent + 3);
-            assertThat(commentDtoList.get(1).getCommentNo()).isEqualTo(Integer.toUnsignedLong(4));
-            assertThat(commentDtoList.get(1).getContent()).isEqualTo(commentContent + 4);
-            assertThat(commentDtoList.get(2).getCommentNo()).isEqualTo(Integer.toUnsignedLong(5));
-            assertThat(commentDtoList.get(2).getContent()).isEqualTo(commentContent + 5);
+            assertThat(commentDtoList.getContent().get(0).getCommentNo()).isEqualTo(Integer.toUnsignedLong(3));
+            assertThat(commentDtoList.getContent().get(0).getContent()).isEqualTo(commentContent + 3);
+            assertThat(commentDtoList.getContent().get(1).getCommentNo()).isEqualTo(Integer.toUnsignedLong(4));
+            assertThat(commentDtoList.getContent().get(1).getContent()).isEqualTo(commentContent + 4);
+            assertThat(commentDtoList.getContent().get(2).getCommentNo()).isEqualTo(Integer.toUnsignedLong(5));
+            assertThat(commentDtoList.getContent().get(2).getContent()).isEqualTo(commentContent + 5);
+            assertThat(commentDtoList.isLast()).isFalse();
+
 
         }
         @DisplayName("실패 : 존재하지 않는 프로젝트")
@@ -137,7 +143,7 @@ class CommentServiceImplTest {
 
             //when
             CustomException e = Assertions.assertThrows(CustomException.class, () -> {
-                List<CommentDto> commentList = commentService.commentList(projectNo, pageable);
+                SliceDto<CommentDto> commentList = commentService.commentList(projectNo, null, pageable);
             });
 
             //then

@@ -1,6 +1,7 @@
 package com.matching.project.controller;
 
 import com.matching.project.dto.ResponseDto;
+import com.matching.project.dto.SliceDto;
 import com.matching.project.dto.comment.CommentDto;
 import com.matching.project.dto.comment.CommentRequestDto;
 import com.matching.project.entity.Comment;
@@ -34,8 +35,9 @@ public class CommentController {
     @GetMapping("/{projectNo}")
     @ApiOperation(value = "댓글 조회")
     public ResponseEntity<ResponseDto<List<CommentDto>>> commentList(@PathVariable Long projectNo,
+                                                                     Long commentNo,
                                                                      @PageableDefault(size = 5) Pageable pageable) {
-        List<CommentDto> commentDtos = commentService.commentList(projectNo, pageable);
+        SliceDto<CommentDto> commentDtos = commentService.commentList(projectNo, commentNo, pageable);
         return ResponseEntity.ok(new ResponseDto(null, commentDtos));
     }
 

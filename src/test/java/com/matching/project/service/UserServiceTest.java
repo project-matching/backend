@@ -1,5 +1,7 @@
 package com.matching.project.service;
 
+import com.google.common.primitives.UnsignedLong;
+import com.matching.project.dto.SliceDto;
 import com.matching.project.dto.enumerate.OAuth;
 import com.matching.project.dto.enumerate.Role;
 import com.matching.project.dto.enumerate.UserFilter;
@@ -543,43 +545,42 @@ class UserServiceTest {
         @Test
         public void success() {
             //given
+            Long UserNo = 3L;
+
             List<User> userList = new ArrayList<>();
             for (int i = 0; i < 10; i++) {
                 userList.add(User.builder()
-                        .no(Integer.toUnsignedLong(i))
-                        .name("테스터 " + Integer.toString(i))
-                        .email("test" + Integer.toString(i) + "@naver.com")
-                        .imageNo(Integer.toUnsignedLong(i))
+                        .no(Integer.toUnsignedLong(i+1))
+                        .name("테스터 " + Integer.toString(i+1))
+                        .email("test" + Integer.toString(i+1) + "@naver.com")
                         .build()
                 );
             }
 
-            int page = 1;
+            int page = 0;
             int size = 2;
             Pageable pageable = PageRequest.of(page, size, Sort.by("no").descending());
-            int start = (int)pageable.getOffset();
-            int end = (start + pageable.getPageSize()) > userList.size() ? userList.size() : (start + pageable.getPageSize());
-            Page<User> users = new PageImpl<>(userList.subList(start, end), pageable, userList.size());
+            int start = Math.toIntExact(UserNo) - 1;
+            int end = Math.min((start + pageable.getPageSize()), userList.size());
+            boolean hasNext = userList.size() >= start + pageable.getPageSize() + 1;
+            Slice<User> users = new SliceImpl<User>(userList.subList(start, end), pageable, hasNext);
 
             UserFilterDto userFilterDto = UserFilterDto.builder().userFilter(UserFilter.NAME).content("테스터").build();
 
-            given(userRepositoryCustom.findByNoOrderByNoDescUsingQueryDsl(userFilterDto, pageable)).willReturn(users);
-            for (int i = start; i < start + size; i++)
-                given(imageService.getImageUrl(Integer.toUnsignedLong(i))).willReturn("url_"+i);
+            given(userRepositoryCustom.findByNoOrderByNoDescUsingQueryDsl(UserNo, userFilterDto, pageable)).willReturn(users);
 
             //when
-            List<UserSimpleInfoDto> dtoList = userService.userInfoList(userFilterDto, pageable);
+            SliceDto<UserSimpleInfoDto> dtoList = userService.userInfoList(UserNo, userFilterDto, pageable);
 
             //then
-            assertThat(dtoList.get(0).getUserNo()).isEqualTo(2);
-            assertThat(dtoList.get(0).getName()).isEqualTo("테스터 2");
-            assertThat(dtoList.get(0).getEmail()).isEqualTo("test2@naver.com");
-            assertThat(dtoList.get(0).getImage()).isEqualTo("url_2");
-            assertThat(dtoList.get(1).getUserNo()).isEqualTo(3);
-            assertThat(dtoList.get(1).getName()).isEqualTo("테스터 3");
-            assertThat(dtoList.get(1).getEmail()).isEqualTo("test3@naver.com");
-            assertThat(dtoList.get(1).getImage()).isEqualTo("url_3");
-            assertThat(dtoList.size()).isEqualTo(size);
+            assertThat(dtoList.getContent().get(0).getUserNo()).isEqualTo(3);
+            assertThat(dtoList.getContent().get(0).getName()).isEqualTo("테스터 3");
+            assertThat(dtoList.getContent().get(0).getEmail()).isEqualTo("test3@naver.com");
+            assertThat(dtoList.getContent().get(1).getUserNo()).isEqualTo(4);
+            assertThat(dtoList.getContent().get(1).getName()).isEqualTo("테스터 4");
+            assertThat(dtoList.getContent().get(1).getEmail()).isEqualTo("test4@naver.com");
+            assertThat(dtoList.getContent().size()).isEqualTo(size);
+            assertThat(dtoList.isLast()).isFalse();
         }
     }
 

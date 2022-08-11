@@ -79,6 +79,25 @@ public class CommentControllerTest {
         return userRepository.save(user);
     }
 
+    User saveUser(String email) {
+        User user = User.builder()
+                .name("testUser")
+                .sex("M")
+                .email(email)
+                .password(passwordEncoder.encode("test"))
+                .github(null)
+                .selfIntroduction(null)
+                .block(false)
+                .blockReason(null)
+                .permission(Role.ROLE_USER)
+                .oauthCategory(OAuth.NORMAL)
+                .email_auth(false)
+                .imageNo(null)
+                .position(null)
+                .build();
+        return userRepository.save(user);
+    }
+
     Project saveProject(User user) {
         Project project = Project.builder()
                 .name("testProject")
@@ -174,13 +193,19 @@ public class CommentControllerTest {
         @Test
         void success() throws Exception {
             //given
-            User user = saveUser();
-            String token = getToken(user);
-            Project project = saveProject(user);
-            Comment comment = saveComment(user, project);
+            User user1 = saveUser("test1@user.com");
+            User user2 = saveUser("test2@user.com");
+            User user3 = saveUser("test3@user.com");
+
+            String token = getToken(user3);
+            Project project = saveProject(user3);
+            Comment comment1 = saveComment(user1, project);
+            Comment comment2 = saveComment(user2, project);
+            Comment comment3 = saveComment(user3, project);
+            Comment comment4 = saveComment(user1, project);
 
             //when
-            ResultActions resultActions = mvc.perform(get("/v1/comment/" + project.getNo())
+            ResultActions resultActions = mvc.perform(get("/v1/comment/" + project.getNo() + "?size=2")
                     .header("Authorization", "Bearer " + token)
                     .contentType(MediaType.APPLICATION_JSON)
             );
@@ -188,10 +213,15 @@ public class CommentControllerTest {
             //then
             resultActions.andDo(print())
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.data.[0].commentNo").value(comment.getNo()))
-                    .andExpect(jsonPath("$.data.[0].userNo").value(comment.getUser().getNo()))
-                    .andExpect(jsonPath("$.data.[0].registrant").value(comment.getUser().getName()))
-                    .andExpect(jsonPath("$.data.[0].content").value(comment.getContent()));
+                    .andExpect(jsonPath("$.data.content.[0].commentNo").value(comment4.getNo()))
+                    .andExpect(jsonPath("$.data.content.[0].userNo").value(comment4.getUser().getNo()))
+                    .andExpect(jsonPath("$.data.content.[0].registrant").value(comment4.getUser().getName()))
+                    .andExpect(jsonPath("$.data.content.[0].content").value(comment4.getContent()))
+                    .andExpect(jsonPath("$.data.content.[1].commentNo").value(comment3.getNo()))
+                    .andExpect(jsonPath("$.data.content.[1].userNo").value(comment3.getUser().getNo()))
+                    .andExpect(jsonPath("$.data.content.[1].registrant").value(comment3.getUser().getName()))
+                    .andExpect(jsonPath("$.data.content.[1].content").value(comment3.getContent()))
+                    .andExpect(jsonPath("$.data.last").value(false));
         }
     }
 

@@ -95,6 +95,26 @@ public class UserControllerTest {
         return userRepository.save(user);
     }
 
+    User saveUser(String email) {
+        User user = User.builder()
+                .name("testUser")
+                .sex("M")
+                .email(email)
+                .password(passwordEncoder.encode("test"))
+                .github(null)
+                .selfIntroduction(null)
+                .block(false)
+                .blockReason(null)
+                .permission(Role.ROLE_USER)
+                .oauthCategory(OAuth.NORMAL)
+                .email_auth(false)
+                .imageNo(null)
+                .position(null)
+                .build();
+
+        return userRepository.save(user);
+    }
+
     User saveAdmin() {
         User user = User.builder()
                 .name("testUser")
@@ -471,20 +491,33 @@ public class UserControllerTest {
         @Test
         void success() throws Exception {
             //given
-            User user = saveAdmin();
-            String token = getToken(user);
+            User user1 = saveUser("test1@user.com");
+            User user2 = saveUser("test2@user.com");
+            User user3 = saveUser("test3@user.com");
+            User user4 = saveUser("test4@user.com");
+            User admin = saveAdmin();
+            String token = getToken(admin);
 
             //when
-            ResultActions resultActions = mvc.perform(get("/v1/user/list?userFilter=EMAIL&content=leeworld9")
+            ResultActions resultActions = mvc.perform(get("/v1/user/list?userFilter=EMAIL&content=test&size=3")
                             .header("Authorization", "Bearer " + token));
 
             //then
             resultActions.andDo(print())
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.data.[0].userNo").value(user.getNo()))
-                    .andExpect(jsonPath("$.data.[0].image").value(user.getImageNo()))
-                    .andExpect(jsonPath("$.data.[0].name").value(user.getName()))
-                    .andExpect(jsonPath("$.data.[0].email").value(user.getEmail()));
+                    .andExpect(jsonPath("$.data.content.[0].userNo").value(user4.getNo()))
+                    .andExpect(jsonPath("$.data.content.[0].image").value(user4.getImageNo()))
+                    .andExpect(jsonPath("$.data.content.[0].name").value(user4.getName()))
+                    .andExpect(jsonPath("$.data.content.[0].email").value(user4.getEmail()))
+                    .andExpect(jsonPath("$.data.content.[1].userNo").value(user3.getNo()))
+                    .andExpect(jsonPath("$.data.content.[1].image").value(user3.getImageNo()))
+                    .andExpect(jsonPath("$.data.content.[1].name").value(user3.getName()))
+                    .andExpect(jsonPath("$.data.content.[1].email").value(user3.getEmail()))
+                    .andExpect(jsonPath("$.data.content.[2].userNo").value(user2.getNo()))
+                    .andExpect(jsonPath("$.data.content.[2].image").value(user2.getImageNo()))
+                    .andExpect(jsonPath("$.data.content.[2].name").value(user2.getName()))
+                    .andExpect(jsonPath("$.data.content.[2].email").value(user2.getEmail()))
+                    .andExpect(jsonPath("$.data.last").value(false));
         }
 
         @DisplayName("실패 : 로그인 하지 않는 경우")

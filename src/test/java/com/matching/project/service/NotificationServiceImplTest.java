@@ -1,5 +1,6 @@
 package com.matching.project.service;
 
+import com.matching.project.dto.SliceDto;
 import com.matching.project.dto.enumerate.Role;
 import com.matching.project.dto.enumerate.Type;
 import com.matching.project.dto.notification.NotificationDto;
@@ -159,35 +160,42 @@ class NotificationServiceImplTest {
             List<Notification> notificationList = new ArrayList<>();
             for (int i = 0 ; i < 10 ; i++) {
                 notificationList.add(Notification.builder()
-                        .no(Integer.toUnsignedLong(i))
+                        .no(Integer.toUnsignedLong(i+1))
                         .type(Type.NOTICE)
-                        .title("title" + i)
-                        .content("content" + i)
+                        .title("title" + Integer.toString(i+1))
+                        .content("content" + Integer.toString(i+1))
                         .read(false)
                         .user(null)
                         .build()
                 );
             }
 
-            int page = 1;
-            int size = 3;
-            Pageable pageable = PageRequest.of(page, size, Sort.by("no").ascending());
-            int start = (int)pageable.getOffset();
-            int end = (start + pageable.getPageSize()) > notificationList.size() ? notificationList.size() : (start + pageable.getPageSize());
-            Page<Notification> notifications = new PageImpl<>(notificationList.subList(start, end), pageable, notificationList.size());
+            Long notificationNo = 3L;
 
-            given(notificationRepository.findByUserOrUserIsNullOrderByNoDesc(user, pageable)).willReturn(notifications.stream().collect(Collectors.toList()));
+            int page = 0;
+            int size = 3;
+            Pageable pageable = PageRequest.of(page, size, Sort.by("no").descending());
+            int start = Math.toIntExact(notificationNo) - 1;
+            int end = Math.min((start + pageable.getPageSize()), notificationList.size());
+            boolean hasNext = notificationList.size() >= start + pageable.getPageSize() + 1;
+            Slice<Notification> notifications = new SliceImpl<>(notificationList.subList(start, end), pageable, hasNext);
+
+            given(notificationRepository.findByUserOrUserIsNullOrderByNoDescUsingPaging(user, notificationNo, pageable))
+                    .willReturn(notifications);
 
             //when
-            List<NotificationSimpleInfoDto> dtos = notificationService.notificationList(pageable);
+            SliceDto<NotificationSimpleInfoDto> dtos = notificationService.notificationList(notificationNo, pageable);
 
             //then
-            assertThat(dtos.get(0).getNo()).isEqualTo(Integer.toUnsignedLong(3));
-            assertThat(dtos.get(0).getTitle()).isEqualTo("title" + 3);
-            assertThat(dtos.get(1).getNo()).isEqualTo(Integer.toUnsignedLong(4));
-            assertThat(dtos.get(1).getTitle()).isEqualTo("title" + 4);
-            assertThat(dtos.get(2).getNo()).isEqualTo(Integer.toUnsignedLong(5));
-            assertThat(dtos.get(2).getTitle()).isEqualTo("title" + 5);
+            assertThat(dtos.getContent().size()).isEqualTo(3);
+            assertThat(dtos.getContent().get(0).getNo()).isEqualTo(Integer.toUnsignedLong(3));
+            assertThat(dtos.getContent().get(0).getTitle()).isEqualTo("title" + 3);
+            assertThat(dtos.getContent().get(1).getNo()).isEqualTo(Integer.toUnsignedLong(4));
+            assertThat(dtos.getContent().get(1).getTitle()).isEqualTo("title" + 4);
+            assertThat(dtos.getContent().get(2).getNo()).isEqualTo(Integer.toUnsignedLong(5));
+            assertThat(dtos.getContent().get(2).getTitle()).isEqualTo("title" + 5);
+            assertThat(dtos.isLast()).isFalse();
+
         }
     }
 

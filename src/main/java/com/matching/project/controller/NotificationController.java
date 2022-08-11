@@ -1,6 +1,7 @@
 package com.matching.project.controller;
 
 import com.matching.project.dto.ResponseDto;
+import com.matching.project.dto.SliceDto;
 import com.matching.project.dto.enumerate.Type;
 import com.matching.project.dto.notification.NotificationDto;
 import com.matching.project.dto.notification.NotificationSendRequestDto;
@@ -35,8 +36,9 @@ public class NotificationController {
 
     @GetMapping
     @ApiOperation(value = "알림 목록 조회")
-    public ResponseEntity<ResponseDto<List<NotificationSimpleInfoDto>>> notificationList(@PageableDefault(size = 5) Pageable pageable) {
-        return ResponseEntity.ok(new ResponseDto<>(null, notificationService.notificationList(pageable)));
+    public ResponseEntity<ResponseDto<SliceDto<NotificationSimpleInfoDto>>> notificationList(Long notificationNo,
+                                                                                             @PageableDefault(size = 5) Pageable pageable) {
+        return ResponseEntity.ok(new ResponseDto<>(null, notificationService.notificationList(notificationNo, pageable)));
     }
 
     @GetMapping("/{notificationNo}")

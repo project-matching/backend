@@ -1,6 +1,7 @@
 package com.matching.project.controller;
 
 import com.matching.project.dto.ResponseDto;
+import com.matching.project.dto.SliceDto;
 import com.matching.project.dto.common.TokenDto;
 import com.matching.project.dto.enumerate.EmailAuthPurpose;
 import com.matching.project.dto.user.*;
@@ -13,6 +14,7 @@ import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -111,9 +114,10 @@ public class UserController {
 
     @GetMapping("/list")
     @ApiOperation(value = "회원 목록 조회 (관리자)")
-    public ResponseEntity<ResponseDto<List<UserSimpleInfoDto>>> userInfoList(@Valid UserFilterDto userFilterDto,
-                                                                             @PageableDefault(size = 5) Pageable pageable) {
-        List<UserSimpleInfoDto> dtoList = userService.userInfoList(userFilterDto, pageable);
+    public ResponseEntity<ResponseDto<SliceDto<UserSimpleInfoDto>> >userInfoList(Long userNo,
+                                                              @Valid UserFilterDto userFilterDto,
+                                                              @PageableDefault(size = 5) Pageable pageable) {
+        SliceDto<UserSimpleInfoDto> dtoList = userService.userInfoList(userNo, userFilterDto, pageable);
         return ResponseEntity.ok(new ResponseDto<>(null, dtoList));
     }
 

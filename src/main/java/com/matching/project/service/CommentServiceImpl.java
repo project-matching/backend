@@ -1,5 +1,6 @@
 package com.matching.project.service;
 
+import com.matching.project.dto.SliceDto;
 import com.matching.project.dto.comment.CommentDto;
 import com.matching.project.entity.Comment;
 import com.matching.project.entity.Project;
@@ -10,6 +11,7 @@ import com.matching.project.repository.CommentRepository;
 import com.matching.project.repository.ProjectRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -32,16 +34,25 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public List<CommentDto> commentList(Long projectNo, Pageable pageable) {
+    public SliceDto<CommentDto> commentList(Long projectNo, Long commentNo, Pageable pageable) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Optional<User> optionalUser = Optional.ofNullable((User)auth.getPrincipal());
 
         Optional<Project> optionalProject = projectRepository.findById(projectNo);
         optionalProject.orElseThrow(() -> new CustomException(ErrorCode.NOT_FIND_PROJECT_NO_EXCEPTION));
 
-        List<Comment> commentPage = commentRepository.findByProjectOrderByNoDescUsingPaging(optionalProject.get(), pageable);
+        if (commentNo == null)
+            commentNo = Long.MAX_VALUE;
 
-        return commentPage.stream().map(CommentDto::toCommentDto).collect(Collectors.toList());
+        Slice<Comment> commentPage = commentRepository.findByProjectOrderByNoDescUsingPaging(optionalProject.get(), commentNo, pageable);
+
+        SliceDto<CommentDto> dto = SliceDto.<CommentDto>builder()
+                .content(commentPage.stream().
+                        map(CommentDto::toCommentDto)
+                        .collect(Collectors.toList()))
+                .last(commentPage.isLast())
+                .build();
+        return dto;
     }
 
     @Override
