@@ -1,5 +1,6 @@
 package com.matching.project.service;
 
+import com.matching.project.dto.SliceDto;
 import com.matching.project.dto.enumerate.OAuth;
 import com.matching.project.dto.enumerate.Role;
 import com.matching.project.dto.project.ProjectSimpleDto;
@@ -286,64 +287,66 @@ class BookMarkServiceImplTest {
             int end = (start + pageable.getPageSize()) > projectSimpleDtoList.size() ? projectSimpleDtoList.size() : (start + pageable.getPageSize());
             Page<ProjectSimpleDto> projectPage = new PageImpl<>(projectSimpleDtoList.subList(start, end), pageable, projectSimpleDtoList.size());
 
-            given(projectRepository.findBookMarkProject(any(Pageable.class),any(User.class))).willReturn(projectPage);
+            given(projectRepository.findBookMarkProject(any(Pageable.class), any(Long.class), any(User.class))).willReturn(projectPage);
 
-            List<ProjectSimpleDto> result = null;
+            SliceDto<ProjectSimpleDto> result = null;
 
             UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(user1, "", user1.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(auth);
             try {
-                result = bookMarkService.findBookMarkProject(pageable);
+                result = bookMarkService.findBookMarkProject(Long.MAX_VALUE, pageable);
             } catch (Exception e) {
                 e.printStackTrace();
             }
 
-            verify(projectRepository).findBookMarkProject(any(Pageable.class),any(User.class));
+            verify(projectRepository).findBookMarkProject(any(Pageable.class), any(Long.class), any(User.class));
 
-            assertEquals(result.size(), 2);
-            assertEquals(result.get(0).getProjectNo(), projectSimpleDto1.getProjectNo());
-            assertEquals(result.get(0).getName(), projectSimpleDto1.getName());
-            assertEquals(result.get(0).getMaxPeople(), projectSimpleDto1.getMaxPeople());
-            assertEquals(result.get(0).getCurrentPeople(), projectSimpleDto1.getCurrentPeople());
-            assertEquals(result.get(0).getViewCount(), projectSimpleDto1.getViewCount());
-            assertEquals(result.get(0).getRegister(), user1.getName());
-            assertEquals(result.get(0).isBookMark(), true);
+            assertEquals(result.getContent().size(), 2);
+            assertEquals(result.getContent().get(0).getProjectNo(), projectSimpleDto1.getProjectNo());
+            assertEquals(result.getContent().get(0).getName(), projectSimpleDto1.getName());
+            assertEquals(result.getContent().get(0).getMaxPeople(), projectSimpleDto1.getMaxPeople());
+            assertEquals(result.getContent().get(0).getCurrentPeople(), projectSimpleDto1.getCurrentPeople());
+            assertEquals(result.getContent().get(0).getViewCount(), projectSimpleDto1.getViewCount());
+            assertEquals(result.getContent().get(0).getRegister(), user1.getName());
+            assertEquals(result.getContent().get(0).isBookMark(), true);
 
-            assertEquals(result.get(0).getProjectSimplePositionDtoList().get(0).getProjectNo(), positionName1.getProjectNo());
-            assertEquals(result.get(0).getProjectSimplePositionDtoList().get(0).getPositionNo(), positionName1.getPositionNo());
-            assertEquals(result.get(0).getProjectSimplePositionDtoList().get(0).getPositionName(), positionName1.getPositionName());
-            assertEquals(result.get(0).getProjectSimplePositionDtoList().get(1).getProjectNo(), positionName2.getProjectNo());
-            assertEquals(result.get(0).getProjectSimplePositionDtoList().get(1).getPositionNo(), positionName2.getPositionNo());
-            assertEquals(result.get(0).getProjectSimplePositionDtoList().get(1).getPositionName(), positionName2.getPositionName());
+            assertEquals(result.getContent().get(0).getProjectSimplePositionDtoList().get(0).getProjectNo(), positionName1.getProjectNo());
+            assertEquals(result.getContent().get(0).getProjectSimplePositionDtoList().get(0).getPositionNo(), positionName1.getPositionNo());
+            assertEquals(result.getContent().get(0).getProjectSimplePositionDtoList().get(0).getPositionName(), positionName1.getPositionName());
+            assertEquals(result.getContent().get(0).getProjectSimplePositionDtoList().get(1).getProjectNo(), positionName2.getProjectNo());
+            assertEquals(result.getContent().get(0).getProjectSimplePositionDtoList().get(1).getPositionNo(), positionName2.getPositionNo());
+            assertEquals(result.getContent().get(0).getProjectSimplePositionDtoList().get(1).getPositionName(), positionName2.getPositionName());
 
-            assertEquals(result.get(0).getProjectSimpleTechnicalStackDtoList().get(0).getProjectNo(), technicalStackName1.getProjectNo());
-            assertEquals(result.get(0).getProjectSimpleTechnicalStackDtoList().get(0).getImage(), technicalStackName1.getImage());
-            assertEquals(result.get(0).getProjectSimpleTechnicalStackDtoList().get(0).getTechnicalStackName(), technicalStackName1.getTechnicalStackName());
-            assertEquals(result.get(0).getProjectSimpleTechnicalStackDtoList().get(1).getProjectNo(), technicalStackName2.getProjectNo());
-            assertEquals(result.get(0).getProjectSimpleTechnicalStackDtoList().get(1).getImage(), technicalStackName2.getImage());
-            assertEquals(result.get(0).getProjectSimpleTechnicalStackDtoList().get(1).getTechnicalStackName(), technicalStackName2.getTechnicalStackName());
+            assertEquals(result.getContent().get(0).getProjectSimpleTechnicalStackDtoList().get(0).getProjectNo(), technicalStackName1.getProjectNo());
+            assertEquals(result.getContent().get(0).getProjectSimpleTechnicalStackDtoList().get(0).getImage(), technicalStackName1.getImage());
+            assertEquals(result.getContent().get(0).getProjectSimpleTechnicalStackDtoList().get(0).getTechnicalStackName(), technicalStackName1.getTechnicalStackName());
+            assertEquals(result.getContent().get(0).getProjectSimpleTechnicalStackDtoList().get(1).getProjectNo(), technicalStackName2.getProjectNo());
+            assertEquals(result.getContent().get(0).getProjectSimpleTechnicalStackDtoList().get(1).getImage(), technicalStackName2.getImage());
+            assertEquals(result.getContent().get(0).getProjectSimpleTechnicalStackDtoList().get(1).getTechnicalStackName(), technicalStackName2.getTechnicalStackName());
 
-            assertEquals(result.get(1).getProjectNo(), projectSimpleDto2.getProjectNo());
-            assertEquals(result.get(1).getName(), projectSimpleDto2.getName());
-            assertEquals(result.get(1).getMaxPeople(), projectSimpleDto2.getMaxPeople());
-            assertEquals(result.get(1).getCurrentPeople(), projectSimpleDto2.getCurrentPeople());
-            assertEquals(result.get(1).getViewCount(), projectSimpleDto2.getViewCount());
-            assertEquals(result.get(1).getRegister(), user1.getName());
-            assertEquals(result.get(1).isBookMark(), true);
+            assertEquals(result.getContent().get(1).getProjectNo(), projectSimpleDto2.getProjectNo());
+            assertEquals(result.getContent().get(1).getName(), projectSimpleDto2.getName());
+            assertEquals(result.getContent().get(1).getMaxPeople(), projectSimpleDto2.getMaxPeople());
+            assertEquals(result.getContent().get(1).getCurrentPeople(), projectSimpleDto2.getCurrentPeople());
+            assertEquals(result.getContent().get(1).getViewCount(), projectSimpleDto2.getViewCount());
+            assertEquals(result.getContent().get(1).getRegister(), user1.getName());
+            assertEquals(result.getContent().get(1).isBookMark(), true);
 
-            assertEquals(result.get(1).getProjectSimplePositionDtoList().get(0).getProjectNo(), positionName3.getProjectNo());
-            assertEquals(result.get(1).getProjectSimplePositionDtoList().get(0).getPositionNo(), positionName3.getPositionNo());
-            assertEquals(result.get(1).getProjectSimplePositionDtoList().get(0).getPositionName(), positionName3.getPositionName());
-            assertEquals(result.get(1).getProjectSimplePositionDtoList().get(1).getProjectNo(), positionName4.getProjectNo());
-            assertEquals(result.get(1).getProjectSimplePositionDtoList().get(1).getPositionNo(), positionName4.getPositionNo());
-            assertEquals(result.get(1).getProjectSimplePositionDtoList().get(1).getPositionName(), positionName4.getPositionName());
+            assertEquals(result.getContent().get(1).getProjectSimplePositionDtoList().get(0).getProjectNo(), positionName3.getProjectNo());
+            assertEquals(result.getContent().get(1).getProjectSimplePositionDtoList().get(0).getPositionNo(), positionName3.getPositionNo());
+            assertEquals(result.getContent().get(1).getProjectSimplePositionDtoList().get(0).getPositionName(), positionName3.getPositionName());
+            assertEquals(result.getContent().get(1).getProjectSimplePositionDtoList().get(1).getProjectNo(), positionName4.getProjectNo());
+            assertEquals(result.getContent().get(1).getProjectSimplePositionDtoList().get(1).getPositionNo(), positionName4.getPositionNo());
+            assertEquals(result.getContent().get(1).getProjectSimplePositionDtoList().get(1).getPositionName(), positionName4.getPositionName());
 
-            assertEquals(result.get(1).getProjectSimpleTechnicalStackDtoList().get(0).getProjectNo(), technicalStackName3.getProjectNo());
-            assertEquals(result.get(1).getProjectSimpleTechnicalStackDtoList().get(0).getImage(), technicalStackName3.getImage());
-            assertEquals(result.get(1).getProjectSimpleTechnicalStackDtoList().get(0).getTechnicalStackName(), technicalStackName3.getTechnicalStackName());
-            assertEquals(result.get(1).getProjectSimpleTechnicalStackDtoList().get(1).getProjectNo(), technicalStackName4.getProjectNo());
-            assertEquals(result.get(1).getProjectSimpleTechnicalStackDtoList().get(1).getImage(), technicalStackName4.getImage());
-            assertEquals(result.get(1).getProjectSimpleTechnicalStackDtoList().get(1).getTechnicalStackName(), technicalStackName4.getTechnicalStackName());
+            assertEquals(result.getContent().get(1).getProjectSimpleTechnicalStackDtoList().get(0).getProjectNo(), technicalStackName3.getProjectNo());
+            assertEquals(result.getContent().get(1).getProjectSimpleTechnicalStackDtoList().get(0).getImage(), technicalStackName3.getImage());
+            assertEquals(result.getContent().get(1).getProjectSimpleTechnicalStackDtoList().get(0).getTechnicalStackName(), technicalStackName3.getTechnicalStackName());
+            assertEquals(result.getContent().get(1).getProjectSimpleTechnicalStackDtoList().get(1).getProjectNo(), technicalStackName4.getProjectNo());
+            assertEquals(result.getContent().get(1).getProjectSimpleTechnicalStackDtoList().get(1).getImage(), technicalStackName4.getImage());
+            assertEquals(result.getContent().get(1).getProjectSimpleTechnicalStackDtoList().get(1).getTechnicalStackName(), technicalStackName4.getTechnicalStackName());
+
+            assertEquals(result.isLast(), true);
         }
     }
 }

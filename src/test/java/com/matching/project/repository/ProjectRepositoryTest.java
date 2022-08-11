@@ -14,12 +14,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -27,7 +25,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@Import({QuerydslConfiguration.class})
+@Import({QuerydslConfiguration.class, JpaConfig.class})
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Transactional
@@ -59,6 +57,9 @@ class ProjectRepositoryTest {
 
     @Autowired
     private BookMarkRepository bookMarkRepository;
+
+    @Autowired
+    private EntityManager em;
 
     @Test
     public void 프로젝트_탐색() {
@@ -204,23 +205,22 @@ class ProjectRepositoryTest {
         Pageable pageable = PageRequest.of(0, 5, Sort.by("createdDate").descending());
 
         // 모집 중이고, 삭제되지 않은 프로젝트 탐색
-        Page<ProjectSimpleDto> projectSimpleDtoPage = null;
+        Slice<ProjectSimpleDto> projectSimpleDtoSlice = null;
         try {
-            projectSimpleDtoPage = projectRepository.findProjectByStatus(pageable, true, new ProjectSearchRequestDto(ProjectFilter.PROJECT_NAME_AND_CONTENT, null));
+            projectSimpleDtoSlice = projectRepository.findProjectByStatus(pageable, Long.MAX_VALUE,true, new ProjectSearchRequestDto(ProjectFilter.PROJECT_NAME_AND_CONTENT, null));
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        List<ProjectSimpleDto> projectList =  projectSimpleDtoPage.getContent();
+        List<ProjectSimpleDto> projectList =  projectSimpleDtoSlice.getContent();
 
         //then
-        assertEquals(projectSimpleDtoPage.getTotalPages(), 1);
-        assertEquals(projectSimpleDtoPage.getNumber(), 0);
-        assertEquals(projectSimpleDtoPage.getNumberOfElements(), 2);
-        assertEquals(projectSimpleDtoPage.hasNext(), false);
-        assertEquals(projectSimpleDtoPage.isFirst(), true);
-        assertEquals(projectSimpleDtoPage.isLast(), true);
-        assertEquals(projectSimpleDtoPage.hasContent(), true);
+        assertEquals(projectSimpleDtoSlice.getNumber(), 0);
+        assertEquals(projectSimpleDtoSlice.getNumberOfElements(), 2);
+        assertEquals(projectSimpleDtoSlice.hasNext(), false);
+        assertEquals(projectSimpleDtoSlice.isFirst(), true);
+        assertEquals(projectSimpleDtoSlice.isLast(), true);
+        assertEquals(projectSimpleDtoSlice.hasContent(), true);
 
         assertEquals(projectList.size(), 2);
         assertEquals(projectList.get(0).getProjectNo(), saveProject2.getNo());
@@ -410,23 +410,22 @@ class ProjectRepositoryTest {
         Pageable pageable = PageRequest.of(0, 5, Sort.by("createdDate").descending());
 
         // 모집 중이고, 삭제되지 않은 프로젝트 중 Name2을 포함하고있는 리스트 탐색
-        Page<ProjectSimpleDto> projectSimpleDtoPage = null;
+        Slice<ProjectSimpleDto> projectSimpleDtoSlice = null;
         try {
-            projectSimpleDtoPage = projectRepository.findProjectByStatus(pageable, true, new ProjectSearchRequestDto(ProjectFilter.PROJECT_NAME_AND_CONTENT, "Name2"));
+            projectSimpleDtoSlice = projectRepository.findProjectByStatus(pageable, Long.MAX_VALUE, true, new ProjectSearchRequestDto(ProjectFilter.PROJECT_NAME_AND_CONTENT, "Name2"));
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        List<ProjectSimpleDto> projectList =  projectSimpleDtoPage.getContent();
+        List<ProjectSimpleDto> projectList =  projectSimpleDtoSlice.getContent();
 
         //then
-        assertEquals(projectSimpleDtoPage.getTotalPages(), 1);
-        assertEquals(projectSimpleDtoPage.getNumber(), 0);
-        assertEquals(projectSimpleDtoPage.getNumberOfElements(), 1);
-        assertEquals(projectSimpleDtoPage.hasNext(), false);
-        assertEquals(projectSimpleDtoPage.isFirst(), true);
-        assertEquals(projectSimpleDtoPage.isLast(), true);
-        assertEquals(projectSimpleDtoPage.hasContent(), true);
+        assertEquals(projectSimpleDtoSlice.getNumber(), 0);
+        assertEquals(projectSimpleDtoSlice.getNumberOfElements(), 1);
+        assertEquals(projectSimpleDtoSlice.hasNext(), false);
+        assertEquals(projectSimpleDtoSlice.isFirst(), true);
+        assertEquals(projectSimpleDtoSlice.isLast(), true);
+        assertEquals(projectSimpleDtoSlice.hasContent(), true);
 
         assertEquals(projectList.size(), 1);
         assertEquals(projectList.get(0).getProjectNo(), saveProject2.getNo());
@@ -613,23 +612,22 @@ class ProjectRepositoryTest {
         Pageable pageable = PageRequest.of(0, 5, Sort.by("createdDate").descending());
 
         // 유저가 만든, 삭제되지 않은 프로젝트 탐색
-        Page<ProjectSimpleDto> projectSimpleDtoPage = null;
+        Slice<ProjectSimpleDto> projectSimpleDtoSlice = null;
         try {
-            projectSimpleDtoPage = projectRepository.findUserProject(pageable, saveUser1);
+            projectSimpleDtoSlice = projectRepository.findUserProject(pageable, Long.MAX_VALUE, saveUser1);
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        List<ProjectSimpleDto> projectList =  projectSimpleDtoPage.getContent();
+        List<ProjectSimpleDto> projectList =  projectSimpleDtoSlice.getContent();
 
         //then
-        assertEquals(projectSimpleDtoPage.getTotalPages(), 1);
-        assertEquals(projectSimpleDtoPage.getNumber(), 0);
-        assertEquals(projectSimpleDtoPage.getNumberOfElements(), 2);
-        assertEquals(projectSimpleDtoPage.hasNext(), false);
-        assertEquals(projectSimpleDtoPage.isFirst(), true);
-        assertEquals(projectSimpleDtoPage.isLast(), true);
-        assertEquals(projectSimpleDtoPage.hasContent(), true);
+        assertEquals(projectSimpleDtoSlice.getNumber(), 0);
+        assertEquals(projectSimpleDtoSlice.getNumberOfElements(), 2);
+        assertEquals(projectSimpleDtoSlice.hasNext(), false);
+        assertEquals(projectSimpleDtoSlice.isFirst(), true);
+        assertEquals(projectSimpleDtoSlice.isLast(), true);
+        assertEquals(projectSimpleDtoSlice.hasContent(), true);
 
         assertEquals(projectList.size(), 2);
         assertEquals(projectList.get(0).getProjectNo(), saveProject2.getNo());
@@ -836,23 +834,22 @@ class ProjectRepositoryTest {
         Pageable pageable = PageRequest.of(0, 5, Sort.by("createdDate").descending());
 
         // 참여중인 프로젝트 조회
-        Page<ProjectSimpleDto> projectSimpleDtoPage = null;
+        Slice<ProjectSimpleDto> projectSimpleDtoSlice = null;
         try {
-            projectSimpleDtoPage = projectRepository.findParticipateProject(pageable, saveUser1);
+            projectSimpleDtoSlice = projectRepository.findParticipateProject(pageable, Long.MAX_VALUE, saveUser1);
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        List<ProjectSimpleDto> projectList =  projectSimpleDtoPage.getContent();
+        List<ProjectSimpleDto> projectList =  projectSimpleDtoSlice.getContent();
 
         //then
-        assertEquals(projectSimpleDtoPage.getTotalPages(), 1);
-        assertEquals(projectSimpleDtoPage.getNumber(), 0);
-        assertEquals(projectSimpleDtoPage.getNumberOfElements(), 2);
-        assertEquals(projectSimpleDtoPage.hasNext(), false);
-        assertEquals(projectSimpleDtoPage.isFirst(), true);
-        assertEquals(projectSimpleDtoPage.isLast(), true);
-        assertEquals(projectSimpleDtoPage.hasContent(), true);
+        assertEquals(projectSimpleDtoSlice.getNumber(), 0);
+        assertEquals(projectSimpleDtoSlice.getNumberOfElements(), 2);
+        assertEquals(projectSimpleDtoSlice.hasNext(), false);
+        assertEquals(projectSimpleDtoSlice.isFirst(), true);
+        assertEquals(projectSimpleDtoSlice.isLast(), true);
+        assertEquals(projectSimpleDtoSlice.hasContent(), true);
 
         assertEquals(projectList.size(), 2);
         assertEquals(projectList.get(0).getProjectNo(), saveProject2.getNo());
@@ -1062,23 +1059,22 @@ class ProjectRepositoryTest {
         Pageable pageable = PageRequest.of(0, 5, Sort.by("createdDate").descending());
 
         // 참여중인 프로젝트 조회
-        Page<ProjectSimpleDto> projectSimpleDtoPage = null;
+        Slice<ProjectSimpleDto> projectSimpleDtoSlice = null;
         try {
-            projectSimpleDtoPage = projectRepository.findParticipateProject(pageable, saveUser1);
+            projectSimpleDtoSlice = projectRepository.findParticipateProject(pageable, Long.MAX_VALUE, saveUser1);
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        List<ProjectSimpleDto> projectList =  projectSimpleDtoPage.getContent();
+        List<ProjectSimpleDto> projectList =  projectSimpleDtoSlice.getContent();
 
         //then
-        assertEquals(projectSimpleDtoPage.getTotalPages(), 1);
-        assertEquals(projectSimpleDtoPage.getNumber(), 0);
-        assertEquals(projectSimpleDtoPage.getNumberOfElements(), 2);
-        assertEquals(projectSimpleDtoPage.hasNext(), false);
-        assertEquals(projectSimpleDtoPage.isFirst(), true);
-        assertEquals(projectSimpleDtoPage.isLast(), true);
-        assertEquals(projectSimpleDtoPage.hasContent(), true);
+        assertEquals(projectSimpleDtoSlice.getNumber(), 0);
+        assertEquals(projectSimpleDtoSlice.getNumberOfElements(), 2);
+        assertEquals(projectSimpleDtoSlice.hasNext(), false);
+        assertEquals(projectSimpleDtoSlice.isFirst(), true);
+        assertEquals(projectSimpleDtoSlice.isLast(), true);
+        assertEquals(projectSimpleDtoSlice.hasContent(), true);
 
         assertEquals(projectList.size(), 2);
         assertEquals(projectList.get(0).getProjectNo(), saveProject2.getNo());
@@ -1303,23 +1299,22 @@ class ProjectRepositoryTest {
         Pageable pageable = PageRequest.of(0, 5, Sort.by("createdDate").descending());
 
         // 참여중인 프로젝트 조회
-        Page<ProjectSimpleDto> projectSimpleDtoPage = null;
+        Slice<ProjectSimpleDto> projectSimpleDtoSlice = null;
         try {
-            projectSimpleDtoPage = projectRepository.findParticipateRequestProject(pageable, saveUser1);
+            projectSimpleDtoSlice = projectRepository.findParticipateRequestProject(pageable, Long.MAX_VALUE, saveUser1);
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        List<ProjectSimpleDto> projectList =  projectSimpleDtoPage.getContent();
+        List<ProjectSimpleDto> projectList =  projectSimpleDtoSlice.getContent();
 
         //then
-        assertEquals(projectSimpleDtoPage.getTotalPages(), 1);
-        assertEquals(projectSimpleDtoPage.getNumber(), 0);
-        assertEquals(projectSimpleDtoPage.getNumberOfElements(), 2);
-        assertEquals(projectSimpleDtoPage.hasNext(), false);
-        assertEquals(projectSimpleDtoPage.isFirst(), true);
-        assertEquals(projectSimpleDtoPage.isLast(), true);
-        assertEquals(projectSimpleDtoPage.hasContent(), true);
+        assertEquals(projectSimpleDtoSlice.getNumber(), 0);
+        assertEquals(projectSimpleDtoSlice.getNumberOfElements(), 2);
+        assertEquals(projectSimpleDtoSlice.hasNext(), false);
+        assertEquals(projectSimpleDtoSlice.isFirst(), true);
+        assertEquals(projectSimpleDtoSlice.isLast(), true);
+        assertEquals(projectSimpleDtoSlice.hasContent(), true);
 
         assertEquals(projectList.size(), 2);
         assertEquals(projectList.get(0).getProjectNo(), saveProject2.getNo());
@@ -1560,23 +1555,22 @@ class ProjectRepositoryTest {
         Pageable pageable = PageRequest.of(0, 5, Sort.by("createdDate").descending());
 
         // 참여중인 프로젝트 조회
-        Page<ProjectSimpleDto> projectSimpleDtoPage = null;
+        Slice<ProjectSimpleDto> projectSimpleDtoSlice = null;
         try {
-            projectSimpleDtoPage = projectRepository.findParticipateRequestProject(pageable, saveUser1);
+            projectSimpleDtoSlice = projectRepository.findParticipateRequestProject(pageable, Long.MAX_VALUE, saveUser1);
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        List<ProjectSimpleDto> projectList =  projectSimpleDtoPage.getContent();
+        List<ProjectSimpleDto> projectList =  projectSimpleDtoSlice.getContent();
 
         //then
-        assertEquals(projectSimpleDtoPage.getTotalPages(), 1);
-        assertEquals(projectSimpleDtoPage.getNumber(), 0);
-        assertEquals(projectSimpleDtoPage.getNumberOfElements(), 2);
-        assertEquals(projectSimpleDtoPage.hasNext(), false);
-        assertEquals(projectSimpleDtoPage.isFirst(), true);
-        assertEquals(projectSimpleDtoPage.isLast(), true);
-        assertEquals(projectSimpleDtoPage.hasContent(), true);
+        assertEquals(projectSimpleDtoSlice.getNumber(), 0);
+        assertEquals(projectSimpleDtoSlice.getNumberOfElements(), 2);
+        assertEquals(projectSimpleDtoSlice.hasNext(), false);
+        assertEquals(projectSimpleDtoSlice.isFirst(), true);
+        assertEquals(projectSimpleDtoSlice.isLast(), true);
+        assertEquals(projectSimpleDtoSlice.hasContent(), true);
 
         assertEquals(projectList.size(), 2);
         assertEquals(projectList.get(0).getProjectNo(), saveProject2.getNo());
@@ -1797,23 +1791,22 @@ class ProjectRepositoryTest {
         Pageable pageable = PageRequest.of(0, 5, Sort.by("createdDate").descending());
 
         // 참여중인 프로젝트 조회
-        Page<ProjectSimpleDto> projectSimpleDtoPage = null;
+        Slice<ProjectSimpleDto> projectSimpleDtoSlice = null;
         try {
-            projectSimpleDtoPage = projectRepository.findBookMarkProject(pageable, saveUser1);
+            projectSimpleDtoSlice = projectRepository.findBookMarkProject(pageable, Long.MAX_VALUE, saveUser1);
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        List<ProjectSimpleDto> projectList =  projectSimpleDtoPage.getContent();
+        List<ProjectSimpleDto> projectList =  projectSimpleDtoSlice.getContent();
 
         //then
-        assertEquals(projectSimpleDtoPage.getTotalPages(), 1);
-        assertEquals(projectSimpleDtoPage.getNumber(), 0);
-        assertEquals(projectSimpleDtoPage.getNumberOfElements(), 2);
-        assertEquals(projectSimpleDtoPage.hasNext(), false);
-        assertEquals(projectSimpleDtoPage.isFirst(), true);
-        assertEquals(projectSimpleDtoPage.isLast(), true);
-        assertEquals(projectSimpleDtoPage.hasContent(), true);
+        assertEquals(projectSimpleDtoSlice.getNumber(), 0);
+        assertEquals(projectSimpleDtoSlice.getNumberOfElements(), 2);
+        assertEquals(projectSimpleDtoSlice.hasNext(), false);
+        assertEquals(projectSimpleDtoSlice.isFirst(), true);
+        assertEquals(projectSimpleDtoSlice.isLast(), true);
+        assertEquals(projectSimpleDtoSlice.hasContent(), true);
 
         assertEquals(projectList.size(), 2);
         assertEquals(projectList.get(0).getProjectNo(), saveProject2.getNo());

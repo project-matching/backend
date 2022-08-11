@@ -46,36 +46,36 @@ public class ProjectController {
 
     @GetMapping("/recruitment")
     @ApiOperation(value = "모집중인 프로젝트 목록 조회")
-    public ResponseEntity<ResponseDto<SliceDto<ProjectSimpleDto>>> projectRecruitingList(@PageableDefault(size = 5, sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable, @RequestParam(value = "no", required = false) Long no) throws Exception {
-        SliceDto<ProjectSimpleDto> projectSimpleDtoList = projectService.findProjectList(no,true, pageable);
+    public ResponseEntity<ResponseDto<SliceDto<ProjectSimpleDto>>> projectRecruitingList(@PageableDefault(size = 5, sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable, @RequestParam(value = "projectNo", required = false) Long projectNo, @RequestParam(value = "searchContent", required = false) String searchContent) throws Exception {
+        SliceDto<ProjectSimpleDto> projectSimpleDtoList = projectService.findProjectList(projectNo,true, new ProjectSearchRequestDto(ProjectFilter.PROJECT_NAME_AND_CONTENT, searchContent), pageable);
         return ResponseEntity.ok(new ResponseDto<>(null, projectSimpleDtoList));
     }
 
     @GetMapping("/recruitment/complete")
     @ApiOperation(value = "모집 완료된 프로젝트 목록 조회")
-    public ResponseEntity<ResponseDto<SliceDto<ProjectSimpleDto>>> projectRecruitingCompleteList(@PageableDefault(size = 5, sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable, @RequestParam(value = "no", required = false) Long no) throws Exception {
-        SliceDto<ProjectSimpleDto> projectSimpleDtoList = projectService.findProjectList(no, false, pageable);
+    public ResponseEntity<ResponseDto<SliceDto<ProjectSimpleDto>>> projectRecruitingCompleteList(@PageableDefault(size = 5, sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable, @RequestParam(value = "projectNo", required = false) Long projectNo, @RequestParam(value = "searchContent", required = false) String searchContent) throws Exception {
+        SliceDto<ProjectSimpleDto> projectSimpleDtoList = projectService.findProjectList(projectNo, false, new ProjectSearchRequestDto(ProjectFilter.PROJECT_NAME_AND_CONTENT, searchContent), pageable);
         return ResponseEntity.ok(new ResponseDto<>(null, projectSimpleDtoList));
     }
 
     @GetMapping("/create/self")
     @ApiOperation(value = "내가 만든 프로젝트 목록 조회")
-    public ResponseEntity<ResponseDto<List<ProjectSimpleDto>>> projectCreateSelfList(@PageableDefault(size = 5, sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable) throws Exception {
-        List<ProjectSimpleDto> projectSimpleDtoList = projectService.findUserProjectList(pageable);
+    public ResponseEntity<ResponseDto<SliceDto<ProjectSimpleDto>>> projectCreateSelfList(@PageableDefault(size = 5, sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable, @RequestParam(value = "projectNo", required = false) Long projectNo) throws Exception {
+        SliceDto<ProjectSimpleDto> projectSimpleDtoList = projectService.findUserProjectList(projectNo, pageable);
         return ResponseEntity.ok(new ResponseDto<>(null, projectSimpleDtoList));
     }
 
     @GetMapping("/participate")
     @ApiOperation(value = "참여중인 프로젝트 목록 조회")
-    public ResponseEntity<ResponseDto<List<ProjectSimpleDto>>> projectParticipateList(@PageableDefault(size = 5, sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable) throws Exception {
-        List<ProjectSimpleDto> projectSimpleDtoList = projectService.findParticipateProjectList(pageable);
+    public ResponseEntity<ResponseDto<SliceDto<ProjectSimpleDto>>> projectParticipateList(@PageableDefault(size = 5, sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable, @RequestParam(value = "projectNo", required = false) Long projectNo) throws Exception {
+        SliceDto<ProjectSimpleDto> projectSimpleDtoList = projectService.findParticipateProjectList(projectNo, pageable);
         return ResponseEntity.ok(new ResponseDto<>(null, projectSimpleDtoList));
     }
 
     @GetMapping("/application")
     @ApiOperation(value = "신청중인 프로젝트 목록 조회")
-    public ResponseEntity<ResponseDto<List<ProjectSimpleDto>>> projectApplicationList(@PageableDefault(size = 5, sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable) throws Exception {
-        List<ProjectSimpleDto> projectSimpleDtoList = projectService.findParticipateRequestProjectList(pageable);
+    public ResponseEntity<ResponseDto<SliceDto<ProjectSimpleDto>>> projectApplicationList(@PageableDefault(size = 5, sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable, @RequestParam(value = "projectNo", required = false) Long projectNo) throws Exception {
+        SliceDto<ProjectSimpleDto> projectSimpleDtoList = projectService.findParticipateRequestProjectList(projectNo, pageable);
         return ResponseEntity.ok(new ResponseDto<>(null, projectSimpleDtoList));
     }
 

@@ -1,5 +1,6 @@
 package com.matching.project.repository;
 
+import com.matching.project.config.JpaConfig;
 import com.matching.project.config.QuerydslConfiguration;
 import com.matching.project.dto.enumerate.OAuth;
 import com.matching.project.dto.enumerate.Role;
@@ -12,10 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.security.core.parameters.P;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,7 +23,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-@Import(QuerydslConfiguration.class)
+@Import({QuerydslConfiguration.class, JpaConfig.class})
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Transactional
@@ -208,25 +206,24 @@ class ProjectParticipateRequestRepositoryTest {
         ParticipateRequestTechnicalStack saveParticipateRequestTechnicalStack3 = participateRequestTechnicalStackRepository.save(participateRequestTechnicalStack3);
 
         // when
-        Pageable pageable = PageRequest.of(0, 5, Sort.by("no").descending());
+        Pageable pageable = PageRequest.of(0, 5, Sort.by("createdDate").descending());
 
-        Page<ProjectParticipateFormResponseDto> projectParticipateFormResponseDtoPage = null;
+        Slice<ProjectParticipateFormResponseDto> projectParticipateFormResponseDtoSlice = null;
         try {
-            projectParticipateFormResponseDtoPage = projectParticipateRequestRepository.findProjectParticipateRequestByProjectNo(saveProject1.getNo(), pageable);
+            projectParticipateFormResponseDtoSlice = projectParticipateRequestRepository.findProjectParticipateRequestByProjectNo(saveProject1.getNo(), Long.MAX_VALUE, pageable);
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        List<ProjectParticipateFormResponseDto> projectParticipateFormResponseDtoList = projectParticipateFormResponseDtoPage.getContent();
+        List<ProjectParticipateFormResponseDto> projectParticipateFormResponseDtoList = projectParticipateFormResponseDtoSlice.getContent();
 
         // then
-        assertEquals(projectParticipateFormResponseDtoPage.getTotalPages(), 1);
-        assertEquals(projectParticipateFormResponseDtoPage.getNumber(), 0);
-        assertEquals(projectParticipateFormResponseDtoPage.getNumberOfElements(), 3);
-        assertEquals(projectParticipateFormResponseDtoPage.hasNext(), false);
-        assertEquals(projectParticipateFormResponseDtoPage.isFirst(), true);
-        assertEquals(projectParticipateFormResponseDtoPage.isLast(), true);
-        assertEquals(projectParticipateFormResponseDtoPage.hasContent(), true);
+        assertEquals(projectParticipateFormResponseDtoSlice.getNumber(), 0);
+        assertEquals(projectParticipateFormResponseDtoSlice.getNumberOfElements(), 3);
+        assertEquals(projectParticipateFormResponseDtoSlice.hasNext(), false);
+        assertEquals(projectParticipateFormResponseDtoSlice.isFirst(), true);
+        assertEquals(projectParticipateFormResponseDtoSlice.isLast(), true);
+        assertEquals(projectParticipateFormResponseDtoSlice.hasContent(), true);
 
         assertEquals(projectParticipateFormResponseDtoList.size(), 3);
         assertEquals(projectParticipateFormResponseDtoList.get(0).getProjectParticipateNo(), saveProjectParticipateRequest3.getNo());

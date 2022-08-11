@@ -77,7 +77,7 @@ public class ProjectRepositoryImpl implements ProjectRepositoryCustom {
     
     // 모집 상태 검색하는 메소드
     @Override
-    public Slice<ProjectSimpleDto> findProjectByStatus(Pageable pageable, Long no, boolean state){
+    public Slice<ProjectSimpleDto> findProjectByStatus(Pageable pageable, Long projectNo, boolean state, ProjectSearchRequestDto projectSearchRequestDto){
         List<ProjectSimpleDto> projectSimpleDtoList = queryFactory.select(Projections.constructor(ProjectSimpleDto.class,
                         project.no,
                         project.name,
@@ -87,8 +87,9 @@ public class ProjectRepositoryImpl implements ProjectRepositoryCustom {
                         project.createUserName))
                 .from(project)
                 .where(
-                        underNo(no),
-                        eqStatus(state))
+                        underProjectNo(projectNo),
+                        eqStatus(state),
+                        search(projectSearchRequestDto))
                 .offset(0)
                 .limit(pageable.getPageSize() + 1)
                 .orderBy(projectSort(pageable))
@@ -97,13 +98,6 @@ public class ProjectRepositoryImpl implements ProjectRepositoryCustom {
         // 프로젝트 연관 select
         findProjectSimpleDtoListRelation(projectSimpleDtoList);
 
-        // count 쿼리
-//        int totalSize = queryFactory
-//                .selectFrom(project)
-//                .where(
-//                        eqStatus(state)
-//                )
-//                .fetch().size();
         boolean hasNext = false;
         if (projectSimpleDtoList.size() > pageable.getPageSize()) {
             projectSimpleDtoList.remove(pageable.getPageSize());
@@ -115,7 +109,7 @@ public class ProjectRepositoryImpl implements ProjectRepositoryCustom {
     
     // 유저가 등록한 프로젝트 조회(모집중, 모집완료 포함)
     @Override
-    public Page<ProjectSimpleDto> findUserProject(Pageable pageable, User user) {
+    public Slice<ProjectSimpleDto> findUserProject(Pageable pageable, Long projectNo, User user) {
         List<ProjectSimpleDto> projectSimpleDtoList = queryFactory.select(Projections.constructor(ProjectSimpleDto.class,
                         project.no,
                         project.name,
@@ -126,31 +120,29 @@ public class ProjectRepositoryImpl implements ProjectRepositoryCustom {
                 .from(project)
                 .join(project.user, QUser.user)
                 .where(
+                        underProjectNo(projectNo),
                         eqProjectUser(user)
                 )
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
+                .offset(0)
+                .limit(pageable.getPageSize() + 1)
                 .orderBy(projectSort(pageable))
                 .fetch();
 
         // 프로젝트 연관 select
         findProjectSimpleDtoListRelation(projectSimpleDtoList);
 
-        // count 쿼리
-        int totalSize = queryFactory
-                .selectFrom(project)
-                .join(project.user, QUser.user)
-                .where(
-                        eqProjectUser(user)
-                )
-                .fetch().size();
+        boolean hasNext = false;
+        if (projectSimpleDtoList.size() > pageable.getPageSize()) {
+            projectSimpleDtoList.remove(pageable.getPageSize());
+            hasNext = true;
+        }
 
-        return new PageImpl<>(projectSimpleDtoList, pageable, totalSize);
+        return new SliceImpl<>(projectSimpleDtoList, pageable, hasNext);
     }
     
     // 유저가 참여중인 프로젝트 조회
     @Override
-    public Page<ProjectSimpleDto> findParticipateProject(Pageable pageable, User user) {
+    public Slice<ProjectSimpleDto> findParticipateProject(Pageable pageable, Long projectNo, User user) {
         
         // 유저가 참여한 프로젝트를 중복제거한 상태로 가져오는 서브쿼리
         JPQLQuery<Long> subQuery = JPAExpressions.selectDistinct(project.no)
@@ -170,31 +162,28 @@ public class ProjectRepositoryImpl implements ProjectRepositoryCustom {
                 .where(
                         project.no.in(
                                 subQuery
-                        ))
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
+                        ),
+                        underProjectNo(projectNo))
+                .offset(0)
+                .limit(pageable.getPageSize() + 1)
                 .orderBy(projectSort(pageable))
                 .fetch();
 
         // 프로젝트 연관 select
         findProjectSimpleDtoListRelation(projectSimpleDtoList);
 
-        // count 쿼리
-        int totalSize = queryFactory
-                .selectFrom(project)
-                .where(
-                        (project.no.in(
-                                subQuery
-                        )))
-                .fetch().size();
+        boolean hasNext = false;
+        if (projectSimpleDtoList.size() > pageable.getPageSize()) {
+            projectSimpleDtoList.remove(pageable.getPageSize());
+            hasNext = true;
+        }
 
-        return new PageImpl<>(projectSimpleDtoList, pageable, totalSize);
+        return new SliceImpl<>(projectSimpleDtoList, pageable, hasNext);
     }
 
     // 유저가 신청중인 프로젝트 조회
     @Override
-    public Page<ProjectSimpleDto> findParticipateRequestProject(Pageable pageable, User user) {
-        
+    public Slice<ProjectSimpleDto> findParticipateRequestProject(Pageable pageable, Long projectNo, User user) {
         // 신청중인 프로젝트 no를 중복제거한 상태로 가져오는 서브쿼리
         JPQLQuery<Long> subQuery = JPAExpressions.selectDistinct(project.no)
                 .from(projectParticipateRequest)
@@ -214,29 +203,27 @@ public class ProjectRepositoryImpl implements ProjectRepositoryCustom {
                 .where(
                         project.no.in(
                                 subQuery
-                        ))
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
+                        ),
+                        underProjectNo(projectNo))
+                .offset(0)
+                .limit(pageable.getPageSize() + 1)
                 .orderBy(projectSort(pageable))
                 .fetch();
 
         // 프로젝트 연관 select
         findProjectSimpleDtoListRelation(projectSimpleDtoList);
 
-        // count 쿼리
-        int totalSize = queryFactory
-                .selectFrom(project)
-                .where(
-                        project.no.in(
-                                subQuery
-                        ))
-                .fetch().size();
+        boolean hasNext = false;
+        if (projectSimpleDtoList.size() > pageable.getPageSize()) {
+            projectSimpleDtoList.remove(pageable.getPageSize());
+            hasNext = true;
+        }
 
-        return new PageImpl<>(projectSimpleDtoList, pageable, totalSize);
+        return new SliceImpl<>(projectSimpleDtoList, pageable, hasNext);
     }
 
     @Override
-    public Page<ProjectSimpleDto> findBookMarkProject(Pageable pageable, User user) {
+    public Slice<ProjectSimpleDto> findBookMarkProject(Pageable pageable, Long projectNo, User user) {
         JPQLQuery<Long> subQuery = JPAExpressions.selectDistinct(bookMark.project.no)
                 .from(bookMark)
                 .join(bookMark.user, QUser.user)
@@ -254,9 +241,10 @@ public class ProjectRepositoryImpl implements ProjectRepositoryCustom {
                 .where(
                         project.no.in(
                                 subQuery
-                        ))
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
+                        ),
+                        underProjectNo(projectNo))
+                .offset(0)
+                .limit(pageable.getPageSize() + 1)
                 .orderBy(projectSort(pageable))
                 .fetch();
 
@@ -266,16 +254,13 @@ public class ProjectRepositoryImpl implements ProjectRepositoryCustom {
         // 프로젝트 연관 select
         findProjectSimpleDtoListRelation(projectSimpleDtoList);
 
-        // count 쿼리
-        int totalSize = queryFactory
-                .selectFrom(project)
-                .where(
-                        project.no.in(
-                                subQuery
-                        ))
-                .fetch().size();
+        boolean hasNext = false;
+        if (projectSimpleDtoList.size() > pageable.getPageSize()) {
+            projectSimpleDtoList.remove(pageable.getPageSize());
+            hasNext = true;
+        }
 
-        return new PageImpl<>(projectSimpleDtoList, pageable, totalSize);
+        return new SliceImpl<>(projectSimpleDtoList, pageable, hasNext);
     }
 
     // 프로젝트 연관 조회 메소드(프로젝트 포지션, 프로젝트 기술스택)
@@ -311,21 +296,35 @@ public class ProjectRepositoryImpl implements ProjectRepositoryCustom {
                 .fetchOne();
     }
 
-    private BooleanExpression underNo(Long no) { return  project.no.lt(no);}
+    private BooleanExpression underProjectNo(Long projectNo) {
+        if (projectNo == null) {
+            return null;
+        }
+        return  project.no.lt(projectNo);
+    }
 
     private BooleanExpression eqStatus(boolean state) {
         return project.state.eq(state);
     }
 
     private BooleanExpression eqProjectUser(User user) {
+        if (user == null) {
+            return null;
+        }
         return project.user.eq(user);
     }
 
     private BooleanExpression eqProjectPositionUser(User user) {
+        if (user == null) {
+            return null;
+        }
         return projectPosition.user.eq(user);
     }
 
     private BooleanExpression eqProjectParticipateRequest(User user) {
+        if (user == null) {
+            return null;
+        }
         return projectParticipateRequest.user.eq(user);
     }
     
