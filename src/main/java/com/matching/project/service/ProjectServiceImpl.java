@@ -1,5 +1,6 @@
 package com.matching.project.service;
 
+import com.matching.project.dto.SliceDto;
 import com.matching.project.dto.comment.CommentDto;
 import com.matching.project.dto.enumerate.Role;
 import com.matching.project.dto.project.*;
@@ -16,6 +17,7 @@ import com.matching.project.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -130,8 +132,8 @@ public class ProjectServiceImpl implements ProjectService {
     
     // 프로젝트 조회
     @Override
-    public List<ProjectSimpleDto> findProjectList(boolean state, ProjectSearchRequestDto projectSearchRequestDto, Pageable pageable) throws Exception {
-        Page<ProjectSimpleDto> projectSimpleDtoPage = projectRepository.findProjectByStatus(pageable, state, projectSearchRequestDto);
+    public SliceDto<ProjectSimpleDto> findProjectList(Long no, boolean state, Pageable pageable) throws Exception {
+        Slice<ProjectSimpleDto> projectSimpleDtoSlice = projectRepository.findProjectByStatus(pageable, no != null ? no : Long.MAX_VALUE, state);
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
@@ -140,9 +142,10 @@ public class ProjectServiceImpl implements ProjectService {
             User user = (User) principal;
 
             // 유저 즐겨찾기 조회
-            findBookMark(projectSimpleDtoPage.getContent(), user);
+            findBookMark(projectSimpleDtoSlice.getContent(), user);
         }
-        return projectSimpleDtoPage.getContent();
+
+        return new SliceDto<ProjectSimpleDto>(projectSimpleDtoSlice.getContent(), projectSimpleDtoSlice.isLast());
     }
     
     // 유저가 만든 프로젝트 조회

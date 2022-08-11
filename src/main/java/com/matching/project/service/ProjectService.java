@@ -1,14 +1,17 @@
 package com.matching.project.service;
 
+import com.matching.project.dto.SliceDto;
 import com.matching.project.dto.project.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+
 import java.util.List;
 
 public interface ProjectService {
     public ProjectRegisterFormResponseDto findProjectRegisterForm() throws Exception;
     public Long projectRegister(ProjectRegisterRequestDto projectRegisterRequestDto) throws Exception;
-    public List<ProjectSimpleDto> findProjectList(boolean state, ProjectSearchRequestDto projectSearchRequestDto, Pageable pageable) throws Exception;
+    public SliceDto<ProjectSimpleDto> findProjectList(Long no, boolean state, Pageable pageable) throws Exception;
     public List<ProjectSimpleDto> findUserProjectList(Pageable pageable) throws Exception;
     public List<ProjectSimpleDto> findParticipateProjectList(Pageable pageable) throws Exception;
     public List<ProjectSimpleDto> findParticipateRequestProjectList(Pageable pageable) throws Exception;

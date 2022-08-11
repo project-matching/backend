@@ -13,10 +13,7 @@ import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -80,7 +77,7 @@ public class ProjectRepositoryImpl implements ProjectRepositoryCustom {
     
     // 모집 상태 검색하는 메소드
     @Override
-    public Page<ProjectSimpleDto> findProjectByStatus(Pageable pageable, boolean state, ProjectSearchRequestDto projectSearchRequestDto){
+    public Slice<ProjectSimpleDto> findProjectByStatus(Pageable pageable, Long no, boolean state){
         List<ProjectSimpleDto> projectSimpleDtoList = queryFactory.select(Projections.constructor(ProjectSimpleDto.class,
                         project.no,
                         project.name,
@@ -90,10 +87,10 @@ public class ProjectRepositoryImpl implements ProjectRepositoryCustom {
                         project.createUserName))
                 .from(project)
                 .where(
-                        eqStatus(state),
-                        search(projectSearchRequestDto))
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
+                        underNo(no),
+                        eqStatus(state))
+                .offset(0)
+                .limit(pageable.getPageSize() + 1)
                 .orderBy(projectSort(pageable))
                 .fetch();
 
@@ -101,14 +98,19 @@ public class ProjectRepositoryImpl implements ProjectRepositoryCustom {
         findProjectSimpleDtoListRelation(projectSimpleDtoList);
 
         // count 쿼리
-        int totalSize = queryFactory
-                .selectFrom(project)
-                .where(
-                        eqStatus(state)
-                )
-                .fetch().size();
+//        int totalSize = queryFactory
+//                .selectFrom(project)
+//                .where(
+//                        eqStatus(state)
+//                )
+//                .fetch().size();
+        boolean hasNext = false;
+        if (projectSimpleDtoList.size() > pageable.getPageSize()) {
+            projectSimpleDtoList.remove(pageable.getPageSize());
+            hasNext = true;
+        }
 
-        return new PageImpl<>(projectSimpleDtoList, pageable, totalSize);
+        return new SliceImpl<>(projectSimpleDtoList, pageable, hasNext);
     }
     
     // 유저가 등록한 프로젝트 조회(모집중, 모집완료 포함)
@@ -308,6 +310,8 @@ public class ProjectRepositoryImpl implements ProjectRepositoryCustom {
                 .where(QProject.project.no.eq(projectNo))
                 .fetchOne();
     }
+
+    private BooleanExpression underNo(Long no) { return  project.no.lt(no);}
 
     private BooleanExpression eqStatus(boolean state) {
         return project.state.eq(state);
