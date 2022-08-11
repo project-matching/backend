@@ -44,7 +44,7 @@ public class ProjectController {
 
     @GetMapping("/recruitment")
     @ApiOperation(value = "모집중인 프로젝트 목록 조회")
-    public ResponseEntity<ResponseDto<List<ProjectSimpleDto>>> projectRecruitingList(@PageableDefault(size = 5, sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable, String searchContent) throws Exception {
+    public ResponseEntity<ResponseDto<List<ProjectSimpleDto>>> projectRecruitingList(Pageable pageable, String searchContent) throws Exception {
         List<ProjectSimpleDto> projectSimpleDtoList = projectService.findProjectList(true, new ProjectSearchRequestDto(ProjectFilter.PROJECT_NAME_AND_CONTENT, searchContent), pageable);
         return ResponseEntity.ok(new ResponseDto<>(null, projectSimpleDtoList));
     }

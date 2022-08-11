@@ -92,8 +92,8 @@ public class ProjectRepositoryImpl implements ProjectRepositoryCustom {
                 .where(
                         eqStatus(state),
                         search(projectSearchRequestDto))
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
+                .offset(pageable.getOffset()) // 2     0 ~ 15   0 1 2 3 4  / 1 2 3 4 5 / 2 3 4 5 6
+                .limit(pageable.getPageSize()) // 5
                 .orderBy(projectSort(pageable))
                 .fetch();
 

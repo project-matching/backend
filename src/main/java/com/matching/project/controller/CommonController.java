@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -31,7 +32,7 @@ public class CommonController {
     // 일반 로그인
     @PostMapping("/login")
     @ApiOperation(value = "일반 로그인")
-    public ResponseEntity<ResponseDto<String>> normalLogin(@RequestBody @Valid NormalLoginRequestDto dto) {
+    public ResponseEntity<ResponseDto<String>> normalLogin(@RequestBody @Valid NormalLoginRequestDto dto, BindingResult bindingResult) {
         User user = commonService.normalLogin(dto);
         TokenDto tokenDto = TokenDto.builder()
                 .email(user.getEmail())
