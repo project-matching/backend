@@ -5,13 +5,14 @@ import com.matching.project.entity.Project;
 import com.matching.project.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 
 public interface ProjectRepositoryCustom {
     public Project findProjectWithUserUsingFetchJoinByProjectNo(Long projectNo);
-    public Page<ProjectSimpleDto> findProjectByStatus(Pageable pageable, boolean status, ProjectSearchRequestDto projectSearchRequestDto);
-    public Page<ProjectSimpleDto> findUserProject(Pageable pageable, User user);
-    public Page<ProjectSimpleDto> findParticipateProject(Pageable pageable, User user);
-    public Page<ProjectSimpleDto> findParticipateRequestProject(Pageable pageable, User user);
-    public Page<ProjectSimpleDto> findBookMarkProject(Pageable pageable, User user);
+    public Slice<ProjectSimpleDto> findProjectByStatus(Pageable pageable, Long projectNo, boolean status, ProjectSearchRequestDto projectSearchRequestDto);
+    public Slice<ProjectSimpleDto> findUserProject(Pageable pageable, Long projectNo, User user);
+    public Slice<ProjectSimpleDto> findParticipateProject(Pageable pageable, Long projectNo, User user);
+    public Slice<ProjectSimpleDto> findParticipateRequestProject(Pageable pageable, Long projectNo, User user);
+    public Slice<ProjectSimpleDto> findBookMarkProject(Pageable pageable, Long projectNo, User user);
     public boolean existUserProjectByUser(Long userNo, Long projectNo);
 }

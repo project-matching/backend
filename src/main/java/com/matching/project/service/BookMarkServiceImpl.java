@@ -1,5 +1,6 @@
 package com.matching.project.service;
 
+import com.matching.project.dto.SliceDto;
 import com.matching.project.dto.project.ProjectSimpleDto;
 import com.matching.project.entity.BookMark;
 import com.matching.project.entity.Project;
@@ -12,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -42,8 +44,10 @@ public class BookMarkServiceImpl implements BookMarkService{
     }
 
     @Override
-    public List<ProjectSimpleDto> findBookMarkProject(Pageable pageable) throws Exception {
-        return projectRepository.findBookMarkProject(pageable, getUser()).getContent();
+    public SliceDto<ProjectSimpleDto> findBookMarkProject(Long projectNo, Pageable pageable) throws Exception {
+        Slice<ProjectSimpleDto> projectSimpleDtoSlice = projectRepository.findBookMarkProject(pageable, projectNo, getUser());
+
+        return new SliceDto<>(projectSimpleDtoSlice.getContent(), projectSimpleDtoSlice.isLast());
     }
 
     @Override

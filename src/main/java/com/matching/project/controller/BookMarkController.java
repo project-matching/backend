@@ -1,6 +1,7 @@
 package com.matching.project.controller;
 
 import com.matching.project.dto.ResponseDto;
+import com.matching.project.dto.SliceDto;
 import com.matching.project.dto.bookmark.BookMarkDto;
 import com.matching.project.dto.project.ProjectSimpleDto;
 import com.matching.project.service.BookMarkService;
@@ -32,8 +33,8 @@ public class BookMarkController {
 
     @GetMapping
     @ApiOperation(value = "즐겨찾기 프로젝트 목록 조회")
-    public ResponseEntity<ResponseDto<List<ProjectSimpleDto>>> bookMarkList(@PageableDefault(size = 5, sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable) throws Exception{
-        return ResponseEntity.ok(new ResponseDto<List<ProjectSimpleDto>>(null, bookMarkService.findBookMarkProject(pageable)));
+    public ResponseEntity<ResponseDto<SliceDto<ProjectSimpleDto>>> bookMarkList(@PageableDefault(size = 5, sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable, @RequestParam(value = "projectNo", required = false) Long projectNo) throws Exception{
+        return ResponseEntity.ok(new ResponseDto<>(null, bookMarkService.findBookMarkProject(projectNo, pageable)));
     }
 
     @DeleteMapping("/{projectNo}")

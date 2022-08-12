@@ -1,5 +1,6 @@
 package com.matching.project.service;
 
+import com.matching.project.dto.SliceDto;
 import com.matching.project.dto.enumerate.OAuth;
 import com.matching.project.dto.enumerate.Role;
 import com.matching.project.dto.project.ProjectParticipateRequestDto;
@@ -472,7 +473,7 @@ class ProjectParticipateRequestServiceImplTest {
             Page<ProjectParticipateFormResponseDto> projectParticipateFormResponseDtoPage = new PageImpl<>(projectParticipateFormResponseDtoList.subList(start, end), pageable, projectParticipateFormResponseDtoList.size());
 
             given(projectRepository.findProjectWithUserUsingFetchJoinByProjectNo(any())).willReturn(project1);
-            given(projectParticipateRequestRepository.findProjectParticipateRequestByProjectNo(any(), any())).willReturn(projectParticipateFormResponseDtoPage);
+            given(projectParticipateRequestRepository.findProjectParticipateRequestByProjectNo(any(), any(), any())).willReturn(projectParticipateFormResponseDtoPage);
 
             // when
             // 권한 추가
@@ -480,23 +481,25 @@ class ProjectParticipateRequestServiceImplTest {
             Authentication auth = new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(auth);
 
-            List<ProjectParticipateFormResponseDto> result = null;
+            SliceDto<ProjectParticipateFormResponseDto> result = null;
             try {
-                result = projectParticipateRequestService.findProjectParticipateManagementForm(project1.getNo(), pageable);
+                result = projectParticipateRequestService.findProjectParticipateManagementForm(project1.getNo(), Long.MAX_VALUE, pageable);
             } catch (Exception e) {
                 e.printStackTrace();
             }
 
             // then
             verify(projectRepository).findProjectWithUserUsingFetchJoinByProjectNo(any());
-            verify(projectParticipateRequestRepository).findProjectParticipateRequestByProjectNo(any(), any());
+            verify(projectParticipateRequestRepository).findProjectParticipateRequestByProjectNo(any(), any(), any());
 
-            assertEquals(result.get(0).getProjectParticipateNo(), projectParticipateFormResponseDtoList.get(0).getProjectParticipateNo());
-            assertEquals(result.get(0).getTechnicalStackList().get(0), projectParticipateFormResponseDtoList.get(0).getTechnicalStackList().get(0));
-            assertEquals(result.get(0).getTechnicalStackList().get(1), projectParticipateFormResponseDtoList.get(0).getTechnicalStackList().get(1));
-            assertEquals(result.get(0).getPositionName(), projectParticipateFormResponseDtoList.get(0).getPositionName());
-            assertEquals(result.get(0).getUserName(), projectParticipateFormResponseDtoList.get(0).getUserName());
-            assertEquals(result.get(0).getMotive(), projectParticipateFormResponseDtoList.get(0).getMotive());
+            assertEquals(result.getContent().get(0).getProjectParticipateNo(), projectParticipateFormResponseDtoList.get(0).getProjectParticipateNo());
+            assertEquals(result.getContent().get(0).getTechnicalStackList().get(0), projectParticipateFormResponseDtoList.get(0).getTechnicalStackList().get(0));
+            assertEquals(result.getContent().get(0).getTechnicalStackList().get(1), projectParticipateFormResponseDtoList.get(0).getTechnicalStackList().get(1));
+            assertEquals(result.getContent().get(0).getPositionName(), projectParticipateFormResponseDtoList.get(0).getPositionName());
+            assertEquals(result.getContent().get(0).getUserName(), projectParticipateFormResponseDtoList.get(0).getUserName());
+            assertEquals(result.getContent().get(0).getMotive(), projectParticipateFormResponseDtoList.get(0).getMotive());
+
+            assertEquals(result.isLast(), true);
         }
 
         @Test
@@ -549,7 +552,7 @@ class ProjectParticipateRequestServiceImplTest {
             Pageable pageable = PageRequest.of(0, 5, Sort.by("no").descending());
 
             CustomException e = Assertions.assertThrows(CustomException.class, () -> {
-                projectParticipateRequestService.findProjectParticipateManagementForm(project1.getNo(), pageable);
+                projectParticipateRequestService.findProjectParticipateManagementForm(project1.getNo(), Long.MAX_VALUE, pageable);
             });
 
             // then

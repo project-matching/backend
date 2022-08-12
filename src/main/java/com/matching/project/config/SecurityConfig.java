@@ -104,8 +104,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.GET,"/v1/notification/**").hasAnyRole("USER", "ADMIN")
 
                 //ProjectController
-                //.antMatchers("/v1/project/recruitment/*").hasAnyRole("USER", "ADMIN", "ANONYMOUS")
-                //.antMatchers("/v1/project/recruitment/complete/*").hasAnyRole("USER", "ADMIN", "ANONYMOUS")
+                .antMatchers("/v1/project/recruitment/*").hasAnyRole("USER", "ADMIN", "ANONYMOUS")
+                .antMatchers("/v1/project/recruitment/complete/*").hasAnyRole("USER", "ADMIN", "ANONYMOUS")
 
                 //ProjectParticipateController
                 .antMatchers("/v1/participate").hasAnyRole("USER", "ADMIN")

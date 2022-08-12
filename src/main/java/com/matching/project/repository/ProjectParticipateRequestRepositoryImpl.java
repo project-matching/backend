@@ -11,10 +11,7 @@ import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,6 +45,8 @@ public class ProjectParticipateRequestRepositoryImpl implements ProjectParticipa
                 switch (order.getProperty()) {
                     case "no":
                         return new OrderSpecifier(direction, projectParticipateRequest.no);
+                    case "createdDate":
+                        return new OrderSpecifier(direction, projectParticipateRequest.createdDate);
                 }
             }
         }
@@ -56,7 +55,7 @@ public class ProjectParticipateRequestRepositoryImpl implements ProjectParticipa
     
     // 신청한 프로젝트 페이지 조회
     @Override
-    public Page<ProjectParticipateFormResponseDto> findProjectParticipateRequestByProjectNo(Long projectNo, Pageable pageable) throws Exception {
+    public Slice<ProjectParticipateFormResponseDto> findProjectParticipateRequestByProjectNo(Long projectNo, Long projectParticipateRequestNo, Pageable pageable) throws Exception {
         // projectParticipateRequest ManyToOne 조인
         List<ProjectParticipateFormResponseDto> projectParticipateFormResponseDtoList =
                 queryFactory.select(Projections.constructor(ProjectParticipateFormResponseDto.class,
@@ -70,9 +69,11 @@ public class ProjectParticipateRequestRepositoryImpl implements ProjectParticipa
                 .join(projectParticipateRequest.projectPosition.position, position)
                 .join(projectParticipateRequest.user, user)
                 .join(projectPosition.project, project)
-                .where(eqProjectNo(projectNo))
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
+                .where(
+                        eqProjectNo(projectNo),
+                        underProjectParticipateRequestNo(projectParticipateRequestNo))
+                .offset(0)
+                .limit(pageable.getPageSize() + 1)
                 .orderBy(projectParticipateRequestSort(pageable))
                 .fetch();
 
@@ -94,17 +95,13 @@ public class ProjectParticipateRequestRepositoryImpl implements ProjectParticipa
             }
         }
 
-        
-        // count 쿼리
-        int totalSize = queryFactory.selectFrom(projectParticipateRequest)
-                .join(projectParticipateRequest.projectPosition, projectPosition)
-                .join(projectParticipateRequest.projectPosition.position, position)
-                .join(projectParticipateRequest.user, user)
-                .join(projectPosition.project, project)
-                .where(eqProjectNo(projectNo))
-                .fetch().size();
+        boolean hasNext = false;
+        if (projectParticipateFormResponseDtoList.size() > pageable.getPageSize()) {
+            projectParticipateFormResponseDtoList.remove(pageable.getPageSize());
+            hasNext = true;
+        }
 
-        return new PageImpl<>(projectParticipateFormResponseDtoList, pageable, totalSize);
+        return new SliceImpl<>(projectParticipateFormResponseDtoList, pageable, hasNext);
     }
     
     // ProjectParticipateRequestNo 가져오기
@@ -132,6 +129,13 @@ public class ProjectParticipateRequestRepositoryImpl implements ProjectParticipa
 
     private BooleanExpression eqProjectNo(Long projectNo) {
         return project.no.eq(projectNo);
+    }
+
+    private BooleanExpression underProjectParticipateRequestNo(Long projectParticipateRequestNo) {
+        if (projectParticipateRequestNo == null) {
+            return null;
+        }
+        return projectParticipateRequest.no.lt(projectParticipateRequestNo);
     }
     
     // User, projectPosition join 메소드
