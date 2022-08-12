@@ -1,5 +1,6 @@
 package com.matching.project.repository;
 
+import com.matching.project.config.JpaConfig;
 import com.matching.project.config.QuerydslConfiguration;
 import com.matching.project.dto.enumerate.OAuth;
 import com.matching.project.dto.enumerate.Role;
@@ -12,10 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.security.core.parameters.P;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,7 +23,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-@Import(QuerydslConfiguration.class)
+@Import({QuerydslConfiguration.class, JpaConfig.class})
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Transactional
@@ -60,7 +58,6 @@ class ProjectParticipateRequestRepositoryTest {
     @Test
     public void 프로젝트_신청_페이지_조회() {
         // given
-        LocalDateTime createDate = LocalDateTime.now();
         LocalDate startDate = LocalDate.of(2022, 06, 24);
         LocalDate endDate = LocalDate.of(2022, 06, 28);
         
@@ -118,15 +115,12 @@ class ProjectParticipateRequestRepositoryTest {
         Project project1 = Project.builder()
                 .name("testName1")
                 .createUserName("user1")
-                .createDate(createDate.plusDays(1))
                 .startDate(startDate)
                 .endDate(endDate)
                 .state(true)
                 .introduction("testIntroduction1")
                 .maxPeople(10)
                 .currentPeople(4)
-                .delete(false)
-                .deleteReason(null)
                 .viewCount(10)
                 .user(saveUser1)
                 .commentCount(10)
@@ -212,25 +206,24 @@ class ProjectParticipateRequestRepositoryTest {
         ParticipateRequestTechnicalStack saveParticipateRequestTechnicalStack3 = participateRequestTechnicalStackRepository.save(participateRequestTechnicalStack3);
 
         // when
-        Pageable pageable = PageRequest.of(0, 5, Sort.by("no").descending());
+        Pageable pageable = PageRequest.of(0, 5, Sort.by("createdDate").descending());
 
-        Page<ProjectParticipateFormResponseDto> projectParticipateFormResponseDtoPage = null;
+        Slice<ProjectParticipateFormResponseDto> projectParticipateFormResponseDtoSlice = null;
         try {
-            projectParticipateFormResponseDtoPage = projectParticipateRequestRepository.findProjectParticipateRequestByProjectNo(saveProject1.getNo(), pageable);
+            projectParticipateFormResponseDtoSlice = projectParticipateRequestRepository.findProjectParticipateRequestByProjectNo(saveProject1.getNo(), Long.MAX_VALUE, pageable);
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        List<ProjectParticipateFormResponseDto> projectParticipateFormResponseDtoList = projectParticipateFormResponseDtoPage.getContent();
+        List<ProjectParticipateFormResponseDto> projectParticipateFormResponseDtoList = projectParticipateFormResponseDtoSlice.getContent();
 
         // then
-        assertEquals(projectParticipateFormResponseDtoPage.getTotalPages(), 1);
-        assertEquals(projectParticipateFormResponseDtoPage.getNumber(), 0);
-        assertEquals(projectParticipateFormResponseDtoPage.getNumberOfElements(), 3);
-        assertEquals(projectParticipateFormResponseDtoPage.hasNext(), false);
-        assertEquals(projectParticipateFormResponseDtoPage.isFirst(), true);
-        assertEquals(projectParticipateFormResponseDtoPage.isLast(), true);
-        assertEquals(projectParticipateFormResponseDtoPage.hasContent(), true);
+        assertEquals(projectParticipateFormResponseDtoSlice.getNumber(), 0);
+        assertEquals(projectParticipateFormResponseDtoSlice.getNumberOfElements(), 3);
+        assertEquals(projectParticipateFormResponseDtoSlice.hasNext(), false);
+        assertEquals(projectParticipateFormResponseDtoSlice.isFirst(), true);
+        assertEquals(projectParticipateFormResponseDtoSlice.isLast(), true);
+        assertEquals(projectParticipateFormResponseDtoSlice.hasContent(), true);
 
         assertEquals(projectParticipateFormResponseDtoList.size(), 3);
         assertEquals(projectParticipateFormResponseDtoList.get(0).getProjectParticipateNo(), saveProjectParticipateRequest3.getNo());
@@ -258,7 +251,6 @@ class ProjectParticipateRequestRepositoryTest {
     @Test
     public void 프로젝트_프로젝트포지션_유저_조인_조회() {
         // given
-        LocalDateTime createDate = LocalDateTime.now();
         LocalDate startDate = LocalDate.of(2022, 06, 24);
         LocalDate endDate = LocalDate.of(2022, 06, 28);
 
@@ -285,15 +277,12 @@ class ProjectParticipateRequestRepositoryTest {
         Project project1 = Project.builder()
                 .name("testName1")
                 .createUserName("user1")
-                .createDate(createDate.plusDays(1))
                 .startDate(startDate)
                 .endDate(endDate)
                 .state(true)
                 .introduction("testIntroduction1")
                 .maxPeople(10)
                 .currentPeople(4)
-                .delete(false)
-                .deleteReason(null)
                 .viewCount(10)
                 .user(saveUser1)
                 .commentCount(10)
@@ -358,7 +347,6 @@ class ProjectParticipateRequestRepositoryTest {
     @Test
     public void 프로젝트_신청_삭제() {
         // given
-        LocalDateTime createDate = LocalDateTime.now();
         LocalDate startDate = LocalDate.of(2022, 06, 24);
         LocalDate endDate = LocalDate.of(2022, 06, 28);
 
@@ -385,15 +373,12 @@ class ProjectParticipateRequestRepositoryTest {
         Project project1 = Project.builder()
                 .name("testName1")
                 .createUserName("user1")
-                .createDate(createDate.plusDays(1))
                 .startDate(startDate)
                 .endDate(endDate)
                 .state(true)
                 .introduction("testIntroduction1")
                 .maxPeople(10)
                 .currentPeople(4)
-                .delete(false)
-                .deleteReason(null)
                 .viewCount(10)
                 .user(saveUser1)
                 .commentCount(10)
@@ -457,7 +442,6 @@ class ProjectParticipateRequestRepositoryTest {
         @DisplayName("성공 테스트")
         public void testSuccess() throws Exception {
             // given
-            LocalDateTime createDate = LocalDateTime.now();
             LocalDate startDate = LocalDate.of(2022, 06, 24);
             LocalDate endDate = LocalDate.of(2022, 06, 28);
 
@@ -484,15 +468,12 @@ class ProjectParticipateRequestRepositoryTest {
             Project project1 = Project.builder()
                     .name("testName1")
                     .createUserName("user1")
-                    .createDate(createDate.plusDays(1))
                     .startDate(startDate)
                     .endDate(endDate)
                     .state(true)
                     .introduction("testIntroduction1")
                     .maxPeople(10)
                     .currentPeople(4)
-                    .delete(false)
-                    .deleteReason(null)
                     .viewCount(10)
                     .user(saveUser1)
                     .commentCount(10)

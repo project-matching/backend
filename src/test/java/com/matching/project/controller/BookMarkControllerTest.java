@@ -6,12 +6,15 @@ import com.matching.project.dto.enumerate.Role;
 import com.matching.project.entity.*;
 import com.matching.project.repository.*;
 import com.matching.project.service.JwtTokenService;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
@@ -57,319 +60,569 @@ class BookMarkControllerTest {
     @Autowired
     ImageRepository imageRepository;
 
-    @Test
-    public void 즐겨찾기_등록_테스트() throws Exception {
-        // given
-        LocalDateTime createDate = LocalDateTime.now();
-        LocalDate startDate = LocalDate.of(2022, 06, 24);
-        LocalDate endDate = LocalDate.of(2022, 06, 28);
+    @Nested
+    @DisplayName("즐겨찾기 추가")
+    class bookMarkRegister {
+        @Test
+        @DisplayName("성공")
+        public void success() throws Exception {
+            // given
+            LocalDateTime createdDate = LocalDateTime.now();
+            LocalDate startDate = LocalDate.of(2022, 06, 24);
+            LocalDate endDate = LocalDate.of(2022, 06, 28);
 
-        // 유저 세팅
-        User user1 = User.builder()
-                .name("userName1")
-                .sex("M")
-                .email("wkemrm12@naver.com")
-                .password("testPassword")
-                .github("testGithub")
-                .selfIntroduction("testSelfIntroduction")
-                .block(false)
-                .blockReason(null)
-                .permission(Role.ROLE_USER)
-                .oauthCategory(OAuth.NORMAL)
-                .email_auth(false)
-                .imageNo(0L)
-                .position(null)
-                .build();
-        User saveUser1 = userRepository.save(user1);
+            // 유저 세팅
+            User user1 = User.builder()
+                    .name("userName1")
+                    .sex("M")
+                    .email("wkemrm12@naver.com")
+                    .password("testPassword")
+                    .github("testGithub")
+                    .selfIntroduction("testSelfIntroduction")
+                    .block(false)
+                    .blockReason(null)
+                    .permission(Role.ROLE_USER)
+                    .oauthCategory(OAuth.NORMAL)
+                    .email_auth(false)
+                    .imageNo(0L)
+                    .position(null)
+                    .build();
+            User saveUser1 = userRepository.save(user1);
 
-        // 프로젝트 세팅
-        Project project1 = Project.builder()
-                .name("testName1")
-                .createUserName("user1")
-                .createDate(createDate.plusDays(1))
-                .startDate(startDate)
-                .endDate(endDate)
-                .state(true)
-                .introduction("testIntroduction1")
-                .maxPeople(10)
-                .currentPeople(4)
-                .delete(false)
-                .deleteReason(null)
-                .viewCount(10)
-                .commentCount(10)
-                .build();
-        Project saveProject1 = projectRepository.save(project1);
+            // 프로젝트 세팅
+            Project project1 = Project.builder()
+                    .name("testName1")
+                    .createUserName("user1")
+                    .startDate(startDate)
+                    .endDate(endDate)
+                    .state(true)
+                    .introduction("testIntroduction1")
+                    .maxPeople(10)
+                    .currentPeople(4)
+                    .viewCount(10)
+                    .commentCount(10)
+                    .build();
+            Project saveProject1 = projectRepository.save(project1);
 
-        // then
-        String token = jwtTokenService.createToken(new TokenDto(saveUser1.getEmail()));
+            // when
+            String token = jwtTokenService.createToken(new TokenDto(saveUser1.getEmail()));
 
-        mvc.perform(post("/v1/bookmark/" + saveProject1.getNo()).contentType(MediaType.APPLICATION_JSON)
-                        .header("Authorization", "Bearer " + token))
-                .andDo(print())
-                .andExpect(header().string("Content-type", "application/json"))
-                .andExpect(jsonPath("$.data").value(true))
-                .andExpect(status().isOk());
+            ResultActions resultActions = mvc.perform(post("/v1/bookmark/" + saveProject1.getNo()).contentType(MediaType.APPLICATION_JSON)
+                            .header("Authorization", "Bearer " + token));
 
-        List<BookMark> bookMarkList = bookMarkRepository.findAll();
+            // then
+            resultActions.andDo(print())
+                    .andExpect(header().string("Content-type", "application/json"))
+                    .andExpect(jsonPath("$.data").value(true))
+                    .andExpect(status().isOk());
 
-        assertEquals(bookMarkList.size(), 1);
-        assertEquals(bookMarkList.get(0).getUser(), saveUser1);
-        assertEquals(bookMarkList.get(0).getProject(), saveProject1);
+            List<BookMark> bookMarkList = bookMarkRepository.findAll();
+
+            assertEquals(bookMarkList.size(), 1);
+            assertEquals(bookMarkList.get(0).getUser(), saveUser1);
+            assertEquals(bookMarkList.get(0).getProject(), saveProject1);
+        }
+
+        @Test
+        @DisplayName("실패 : 비로그인 유저")
+        public void fail1() throws Exception {
+            // when
+            ResultActions resultActions = mvc.perform(post("/v1/bookmark/1").contentType(MediaType.APPLICATION_JSON));
+
+            // then
+            resultActions.andDo(print())
+                    .andExpect(status().isUnauthorized());
+        }
     }
 
-    @Test
-    public void 즐겨찾기_프로젝트_조회_테스트() throws Exception {
-        // given
-        LocalDateTime createDate = LocalDateTime.now();
-        LocalDate startDate = LocalDate.of(2022, 06, 24);
-        LocalDate endDate = LocalDate.of(2022, 06, 28);
-        
-        // 유저 세팅
-        User user1 = User.builder()
-                .name("userName1")
-                .sex("M")
-                .email("wkemrm12@naver.com")
-                .password("testPassword")
-                .github("testGithub")
-                .selfIntroduction("testSelfIntroduction")
-                .block(false)
-                .blockReason(null)
-                .permission(Role.ROLE_USER)
-                .oauthCategory(OAuth.NORMAL)
-                .email_auth(false)
-                .imageNo(0L)
-                .position(null)
-                .build();
-        User saveUser1 = userRepository.save(user1);
+    @Nested
+    @DisplayName("즐겨찾기 프로젝트 조회")
+    class bookMarkList {
+        @Test
+        @DisplayName("성공 : projectNo를 안줬을때")
+        public void success1() throws Exception {
+            // given
+            LocalDate startDate = LocalDate.of(2022, 06, 24);
+            LocalDate endDate = LocalDate.of(2022, 06, 28);
 
-        // 프로젝트 세팅
-        Project project1 = Project.builder()
-                .name("testName1")
-                .createUserName("user1")
-                .createDate(createDate.plusDays(1))
-                .startDate(startDate)
-                .endDate(endDate)
-                .state(true)
-                .introduction("testIntroduction1")
-                .maxPeople(10)
-                .currentPeople(4)
-                .delete(false)
-                .deleteReason(null)
-                .viewCount(10)
-                .commentCount(10)
-                .build();
+            // 유저 세팅
+            User user1 = User.builder()
+                    .name("userName1")
+                    .sex("M")
+                    .email("wkemrm12@naver.com")
+                    .password("testPassword")
+                    .github("testGithub")
+                    .selfIntroduction("testSelfIntroduction")
+                    .block(false)
+                    .blockReason(null)
+                    .permission(Role.ROLE_USER)
+                    .oauthCategory(OAuth.NORMAL)
+                    .email_auth(false)
+                    .imageNo(0L)
+                    .position(null)
+                    .build();
+            User saveUser1 = userRepository.save(user1);
 
-        Project project2 = Project.builder()
-                .name("testName2")
-                .createUserName("user2")
-                .createDate(createDate.plusDays(1))
-                .startDate(startDate)
-                .endDate(endDate)
-                .state(true)
-                .introduction("testIntroduction2")
-                .maxPeople(10)
-                .currentPeople(4)
-                .delete(false)
-                .deleteReason(null)
-                .viewCount(10)
-                .commentCount(10)
-                .build();
-        Project saveProject1 = projectRepository.save(project1);
-        Project saveProject2 = projectRepository.save(project2);
-        
-        // 포지션 세팅
-        Position position1 = Position.builder()
-                .name("testPosition1")
-                .build();
+            // 프로젝트 세팅
+            Project project1 = Project.builder()
+                    .name("testName1")
+                    .createUserName("user1")
+                    .startDate(startDate)
+                    .endDate(endDate)
+                    .state(true)
+                    .introduction("testIntroduction1")
+                    .maxPeople(10)
+                    .currentPeople(4)
+                    .viewCount(10)
+                    .commentCount(10)
+                    .build();
 
-        Position position2 = Position.builder()
-                .name("testPosition2")
-                .build();
-        Position savePosition1 = positionRepository.save(position1);
-        Position savePosition2 = positionRepository.save(position2);
+            Project project2 = Project.builder()
+                    .name("testName2")
+                    .createUserName("user2")
+                    .startDate(startDate)
+                    .endDate(endDate)
+                    .state(true)
+                    .introduction("testIntroduction2")
+                    .maxPeople(10)
+                    .currentPeople(4)
+                    .viewCount(10)
+                    .commentCount(10)
+                    .build();
+            Project saveProject1 = projectRepository.save(project1);
+            Project saveProject2 = projectRepository.save(project2);
 
-        // 프로젝트 포지션 세팅
-        ProjectPosition projectPosition1 = ProjectPosition.builder()
-                .state(false)
-                .project(saveProject1)
-                .position(savePosition1)
-                .creator(false)
-                .build();
+            // 포지션 세팅
+            Position position1 = Position.builder()
+                    .name("testPosition1")
+                    .build();
 
-        ProjectPosition projectPosition2 = ProjectPosition.builder()
-                .state(false)
-                .project(saveProject1)
-                .position(savePosition2)
-                .creator(false)
-                .build();
+            Position position2 = Position.builder()
+                    .name("testPosition2")
+                    .build();
+            Position savePosition1 = positionRepository.save(position1);
+            Position savePosition2 = positionRepository.save(position2);
 
-        ProjectPosition projectPosition3 = ProjectPosition.builder()
-                .state(false)
-                .project(saveProject2)
-                .position(savePosition1)
-                .creator(false)
-                .build();
+            // 프로젝트 포지션 세팅
+            ProjectPosition projectPosition1 = ProjectPosition.builder()
+                    .state(false)
+                    .project(saveProject1)
+                    .position(savePosition1)
+                    .creator(false)
+                    .build();
 
-        ProjectPosition projectPosition4 = ProjectPosition.builder()
-                .state(false)
-                .project(saveProject2)
-                .position(savePosition2)
-                .creator(false)
-                .build();
-        ProjectPosition saveProjectPosition1 = projectPositionRepository.save(projectPosition1);
-        ProjectPosition saveProjectPosition2 = projectPositionRepository.save(projectPosition2);
-        projectPositionRepository.save(projectPosition3);
-        projectPositionRepository.save(projectPosition4);
+            ProjectPosition projectPosition2 = ProjectPosition.builder()
+                    .state(false)
+                    .project(saveProject1)
+                    .position(savePosition2)
+                    .creator(false)
+                    .build();
 
-        // 이미지 세팅
-        Image image1 = Image.builder()
-                .physicalName("testPhysicalName1")
-                .logicalName("testLogicalName1")
-                .url("testUrl1")
-                .build();
-        Image saveImage1 = imageRepository.save(image1);
+            ProjectPosition projectPosition3 = ProjectPosition.builder()
+                    .state(false)
+                    .project(saveProject2)
+                    .position(savePosition1)
+                    .creator(false)
+                    .build();
 
-        // 기술 스택 세팅
-        TechnicalStack technicalStack1 = TechnicalStack.builder()
-                .name("testTechnicalStack1")
-                .imageNo(saveImage1.getNo())
-                .build();
+            ProjectPosition projectPosition4 = ProjectPosition.builder()
+                    .state(false)
+                    .project(saveProject2)
+                    .position(savePosition2)
+                    .creator(false)
+                    .build();
+            ProjectPosition saveProjectPosition1 = projectPositionRepository.save(projectPosition1);
+            ProjectPosition saveProjectPosition2 = projectPositionRepository.save(projectPosition2);
+            projectPositionRepository.save(projectPosition3);
+            projectPositionRepository.save(projectPosition4);
 
-        TechnicalStack technicalStack2 = TechnicalStack.builder()
-                .name("testTechnicalStack2")
-                .imageNo(saveImage1.getNo())
-                .build();
-        TechnicalStack saveTechnicalStack1 = technicalStackRepository.save(technicalStack1);
-        TechnicalStack saveTechnicalStack2 = technicalStackRepository.save(technicalStack1);
-        
-        // 프로젝트 기술 스택 세팅
-        ProjectTechnicalStack projectTechnicalStack1 = ProjectTechnicalStack.builder()
-                .project(saveProject1)
-                .technicalStack(saveTechnicalStack1)
-                .build();
-        ProjectTechnicalStack projectTechnicalStack2 = ProjectTechnicalStack.builder()
-                .project(saveProject1)
-                .technicalStack(saveTechnicalStack2)
-                .build();
-        ProjectTechnicalStack projectTechnicalStack3 = ProjectTechnicalStack.builder()
-                .project(saveProject2)
-                .technicalStack(saveTechnicalStack1)
-                .build();
-        ProjectTechnicalStack projectTechnicalStack4 = ProjectTechnicalStack.builder()
-                .project(saveProject2)
-                .technicalStack(saveTechnicalStack2)
-                .build();
-        ProjectTechnicalStack saveProjectTechnicalStack1 = projectTechnicalStackRepository.save(projectTechnicalStack1);
-        ProjectTechnicalStack saveProjectTechnicalStack2 = projectTechnicalStackRepository.save(projectTechnicalStack2);
-        ProjectTechnicalStack saveProjectTechnicalStack3 = projectTechnicalStackRepository.save(projectTechnicalStack3);
-        ProjectTechnicalStack saveProjectTechnicalStack4 = projectTechnicalStackRepository.save(projectTechnicalStack4);
+            // 이미지 세팅
+            Image image1 = Image.builder()
+                    .physicalName("testPhysicalName1")
+                    .logicalName("testLogicalName1")
+                    .url("testUrl1")
+                    .build();
+            Image saveImage1 = imageRepository.save(image1);
 
-        // 북마크 세팅
-        BookMark bookMark1 = BookMark.builder()
-                .user(saveUser1)
-                .project(project1)
-                .build();
-        bookMarkRepository.save(bookMark1);
+            // 기술 스택 세팅
+            TechnicalStack technicalStack1 = TechnicalStack.builder()
+                    .name("testTechnicalStack1")
+                    .imageNo(saveImage1.getNo())
+                    .build();
 
-        // then
-        String token = jwtTokenService.createToken(new TokenDto(saveUser1.getEmail()));
+            TechnicalStack technicalStack2 = TechnicalStack.builder()
+                    .name("testTechnicalStack2")
+                    .imageNo(saveImage1.getNo())
+                    .build();
+            TechnicalStack saveTechnicalStack1 = technicalStackRepository.save(technicalStack1);
+            TechnicalStack saveTechnicalStack2 = technicalStackRepository.save(technicalStack1);
 
-        mvc.perform(get("/v1/bookmark?page=0&size=5&sortBy=createDate,desc")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .header("Authorization", "Bearer " + token))
-                .andDo(print())
-                .andExpect(header().string("Content-type", "application/json"))
-                .andExpect(jsonPath("$.data.content.length()").value(1))
-                .andExpect(jsonPath("$.data.content[0].name").value(saveProject1.getName()))
-                .andExpect(jsonPath("$.data.content[0].maxPeople").value(saveProject1.getMaxPeople()))
-                .andExpect(jsonPath("$.data.content[0].currentPeople").value(saveProject1.getCurrentPeople()))
-                .andExpect(jsonPath("$.data.content[0].viewCount").value(saveProject1.getViewCount()))
-                .andExpect(jsonPath("$.data.content[0].register").value(saveProject1.getCreateUserName()))
-                .andExpect(jsonPath("$.data.content[0].bookMark").value(true))
+            // 프로젝트 기술 스택 세팅
+            ProjectTechnicalStack projectTechnicalStack1 = ProjectTechnicalStack.builder()
+                    .project(saveProject1)
+                    .technicalStack(saveTechnicalStack1)
+                    .build();
+            ProjectTechnicalStack projectTechnicalStack2 = ProjectTechnicalStack.builder()
+                    .project(saveProject1)
+                    .technicalStack(saveTechnicalStack2)
+                    .build();
+            ProjectTechnicalStack projectTechnicalStack3 = ProjectTechnicalStack.builder()
+                    .project(saveProject2)
+                    .technicalStack(saveTechnicalStack1)
+                    .build();
+            ProjectTechnicalStack projectTechnicalStack4 = ProjectTechnicalStack.builder()
+                    .project(saveProject2)
+                    .technicalStack(saveTechnicalStack2)
+                    .build();
+            ProjectTechnicalStack saveProjectTechnicalStack1 = projectTechnicalStackRepository.save(projectTechnicalStack1);
+            ProjectTechnicalStack saveProjectTechnicalStack2 = projectTechnicalStackRepository.save(projectTechnicalStack2);
+            ProjectTechnicalStack saveProjectTechnicalStack3 = projectTechnicalStackRepository.save(projectTechnicalStack3);
+            ProjectTechnicalStack saveProjectTechnicalStack4 = projectTechnicalStackRepository.save(projectTechnicalStack4);
 
-                .andExpect(jsonPath("$.data.content[0].projectSimplePositionDtoList[0].projectNo").value(saveProjectPosition1.getProject().getNo()))
-                .andExpect(jsonPath("$.data.content[0].projectSimplePositionDtoList[0].positionNo").value(saveProjectPosition1.getPosition().getNo()))
-                .andExpect(jsonPath("$.data.content[0].projectSimplePositionDtoList[0].positionName").value(saveProjectPosition1.getPosition().getName()))
-                .andExpect(jsonPath("$.data.content[0].projectSimplePositionDtoList[1].projectNo").value(saveProjectPosition2.getProject().getNo()))
-                .andExpect(jsonPath("$.data.content[0].projectSimplePositionDtoList[1].positionNo").value(saveProjectPosition2.getPosition().getNo()))
-                .andExpect(jsonPath("$.data.content[0].projectSimplePositionDtoList[1].positionName").value(saveProjectPosition2.getPosition().getName()))
+            // 북마크 세팅
+            BookMark bookMark1 = BookMark.builder()
+                    .user(saveUser1)
+                    .project(project1)
+                    .build();
+            bookMarkRepository.save(bookMark1);
 
-                .andExpect(jsonPath("$.data.content[0].projectSimpleTechnicalStackDtoList[0].projectNo").value(saveProjectTechnicalStack1.getProject().getNo()))
-                .andExpect(jsonPath("$.data.content[0].projectSimpleTechnicalStackDtoList[0].image").value(saveImage1.getLogicalName()))
-                .andExpect(jsonPath("$.data.content[0].projectSimpleTechnicalStackDtoList[0].technicalStackName").value(saveProjectTechnicalStack1.getTechnicalStack().getName()))
-                .andExpect(jsonPath("$.data.content[0].projectSimpleTechnicalStackDtoList[1].projectNo").value(saveProjectTechnicalStack2.getProject().getNo()))
-                .andExpect(jsonPath("$.data.content[0].projectSimpleTechnicalStackDtoList[1].image").value(saveImage1.getLogicalName()))
-                .andExpect(jsonPath("$.data.content[0].projectSimpleTechnicalStackDtoList[1].technicalStackName").value(saveProjectTechnicalStack2.getTechnicalStack().getName()))
-                // paging
-                .andExpect(jsonPath("$.data.pageable.pageSize").value(5))
-                .andExpect(jsonPath("$.data.pageable.pageNumber").value(0))
-                .andExpect(jsonPath("$.data.pageable.offset").value(0))
-                .andExpect(jsonPath("$.data.totalElements").value(1))
-                .andExpect(status().isOk());
+            // when
+            String token = jwtTokenService.createToken(new TokenDto(saveUser1.getEmail()));
+
+            ResultActions resultActions = mvc.perform(get("/v1/bookmark?size=5&sortBy=createdDate,desc")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .header("Authorization", "Bearer " + token));
+
+            // then
+            resultActions
+                    .andDo(print())
+                    .andExpect(header().string("Content-type", "application/json"))
+                    .andExpect(jsonPath("$.data.content.length()").value(1))
+                    .andExpect(jsonPath("$.data.content[0].name").value(saveProject1.getName()))
+                    .andExpect(jsonPath("$.data.content[0].maxPeople").value(saveProject1.getMaxPeople()))
+                    .andExpect(jsonPath("$.data.content[0].currentPeople").value(saveProject1.getCurrentPeople()))
+                    .andExpect(jsonPath("$.data.content[0].viewCount").value(saveProject1.getViewCount()))
+                    .andExpect(jsonPath("$.data.content[0].register").value(saveProject1.getCreateUserName()))
+                    .andExpect(jsonPath("$.data.content[0].bookMark").value(true))
+
+                    .andExpect(jsonPath("$.data.content[0].projectSimplePositionDtoList[0].projectNo").value(saveProjectPosition1.getProject().getNo()))
+                    .andExpect(jsonPath("$.data.content[0].projectSimplePositionDtoList[0].positionNo").value(saveProjectPosition1.getPosition().getNo()))
+                    .andExpect(jsonPath("$.data.content[0].projectSimplePositionDtoList[0].positionName").value(saveProjectPosition1.getPosition().getName()))
+                    .andExpect(jsonPath("$.data.content[0].projectSimplePositionDtoList[1].projectNo").value(saveProjectPosition2.getProject().getNo()))
+                    .andExpect(jsonPath("$.data.content[0].projectSimplePositionDtoList[1].positionNo").value(saveProjectPosition2.getPosition().getNo()))
+                    .andExpect(jsonPath("$.data.content[0].projectSimplePositionDtoList[1].positionName").value(saveProjectPosition2.getPosition().getName()))
+
+                    .andExpect(jsonPath("$.data.content[0].projectSimpleTechnicalStackDtoList[0].projectNo").value(saveProjectTechnicalStack1.getProject().getNo()))
+                    .andExpect(jsonPath("$.data.content[0].projectSimpleTechnicalStackDtoList[0].image").value(saveImage1.getLogicalName()))
+                    .andExpect(jsonPath("$.data.content[0].projectSimpleTechnicalStackDtoList[0].technicalStackName").value(saveProjectTechnicalStack1.getTechnicalStack().getName()))
+                    .andExpect(jsonPath("$.data.content[0].projectSimpleTechnicalStackDtoList[1].projectNo").value(saveProjectTechnicalStack2.getProject().getNo()))
+                    .andExpect(jsonPath("$.data.content[0].projectSimpleTechnicalStackDtoList[1].image").value(saveImage1.getLogicalName()))
+                    .andExpect(jsonPath("$.data.content[0].projectSimpleTechnicalStackDtoList[1].technicalStackName").value(saveProjectTechnicalStack2.getTechnicalStack().getName()))
+
+                    .andExpect(jsonPath("$.data.last").value(true))
+                    .andExpect(status().isOk());
+        }
+
+        @Test
+        @DisplayName("성공 : projectNo를 줬을때")
+        public void success2() throws Exception {
+            // given
+            LocalDate startDate = LocalDate.of(2022, 06, 24);
+            LocalDate endDate = LocalDate.of(2022, 06, 28);
+
+            // 유저 세팅
+            User user1 = User.builder()
+                    .name("userName1")
+                    .sex("M")
+                    .email("wkemrm12@naver.com")
+                    .password("testPassword")
+                    .github("testGithub")
+                    .selfIntroduction("testSelfIntroduction")
+                    .block(false)
+                    .blockReason(null)
+                    .permission(Role.ROLE_USER)
+                    .oauthCategory(OAuth.NORMAL)
+                    .email_auth(false)
+                    .imageNo(0L)
+                    .position(null)
+                    .build();
+            User saveUser1 = userRepository.save(user1);
+
+            // 프로젝트 세팅
+            Project project1 = Project.builder()
+                    .name("testName1")
+                    .createUserName("user1")
+                    .startDate(startDate)
+                    .endDate(endDate)
+                    .state(true)
+                    .introduction("testIntroduction1")
+                    .maxPeople(10)
+                    .currentPeople(4)
+                    .viewCount(10)
+                    .commentCount(10)
+                    .build();
+
+            Project project2 = Project.builder()
+                    .name("testName2")
+                    .createUserName("user2")
+                    .startDate(startDate)
+                    .endDate(endDate)
+                    .state(true)
+                    .introduction("testIntroduction2")
+                    .maxPeople(10)
+                    .currentPeople(4)
+                    .viewCount(10)
+                    .commentCount(10)
+                    .build();
+
+            Project project3 = Project.builder()
+                    .name("testName3")
+                    .createUserName("user3")
+                    .startDate(startDate)
+                    .endDate(endDate)
+                    .state(true)
+                    .introduction("testIntroduction2")
+                    .maxPeople(10)
+                    .currentPeople(4)
+                    .viewCount(10)
+                    .commentCount(10)
+                    .build();
+
+            Project saveProject1 = projectRepository.save(project1);
+            Project saveProject2 = projectRepository.save(project2);
+            Project saveProject3 = projectRepository.save(project3);
+
+            // 포지션 세팅
+            Position position1 = Position.builder()
+                    .name("testPosition1")
+                    .build();
+
+            Position position2 = Position.builder()
+                    .name("testPosition2")
+                    .build();
+            Position savePosition1 = positionRepository.save(position1);
+            Position savePosition2 = positionRepository.save(position2);
+
+            // 프로젝트 포지션 세팅
+            ProjectPosition projectPosition1 = ProjectPosition.builder()
+                    .state(false)
+                    .project(saveProject1)
+                    .position(savePosition1)
+                    .creator(false)
+                    .build();
+
+            ProjectPosition projectPosition2 = ProjectPosition.builder()
+                    .state(false)
+                    .project(saveProject1)
+                    .position(savePosition2)
+                    .creator(false)
+                    .build();
+
+            ProjectPosition projectPosition3 = ProjectPosition.builder()
+                    .state(false)
+                    .project(saveProject2)
+                    .position(savePosition1)
+                    .creator(false)
+                    .build();
+
+            ProjectPosition projectPosition4 = ProjectPosition.builder()
+                    .state(false)
+                    .project(saveProject2)
+                    .position(savePosition2)
+                    .creator(false)
+                    .build();
+            ProjectPosition saveProjectPosition1 = projectPositionRepository.save(projectPosition1);
+            ProjectPosition saveProjectPosition2 = projectPositionRepository.save(projectPosition2);
+            projectPositionRepository.save(projectPosition3);
+            projectPositionRepository.save(projectPosition4);
+
+            // 이미지 세팅
+            Image image1 = Image.builder()
+                    .physicalName("testPhysicalName1")
+                    .logicalName("testLogicalName1")
+                    .url("testUrl1")
+                    .build();
+            Image saveImage1 = imageRepository.save(image1);
+
+            // 기술 스택 세팅
+            TechnicalStack technicalStack1 = TechnicalStack.builder()
+                    .name("testTechnicalStack1")
+                    .imageNo(saveImage1.getNo())
+                    .build();
+
+            TechnicalStack technicalStack2 = TechnicalStack.builder()
+                    .name("testTechnicalStack2")
+                    .imageNo(saveImage1.getNo())
+                    .build();
+            TechnicalStack saveTechnicalStack1 = technicalStackRepository.save(technicalStack1);
+            TechnicalStack saveTechnicalStack2 = technicalStackRepository.save(technicalStack1);
+
+            // 프로젝트 기술 스택 세팅
+            ProjectTechnicalStack projectTechnicalStack1 = ProjectTechnicalStack.builder()
+                    .project(saveProject1)
+                    .technicalStack(saveTechnicalStack1)
+                    .build();
+            ProjectTechnicalStack projectTechnicalStack2 = ProjectTechnicalStack.builder()
+                    .project(saveProject1)
+                    .technicalStack(saveTechnicalStack2)
+                    .build();
+            ProjectTechnicalStack projectTechnicalStack3 = ProjectTechnicalStack.builder()
+                    .project(saveProject2)
+                    .technicalStack(saveTechnicalStack1)
+                    .build();
+            ProjectTechnicalStack projectTechnicalStack4 = ProjectTechnicalStack.builder()
+                    .project(saveProject2)
+                    .technicalStack(saveTechnicalStack2)
+                    .build();
+            ProjectTechnicalStack saveProjectTechnicalStack1 = projectTechnicalStackRepository.save(projectTechnicalStack1);
+            ProjectTechnicalStack saveProjectTechnicalStack2 = projectTechnicalStackRepository.save(projectTechnicalStack2);
+            ProjectTechnicalStack saveProjectTechnicalStack3 = projectTechnicalStackRepository.save(projectTechnicalStack3);
+            ProjectTechnicalStack saveProjectTechnicalStack4 = projectTechnicalStackRepository.save(projectTechnicalStack4);
+
+            // 북마크 세팅
+            BookMark bookMark1 = BookMark.builder()
+                    .user(saveUser1)
+                    .project(project1)
+                    .build();
+
+            BookMark bookMark2 = BookMark.builder()
+                    .user(saveUser1)
+                    .project(project3)
+                    .build();
+
+            bookMarkRepository.save(bookMark1);
+            bookMarkRepository.save(bookMark2);
+
+            // when
+            String token = jwtTokenService.createToken(new TokenDto(saveUser1.getEmail()));
+
+            ResultActions resultActions = mvc.perform(get("/v1/bookmark?size=5&sortBy=createdDate,desc&projectNo=" + saveProject3.getNo())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .header("Authorization", "Bearer " + token));
+
+            // then
+            resultActions
+                    .andDo(print())
+                    .andExpect(header().string("Content-type", "application/json"))
+                    .andExpect(jsonPath("$.data.content.length()").value(1))
+                    .andExpect(jsonPath("$.data.content[0].name").value(saveProject1.getName()))
+                    .andExpect(jsonPath("$.data.content[0].maxPeople").value(saveProject1.getMaxPeople()))
+                    .andExpect(jsonPath("$.data.content[0].currentPeople").value(saveProject1.getCurrentPeople()))
+                    .andExpect(jsonPath("$.data.content[0].viewCount").value(saveProject1.getViewCount()))
+                    .andExpect(jsonPath("$.data.content[0].register").value(saveProject1.getCreateUserName()))
+                    .andExpect(jsonPath("$.data.content[0].bookMark").value(true))
+
+                    .andExpect(jsonPath("$.data.content[0].projectSimplePositionDtoList[0].projectNo").value(saveProjectPosition1.getProject().getNo()))
+                    .andExpect(jsonPath("$.data.content[0].projectSimplePositionDtoList[0].positionNo").value(saveProjectPosition1.getPosition().getNo()))
+                    .andExpect(jsonPath("$.data.content[0].projectSimplePositionDtoList[0].positionName").value(saveProjectPosition1.getPosition().getName()))
+                    .andExpect(jsonPath("$.data.content[0].projectSimplePositionDtoList[1].projectNo").value(saveProjectPosition2.getProject().getNo()))
+                    .andExpect(jsonPath("$.data.content[0].projectSimplePositionDtoList[1].positionNo").value(saveProjectPosition2.getPosition().getNo()))
+                    .andExpect(jsonPath("$.data.content[0].projectSimplePositionDtoList[1].positionName").value(saveProjectPosition2.getPosition().getName()))
+
+                    .andExpect(jsonPath("$.data.content[0].projectSimpleTechnicalStackDtoList[0].projectNo").value(saveProjectTechnicalStack1.getProject().getNo()))
+                    .andExpect(jsonPath("$.data.content[0].projectSimpleTechnicalStackDtoList[0].image").value(saveImage1.getLogicalName()))
+                    .andExpect(jsonPath("$.data.content[0].projectSimpleTechnicalStackDtoList[0].technicalStackName").value(saveProjectTechnicalStack1.getTechnicalStack().getName()))
+                    .andExpect(jsonPath("$.data.content[0].projectSimpleTechnicalStackDtoList[1].projectNo").value(saveProjectTechnicalStack2.getProject().getNo()))
+                    .andExpect(jsonPath("$.data.content[0].projectSimpleTechnicalStackDtoList[1].image").value(saveImage1.getLogicalName()))
+                    .andExpect(jsonPath("$.data.content[0].projectSimpleTechnicalStackDtoList[1].technicalStackName").value(saveProjectTechnicalStack2.getTechnicalStack().getName()))
+
+                    .andExpect(jsonPath("$.data.last").value(true))
+                    .andExpect(status().isOk());
+        }
+
+        @Test
+        @DisplayName("실패 : 비로그인 유저")
+        public void fail1() throws Exception {
+            // when
+            ResultActions resultActions = mvc.perform(get("/v1/bookmark?size=5&sortBy=createDate,desc")
+                    .contentType(MediaType.APPLICATION_JSON));
+
+            // then
+            resultActions
+                    .andDo(print())
+                    .andExpect(status().isUnauthorized());
+        }
     }
 
-    @Test
-    public void 즐겨찾기_삭제_테스트() throws Exception {
-        // given
-        LocalDateTime createDate = LocalDateTime.now();
-        LocalDate startDate = LocalDate.of(2022, 06, 24);
-        LocalDate endDate = LocalDate.of(2022, 06, 28);
+    @Nested
+    @DisplayName("즐겨찾기 삭제")
+    class bookMarkDelete {
+        @Test
+        @DisplayName("성공")
+        public void success() throws Exception {
+            // given
+            LocalDateTime createdDate = LocalDateTime.now();
+            LocalDate startDate = LocalDate.of(2022, 06, 24);
+            LocalDate endDate = LocalDate.of(2022, 06, 28);
 
-        // 유저 세팅
-        User user1 = User.builder()
-                .name("userName1")
-                .sex("M")
-                .email("wkemrm12@naver.com")
-                .password("testPassword")
-                .github("testGithub")
-                .selfIntroduction("testSelfIntroduction")
-                .block(false)
-                .blockReason(null)
-                .permission(Role.ROLE_USER)
-                .oauthCategory(OAuth.NORMAL)
-                .email_auth(false)
-                .imageNo(0L)
-                .position(null)
-                .build();
-        User saveUser1 = userRepository.save(user1);
+            // 유저 세팅
+            User user1 = User.builder()
+                    .name("userName1")
+                    .sex("M")
+                    .email("wkemrm12@naver.com")
+                    .password("testPassword")
+                    .github("testGithub")
+                    .selfIntroduction("testSelfIntroduction")
+                    .block(false)
+                    .blockReason(null)
+                    .permission(Role.ROLE_USER)
+                    .oauthCategory(OAuth.NORMAL)
+                    .email_auth(false)
+                    .imageNo(0L)
+                    .position(null)
+                    .build();
+            User saveUser1 = userRepository.save(user1);
 
-        // 프로젝트 세팅
-        Project project1 = Project.builder()
-                .name("testName1")
-                .createUserName("user1")
-                .createDate(createDate.plusDays(1))
-                .startDate(startDate)
-                .endDate(endDate)
-                .state(true)
-                .introduction("testIntroduction1")
-                .maxPeople(10)
-                .currentPeople(4)
-                .delete(false)
-                .deleteReason(null)
-                .viewCount(10)
-                .commentCount(10)
-                .build();
-        Project saveProject1 = projectRepository.save(project1);
+            // 프로젝트 세팅
+            Project project1 = Project.builder()
+                    .name("testName1")
+                    .createUserName("user1")
+                    .startDate(startDate)
+                    .endDate(endDate)
+                    .state(true)
+                    .introduction("testIntroduction1")
+                    .maxPeople(10)
+                    .currentPeople(4)
+                    .viewCount(10)
+                    .commentCount(10)
+                    .build();
+            Project saveProject1 = projectRepository.save(project1);
 
-        BookMark bookMark1 = BookMark.builder()
-                .user(saveUser1)
-                .project(saveProject1)
-                .build();
+            BookMark bookMark1 = BookMark.builder()
+                    .user(saveUser1)
+                    .project(saveProject1)
+                    .build();
 
-        bookMarkRepository.save(bookMark1);
+            bookMarkRepository.save(bookMark1);
 
-        // then
-        String token = jwtTokenService.createToken(new TokenDto(saveUser1.getEmail()));
+            // when
+            String token = jwtTokenService.createToken(new TokenDto(saveUser1.getEmail()));
 
-        mvc.perform(delete("/v1/bookmark/" + saveProject1.getNo()).contentType(MediaType.APPLICATION_JSON)
-                        .header("Authorization", "Bearer " + token))
-                .andDo(print())
-                .andExpect(header().string("Content-type", "application/json"))
-                .andExpect(jsonPath("$.data").value(true))
-                .andExpect(status().isOk());
+            ResultActions resultActions = mvc.perform(delete("/v1/bookmark/" + saveProject1.getNo()).contentType(MediaType.APPLICATION_JSON)
+                            .header("Authorization", "Bearer " + token));
 
-        List<BookMark> bookMarkList = bookMarkRepository.findAll();
-        assertEquals(bookMarkList.size(), 0);
+            // then
+            resultActions
+                    .andDo(print())
+                    .andExpect(header().string("Content-type", "application/json"))
+                    .andExpect(jsonPath("$.data").value(true))
+                    .andExpect(status().isOk());
+
+            List<BookMark> bookMarkList = bookMarkRepository.findAll();
+            assertEquals(bookMarkList.size(), 0);
+        }
+
+        @Test
+        @DisplayName("실패 : 비로그인 유저")
+        public void fail1() throws Exception {
+            // when
+            ResultActions resultActions = mvc.perform(delete("/v1/bookmark/1").contentType(MediaType.APPLICATION_JSON));
+
+            // then
+            resultActions
+                    .andDo(print())
+                    .andExpect(status().isUnauthorized());
+        }
     }
 
 }

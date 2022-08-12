@@ -55,12 +55,20 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
                 //ProjectController
                 .antMatchers(HttpMethod.POST, "/v1/project").hasAnyRole("USER", "ADMIN")
-                .antMatchers("/v1/project/create").hasAnyRole("USER", "ADMIN")
-                .antMatchers("/v1/project/recruitment/*")
+                .antMatchers(HttpMethod.GET,"/v1/project/create").hasAnyRole("USER", "ADMIN")
+                .antMatchers(HttpMethod.GET,"/v1/project/recruitment/**")
                     .hasAnyRole("USER", "ADMIN", "ANONYMOUS")
-                .antMatchers("/v1/project/recruitment/complete/*")
-                .hasAnyRole("USER", "ADMIN", "ANONYMOUS")
-                .antMatchers(HttpMethod.GET,"/v1/project/*")
+                .antMatchers(HttpMethod.GET, "/v1/project/participate")
+                .hasAnyRole("USER", "ADMIN")
+                .antMatchers(HttpMethod.GET, "/v1/project/application")
+                .hasAnyRole("USER", "ADMIN")
+                .antMatchers(HttpMethod.GET, "/v1/project/create/self")
+                .hasAnyRole("USER", "ADMIN")
+                .antMatchers(HttpMethod.GET, "/v1/project/**/update")
+                .hasAnyRole("USER", "ADMIN")
+                .antMatchers(HttpMethod.GET, "/v1/project/create")
+                .hasAnyRole("USER", "ADMIN")
+                .antMatchers(HttpMethod.GET, "/v1/project/*")
                 .hasAnyRole("USER", "ADMIN", "ANONYMOUS")
                 .antMatchers(HttpMethod.PATCH,"/v1/project/*")
                 .hasAnyRole("USER", "ADMIN")
@@ -96,13 +104,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.GET,"/v1/notification/**").hasAnyRole("USER", "ADMIN")
 
                 //ProjectController
-                //.antMatchers("/v1/project/recruitment/*").hasAnyRole("USER", "ADMIN", "ANONYMOUS")
-                //.antMatchers("/v1/project/recruitment/complete/*").hasAnyRole("USER", "ADMIN", "ANONYMOUS")
+                .antMatchers("/v1/project/recruitment/*").hasAnyRole("USER", "ADMIN", "ANONYMOUS")
+                .antMatchers("/v1/project/recruitment/complete/*").hasAnyRole("USER", "ADMIN", "ANONYMOUS")
 
                 //ProjectParticipateController
                 .antMatchers("/v1/participate").hasAnyRole("USER", "ADMIN")
                 .antMatchers("/v1/participate/*/permit").hasAnyRole("USER", "ADMIN")
                 .antMatchers("/v1/participate/*/refusal").hasAnyRole("USER", "ADMIN")
+                .antMatchers(HttpMethod.GET,"/v1/participate/*").hasAnyRole("USER", "ADMIN")
 
                 //BookMarkController
                 .antMatchers(HttpMethod.POST,"/v1/bookmark/*").hasAnyRole("USER", "ADMIN")
@@ -113,6 +122,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.GET,"/v1/technicalStack").hasRole("ADMIN")
                 .antMatchers(HttpMethod.POST,"/v1/technicalStack").hasRole("ADMIN")
                 .antMatchers(HttpMethod.PUT,"/v1/technicalStack/*").hasRole("ADMIN")
+
+                //ProjectPositionController
+                .antMatchers(HttpMethod.DELETE, "/v1/projectposition/*/withdrawal").hasAnyRole("USER", "ADMIN")
+                .antMatchers(HttpMethod.DELETE, "/v1/projectposition/*/expulsion").hasAnyRole("USER", "ADMIN")
 
                 //AnyRequest
                 .anyRequest().permitAll()

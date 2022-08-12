@@ -6,6 +6,8 @@ import com.matching.project.entity.Image;
 import com.matching.project.entity.TechnicalStack;
 import com.matching.project.repository.ImageRepository;
 import com.matching.project.repository.TechnicalStackRepository;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.BDDMockito;
@@ -43,141 +45,156 @@ class TechnicalStackServiceImplTest {
     @InjectMocks
     private TechnicalStackServiceImpl technicalStackService;
 
-    @Test
-    public void 기술스택_등록_폼_조회() {
-        // given
-        // 기술스택 세팅
-        List<TechnicalStack> technicalStackList = new ArrayList<>();
-        TechnicalStack technicalStack1 = TechnicalStack.builder()
-                .no(1L)
-                .name("testTechnicalStack1")
-                .imageNo(1L)
-                .build();
-        TechnicalStack technicalStack2 = TechnicalStack.builder()
-                .no(2L)
-                .name("testTechnicalStack2")
-                .imageNo(2L)
-                .build();
-        TechnicalStack technicalStack3 = TechnicalStack.builder()
-                .no(3L)
-                .name("testTechnicalStack3")
-                .imageNo(3L)
-                .build();
-        technicalStackList.add(technicalStack1);
-        technicalStackList.add(technicalStack2);
-        technicalStackList.add(technicalStack3);
-        
-        // 이미지 세팅
-        List<Image> imageList = new ArrayList<>();
-        Image image1 = Image.builder()
-                .no(1L)
-                .logicalName("testLogicalName1")
-                .physicalName("testPhysicalName1")
-                .url("testUrl1")
-                .build();
-        Image image2 = Image.builder()
-                .no(2L)
-                .logicalName("testLogicalName2")
-                .physicalName("testPhysicalName2")
-                .url("testUrl2")
-                .build();
-        Image image3 = Image.builder()
-                .no(3L)
-                .logicalName("testLogicalName3")
-                .physicalName("testPhysicalName3")
-                .url("testUrl3")
-                .build();
-        imageList.add(image1);
-        imageList.add(image2);
-        imageList.add(image3);
+    @Nested
+    @DisplayName("기술스택 등록 폼 조회")
+    class testFindTechnicalStackRegisterForm {
+        @Test
+        @DisplayName("성공")
+        public void success() {
+            // given
+            // 기술스택 세팅
+            List<TechnicalStack> technicalStackList = new ArrayList<>();
+            TechnicalStack technicalStack1 = TechnicalStack.builder()
+                    .no(1L)
+                    .name("testTechnicalStack1")
+                    .imageNo(1L)
+                    .build();
+            TechnicalStack technicalStack2 = TechnicalStack.builder()
+                    .no(2L)
+                    .name("testTechnicalStack2")
+                    .imageNo(2L)
+                    .build();
+            TechnicalStack technicalStack3 = TechnicalStack.builder()
+                    .no(3L)
+                    .name("testTechnicalStack3")
+                    .imageNo(3L)
+                    .build();
+            technicalStackList.add(technicalStack1);
+            technicalStackList.add(technicalStack2);
+            technicalStackList.add(technicalStack3);
 
-        given(technicalStackRepository.findAll()).willReturn(technicalStackList);
-        given(imageRepository.findByNoIn(any())).willReturn(imageList);
+            // 이미지 세팅
+            List<Image> imageList = new ArrayList<>();
+            Image image1 = Image.builder()
+                    .no(1L)
+                    .logicalName("testLogicalName1")
+                    .physicalName("testPhysicalName1")
+                    .url("testUrl1")
+                    .build();
+            Image image2 = Image.builder()
+                    .no(2L)
+                    .logicalName("testLogicalName2")
+                    .physicalName("testPhysicalName2")
+                    .url("testUrl2")
+                    .build();
+            Image image3 = Image.builder()
+                    .no(3L)
+                    .logicalName("testLogicalName3")
+                    .physicalName("testPhysicalName3")
+                    .url("testUrl3")
+                    .build();
+            imageList.add(image1);
+            imageList.add(image2);
+            imageList.add(image3);
 
-        // when
-        List<TechnicalStackRegisterFormResponseDto> technicalStackRegisterFormResponseDtoList = null;
-        try {
-            technicalStackRegisterFormResponseDtoList = technicalStackService.findTechnicalStackRegisterForm();
-        } catch (Exception e) {
-            e.printStackTrace();
+            given(technicalStackRepository.findAll()).willReturn(technicalStackList);
+            given(imageRepository.findByNoIn(any())).willReturn(imageList);
+
+            // when
+            List<TechnicalStackRegisterFormResponseDto> technicalStackRegisterFormResponseDtoList = null;
+            try {
+                technicalStackRegisterFormResponseDtoList = technicalStackService.findTechnicalStackRegisterForm();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            // then
+            verify(technicalStackRepository).findAll();
+            verify(imageRepository).findByNoIn(any());
+
+            assertEquals(technicalStackRegisterFormResponseDtoList.get(0).getTechnicalStackNo(), technicalStack1.getNo());
+            assertEquals(technicalStackRegisterFormResponseDtoList.get(0).getTechnicalStackName(), technicalStack1.getName());
+            assertEquals(technicalStackRegisterFormResponseDtoList.get(0).getImage(), image1.getUrl());
+            assertEquals(technicalStackRegisterFormResponseDtoList.get(1).getTechnicalStackNo(), technicalStack2.getNo());
+            assertEquals(technicalStackRegisterFormResponseDtoList.get(1).getTechnicalStackName(), technicalStack2.getName());
+            assertEquals(technicalStackRegisterFormResponseDtoList.get(1).getImage(), image2.getUrl());
+            assertEquals(technicalStackRegisterFormResponseDtoList.get(2).getTechnicalStackNo(), technicalStack3.getNo());
+            assertEquals(technicalStackRegisterFormResponseDtoList.get(2).getTechnicalStackName(), technicalStack3.getName());
+            assertEquals(technicalStackRegisterFormResponseDtoList.get(2).getImage(), image3.getUrl());
         }
-
-        // then
-        verify(technicalStackRepository).findAll();
-        verify(imageRepository).findByNoIn(any());
-
-        assertEquals(technicalStackRegisterFormResponseDtoList.get(0).getTechnicalStackNo(), technicalStack1.getNo());
-        assertEquals(technicalStackRegisterFormResponseDtoList.get(0).getTechnicalStackName(), technicalStack1.getName());
-        assertEquals(technicalStackRegisterFormResponseDtoList.get(0).getImage(), image1.getUrl());
-        assertEquals(technicalStackRegisterFormResponseDtoList.get(1).getTechnicalStackNo(), technicalStack2.getNo());
-        assertEquals(technicalStackRegisterFormResponseDtoList.get(1).getTechnicalStackName(), technicalStack2.getName());
-        assertEquals(technicalStackRegisterFormResponseDtoList.get(1).getImage(), image2.getUrl());
-        assertEquals(technicalStackRegisterFormResponseDtoList.get(2).getTechnicalStackNo(), technicalStack3.getNo());
-        assertEquals(technicalStackRegisterFormResponseDtoList.get(2).getTechnicalStackName(), technicalStack3.getName());
-        assertEquals(technicalStackRegisterFormResponseDtoList.get(2).getImage(), image3.getUrl());
     }
     
-    @Test
-    public void 기술스택_등록() throws Exception{
-        // given
-        // 기술스택 세팅
-        TechnicalStack technicalStack1 = TechnicalStack.builder()
-                .no(1L)
-                .name("testTechnicalStack1")
-                .imageNo(1L)
-                .build();
+    @Nested
+    @DisplayName("기술스택 등록")
+    class testTechnicalStackRegister {
+        @Test
+        @DisplayName("성공")
+        public void success() {
+            // given
+            // 기술스택 세팅
+            TechnicalStack technicalStack1 = TechnicalStack.builder()
+                    .no(1L)
+                    .name("testTechnicalStack1")
+                    .imageNo(1L)
+                    .build();
 
 
-        given(imageService.imageUpload(any(MultipartFile.class), any(Integer.class), any(Integer.class))).willReturn(1L);
-        given(technicalStackRepository.save(any())).willReturn(technicalStack1);
+            given(imageService.imageUpload(any(MultipartFile.class), any(Integer.class), any(Integer.class))).willReturn(1L);
+            given(technicalStackRepository.save(any())).willReturn(technicalStack1);
 
-        // when
-        MockMultipartFile mockMultipartFile
-                = new MockMultipartFile("file", "hello.txt", MediaType.MULTIPART_FORM_DATA_VALUE, "Hello, World".getBytes());
+            // when
+            MockMultipartFile mockMultipartFile
+                    = new MockMultipartFile("file", "hello.txt", MediaType.MULTIPART_FORM_DATA_VALUE, "Hello, World".getBytes());
 
-        boolean result = false;
-        try {
-            result = technicalStackService.technicalStackRegister("testTechnicalStackName", mockMultipartFile);
-        } catch (Exception e) {
-            e.printStackTrace();
+            boolean result = false;
+            try {
+                result = technicalStackService.technicalStackRegister("testTechnicalStackName", mockMultipartFile);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            // then
+            verify(imageService).imageUpload(any(MultipartFile.class), any(Integer.class), any(Integer.class));
+            verify(technicalStackRepository).save(any());
+
+            assertEquals(result, true);
         }
-
-        // then
-        verify(imageService).imageUpload(any(MultipartFile.class), any(Integer.class), any(Integer.class));
-        verify(technicalStackRepository).save(any());
-
-        assertEquals(result, true);
     }
+    
+    @Nested
+    @DisplayName("기술스택 수정")
+    class testTechnicalStackUpdate {
+        @Test
+        @DisplayName("성공")
+        public void success() {
+            // given
+            // 기술스택 세팅
+            TechnicalStack technicalStack1 = TechnicalStack.builder()
+                    .no(1L)
+                    .name("testTechnicalStack1")
+                    .imageNo(1L)
+                    .build();
 
-    @Test
-    public void 기술스택_수정() throws Exception{
-        // given
-        // 기술스택 세팅
-        TechnicalStack technicalStack1 = TechnicalStack.builder()
-                .no(1L)
-                .name("testTechnicalStack1")
-                .imageNo(1L)
-                .build();
+            given(technicalStackRepository.findById(any())).willReturn(Optional.of(technicalStack1));
+            given(imageService.imageUpload(any(MultipartFile.class), any(Integer.class), any(Integer.class))).willReturn(1L);
 
-        given(technicalStackRepository.findById(any())).willReturn(Optional.of(technicalStack1));
-        given(imageService.imageUpload(any(MultipartFile.class), any(Integer.class), any(Integer.class))).willReturn(1L);
+            // when
+            TechnicalStackUpdateRequestDto technicalStackUpdateRequestDto = new TechnicalStackUpdateRequestDto(technicalStack1.getNo(), "testTechnicalStackNameUpdate");
+            MockMultipartFile mockMultipartFile
+                    = new MockMultipartFile("file", "hello.txt", MediaType.MULTIPART_FORM_DATA_VALUE, "Hello, World".getBytes());
 
-        // when
-        TechnicalStackUpdateRequestDto technicalStackUpdateRequestDto = new TechnicalStackUpdateRequestDto(technicalStack1.getNo(), "testTechnicalStackNameUpdate");
-        MockMultipartFile mockMultipartFile
-                = new MockMultipartFile("file", "hello.txt", MediaType.MULTIPART_FORM_DATA_VALUE, "Hello, World".getBytes());
+            boolean result = false;
+            try {
+                result = technicalStackService.technicalStackUpdate(technicalStackUpdateRequestDto, mockMultipartFile);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
-        boolean result = false;
-        try {
-            result = technicalStackService.technicalStackUpdate(technicalStackUpdateRequestDto, mockMultipartFile);
-        } catch (Exception e) {
-            e.printStackTrace();
+            // then
+            verify(technicalStackRepository).findById(any());
+            verify(imageService).imageUpload(any(MultipartFile.class), any(Integer.class), any(Integer.class));
+
+            assertEquals(result, true);
         }
-
-        // then
-        verify(technicalStackRepository).findById(any());
-        verify(imageService).imageUpload(any(MultipartFile.class), any(Integer.class), any(Integer.class));
-
-        assertEquals(result, true);
     }
 }

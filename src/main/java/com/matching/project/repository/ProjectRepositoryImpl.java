@@ -13,10 +13,7 @@ import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -58,8 +55,8 @@ public class ProjectRepositoryImpl implements ProjectRepositoryCustom {
                         return new OrderSpecifier(direction, project.name);
                     case "createUserName":
                         return new OrderSpecifier(direction, project.createUserName);
-                    case "createDate":
-                        return new OrderSpecifier(direction, project.createDate);
+                    case "createdDate":
+                        return new OrderSpecifier(direction, project.createdDate);
                     case "startDate":
                         return new OrderSpecifier(direction, project.startDate);
                     case "endDate":
@@ -68,8 +65,6 @@ public class ProjectRepositoryImpl implements ProjectRepositoryCustom {
                         return new OrderSpecifier(direction, project.introduction);
                     case "maxPeople":
                         return new OrderSpecifier(direction, project.maxPeople);
-                    case "deleteReason":
-                        return new OrderSpecifier(direction, project.deleteReason);
                     case "viewCount":
                         return new OrderSpecifier(direction, project.viewCount);
                     case "commentCount":
@@ -80,9 +75,9 @@ public class ProjectRepositoryImpl implements ProjectRepositoryCustom {
         return null;
     }
     
-    // 모집 상태와 삭제 상태로 검색하는 메소드
+    // 모집 상태 검색하는 메소드
     @Override
-    public Page<ProjectSimpleDto> findProjectByStatusAndDelete(Pageable pageable, boolean state, boolean delete, ProjectSearchRequestDto projectSearchRequestDto){
+    public Slice<ProjectSimpleDto> findProjectByStatus(Pageable pageable, Long projectNo, boolean state, ProjectSearchRequestDto projectSearchRequestDto){
         List<ProjectSimpleDto> projectSimpleDtoList = queryFactory.select(Projections.constructor(ProjectSimpleDto.class,
                         project.no,
                         project.name,
@@ -92,31 +87,29 @@ public class ProjectRepositoryImpl implements ProjectRepositoryCustom {
                         project.createUserName))
                 .from(project)
                 .where(
+                        underProjectNo(projectNo),
                         eqStatus(state),
-                        eqDelete(delete),
                         search(projectSearchRequestDto))
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
+                .offset(0)
+                .limit(pageable.getPageSize() + 1)
                 .orderBy(projectSort(pageable))
                 .fetch();
 
         // 프로젝트 연관 select
         findProjectSimpleDtoListRelation(projectSimpleDtoList);
 
-        // count 쿼리
-        int totalSize = queryFactory
-                .selectFrom(project)
-                .where(
-                        eqStatus(state),
-                        eqDelete(delete))
-                .fetch().size();
+        boolean hasNext = false;
+        if (projectSimpleDtoList.size() > pageable.getPageSize()) {
+            projectSimpleDtoList.remove(pageable.getPageSize());
+            hasNext = true;
+        }
 
-        return new PageImpl<>(projectSimpleDtoList, pageable, totalSize);
+        return new SliceImpl<>(projectSimpleDtoList, pageable, hasNext);
     }
     
     // 유저가 등록한 프로젝트 조회(모집중, 모집완료 포함)
     @Override
-    public Page<ProjectSimpleDto> findUserProjectByDelete(Pageable pageable, User user, boolean delete) {
+    public Slice<ProjectSimpleDto> findUserProject(Pageable pageable, Long projectNo, User user) {
         List<ProjectSimpleDto> projectSimpleDtoList = queryFactory.select(Projections.constructor(ProjectSimpleDto.class,
                         project.no,
                         project.name,
@@ -127,31 +120,29 @@ public class ProjectRepositoryImpl implements ProjectRepositoryCustom {
                 .from(project)
                 .join(project.user, QUser.user)
                 .where(
-                        eqProjectUser(user),
-                        eqDelete(delete))
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
+                        underProjectNo(projectNo),
+                        eqProjectUser(user)
+                )
+                .offset(0)
+                .limit(pageable.getPageSize() + 1)
                 .orderBy(projectSort(pageable))
                 .fetch();
 
         // 프로젝트 연관 select
         findProjectSimpleDtoListRelation(projectSimpleDtoList);
 
-        // count 쿼리
-        int totalSize = queryFactory
-                .selectFrom(project)
-                .join(project.user, QUser.user)
-                .where(
-                        eqProjectUser(user),
-                        eqDelete(delete))
-                .fetch().size();
+        boolean hasNext = false;
+        if (projectSimpleDtoList.size() > pageable.getPageSize()) {
+            projectSimpleDtoList.remove(pageable.getPageSize());
+            hasNext = true;
+        }
 
-        return new PageImpl<>(projectSimpleDtoList, pageable, totalSize);
+        return new SliceImpl<>(projectSimpleDtoList, pageable, hasNext);
     }
     
     // 유저가 참여중인 프로젝트 조회
     @Override
-    public Page<ProjectSimpleDto> findParticipateProjectByDelete(Pageable pageable, User user, boolean delete) {
+    public Slice<ProjectSimpleDto> findParticipateProject(Pageable pageable, Long projectNo, User user) {
         
         // 유저가 참여한 프로젝트를 중복제거한 상태로 가져오는 서브쿼리
         JPQLQuery<Long> subQuery = JPAExpressions.selectDistinct(project.no)
@@ -168,35 +159,31 @@ public class ProjectRepositoryImpl implements ProjectRepositoryCustom {
                         project.viewCount,
                         project.createUserName))
                 .from(project)
-                .where(eqDelete(delete)
-                        .and(project.no.in(
+                .where(
+                        project.no.in(
                                 subQuery
-                        )))
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
+                        ),
+                        underProjectNo(projectNo))
+                .offset(0)
+                .limit(pageable.getPageSize() + 1)
                 .orderBy(projectSort(pageable))
                 .fetch();
 
         // 프로젝트 연관 select
         findProjectSimpleDtoListRelation(projectSimpleDtoList);
 
-        // count 쿼리
-        int totalSize = queryFactory
-                .selectFrom(project)
-                .where(
-                        eqDelete(delete)
-                        .and(project.no.in(
-                                subQuery
-                        )))
-                .fetch().size();
+        boolean hasNext = false;
+        if (projectSimpleDtoList.size() > pageable.getPageSize()) {
+            projectSimpleDtoList.remove(pageable.getPageSize());
+            hasNext = true;
+        }
 
-        return new PageImpl<>(projectSimpleDtoList, pageable, totalSize);
+        return new SliceImpl<>(projectSimpleDtoList, pageable, hasNext);
     }
 
     // 유저가 신청중인 프로젝트 조회
     @Override
-    public Page<ProjectSimpleDto> findParticipateRequestProjectByDelete(Pageable pageable, User user, boolean delete) {
-        
+    public Slice<ProjectSimpleDto> findParticipateRequestProject(Pageable pageable, Long projectNo, User user) {
         // 신청중인 프로젝트 no를 중복제거한 상태로 가져오는 서브쿼리
         JPQLQuery<Long> subQuery = JPAExpressions.selectDistinct(project.no)
                 .from(projectParticipateRequest)
@@ -213,33 +200,30 @@ public class ProjectRepositoryImpl implements ProjectRepositoryCustom {
                         project.viewCount,
                         project.createUserName))
                 .from(project)
-                .where(eqDelete(delete)
-                        .and(project.no.in(
+                .where(
+                        project.no.in(
                                 subQuery
-                        )))
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
+                        ),
+                        underProjectNo(projectNo))
+                .offset(0)
+                .limit(pageable.getPageSize() + 1)
                 .orderBy(projectSort(pageable))
                 .fetch();
 
         // 프로젝트 연관 select
         findProjectSimpleDtoListRelation(projectSimpleDtoList);
 
-        // count 쿼리
-        int totalSize = queryFactory
-                .selectFrom(project)
-                .where(
-                        eqDelete(delete)
-                        .and(project.no.in(
-                                subQuery
-                        )))
-                .fetch().size();
+        boolean hasNext = false;
+        if (projectSimpleDtoList.size() > pageable.getPageSize()) {
+            projectSimpleDtoList.remove(pageable.getPageSize());
+            hasNext = true;
+        }
 
-        return new PageImpl<>(projectSimpleDtoList, pageable, totalSize);
+        return new SliceImpl<>(projectSimpleDtoList, pageable, hasNext);
     }
 
     @Override
-    public Page<ProjectSimpleDto> findBookMarkProjectByDelete(Pageable pageable, User user, boolean delete) {
+    public Slice<ProjectSimpleDto> findBookMarkProject(Pageable pageable, Long projectNo, User user) {
         JPQLQuery<Long> subQuery = JPAExpressions.selectDistinct(bookMark.project.no)
                 .from(bookMark)
                 .join(bookMark.user, QUser.user)
@@ -254,12 +238,13 @@ public class ProjectRepositoryImpl implements ProjectRepositoryCustom {
                         project.viewCount,
                         project.createUserName))
                 .from(project)
-                .where(eqDelete(delete)
-                        .and(project.no.in(
+                .where(
+                        project.no.in(
                                 subQuery
-                        )))
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
+                        ),
+                        underProjectNo(projectNo))
+                .offset(0)
+                .limit(pageable.getPageSize() + 1)
                 .orderBy(projectSort(pageable))
                 .fetch();
 
@@ -269,17 +254,13 @@ public class ProjectRepositoryImpl implements ProjectRepositoryCustom {
         // 프로젝트 연관 select
         findProjectSimpleDtoListRelation(projectSimpleDtoList);
 
-        // count 쿼리
-        int totalSize = queryFactory
-                .selectFrom(project)
-                .where(
-                        eqDelete(delete)
-                                .and(project.no.in(
-                                        subQuery
-                                )))
-                .fetch().size();
+        boolean hasNext = false;
+        if (projectSimpleDtoList.size() > pageable.getPageSize()) {
+            projectSimpleDtoList.remove(pageable.getPageSize());
+            hasNext = true;
+        }
 
-        return new PageImpl<>(projectSimpleDtoList, pageable, totalSize);
+        return new SliceImpl<>(projectSimpleDtoList, pageable, hasNext);
     }
 
     // 프로젝트 연관 조회 메소드(프로젝트 포지션, 프로젝트 기술스택)
@@ -315,23 +296,35 @@ public class ProjectRepositoryImpl implements ProjectRepositoryCustom {
                 .fetchOne();
     }
 
+    private BooleanExpression underProjectNo(Long projectNo) {
+        if (projectNo == null) {
+            return null;
+        }
+        return  project.no.lt(projectNo);
+    }
+
     private BooleanExpression eqStatus(boolean state) {
         return project.state.eq(state);
     }
 
-    private BooleanExpression eqDelete(boolean delete) {
-        return project.delete.eq(delete);
-    }
-
     private BooleanExpression eqProjectUser(User user) {
+        if (user == null) {
+            return null;
+        }
         return project.user.eq(user);
     }
 
     private BooleanExpression eqProjectPositionUser(User user) {
+        if (user == null) {
+            return null;
+        }
         return projectPosition.user.eq(user);
     }
 
     private BooleanExpression eqProjectParticipateRequest(User user) {
+        if (user == null) {
+            return null;
+        }
         return projectParticipateRequest.user.eq(user);
     }
     

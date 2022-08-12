@@ -36,7 +36,6 @@ class BookMarkRepositoryTest {
     @Test
     public void 북마크_삭제_테스트() {
         // given
-        LocalDateTime createDate = LocalDateTime.now();
         LocalDate startDate = LocalDate.of(2022, 06, 24);
         LocalDate endDate = LocalDate.of(2022, 06, 28);
 
@@ -62,15 +61,12 @@ class BookMarkRepositoryTest {
         Project project1 = Project.builder()
                 .name("testName1")
                 .createUserName("user1")
-                .createDate(createDate.plusDays(1))
                 .startDate(startDate)
                 .endDate(endDate)
                 .state(true)
                 .introduction("testIntroduction1")
                 .maxPeople(10)
                 .currentPeople(4)
-                .delete(false)
-                .deleteReason(null)
                 .viewCount(10)
                 .commentCount(10)
                 .build();

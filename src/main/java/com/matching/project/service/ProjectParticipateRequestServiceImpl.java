@@ -1,6 +1,7 @@
 package com.matching.project.service;
 
 import com.matching.project.dto.ResponseDto;
+import com.matching.project.dto.SliceDto;
 import com.matching.project.dto.project.ProjectParticipateRequestDto;
 import com.matching.project.dto.projectparticipate.ProjectParticipateFormResponseDto;
 import com.matching.project.entity.*;
@@ -10,6 +11,7 @@ import com.matching.project.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -74,7 +76,7 @@ public class ProjectParticipateRequestServiceImpl implements ProjectParticipateR
     
     // 프로젝트 참가 신청 폼 조회
     @Override
-    public Page<ProjectParticipateFormResponseDto> findProjectParticipateManagementForm(Long projectNo, Pageable pageable) throws Exception {
+    public SliceDto<ProjectParticipateFormResponseDto> findProjectParticipateManagementForm(Long projectNo, Long projectParticipateRequestNo, Pageable pageable) throws Exception {
         // 현재 유저 가져오기
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) authentication.getPrincipal();
@@ -83,7 +85,10 @@ public class ProjectParticipateRequestServiceImpl implements ProjectParticipateR
         Project project = projectRepository.findProjectWithUserUsingFetchJoinByProjectNo(projectNo);
         isCreatedProject(user, project);
 
-        return projectParticipateRequestRepository.findProjectParticipateRequestByProjectNo(projectNo, pageable);
+        Slice<ProjectParticipateFormResponseDto> projectParticipateFormResponseDtoSlice =
+                projectParticipateRequestRepository.findProjectParticipateRequestByProjectNo(projectNo, projectParticipateRequestNo != null ? projectParticipateRequestNo : Long.MAX_VALUE, pageable);
+
+        return new SliceDto<>(projectParticipateFormResponseDtoSlice.getContent(), projectParticipateFormResponseDtoSlice.isLast());
     }
     
     // 프로젝트 참가 신청 수락

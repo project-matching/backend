@@ -1,5 +1,6 @@
 package com.matching.project.service;
 
+import com.matching.project.dto.SliceDto;
 import com.matching.project.dto.comment.CommentDto;
 import com.matching.project.dto.enumerate.Role;
 import com.matching.project.dto.project.*;
@@ -16,6 +17,7 @@ import com.matching.project.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -130,8 +132,8 @@ public class ProjectServiceImpl implements ProjectService {
     
     // 프로젝트 조회
     @Override
-    public Page<ProjectSimpleDto> findProjectList(boolean state, boolean delete, ProjectSearchRequestDto projectSearchRequestDto, Pageable pageable) throws Exception {
-        Page<ProjectSimpleDto> projectSimpleDtoPage = projectRepository.findProjectByStatusAndDelete(pageable, state, delete, projectSearchRequestDto);
+    public SliceDto<ProjectSimpleDto> findProjectList(Long projectNo, boolean state, ProjectSearchRequestDto projectSearchRequestDto, Pageable pageable) throws Exception {
+        Slice<ProjectSimpleDto> projectSimpleDtoSlice = projectRepository.findProjectByStatus(pageable, projectNo != null ? projectNo : Long.MAX_VALUE, state, projectSearchRequestDto);
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
@@ -140,24 +142,25 @@ public class ProjectServiceImpl implements ProjectService {
             User user = (User) principal;
 
             // 유저 즐겨찾기 조회
-            findBookMark(projectSimpleDtoPage.getContent(), user);
+            findBookMark(projectSimpleDtoSlice.getContent(), user);
         }
-        return projectSimpleDtoPage;
+
+        return new SliceDto<>(projectSimpleDtoSlice.getContent(), projectSimpleDtoSlice.isLast());
     }
     
     // 유저가 만든 프로젝트 조회
     @Override
-    public Page<ProjectSimpleDto> findUserProjectList(boolean delete, Pageable pageable) throws Exception {
+    public SliceDto<ProjectSimpleDto> findUserProjectList(Long projectNo, Pageable pageable) throws Exception {
         // 현재 로그인한 유저 정보 가져오기
         User user = getUser();
         
         // 유저가 등록한 프로젝트 조회
-        Page<ProjectSimpleDto> projectSimpleDtoPage = projectRepository.findUserProjectByDelete(pageable, user, delete);
+        Slice<ProjectSimpleDto> projectSimpleDtoSlice = projectRepository.findUserProject(pageable, projectNo != null ? projectNo : Long.MAX_VALUE, user);
 
         // 유저 즐겨찾기 조회
-        findBookMark(projectSimpleDtoPage.getContent(), user);
+        findBookMark(projectSimpleDtoSlice.getContent(), user);
 
-        return projectSimpleDtoPage;
+        return new SliceDto<>(projectSimpleDtoSlice.getContent(), projectSimpleDtoSlice.isLast());
     }
     
     // 프로젝트 수정 폼 조회
@@ -208,32 +211,32 @@ public class ProjectServiceImpl implements ProjectService {
 
     // 참여중인 프로젝트 조회
     @Override
-    public Page<ProjectSimpleDto> findParticipateProjectList(boolean delete, Pageable pageable) throws Exception {
+    public SliceDto<ProjectSimpleDto> findParticipateProjectList(Long projectNo, Pageable pageable) throws Exception {
         // 현재 로그인한 유저 정보 가져오기
         User user = getUser();
 
         // 유저가 등록한 프로젝트 조회
-        Page<ProjectSimpleDto> projectSimpleDtoPage = projectRepository.findParticipateProjectByDelete(pageable, user, delete);
+        Slice<ProjectSimpleDto> projectSimpleDtoSlice = projectRepository.findParticipateProject(pageable, projectNo != null ? projectNo : Long.MAX_VALUE, user);
         
         // 유저 즐겨찾기 조회
-        findBookMark(projectSimpleDtoPage.getContent(), user);
+        findBookMark(projectSimpleDtoSlice.getContent(), user);
 
-        return projectSimpleDtoPage;
+        return new SliceDto<>(projectSimpleDtoSlice.getContent(), projectSimpleDtoSlice.isLast());
     }
     
     // 신청중인 프로젝트 조회
     @Override
-    public Page<ProjectSimpleDto> findParticipateRequestProjectList(boolean delete, Pageable pageable) throws Exception {
+    public SliceDto<ProjectSimpleDto> findParticipateRequestProjectList(Long projectNo, Pageable pageable) throws Exception {
         // 현재 로그인한 유저 정보 가져오기
         User user = getUser();
 
         // 유저가 등록한 프로젝트 조회
-        Page<ProjectSimpleDto> projectSimpleDtoPage = projectRepository.findParticipateRequestProjectByDelete(pageable, user, delete);
+        Slice<ProjectSimpleDto> projectSimpleDtoSlice = projectRepository.findParticipateRequestProject(pageable, projectNo != null ? projectNo : Long.MAX_VALUE, user);
 
         // 유저 즐겨찾기 조회
-        findBookMark(projectSimpleDtoPage.getContent(), user);
+        findBookMark(projectSimpleDtoSlice.getContent(), user);
 
-        return projectSimpleDtoPage;
+        return new SliceDto<>(projectSimpleDtoSlice.getContent(), projectSimpleDtoSlice.isLast());
     }
     
     // 유저 즐겨찾기 조회
