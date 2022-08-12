@@ -447,8 +447,8 @@ class ProjectParticipateControllerTest {
                     .projectParticipateRequest(saveProjectParticipateRequest1)
                     .build();
 
-            ParticipateRequestTechnicalStack saveParticipateRequestTechnicalStack1 = participateRequestTechnicalStackRepository.save(participateRequestTechnicalStack1);
-            ParticipateRequestTechnicalStack saveParticipateRequestTechnicalStack2 = participateRequestTechnicalStackRepository.save(participateRequestTechnicalStack2);
+            ParticipateRequestTechnicalStack saveParticipateRequestTechnicalStack1 = participateRequestTechnicalStackRepository.saveAndFlush(participateRequestTechnicalStack1);
+            ParticipateRequestTechnicalStack saveParticipateRequestTechnicalStack2 = participateRequestTechnicalStackRepository.saveAndFlush(participateRequestTechnicalStack2);
 
             // when
             String token = jwtTokenService.createToken(new TokenDto(saveUser1.getEmail()));

@@ -174,9 +174,9 @@ class ProjectParticipateRequestRepositoryTest {
                 .motive("testMotive3")
                 .github("testGitHub3")
                 .build();
-        ProjectParticipateRequest saveProjectParticipateRequest1 = projectParticipateRequestRepository.save(projectParticipateRequest1);
-        ProjectParticipateRequest saveProjectParticipateRequest2 = projectParticipateRequestRepository.save(projectParticipateRequest2);
-        ProjectParticipateRequest saveProjectParticipateRequest3 = projectParticipateRequestRepository.save(projectParticipateRequest3);
+        ProjectParticipateRequest saveProjectParticipateRequest1 = projectParticipateRequestRepository.saveAndFlush(projectParticipateRequest1);
+        ProjectParticipateRequest saveProjectParticipateRequest2 = projectParticipateRequestRepository.saveAndFlush(projectParticipateRequest2);
+        ProjectParticipateRequest saveProjectParticipateRequest3 = projectParticipateRequestRepository.saveAndFlush(projectParticipateRequest3);
         
         // 기술스택 세팅
         TechnicalStack technicalStack1 = TechnicalStack.builder()
