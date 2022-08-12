@@ -198,16 +198,15 @@ public class NotificationControllerTest {
             List<Notification> n = saveNotification(user1, user2);
 
             //when
-            ResultActions resultActions = mvc.perform(get("/v1/notification")
+            ResultActions resultActions = mvc.perform(get("/v1/notification?size=1")
                     .header("Authorization", "Bearer " + token));
 
             //then
             resultActions.andDo(print())
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.data.[0].type").value("PROJECT_PARTICIPATION_SUCCESS"))
-                    .andExpect(jsonPath("$.data.[0].title").value("t3"))
-                    .andExpect(jsonPath("$.data.[1].type").value("NOTICE"))
-                    .andExpect(jsonPath("$.data.[1].title").value("t1"));
+                    .andExpect(jsonPath("$.data.content.[0].type").value("PROJECT_PARTICIPATION_SUCCESS"))
+                    .andExpect(jsonPath("$.data.content.[0].title").value("t3"))
+                    .andExpect(jsonPath("$.data.last").value(false));
 
         }
 

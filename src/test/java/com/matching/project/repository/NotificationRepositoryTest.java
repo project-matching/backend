@@ -14,6 +14,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -84,7 +85,7 @@ class NotificationRepositoryTest {
     }
 
     @Test
-    void findByUserOrUserIsNullOrderByNoDesc() {
+    void findByUserOrUserIsNullOrderByNoDescUsingPaging() {
         //given
         User user1 = saveUser("test1@test.com");
         User user2 = saveUser("test2@test.com");
@@ -125,17 +126,27 @@ class NotificationRepositoryTest {
                 .build();
         notificationRepository.save(notification4);
 
+        Notification notification5 = Notification.builder()
+                .user(user2)
+                .title("title5")
+                .content("content5")
+                .read(false)
+                .type(Type.PROJECT_PARTICIPATION_REFUSE)
+                .build();
+        notificationRepository.save(notification5);
+
 
         Pageable pageable = PageRequest.of(0, 2);
 
         //when
-        List<Notification> notificationList = notificationRepository.findByUserOrUserIsNullOrderByNoDesc(user2, pageable);
+        Slice<Notification> notificationList = notificationRepository.findByUserOrUserIsNullOrderByNoDescUsingPaging(user2, notification4.getNo(), pageable);
 
         //then
-        assertThat(notificationList.size()).isEqualTo(2);
-        assertThat(notificationList.get(0).getTitle()).isEqualTo(notification3.getTitle());
-        assertThat(notificationList.get(0).getType().toString()).isEqualTo(notification3.getType().toString());
-        assertThat(notificationList.get(1).getTitle()).isEqualTo(notification2.getTitle());
-        assertThat(notificationList.get(1).getType().toString()).isEqualTo(notification2.getType().toString());
+        assertThat(notificationList.getContent().size()).isEqualTo(2);
+        assertThat(notificationList.getContent().get(0).getTitle()).isEqualTo(notification3.getTitle());
+        assertThat(notificationList.getContent().get(0).getType().toString()).isEqualTo(notification3.getType().toString());
+        assertThat(notificationList.getContent().get(1).getTitle()).isEqualTo(notification2.getTitle());
+        assertThat(notificationList.getContent().get(1).getType().toString()).isEqualTo(notification2.getType().toString());
+        assertThat(notificationList.isLast()).isFalse();
     }
 }

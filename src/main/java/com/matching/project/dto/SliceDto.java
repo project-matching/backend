@@ -1,15 +1,16 @@
 package com.matching.project.dto;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 import java.util.List;
 
-@Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class SliceDto <D>{
+@Data
+public class SliceDto <D> {
     private List<D> content;
     private boolean last;
 }

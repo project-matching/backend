@@ -1,8 +1,10 @@
 package com.matching.project.service;
 
+import com.matching.project.dto.SliceDto;
 import com.matching.project.dto.user.*;
 import com.matching.project.entity.User;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -11,7 +13,7 @@ public interface UserService {
     User userSignUp(SignUpRequestDto signUpRequestDto);
     UserInfoResponseDto getUserInfo();
     UserProfileInfoResponseDto userProfileInfo();
-    List<UserSimpleInfoDto> userInfoList(UserFilterDto userFilterDto, Pageable pageable);
+    SliceDto<UserSimpleInfoDto> userInfoList(Long UserNo, UserFilterDto userFilterDto, Pageable pageable);
     User userUpdate(UserUpdateRequestDto userUpdateRequestDto, MultipartFile file);
     User userPasswordUpdate(PasswordUpdateRequestDto passwordUpdateRequestDto);
     User userSignOut();

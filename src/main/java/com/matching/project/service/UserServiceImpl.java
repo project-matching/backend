@@ -1,5 +1,6 @@
 package com.matching.project.service;
 
+import com.matching.project.dto.SliceDto;
 import com.matching.project.dto.enumerate.OAuth;
 import com.matching.project.dto.technicalstack.TechnicalStackDto;
 import com.matching.project.dto.user.*;
@@ -11,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -118,15 +120,20 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public List<UserSimpleInfoDto> userInfoList(UserFilterDto userFilterDto, Pageable pageable) {
-        Page<User> users = userRepositoryCustom.findByNoOrderByNoDescUsingQueryDsl(userFilterDto, pageable);
-        return users.get().map(user -> UserSimpleInfoDto.builder()
-                .userNo(user.getNo())
-                .name(user.getName())
-                .email(user.getEmail())
-                .image(imageService.getImageUrl(user.getImageNo()))
-                .build()
-        ).collect(Collectors.toList());
+    public SliceDto<UserSimpleInfoDto> userInfoList(Long UserNo, UserFilterDto userFilterDto, Pageable pageable) {
+        Slice<User> users = userRepositoryCustom.findByNoOrderByNoDescUsingQueryDsl(UserNo, userFilterDto, pageable);
+        SliceDto<UserSimpleInfoDto> dto = SliceDto.<UserSimpleInfoDto>builder()
+                .content(users.get().map(user -> UserSimpleInfoDto.builder()
+                                .userNo(user.getNo())
+                                .name(user.getName())
+                                .email(user.getEmail())
+                                .image(imageService.getImageUrl(user.getImageNo()))
+                                .build()
+                        )
+                        .collect(Collectors.toList()))
+                .last(users.isLast())
+                .build();
+        return dto;
     }
 
     @Transactional

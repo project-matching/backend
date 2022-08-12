@@ -1,5 +1,6 @@
 package com.matching.project.service;
 
+import com.matching.project.dto.SliceDto;
 import com.matching.project.dto.enumerate.Type;
 import com.matching.project.dto.notification.NotificationDto;
 import com.matching.project.dto.notification.NotificationSendRequestDto;
@@ -12,6 +13,7 @@ import com.matching.project.repository.NotificationRepository;
 import com.matching.project.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -54,21 +56,27 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     @Override
-    public List<NotificationSimpleInfoDto> notificationList(Pageable pageable) {
+    public SliceDto<NotificationSimpleInfoDto> notificationList(Long notificationNo, Pageable pageable) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Optional<User> optionalUser = Optional.ofNullable((User)auth.getPrincipal());
+
+        if (notificationNo == null)
+            notificationNo = Long.MAX_VALUE;
         
         // 공지사항도 같이 조회하기 위해서 User가 null인 경우도 조회
-        List<Notification> notificationList = notificationRepository.findByUserOrUserIsNullOrderByNoDesc(optionalUser.get(), pageable);
+        Slice<Notification> notificationList = notificationRepository.findByUserOrUserIsNullOrderByNoDescUsingPaging(optionalUser.get(), notificationNo, pageable);
 
-        return notificationList.stream().map(notification -> NotificationSimpleInfoDto.builder()
-                        .no(notification.getNo())
-                        .type(notification.getType())
-                        .title(notification.getTitle())
-                        .read(notification.isRead())
-                        .createDate(notification.getCreatedDate())
-                        .build())
-                .collect(Collectors.toList());
+        return SliceDto.<NotificationSimpleInfoDto>builder()
+                .content(notificationList.getContent().stream().map(notification -> NotificationSimpleInfoDto.builder()
+                                .no(notification.getNo())
+                                .type(notification.getType())
+                                .title(notification.getTitle())
+                                .read(notification.isRead())
+                                .createDate(notification.getCreatedDate())
+                                .build())
+                        .collect(Collectors.toList()))
+                .last(notificationList.isLast())
+                .build();
     }
 
     @Transactional
