@@ -32,7 +32,7 @@ public class CommonController {
     // 일반 로그인
     @PostMapping("/login")
     @ApiOperation(value = "일반 로그인")
-    public ResponseEntity<ResponseDto<String>> normalLogin(@RequestBody @Valid NormalLoginRequestDto dto, BindingResult bindingResult) {
+    public ResponseEntity<ResponseDto<String>> normalLogin(@RequestBody @Valid NormalLoginRequestDto dto) {
         User user = commonService.normalLogin(dto);
         TokenDto tokenDto = TokenDto.builder()
                 .email(user.getEmail())

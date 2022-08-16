@@ -12,11 +12,18 @@ import com.matching.project.error.CustomException;
 import com.matching.project.error.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.http.entity.InputStreamEntity;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.Signature;
 import org.aspectj.lang.annotation.*;
+import org.aspectj.lang.reflect.CodeSignature;
+import org.aspectj.lang.reflect.FieldSignature;
+import org.aspectj.lang.reflect.MethodSignature;
+import org.aspectj.util.Reflection;
+import org.jboss.jandex.PrimitiveType;
 import org.springframework.core.MethodParameter;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
@@ -24,13 +31,23 @@ import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.support.StandardMultipartHttpServletRequest;
+import org.springframework.web.util.ContentCachingRequestWrapper;
+import org.springframework.web.util.WebUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 import javax.validation.Valid;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.AnnotatedType;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -39,69 +56,32 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 public class LogAspect {
-    private final Validator validator;
 
-    @Pointcut("execution(* com.matching.project.controller..*.*(..))") // 3
+    @Pointcut("execution(* com.matching.project.controller..*.*(..))")
     public void onRequest() {}
 
-
-    @Before("onRequest() && @args(org.springframework.web.bind.annotation.RequestBody,..)") // 4
+    @Before("onRequest()")
     public void doBeforeLogging(JoinPoint jp) throws Throwable {
-        Object[] args = jp.getArgs();
-        for (Object arg : args) {
-            log.info("test : {}", arg);
-        }
         HttpServletRequest request =
                 ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
         loggingRequestUri(request);
         loggingHeader(request);
-        loggingQueryParameter(request);
-        loggingBody(jp);
-
-        //loggingValidation(jp);
+        loggingRequest(jp);
     }
 
-    @AfterReturning(value = "com.matching.project.aop.LogAspect.onRequest()", returning = "responseEntity")
+    @AfterReturning(value = "onRequest()", returning = "responseEntity")
     public void doAfterSuccessLogging(ResponseEntity responseEntity){
-        ResponseDto body = (ResponseDto) responseEntity.getBody();
         log.info("------------[Response Body Start]-----------");
-        log.info("[Response Status Code] : {}", responseEntity.getStatusCode().value());
-        log.info("[Response Status Name] : {}", responseEntity.getStatusCode().name());
+        log.info("[Response Status] : {} -> {}", responseEntity.getStatusCode().value(), responseEntity.getStatusCode().name());
+        log.info("[Response data] : {}", responseEntity.getBody());
         log.info("------------[Response Body End]-----------");
     }
 
-    @AfterThrowing(value = "com.matching.project.aop.LogAspect.onRequest()", throwing = "exception")
-    public void doAfterExceptionLogging(Exception exception) {
-        log.info("------------[Exception Start]-----------");
-        HttpServletRequest request =
-                ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
-        log.info("[Request Method] : {}", request.getMethod());
-        log.info("[Request Uri] : {}", request.getRequestURI());
-        log.info("[Request RemoteHost] : {}", request.getRemoteHost());
-        if (exception instanceof CustomException) {
-            CustomException customException = (CustomException)exception;
-            log.info("[Response Status Value] : {}", customException.getErrorCode().getHttpStatus().value());
-            log.info("[Response Status Name] : {}", customException.getErrorCode().getHttpStatus().name());
-            log.info("[Response ErrorCode Detail] : {}", customException.getErrorCode().getDetail());
-        } else {
-            StringWriter errors = new StringWriter();
-            exception.printStackTrace(new PrintWriter(errors));
-            log.info("[Exception] : {}", errors);
-        }
-        log.info("------------[Exception End]-----------");
-    }
-
-    public void loggingRequestUri(HttpServletRequest request) {
-        log.info("------------[Request Uri Start]-----------");
-        log.info("[Request Method] : {}", request.getMethod());
-        log.info("[Request Uri] : {}", request.getRequestURI());
-        log.info("[Request RemoteHost] : {}", request.getRemoteHost());
-        log.info("------------[Request Uri End]-----------");
-    }
-
     public void loggingHeader(HttpServletRequest request) {
-        Enumeration<String> headerNames = request.getHeaderNames();
         log.info("------------[Request Header Start]-----------");
+        log.info("[Request Host] : {} {}:{}", request.getMethod(), request.getRemoteHost(), request.getRemotePort(), request.getRequestURI());
+        log.info("[Request Uri] : {}", request.getRequestURI());
+        Enumeration<String> headerNames = request.getHeaderNames();
         while(headerNames.hasMoreElements()) {
             String name = headerNames.nextElement();
             String value = request.getHeader(name);
@@ -110,61 +90,30 @@ public class LogAspect {
         log.info("------------[Request Header End]-------------");
     }
 
-    private void loggingQueryParameter(HttpServletRequest request) {
-        Map<String, String[]> parameterMap = request.getParameterMap();
-        Iterator<String> keys = request.getParameterMap().keySet().iterator();
-
-        log.info("------------[Request QueryParameter Start]-----------");
-        if (parameterMap.isEmpty()) {
-            log.info("None QueryParameter");
-        } else {
-            while (keys.hasNext()) {
-                String name = keys.next();
-                String[] value = parameterMap.get(name);
-                log.info("[{}] -> {}", name, value);
-            }
-        }
-        log.info("------------[Request QueryParameter End]-------------");
+    public void loggingRequestUri(HttpServletRequest request) {
+        log.info("------------[Request Uri Start]-----------");
+        log.info("[Request Host] : {} {}:{}", request.getMethod(), request.getRemoteHost(), request.getRemotePort(), request.getRequestURI());
+        log.info("[Request Uri] : {}", request.getRequestURI());
+        log.info("------------[Request Uri End]-------------");
     }
 
-    private void loggingBody(JoinPoint jp) throws JsonProcessingException {
-        Signature signature = jp.getSignature();
+    private void loggingRequest(JoinPoint jp) throws JsonProcessingException {
+        log.info("------------[Request Start]-----------");
         for (Object arg : jp.getArgs()) {
-            if (!isBindingResult(arg)) {
-                String jsonString = new ObjectMapper().writeValueAsString(arg);
-                Map<String,Object> bodyMap = new HashMap<>();
-                bodyMap = (Map<String,Object>) new Gson().fromJson(jsonString, bodyMap.getClass());
-
-                Iterator<String> keys = bodyMap.keySet().iterator();
-                log.info("------------[Request Body Start]-----------");
-                while (keys.hasNext()) {
-                    String name = keys.next();
-                    Object value = bodyMap.get(name);
-                    log.info("[{}] -> {}", name, value);
+            if (arg instanceof PrimitiveType || arg instanceof String) {
+                log.info("[{}] -> {}", arg.getClass().getSimpleName(), arg);
+            } else if(arg instanceof MultipartFile) {
+                MultipartFile file = (MultipartFile)arg;
+                if (!file.isEmpty()) {
+                    log.info("[Image Type] -> {}", file.getContentType());
+                    log.info("[Image FileName] -> {}", file.getOriginalFilename());
+                    log.info("[Image Size] -> {}", file.getSize());
                 }
-                log.info("------------[Request Body End]-----------");
+            } else {
+                String jsonString = new ObjectMapper().writeValueAsString(arg);
+                log.info("[{}] -> {}", arg.getClass().getSimpleName(), jsonString);
             }
         }
-    }
-
-//    private void loggingValidation(JoinPoint jp) {
-//        Object[] args = jp.getArgs();
-//        for (Object arg : args) {
-//            if (isBindingResult(arg)) {
-//                log.info("------------[Request Binding Error Start]-----------");
-//                BindingResult result = (BindingResult) arg;
-//                if (result.hasErrors()) {
-//                    List<ObjectError> list = result.getAllErrors();
-//                    for (ObjectError e : list) {
-//                        log.info("[{}] -> {}", e.getObjectName(), e.getDefaultMessage());
-//                    }
-//                }
-//                log.info("------------[Request Binding Error End]-----------");
-//            }
-//        }
-//    }
-
-    private boolean isBindingResult(Object arg) {
-        return arg instanceof BindingResult;
+        log.info("------------[Request End]-------------");
     }
 }
