@@ -1,5 +1,7 @@
 package com.matching.project.config;
 
+import com.matching.project.error.CustomAccessDeniedHandler;
+import com.matching.project.error.CustomAuthenticationEntryPoint;
 import com.matching.project.oauth.CustomOAuth2UserService;
 import com.matching.project.oauth.OAuthSuccessHandler;
 import com.matching.project.service.JwtTokenService;
@@ -48,7 +50,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         UsernamePasswordAuthenticationFilter.class)
 
                 .exceptionHandling()
-                .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
+                // 인증 에러 핸들링
+                .authenticationEntryPoint(new CustomAuthenticationEntryPoint())
+                // 인가 에러 핸들링
+                .accessDeniedHandler(new CustomAccessDeniedHandler())
                 .and()
 
                 .authorizeRequests()

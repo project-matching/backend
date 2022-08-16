@@ -2,6 +2,7 @@ package com.matching.project.dto.common;
 
 import lombok.*;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 @Builder
