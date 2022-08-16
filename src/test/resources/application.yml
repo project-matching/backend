@@ -73,3 +73,7 @@ cloud:
       static: ap-northeast-2
     stack:
       auto: false
+
+image:
+  default:
+    url: default_url
