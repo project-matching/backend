@@ -21,10 +21,21 @@ import java.util.stream.Collectors;
 public class PositionServiceImpl implements PositionService {
     private final PositionRepository positionRepository;
 
+    private User getAuthenticatedUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Object principal = authentication.getPrincipal();
+
+        User user = null;
+        if (principal instanceof User)
+            user = (User)principal;
+        else
+            throw new CustomException(ErrorCode.GET_USER_AUTHENTICATION_EXCEPTION);
+        return user;
+    }
+
     @Override
     public List<PositionRegisterFormResponseDto> positionList() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        Optional<User> optionalUser = Optional.ofNullable((User)auth.getPrincipal());
+        User user = getAuthenticatedUser();
 
         List<Position> positionList = positionRepository.findAll();
         return positionList.stream()
@@ -34,8 +45,7 @@ public class PositionServiceImpl implements PositionService {
 
     @Override
     public Position positionRegister(String positionName) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        Optional<User> optionalUser = Optional.ofNullable((User)auth.getPrincipal());
+        User user = getAuthenticatedUser();
 
         Optional<Position> optionalPosition = positionRepository.findAllByName(positionName);
         if (optionalPosition.isPresent())
@@ -52,8 +62,7 @@ public class PositionServiceImpl implements PositionService {
     @Override
     @Transactional
     public Position positionUpdate(Long positionNo, String updatePositionName) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        Optional<User> optionalUser = Optional.ofNullable((User)auth.getPrincipal());
+        User user = getAuthenticatedUser();
 
         Optional<Position> optionalPosition = positionRepository.findById(positionNo);
         if (optionalPosition.isEmpty())

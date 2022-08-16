@@ -1,6 +1,7 @@
 package com.matching.project.config;
 
 import com.matching.project.dto.common.TokenDto;
+import com.matching.project.entity.User;
 import com.matching.project.service.JwtTokenService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,8 +38,15 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
                 //토근의 존재 유무, 토큰 유효성 체크, 토큰 유효기간 체크
                 if (jwtTokenService.verifyToken(token)) {
                     Authentication auth = jwtTokenService.getAuthentication(token);
-                    SecurityContextHolder.getContext().setAuthentication(auth);
-                    log.info("Valid Jwt Token");
+                    User user = (User)auth.getPrincipal();
+                    if (user.isWithdrawal()) {
+                        log.error("{} : Withdrawal User", user.getEmail());
+                    } else if (user.isBlock()) {
+                        log.error("{} : Blocked User", user.getEmail());
+                    } else {
+                        SecurityContextHolder.getContext().setAuthentication(auth);
+                        log.info("{} : Valid Jwt Token", user.getEmail());
+                    }
                 }
             }
         }

@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 @Service
 public class CommonServiceImpl implements CommonService {
     private final CustomUserDetailsService customUserDetailsService;
-    private final JwtTokenService jwtTokenService;
     private final PasswordEncoder passwordEncoder;
 
     @Override

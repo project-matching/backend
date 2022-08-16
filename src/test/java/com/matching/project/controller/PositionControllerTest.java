@@ -107,7 +107,7 @@ public class PositionControllerTest {
 
 
     @Nested
-    @DisplayName("포지션 추가 FORM (관리자)")
+    @DisplayName("포지션 리스트 조회")
     class positionRegisterForm {
 
         @DisplayName("성공")
@@ -142,23 +142,6 @@ public class PositionControllerTest {
             //then
             resultActions.andDo(print())
                     .andExpect(status().isUnauthorized());
-        }
-
-        @DisplayName("실패 : 접근 권한이 없는 경우")
-        @Test
-        void fail2() throws Exception {
-            //given
-            User user = saveUser();
-            String token = getToken(user);
-            savePosition();
-
-            //when
-            ResultActions resultActions = mvc.perform(get("/v1/position")
-                    .header("Authorization", "Bearer " + token));
-
-            //then
-            resultActions.andDo(print())
-                    .andExpect(status().isForbidden());
         }
     }
 
