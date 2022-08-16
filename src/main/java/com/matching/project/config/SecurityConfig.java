@@ -100,7 +100,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
                 //PositionController
                 .antMatchers(HttpMethod.POST,"/v1/position").hasAnyRole("ADMIN")
-                .antMatchers(HttpMethod.GET,"/v1/position").hasAnyRole("ADMIN")
+                .antMatchers(HttpMethod.GET,"/v1/position").hasAnyRole("USER", "ADMIN")
                 .antMatchers(HttpMethod.PUT,"/v1/position/**").hasAnyRole("ADMIN")
 
                 //NotificationController
