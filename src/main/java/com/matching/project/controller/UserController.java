@@ -83,7 +83,8 @@ public class UserController {
     }
 
     @GetMapping
-    @ApiOperation(value = "내 프로필 조회")
+    @ApiOperation(value = "내 프로필 조회"
+                    ,notes = "loginCategory => [NORMAL, GITHUB, GOOGLE]")
     public ResponseEntity<ResponseDto<UserProfileInfoResponseDto>> userProfile() {
         UserProfileInfoResponseDto userProfileInfoResponseDto = userService.userProfileInfo();
         return ResponseEntity.ok(new ResponseDto<>(null, userProfileInfoResponseDto));

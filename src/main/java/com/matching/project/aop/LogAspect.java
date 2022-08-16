@@ -81,8 +81,6 @@ public class LogAspect {
 
     public void loggingHeader(HttpServletRequest request) {
         log.info("------------[Request Header Start]-----------");
-        log.info("[Request Host] : {} {}:{}", request.getMethod(), request.getRemoteHost(), request.getRemotePort(), request.getRequestURI());
-        log.info("[Request Uri] : {}", request.getRequestURI());
         Enumeration<String> headerNames = request.getHeaderNames();
         while(headerNames.hasMoreElements()) {
             String name = headerNames.nextElement();

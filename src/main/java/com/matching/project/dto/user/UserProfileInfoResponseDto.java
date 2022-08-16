@@ -14,6 +14,7 @@ public class UserProfileInfoResponseDto {
     private String sex;
     private String email;
     private String position;
+    private String loginCategory;
     private List<String> technicalStackList;
     private String github;
     private String selfIntroduction;

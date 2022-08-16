@@ -179,6 +179,7 @@ public class UserServiceImpl implements UserService{
                         .collect(Collectors.toList()))
                 .github(optionalUser.get().getGithub())
                 .selfIntroduction(optionalUser.get().getSelfIntroduction())
+                .loginCategory(optionalUser.get().getOauthCategory().toString())
                 .build();
         return dto;
     }
