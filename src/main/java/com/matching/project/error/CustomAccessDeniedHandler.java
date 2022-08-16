@@ -14,5 +14,6 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException {
         log.error("AccessDeniedError : {} {}:{} (403) -> {}", request.getMethod(), request.getRemoteHost(), request.getRemotePort(), accessDeniedException.getMessage());
+        response.setStatus(403);
     }
 }

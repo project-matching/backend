@@ -4,12 +4,14 @@ import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.google.common.base.Joiner;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.matching.project.dto.ResponseDto;
 import com.matching.project.error.CustomException;
 import com.matching.project.error.ErrorCode;
+import io.swagger.models.auth.In;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.entity.InputStreamEntity;
@@ -100,7 +102,10 @@ public class LogAspect {
     private void loggingRequest(JoinPoint jp) throws JsonProcessingException {
         log.info("------------[Request Start]-----------");
         for (Object arg : jp.getArgs()) {
-            if (arg instanceof PrimitiveType || arg instanceof String) {
+            if (arg == null) {
+                continue;
+            }
+            if (isPrimitiveType(arg) || arg instanceof String) {
                 log.info("[{}] -> {}", arg.getClass().getSimpleName(), arg);
             } else if(arg instanceof MultipartFile) {
                 MultipartFile file = (MultipartFile)arg;
@@ -110,10 +115,17 @@ public class LogAspect {
                     log.info("[Image Size] -> {}", file.getSize());
                 }
             } else {
-                String jsonString = new ObjectMapper().writeValueAsString(arg);
+                String jsonString = new ObjectMapper().registerModule(new JavaTimeModule()).writeValueAsString(arg);
                 log.info("[{}] -> {}", arg.getClass().getSimpleName(), jsonString);
             }
         }
         log.info("------------[Request End]-------------");
+    }
+
+    private boolean isPrimitiveType(Object o) {
+        if (o instanceof Short || o instanceof Integer || o instanceof Long || o instanceof Float || o instanceof Double || o instanceof Boolean || o instanceof Byte) {
+            return true;
+        }
+         return false;
     }
 }

@@ -46,11 +46,4 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         log.error("CustomException : {} {}:{} ({}) -> {}", request.getMethod(), request.getRemoteHost(), request.getRemotePort(), errorCode.getHttpStatus().value(), errorCode.getDetail());
         return ErrorResponse.toResponseEntity(errorCode);
     }
-
-    @ExceptionHandler(value = {Exception.class})
-    protected void handleException(Exception e) {
-        StringWriter errors = new StringWriter();
-        e.printStackTrace(new PrintWriter(errors));
-        log.error("{}",errors);
-    }
 }
