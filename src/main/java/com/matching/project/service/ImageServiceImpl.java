@@ -8,6 +8,8 @@ import com.matching.project.repository.ImageRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -26,6 +28,9 @@ import java.util.UUID;
 public class ImageServiceImpl implements ImageService{
     private final AmazonS3Service amazonS3Service;
     private final ImageRepository imageRepository;
+
+    @Value("${image.default.url}")
+    public String defaultImage;
 
     @Override
     public BufferedImage imageResize(InputStream inputStream, int width, int height){
@@ -51,7 +56,6 @@ public class ImageServiceImpl implements ImageService{
 
         // 용량 체크 1mb 이상인지 (용량은 임시)
         double size = (double) file.getSize() / (1024.0 * 1024.0);
-        log.debug("{}MB", size);
         if (size > allowSize)
             throw new CustomException(ErrorCode.SIZE_OVER_EXCEPTION);
 
@@ -75,12 +79,10 @@ public class ImageServiceImpl implements ImageService{
         String ext = FilenameUtils.getExtension(file.getOriginalFilename());
         String physicalName = UUID.randomUUID().toString() + "." + ext;
 
-        log.info("{}", logicalName);
-        log.info("{}", physicalName);
-        log.info("{}", file.getContentType());
-
         // 리사이징
-        log.info("이미지 리사이징 시작");
+        log.info("Image Resize Start");
+        long startTime = System.currentTimeMillis();
+
         BufferedImage resizedImage = null;
         try {
             resizedImage = imageResize(new BufferedInputStream(file.getInputStream()), width, height);
@@ -95,15 +97,21 @@ public class ImageServiceImpl implements ImageService{
             throw new CustomException(ErrorCode.FILE_WRITE_FAIL_EXCEPTION);
         }
         InputStream is = new ByteArrayInputStream(os.toByteArray());
-        log.info("이미지 리사이징 완료");
+
+        long endTime = System.currentTimeMillis();
+        log.info("Image Resize End ({}ms)", endTime - startTime);
 
         // s3 업로드
-        log.info("이미지 S3 업로드 시작");
+        log.info("Image S3 Upload Start");
+        startTime = System.currentTimeMillis();
+
         ObjectMetadata objectMetadata = new ObjectMetadata();
         objectMetadata.setContentLength(os.size());
         objectMetadata.setContentType(file.getContentType());
         amazonS3Service.uploadFile(is, objectMetadata, physicalName);
-        log.info("이미지 S3 업로드 완료");
+
+        endTime = System.currentTimeMillis();
+        log.info("Image S3 Upload End ({}ms)", endTime - startTime);
 
         // db 저장
         Image image = Image.builder()
@@ -118,9 +126,9 @@ public class ImageServiceImpl implements ImageService{
     public void imageDelete(Long no){
         Optional<Image> image = imageRepository.findById(no);
         image.orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_FILE_EXCEPTION));
-        log.info("이미지 S3 삭제 시작");
+        log.info("Image S3 Delete Start");
         amazonS3Service.deleteFile(image.get().getPhysicalName());
-        log.info("이미지 S3 삭제 완료");
+        log.info("Image S3 Delete End");
         imageRepository.deleteById(no);
     }
 
@@ -129,7 +137,15 @@ public class ImageServiceImpl implements ImageService{
         String imageUrl = null;
         if (imageNo != null) {
             Optional<Image> image = imageRepository.findById(imageNo);
-            imageUrl = image.get().getUrl();
+            // 이미지 번호에 맞는 이미지가 존재하지 않는 경우 디폴트 이미지 부여
+            if (image.isEmpty())
+                imageUrl = defaultImage;
+            else
+                imageUrl = image.get().getUrl();
+        }
+        else {
+            // 함수의 매개변수에 null 값이 들어온 경우 디폴트 이미지 부여
+            imageUrl = defaultImage;
         }
         return imageUrl;
     }

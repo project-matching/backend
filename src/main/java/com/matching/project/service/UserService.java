@@ -5,6 +5,8 @@ import com.matching.project.dto.user.*;
 import com.matching.project.entity.User;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;

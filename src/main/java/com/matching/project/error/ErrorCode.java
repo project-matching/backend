@@ -26,6 +26,7 @@ public enum ErrorCode {
     EXPIRED_AUTH_TOKEN_EXCEPTION(INTERNAL_SERVER_ERROR, "Email AuthToken Expired"),
 
     //User
+    GET_USER_AUTHENTICATION_EXCEPTION(INTERNAL_SERVER_ERROR, "Failed to load currently connected user information."),
     NOT_FIND_USER_NO_EXCEPTION(INTERNAL_SERVER_ERROR, "Not Find User No"),
     NOT_REGISTERED_EMAIL_EXCEPTION(INTERNAL_SERVER_ERROR, "This is not a registered email"),
     DUPLICATE_EMAIL_EXCEPTION(INTERNAL_SERVER_ERROR, "Duplicated Email"),

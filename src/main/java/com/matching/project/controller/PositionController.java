@@ -23,7 +23,7 @@ public class PositionController {
     private final PositionService positionService;
 
     @GetMapping
-    @ApiOperation(value = "포지션 추가 FORM (관리자)")
+    @ApiOperation(value = "포지션 리스트 조회")
     public ResponseEntity<ResponseDto<List<PositionRegisterFormResponseDto>>> positionRegisterForm() {
         List<PositionRegisterFormResponseDto> positionRegisterFormResponseDtos = positionService.positionList();
         return ResponseEntity.ok(new ResponseDto<>(null, positionRegisterFormResponseDtos));

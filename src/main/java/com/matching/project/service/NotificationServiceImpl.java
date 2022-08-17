@@ -33,6 +33,18 @@ public class NotificationServiceImpl implements NotificationService {
     private final UserRepository userRepository;
     private final NotificationRepository notificationRepository;
 
+    private User getAuthenticatedUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Object principal = authentication.getPrincipal();
+
+        User user = null;
+        if (principal instanceof User)
+            user = (User)principal;
+        else
+            throw new CustomException(ErrorCode.GET_USER_AUTHENTICATION_EXCEPTION);
+        return user;
+    }
+
     @Override
     public Notification sendNotification(Type type, String receiver, String title, String content) {
         User receiveUser = null;
@@ -57,14 +69,13 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     public SliceDto<NotificationSimpleInfoDto> notificationList(Long notificationNo, Pageable pageable) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        Optional<User> optionalUser = Optional.ofNullable((User)auth.getPrincipal());
+        User user = getAuthenticatedUser();
 
         if (notificationNo == null)
             notificationNo = Long.MAX_VALUE;
         
         // 공지사항도 같이 조회하기 위해서 User가 null인 경우도 조회
-        Slice<Notification> notificationList = notificationRepository.findByUserOrUserIsNullOrderByNoDescUsingPaging(optionalUser.get(), notificationNo, pageable);
+        Slice<Notification> notificationList = notificationRepository.findByUserOrUserIsNullOrderByNoDescUsingPaging(user, notificationNo, pageable);
 
         return SliceDto.<NotificationSimpleInfoDto>builder()
                 .content(notificationList.getContent().stream().map(notification -> NotificationSimpleInfoDto.builder()
@@ -82,8 +93,7 @@ public class NotificationServiceImpl implements NotificationService {
     @Transactional
     @Override
     public NotificationDto notificationInfo(Long notificationNo) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        Optional<User> optionalUser = Optional.ofNullable((User)auth.getPrincipal());
+        User user = getAuthenticatedUser();
 
         Optional<Notification> optionalNotification = notificationRepository.findByNoWithUserUsingLeftFetchJoin(notificationNo);
         optionalNotification.orElseThrow(() -> new CustomException(ErrorCode.NOT_FIND_NOTIFICATION_NO_EXCEPTION));
@@ -91,7 +101,7 @@ public class NotificationServiceImpl implements NotificationService {
         // Valid Check
         if (optionalNotification.get().getUser() != null) {
             // 받는 사람만 알람에 접근할 수 있어야함. (공지사항 제외)
-            if (optionalNotification.get().getUser().getNo() != optionalUser.get().getNo())
+            if (optionalNotification.get().getUser().getNo() != user.getNo())
                 throw new CustomException(ErrorCode.UNAUTHORIZED_USER_ACCESS_EXCEPTION);
         }
 

@@ -26,6 +26,19 @@ import java.util.stream.Collectors;
 public class CommentServiceImpl implements CommentService {
     private final ProjectRepository projectRepository;
     private final CommentRepository commentRepository;
+    private final UserService userService;
+
+    private User getAuthenticatedUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Object principal = authentication.getPrincipal();
+
+        User user = null;
+        if (principal instanceof User)
+            user = (User)principal;
+        else
+            throw new CustomException(ErrorCode.GET_USER_AUTHENTICATION_EXCEPTION);
+        return user;
+    }
 
     public void commentValidCheck(User user, Comment comment) {
         // 본인만 수정, 삭제가 가능하여야 함
@@ -35,8 +48,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public SliceDto<CommentDto> commentList(Long projectNo, Long commentNo, Pageable pageable) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        Optional<User> optionalUser = Optional.ofNullable((User)auth.getPrincipal());
+        User user = getAuthenticatedUser();
 
         Optional<Project> optionalProject = projectRepository.findById(projectNo);
         optionalProject.orElseThrow(() -> new CustomException(ErrorCode.NOT_FIND_PROJECT_NO_EXCEPTION));
@@ -57,14 +69,13 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public Comment commentRegister(Long projectNo, String content) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        Optional<User> optionalUser = Optional.ofNullable((User)auth.getPrincipal());
+        User user = getAuthenticatedUser();
 
         Optional<Project> optionalProject = projectRepository.findById(projectNo);
         optionalProject.orElseThrow(() -> new CustomException(ErrorCode.NOT_FIND_PROJECT_NO_EXCEPTION));
 
         Comment comment = Comment.builder()
-                .user(optionalUser.get())
+                .user(user)
                 .project(optionalProject.get())
                 .content(content)
                 .build();
@@ -78,14 +89,13 @@ public class CommentServiceImpl implements CommentService {
     @Transactional
     @Override
     public Comment commentUpdate(Long commentNo, String content) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        Optional<User> optionalUser = Optional.ofNullable((User)auth.getPrincipal());
+        User user = getAuthenticatedUser();
 
         Optional<Comment> optionalComment = commentRepository.findById(commentNo);
         optionalComment.orElseThrow(() -> new CustomException(ErrorCode.NOT_FIND_COMMENT_NO_EXCEPTION));
 
         // Comment Valid Check
-        commentValidCheck(optionalUser.get(), optionalComment.get());
+        commentValidCheck(user, optionalComment.get());
 
         // Comment Update
         optionalComment.get().updateComment(content);
@@ -96,14 +106,13 @@ public class CommentServiceImpl implements CommentService {
     @Transactional
     @Override
     public void commentDelete(Long commentNo) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        Optional<User> optionalUser = Optional.ofNullable((User)auth.getPrincipal());
+        User user = getAuthenticatedUser();
 
         Optional<Comment> optionalComment = commentRepository.findById(commentNo);
         optionalComment.orElseThrow(() -> new CustomException(ErrorCode.NOT_FIND_COMMENT_NO_EXCEPTION));
 
         // Comment Valid Check
-        commentValidCheck(optionalUser.get(), optionalComment.get());
+        commentValidCheck(user, optionalComment.get());
 
         // Comment Delete
         commentRepository.deleteById(commentNo);

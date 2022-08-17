@@ -36,6 +36,18 @@ public class UserServiceImpl implements UserService{
     private final ImageRepository imageRepository;
     private final ImageService imageService;
 
+    private User getAuthenticatedUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Object principal = authentication.getPrincipal();
+
+        User user = null;
+        if (principal instanceof User)
+            user = (User)principal;
+        else
+            throw new CustomException(ErrorCode.GET_USER_AUTHENTICATION_EXCEPTION);
+        return user;
+    }
+
     public Position getPositionForSave(String s) {
         Position position = null;
         if (!"".equals(s) && s != null)
@@ -70,19 +82,18 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public UserInfoResponseDto getUserInfo() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        Optional<User> optionalUser = Optional.ofNullable((User)auth.getPrincipal());
+        User user = getAuthenticatedUser();
 
         // Image
-        String imageUrl = imageService.getImageUrl(optionalUser.get().getImageNo());
+        String imageUrl = imageService.getImageUrl(user.getImageNo());
 
         // Position
         String posision = null;
-        if (optionalUser.get().getPosition() != null)
-            posision = optionalUser.get().getPosition().getName();
+        if (user.getPosition() != null)
+            posision = user.getPosition().getName();
 
         // TechnicalStack
-        List<UserTechnicalStack> userTechnicalStackList = userTechnicalStackRepository.findUserTechnicalStacksByUser(optionalUser.get().getNo());
+        List<UserTechnicalStack> userTechnicalStackList = userTechnicalStackRepository.findUserTechnicalStacksByUser(user.getNo());
         List<TechnicalStackDto> technicalStackDtoList = new ArrayList<>();
         for (int i = 0; i < userTechnicalStackList.size() && i < 3 ; i++) {
             TechnicalStack technicalStack = userTechnicalStackList.get(i).getTechnicalStack();
@@ -92,10 +103,10 @@ public class UserServiceImpl implements UserService{
                     .build());
         }
         UserInfoResponseDto dto = UserInfoResponseDto.builder()
-                .no(optionalUser.get().getNo())
-                .role(optionalUser.get().getPermission())
-                .name(optionalUser.get().getName())
-                .email(optionalUser.get().getEmail())
+                .no(user.getNo())
+                .role(user.getPermission())
+                .name(user.getName())
+                .email(user.getEmail())
                 .image(imageUrl)
                 .position(posision)
                 .technicalStackDtoList(technicalStackDtoList)
@@ -139,46 +150,45 @@ public class UserServiceImpl implements UserService{
     @Transactional
     @Override
     public User userPasswordUpdate(PasswordUpdateRequestDto dto) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        Optional<User> optionalUser = Optional.ofNullable((User)auth.getPrincipal());
+        User user = getAuthenticatedUser();
 
-        if (optionalUser.get().getOauthCategory() == OAuth.NORMAL) {
-            if (!passwordEncoder.matches(dto.getOldPassword(), optionalUser.get().getPassword()))
+        if (user.getOauthCategory() == OAuth.NORMAL) {
+            if (!passwordEncoder.matches(dto.getOldPassword(), user.getPassword()))
                 throw new CustomException(ErrorCode.INCORRECT_PASSWORD_EXCEPTION);
-            optionalUser.get().updatePassword(passwordEncoder, dto.getNewPassword());
+            user.updatePassword(passwordEncoder, dto.getNewPassword());
         }
         else
             throw new CustomException(ErrorCode.SOCIAL_USER_NOT_ALLOWED_FEATURE_EXCEPTION);
-        return optionalUser.get();
+        return userRepository.save(user);
     }
 
     @Override
     public UserProfileInfoResponseDto userProfileInfo() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        Optional<User> optionalUser = Optional.ofNullable((User)auth.getPrincipal());
+        User user = getAuthenticatedUser();
 
         // Image
-        String imageUrl = imageService.getImageUrl(optionalUser.get().getImageNo());
+        String imageUrl = imageService.getImageUrl(user.getImageNo());
 
         // Position
         String posision = null;
-        if (optionalUser.get().getPosition() != null)
-            posision = optionalUser.get().getPosition().getName();
+        if (user.getPosition() != null)
+            posision = user.getPosition().getName();
 
         // TechnicalStack
-        List<UserTechnicalStack> userTechnicalStackList = userTechnicalStackRepository.findUserTechnicalStacksByUser(optionalUser.get().getNo());
+        List<UserTechnicalStack> userTechnicalStackList = userTechnicalStackRepository.findUserTechnicalStacksByUser(user.getNo());
         UserProfileInfoResponseDto dto = UserProfileInfoResponseDto.builder()
                 .image(imageUrl)
-                .name(optionalUser.get().getName())
-                .email(optionalUser.get().getEmail())
-                .sex(optionalUser.get().getSex())
+                .name(user.getName())
+                .email(user.getEmail())
+                .sex(user.getSex())
                 .position(posision)
                 .technicalStackList(userTechnicalStackList.stream()
                         .map(UserTechnicalStack::getTechnicalStack)
                         .map(TechnicalStack::getName)
                         .collect(Collectors.toList()))
-                .github(optionalUser.get().getGithub())
-                .selfIntroduction(optionalUser.get().getSelfIntroduction())
+                .github(user.getGithub())
+                .selfIntroduction(user.getSelfIntroduction())
+                .loginCategory(user.getOauthCategory().toString())
                 .build();
         return dto;
     }
@@ -186,9 +196,7 @@ public class UserServiceImpl implements UserService{
     @Transactional
     @Override
     public User userUpdate(UserUpdateRequestDto dto, MultipartFile file) {
-        // Identification Check
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        Optional<User> optionalUser = Optional.ofNullable((User)auth.getPrincipal());
+        User user = getAuthenticatedUser();
 
         // Get Entity
         Position position = getPositionForSave(dto.getPosition());
@@ -198,49 +206,43 @@ public class UserServiceImpl implements UserService{
         Long imageNo = null;
         if (!file.isEmpty()) {
             // Delete existing images
-            if (optionalUser.get().getImageNo() != null)
-                imageService.imageDelete(optionalUser.get().getImageNo());
+            if (user.getImageNo() != null)
+                imageService.imageDelete(user.getImageNo());
             // New Image Upload
             imageNo = imageService.imageUpload(file, 56, 56);
         }
-        optionalUser.get().setProfileImageNo(imageNo);
+        user.setProfileImageNo(imageNo);
 
         // User & Position Update
-        optionalUser.get().updateUser(dto, position);
+        user.updateUser(dto, position);
 
         // UserTechnicalStacks Delete & Save
-        if (userTechnicalStackRepository.findUserTechnicalStacksByUser(optionalUser.get().getNo()) != null)
-            userTechnicalStackRepository.deleteAllByUser(optionalUser.get());
+        if (userTechnicalStackRepository.findUserTechnicalStacksByUser(user.getNo()) != null)
+            userTechnicalStackRepository.deleteAllByUser(user);
         if (!saveTechnicalStacksList.isEmpty()) {
             for (TechnicalStack t : saveTechnicalStacksList) {
                 userTechnicalStackRepository.save(UserTechnicalStack.builder()
                         .technicalStack(t)
-                        .user(optionalUser.get())
+                        .user(user)
                         .build()
                 );
             }
         }
-        return optionalUser.get();
+        return userRepository.save(user);
     }
 
     @Transactional
     @Override
     public User userSignOut() {
-        // Identification Check
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        Optional<User> optionalUser = Optional.ofNullable((User)auth.getPrincipal());
+        User user = getAuthenticatedUser();
 
-        if (optionalUser.get().isWithdrawal())
+        if (user.isWithdrawal())
             throw new CustomException(ErrorCode.USER_ALREADY_WITHDRAWAL_EXCEPTION);
 
-        // UserTechnicalStacks Delete
-        if (userTechnicalStackRepository.findUserTechnicalStacksByUser(optionalUser.get().getNo()) != null)
-            userTechnicalStackRepository.deleteAllByUser(optionalUser.get());
-
         // User SignOut
-        optionalUser.get().userWithdrawal();
+        user.userWithdrawal();
 
-        return optionalUser.get();
+        return userRepository.save(user);
     }
 
     @Transactional

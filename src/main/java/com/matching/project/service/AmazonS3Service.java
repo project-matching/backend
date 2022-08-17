@@ -9,11 +9,14 @@ import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.matching.project.repository.ImageRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Component;
 
 import java.io.InputStream;
 
 @Component
+@EnableAsync
 @RequiredArgsConstructor
 public class AmazonS3Service {
     private final AmazonS3 amazonS3;
@@ -21,6 +24,7 @@ public class AmazonS3Service {
     @Value("${cloud.aws.s3.bucket}")
     public String bucket;
 
+    @Async
     public void uploadFile(InputStream inputStream, ObjectMetadata objectMetadata, String fileName) {
         amazonS3.putObject(new PutObjectRequest(bucket, fileName, inputStream, objectMetadata)
                 .withCannedAcl(CannedAccessControlList.PublicReadWrite));

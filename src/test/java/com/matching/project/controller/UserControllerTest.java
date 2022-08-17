@@ -621,8 +621,9 @@ public class UserControllerTest {
         @Test
         void success() throws Exception {
             //given
-            User user = saveAdmin();
-            String token = getToken(user);
+            User user = saveUser();
+            User admin = saveAdmin();
+            String token = getToken(admin);
 
             // User Block
             user.userBlock("test");

@@ -73,4 +73,6 @@ cloud:
     stack:
       auto: false
 
-
+image:
+  default:
+    url: default_url

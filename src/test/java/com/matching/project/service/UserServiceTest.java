@@ -96,6 +96,8 @@ class UserServiceTest {
                     .oldPassword(password)
                     .newPassword(newPassword)
                     .build();
+            given(userRepository.save(any(User.class))).willReturn(user.get());
+
             //when
             User resUser = userService.userPasswordUpdate(dto);
 
@@ -334,6 +336,7 @@ class UserServiceTest {
 
             SecurityContext context = SecurityContextHolder.getContext();
             context.setAuthentication(new UsernamePasswordAuthenticationToken(user.get(), user.get().getEmail(), user.get().getAuthorities()));
+            given(userRepository.save(any(User.class))).willReturn(user.get());
 
             //when
             User resUser = userService.userSignOut();
@@ -406,6 +409,7 @@ class UserServiceTest {
             given(technicalStackRepository.findAll()).willReturn(technicalStacks);
             given(imageService.imageUpload(file, 56, 56)).willReturn(imageNo);
             given(userTechnicalStackRepository.findUserTechnicalStacksByUser(no)).willReturn(userTechnicalStackList);
+            given(userRepository.save(any(User.class))).willReturn(user.get());
 
             //when
             User resultUser = userService.userUpdate(dto, file);
