@@ -9,6 +9,7 @@ import com.matching.project.entity.User;
 import com.matching.project.error.CustomException;
 import com.matching.project.repository.CommentRepository;
 import com.matching.project.repository.ProjectRepository;
+import com.matching.project.repository.UserRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -37,6 +38,9 @@ class CommentServiceImplTest {
 
     @Mock
     private ProjectRepository projectRepository;
+
+    @Mock
+    private UserRepository userRepository;
 
     @Mock
     private CommentRepository commentRepository;
@@ -185,6 +189,7 @@ class CommentServiceImplTest {
                     .build();
 
             given(projectRepository.findById(projectNo)).willReturn(Optional.ofNullable(project));
+            given(userRepository.findById(user.getNo())).willReturn(Optional.ofNullable(user));
 
             //when
             Comment comment = commentService.commentRegister(projectNo, commentContent);
@@ -224,6 +229,7 @@ class CommentServiceImplTest {
                     .createUserName(user.getName())
                     .build();
 
+            given(userRepository.findById(user.getNo())).willReturn(Optional.ofNullable(user));
             given(projectRepository.findById(projectNo)).willReturn(Optional.empty());
 
             //when
@@ -273,6 +279,7 @@ class CommentServiceImplTest {
                     .build();
 
             given(commentRepository.findById(commentNo)).willReturn(Optional.ofNullable(comment));
+            given(userRepository.findById(user.getNo())).willReturn(Optional.ofNullable(user));
 
             //when
             Comment resComment = commentService.commentUpdate(commentNo, updateContent);
@@ -305,6 +312,8 @@ class CommentServiceImplTest {
 
             Long commentNo = 1L;
             String commentContent = "코멘트 테스트";
+
+            given(userRepository.findById(user.getNo())).willReturn(Optional.ofNullable(user));
 
             //when
             CustomException e = Assertions.assertThrows(CustomException.class, () -> {
@@ -359,6 +368,7 @@ class CommentServiceImplTest {
                     .build();
 
             given(commentRepository.findById(commentNo)).willReturn(Optional.ofNullable(comment));
+            given(userRepository.findById(user.getNo())).willReturn(Optional.ofNullable(user));
 
             //when
             CustomException e = Assertions.assertThrows(CustomException.class, () -> {
@@ -403,6 +413,7 @@ class CommentServiceImplTest {
                     .build();
 
             given(commentRepository.findById(commentNo)).willReturn(Optional.ofNullable(comment));
+            given(userRepository.findById(user.getNo())).willReturn(Optional.ofNullable(user));
 
             //when
             commentService.commentDelete(commentNo);
@@ -434,6 +445,7 @@ class CommentServiceImplTest {
             String commentContent = "코멘트 테스트";
 
             given(commentRepository.findById(commentNo)).willReturn(Optional.empty());
+            given(userRepository.findById(user.getNo())).willReturn(Optional.ofNullable(user));
 
             //when
             CustomException e = Assertions.assertThrows(CustomException.class, () -> {
@@ -485,6 +497,7 @@ class CommentServiceImplTest {
                     .build();
 
             given(commentRepository.findById(commentNo)).willReturn(Optional.ofNullable(comment));
+            given(userRepository.findById(user.getNo())).willReturn(Optional.ofNullable(user));
 
             //when
             CustomException e = Assertions.assertThrows(CustomException.class, () -> {
