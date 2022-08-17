@@ -179,13 +179,13 @@ class TechnicalStackServiceImplTest {
             given(imageService.imageUpload(any(MultipartFile.class), any(Integer.class), any(Integer.class))).willReturn(1L);
 
             // when
-            TechnicalStackUpdateRequestDto technicalStackUpdateRequestDto = new TechnicalStackUpdateRequestDto(technicalStack1.getNo(), "testTechnicalStackNameUpdate");
+            TechnicalStackUpdateRequestDto technicalStackUpdateRequestDto = new TechnicalStackUpdateRequestDto("testTechnicalStackNameUpdate");
             MockMultipartFile mockMultipartFile
                     = new MockMultipartFile("file", "hello.txt", MediaType.MULTIPART_FORM_DATA_VALUE, "Hello, World".getBytes());
 
             boolean result = false;
             try {
-                result = technicalStackService.technicalStackUpdate(technicalStackUpdateRequestDto, mockMultipartFile);
+                result = technicalStackService.technicalStackUpdate(technicalStack1.getNo(), technicalStackUpdateRequestDto, mockMultipartFile);
             } catch (Exception e) {
                 e.printStackTrace();
             }

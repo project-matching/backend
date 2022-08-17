@@ -414,7 +414,6 @@ public class UserControllerTest {
                     })
                     .header("Authorization", "Bearer " + token)
                     .contentType(MediaType.MULTIPART_FORM_DATA)
-                    .content(new ObjectMapper().writeValueAsString(requestDto))
             );
 
             //then

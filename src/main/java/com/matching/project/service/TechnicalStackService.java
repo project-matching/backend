@@ -9,5 +9,5 @@ import java.util.List;
 public interface TechnicalStackService {
     public List<TechnicalStackRegisterFormResponseDto> findTechnicalStackRegisterForm() throws Exception;
     public boolean technicalStackRegister(String technicalStackName, MultipartFile image) throws Exception;
-    public boolean technicalStackUpdate(TechnicalStackUpdateRequestDto technicalStackUpdateRequestDto, MultipartFile image) throws Exception;
+    public boolean technicalStackUpdate(Long technicalStackNo, TechnicalStackUpdateRequestDto technicalStackUpdateRequestDto, MultipartFile image) throws Exception;
 }

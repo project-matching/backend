@@ -55,23 +55,26 @@ public class TechnicalStackServiceImpl implements TechnicalStackService {
 
     @Override
     public boolean technicalStackRegister(String technicalStackName, MultipartFile image) throws Exception {
-        // 이미지 업로드 및 DB 저장
-        Long imageNo = imageService.imageUpload(image, 56, 56);
-        
-        // 기술스택 저장
         TechnicalStack technicalStack = TechnicalStack.builder()
                 .name(technicalStackName)
-                .imageNo(imageNo)
                 .build();
+        // 이미지 업로드 및 DB 저장
+        if (image != null && !image.isEmpty()) {
+            Long imageNo = imageService.imageUpload(image, 56, 56);
+
+            technicalStack.changeImageNo(imageNo);
+        }
+
+        // 기술스택 저장
         technicalStackRepository.save(technicalStack);
 
         return true;
     }
 
     @Override
-    public boolean technicalStackUpdate(TechnicalStackUpdateRequestDto technicalStackUpdateRequestDto, MultipartFile image) throws Exception {
+    public boolean technicalStackUpdate(Long technicalStackNo, TechnicalStackUpdateRequestDto technicalStackUpdateRequestDto, MultipartFile image) throws Exception {
         // 기술 스택 조회
-        TechnicalStack technicalStack = technicalStackRepository.findById(technicalStackUpdateRequestDto.getTechnicalStackNo()).orElseThrow(() -> new CustomException(ErrorCode.TECHNICAL_STACK_NOT_FOUND));
+        TechnicalStack technicalStack = technicalStackRepository.findById(technicalStackNo).orElseThrow(() -> new CustomException(ErrorCode.TECHNICAL_STACK_NOT_FOUND));
 
         // 이미지 삭제
         imageService.imageDelete(technicalStack.getImageNo());
