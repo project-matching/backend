@@ -2,10 +2,9 @@ package com.matching.project.controller;
 
 import com.matching.project.dto.ResponseDto;
 import com.matching.project.dto.SliceDto;
-import com.matching.project.dto.project.ProjectParticipatePermitRequestDto;
-import com.matching.project.dto.project.ProjectParticipateRefusalRequestDto;
 import com.matching.project.dto.project.ProjectParticipateRequestDto;
 import com.matching.project.dto.projectparticipate.ProjectParticipateFormResponseDto;
+import com.matching.project.dto.projectparticipate.ProjectParticipateRefusalRequestDto;
 import com.matching.project.error.CustomException;
 import com.matching.project.error.ErrorCode;
 import com.matching.project.service.ProjectParticipateRequestService;
@@ -54,7 +53,7 @@ public class ProjectParticipateController {
     // 프로젝트 참가 거부
     @PostMapping("/{projectParticipateNo}/refusal")
     @ApiOperation(value = "프로젝트 참가 거부 (수정 완료)")
-    public ResponseEntity<ResponseDto<Boolean>> projectParticipateRefusal(@PathVariable Long projectParticipateNo, String reason) throws Exception{
-        return ResponseEntity.ok(new ResponseDto(null, projectParticipateRequestService.refusalProjectParticipate(projectParticipateNo, reason)));
+    public ResponseEntity<ResponseDto<Boolean>> projectParticipateRefusal(@PathVariable Long projectParticipateNo, @RequestBody ProjectParticipateRefusalRequestDto projectParticipateRefusalRequestDto) throws Exception{
+        return ResponseEntity.ok(new ResponseDto(null, projectParticipateRequestService.refusalProjectParticipate(projectParticipateNo, projectParticipateRefusalRequestDto.getReason())));
     }
 }

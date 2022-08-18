@@ -107,9 +107,9 @@ class ProjectParticipateRequestRepositoryTest {
                 .imageNo(0L)
                 .position(null)
                 .build();
-        User saveUser1 = userRepository.save(user1);
-        User saveUser2 = userRepository.save(user2);
-        User saveUser3 = userRepository.save(user3);
+        User saveUser1 = userRepository.saveAndFlush(user1);
+        User saveUser2 = userRepository.saveAndFlush(user2);
+        User saveUser3 = userRepository.saveAndFlush(user3);
 
         // 프로젝트 객체
         Project project1 = Project.builder()
@@ -125,7 +125,7 @@ class ProjectParticipateRequestRepositoryTest {
                 .user(saveUser1)
                 .commentCount(10)
                 .build();
-        Project saveProject1 = projectRepository.save(project1);
+        Project saveProject1 = projectRepository.saveAndFlush(project1);
         
         // 포지션 세팅
         Position position1 = Position.builder()
@@ -134,8 +134,8 @@ class ProjectParticipateRequestRepositoryTest {
         Position position2 = Position.builder()
                 .name("testPosition2")
                 .build();
-        positionRepository.save(position1);
-        positionRepository.save(position2);
+        positionRepository.saveAndFlush(position1);
+        positionRepository.saveAndFlush(position2);
         
         // 프로젝트 포지션 세팅
         ProjectPosition projectPosition1 = ProjectPosition.builder()
@@ -152,8 +152,8 @@ class ProjectParticipateRequestRepositoryTest {
                 .user(null)
                 .creator(false)
                 .build();
-        ProjectPosition saveProjectPosition1 = projectPositionRepository.save(projectPosition1);
-        ProjectPosition saveProjectPosition2 = projectPositionRepository.save(projectPosition2);
+        ProjectPosition saveProjectPosition1 = projectPositionRepository.saveAndFlush(projectPosition1);
+        ProjectPosition saveProjectPosition2 = projectPositionRepository.saveAndFlush(projectPosition2);
         
         // 참여 신청 세팅
         ProjectParticipateRequest projectParticipateRequest1 = ProjectParticipateRequest.builder()
@@ -185,8 +185,8 @@ class ProjectParticipateRequestRepositoryTest {
         TechnicalStack technicalStack2 = TechnicalStack.builder()
                 .name("testTechnicalStack2")
                 .build();
-        TechnicalStack saveTechnicalStack1 = technicalStackRepository.save(technicalStack1);
-        TechnicalStack saveTechnicalStack2 = technicalStackRepository.save(technicalStack1);
+        TechnicalStack saveTechnicalStack1 = technicalStackRepository.saveAndFlush(technicalStack1);
+        TechnicalStack saveTechnicalStack2 = technicalStackRepository.saveAndFlush(technicalStack1);
 
         // 참여 신청 기술 스택 세팅
         ParticipateRequestTechnicalStack participateRequestTechnicalStack1 = ParticipateRequestTechnicalStack.builder()
@@ -201,9 +201,9 @@ class ProjectParticipateRequestRepositoryTest {
                 .projectParticipateRequest(saveProjectParticipateRequest2)
                 .technicalStack(saveTechnicalStack2)
                 .build();
-        ParticipateRequestTechnicalStack saveParticipateRequestTechnicalStack1 = participateRequestTechnicalStackRepository.save(participateRequestTechnicalStack1);
-        ParticipateRequestTechnicalStack saveParticipateRequestTechnicalStack2 = participateRequestTechnicalStackRepository.save(participateRequestTechnicalStack2);
-        ParticipateRequestTechnicalStack saveParticipateRequestTechnicalStack3 = participateRequestTechnicalStackRepository.save(participateRequestTechnicalStack3);
+        ParticipateRequestTechnicalStack saveParticipateRequestTechnicalStack1 = participateRequestTechnicalStackRepository.saveAndFlush(participateRequestTechnicalStack1);
+        ParticipateRequestTechnicalStack saveParticipateRequestTechnicalStack2 = participateRequestTechnicalStackRepository.saveAndFlush(participateRequestTechnicalStack2);
+        ParticipateRequestTechnicalStack saveParticipateRequestTechnicalStack3 = participateRequestTechnicalStackRepository.saveAndFlush(participateRequestTechnicalStack3);
 
         // when
         Pageable pageable = PageRequest.of(0, 5, Sort.by("createdDate").descending());
@@ -338,6 +338,7 @@ class ProjectParticipateRequestRepositoryTest {
         // then
         assertEquals(projectParticipateRequest.getNo(), saveProjectParticipateRequest1.getNo());
         assertEquals(projectParticipateRequest.getProjectPosition(), saveProjectParticipateRequest1.getProjectPosition());
+        assertEquals(projectParticipateRequest.getProjectPosition().getProject().getName(), saveProjectParticipateRequest1.getProjectPosition().getProject().getName());
         assertEquals(projectParticipateRequest.getProjectPosition().getProject(), saveProjectParticipateRequest1.getProjectPosition().getProject());
         assertEquals(projectParticipateRequest.getUser(), saveProjectParticipateRequest1.getUser());
         assertEquals(projectParticipateRequest.getMotive(), saveProjectParticipateRequest1.getMotive());

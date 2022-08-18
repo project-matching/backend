@@ -85,6 +85,9 @@ class ProjectControllerTest {
     @Autowired
     ProjectParticipateRequestRepository projectParticipateRequestRepository;
 
+    @Autowired
+    NotificationRepository notificationRepository;
+
     // 프로젝트, 유저 저장
     User saveUser() {
         User user1 = User.builder()
@@ -2170,7 +2173,7 @@ class ProjectControllerTest {
                     .andExpect(status().isOk());
 
             Project project = projectRepository.findById(saveProject1.getNo()).get();
-            List<ProjectPosition> projectPositionList = projectPositionRepository.findProjectAndPositionAndUserUsingFetchJoinByProjectNo(project);
+            List<ProjectPosition> projectPositionList = projectPositionRepository.findProjectAndPositionAndUserUsingFetchJoinByProject(project);
             List<ProjectTechnicalStack> technicalStackList = projectTechnicalStackRepository.findTechnicalStackAndProjectUsingFetchJoin(project);
 
             assertEquals(project.getName(), projectUpdateRequestDto.getName());
@@ -2359,6 +2362,12 @@ class ProjectControllerTest {
             assertEquals(commentRepository.findAll().size(), 0);
             assertEquals(projectParticipateRequestRepository.findAll().size(), 0);
             assertEquals(participateRequestTechnicalStackRepository.findAll().size(), 0);
+
+            List<Notification> notificationList = notificationRepository.findAll();
+            assertEquals(notificationList.size(), 1);
+            assertEquals(notificationList.get(0).getType(), com.matching.project.dto.enumerate.Type.PROJECT_DELETE);
+            assertEquals(notificationList.get(0).getTitle(), "[프로젝트 삭제] " + saveProject1.getName());
+            assertEquals(notificationList.get(0).getContent(), saveProject1.getName() + "이 삭제되었습니다.");
         }
 
         @Test
