@@ -65,8 +65,8 @@ spring:
 cloud:
   aws:
     credentials:
-      access-key: test
-      secret-key: test
+      access-key-enc: test
+      secret-key-enc: test
     s3:
       bucket: project-matching-s3
     region:

@@ -9,6 +9,7 @@ import com.matching.project.error.CustomException;
 import com.matching.project.error.ErrorCode;
 import com.matching.project.repository.CommentRepository;
 import com.matching.project.repository.ProjectRepository;
+import com.matching.project.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -26,8 +27,9 @@ import java.util.stream.Collectors;
 public class CommentServiceImpl implements CommentService {
     private final ProjectRepository projectRepository;
     private final CommentRepository commentRepository;
-    private final UserService userService;
+    private final UserRepository userRepository;
 
+    //임시
     private User getAuthenticatedUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Object principal = authentication.getPrincipal();
@@ -42,14 +44,12 @@ public class CommentServiceImpl implements CommentService {
 
     public void commentValidCheck(User user, Comment comment) {
         // 본인만 수정, 삭제가 가능하여야 함
-        if (!comment.getUser().getName().equals(user.getName()))
+        if (!comment.getUser().getEmail().equals(user.getEmail()))
             throw new CustomException(ErrorCode.UNAUTHORIZED_USER_ACCESS_EXCEPTION);
     }
 
     @Override
     public SliceDto<CommentDto> commentList(Long projectNo, Long commentNo, Pageable pageable) {
-        User user = getAuthenticatedUser();
-
         Optional<Project> optionalProject = projectRepository.findById(projectNo);
         optionalProject.orElseThrow(() -> new CustomException(ErrorCode.NOT_FIND_PROJECT_NO_EXCEPTION));
 
@@ -69,7 +69,8 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public Comment commentRegister(Long projectNo, String content) {
-        User user = getAuthenticatedUser();
+        User user = userRepository.findById(getAuthenticatedUser().getNo())
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FIND_USER_NO_EXCEPTION));
 
         Optional<Project> optionalProject = projectRepository.findById(projectNo);
         optionalProject.orElseThrow(() -> new CustomException(ErrorCode.NOT_FIND_PROJECT_NO_EXCEPTION));
@@ -89,7 +90,8 @@ public class CommentServiceImpl implements CommentService {
     @Transactional
     @Override
     public Comment commentUpdate(Long commentNo, String content) {
-        User user = getAuthenticatedUser();
+        User user = userRepository.findById(getAuthenticatedUser().getNo())
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FIND_USER_NO_EXCEPTION));
 
         Optional<Comment> optionalComment = commentRepository.findById(commentNo);
         optionalComment.orElseThrow(() -> new CustomException(ErrorCode.NOT_FIND_COMMENT_NO_EXCEPTION));
@@ -106,7 +108,8 @@ public class CommentServiceImpl implements CommentService {
     @Transactional
     @Override
     public void commentDelete(Long commentNo) {
-        User user = getAuthenticatedUser();
+        User user = userRepository.findById(getAuthenticatedUser().getNo())
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FIND_USER_NO_EXCEPTION));
 
         Optional<Comment> optionalComment = commentRepository.findById(commentNo);
         optionalComment.orElseThrow(() -> new CustomException(ErrorCode.NOT_FIND_COMMENT_NO_EXCEPTION));

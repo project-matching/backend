@@ -17,14 +17,15 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.transaction.Transactional;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 @Service
 public class UserServiceImpl implements UserService{
     private final UserRepository userRepository;
@@ -36,9 +37,17 @@ public class UserServiceImpl implements UserService{
     private final ImageRepository imageRepository;
     private final ImageService imageService;
 
+    //임시
     private User getAuthenticatedUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Object principal = authentication.getPrincipal();
+
+        // 수정 필요
+        // 참고 : https://velog.io/@jakeseo_me/JPA-%EC%82%AC%EC%9A%A9%ED%95%A0-%EB%95%8C-%ED%8A%B8%EB%9E%9C%EC%9E%AD%EC%85%98-%EC%A3%BC%EC%9D%98%EC%82%AC%ED%95%AD-%EC%A0%95%EB%A6%AC
+
+        // 42번 라인 처럼 받아오면 영속상태가 아니여서 반영이 안될 뿐더러 연관관계에 있는 객체도 가져오지 못함
+        // 따라서 한번 더 조회가 필요하다. ( SecurityContextHolder에 엔티티 객체를 말고 새로 객체를 만들어서 담는것을 고려 )
+        // 리펙토링시 위 상황을 고려해서 작성할 것.
 
         User user = null;
         if (principal instanceof User)
@@ -48,6 +57,7 @@ public class UserServiceImpl implements UserService{
         return user;
     }
 
+    //임시
     public Position getPositionForSave(String s) {
         Position position = null;
         if (!"".equals(s) && s != null)
@@ -82,7 +92,8 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public UserInfoResponseDto getUserInfo() {
-        User user = getAuthenticatedUser();
+        User user = userRepository.findByNoWithPositionUsingLeftFetchJoin(getAuthenticatedUser().getNo())
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FIND_USER_NO_EXCEPTION));
 
         // Image
         String imageUrl = imageService.getImageUrl(user.getImageNo());
@@ -150,7 +161,8 @@ public class UserServiceImpl implements UserService{
     @Transactional
     @Override
     public User userPasswordUpdate(PasswordUpdateRequestDto dto) {
-        User user = getAuthenticatedUser();
+        User user = userRepository.findById(getAuthenticatedUser().getNo())
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FIND_USER_NO_EXCEPTION));
 
         if (user.getOauthCategory() == OAuth.NORMAL) {
             if (!passwordEncoder.matches(dto.getOldPassword(), user.getPassword()))
@@ -159,12 +171,13 @@ public class UserServiceImpl implements UserService{
         }
         else
             throw new CustomException(ErrorCode.SOCIAL_USER_NOT_ALLOWED_FEATURE_EXCEPTION);
-        return userRepository.save(user);
+        return user;
     }
 
     @Override
     public UserProfileInfoResponseDto userProfileInfo() {
-        User user = getAuthenticatedUser();
+        User user = userRepository.findByNoWithPositionUsingLeftFetchJoin(getAuthenticatedUser().getNo())
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FIND_USER_NO_EXCEPTION));
 
         // Image
         String imageUrl = imageService.getImageUrl(user.getImageNo());
@@ -196,7 +209,8 @@ public class UserServiceImpl implements UserService{
     @Transactional
     @Override
     public User userUpdate(UserUpdateRequestDto dto, MultipartFile file) {
-        User user = getAuthenticatedUser();
+        User user = userRepository.findById(getAuthenticatedUser().getNo())
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FIND_USER_NO_EXCEPTION));
 
         // Get Entity
         Position position = getPositionForSave(dto.getPosition());
@@ -228,13 +242,14 @@ public class UserServiceImpl implements UserService{
                 );
             }
         }
-        return userRepository.save(user);
+        return user;
     }
 
     @Transactional
     @Override
     public User userSignOut() {
-        User user = getAuthenticatedUser();
+        User user = userRepository.findById(getAuthenticatedUser().getNo())
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FIND_USER_NO_EXCEPTION));
 
         if (user.isWithdrawal())
             throw new CustomException(ErrorCode.USER_ALREADY_WITHDRAWAL_EXCEPTION);
@@ -242,7 +257,7 @@ public class UserServiceImpl implements UserService{
         // User SignOut
         user.userWithdrawal();
 
-        return userRepository.save(user);
+        return user;
     }
 
     @Transactional
