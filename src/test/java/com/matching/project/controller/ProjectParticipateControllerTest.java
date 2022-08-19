@@ -355,7 +355,7 @@ class ProjectParticipateControllerTest {
                     .imageNo(0L)
                     .position(null)
                     .build();
-            User saveUser1 = userRepository.save(user1);
+            User saveUser1 = userRepository.saveAndFlush(user1);
 
             User user2 = User.builder()
                     .name("userName2")
@@ -372,7 +372,7 @@ class ProjectParticipateControllerTest {
                     .imageNo(0L)
                     .position(null)
                     .build();
-            User saveUser2 = userRepository.save(user2);
+            User saveUser2 = userRepository.saveAndFlush(user2);
 
             User user3 = User.builder()
                     .name("userName3")
@@ -389,7 +389,7 @@ class ProjectParticipateControllerTest {
                     .imageNo(0L)
                     .position(null)
                     .build();
-            User saveUser3 = userRepository.save(user3);
+            User saveUser3 = userRepository.saveAndFlush(user3);
 
             // 프로젝트 세팅
             LocalDate startDate = LocalDate.of(2022, 06, 24);
@@ -408,7 +408,7 @@ class ProjectParticipateControllerTest {
                     .commentCount(10)
                     .user(saveUser1)
                     .build();
-            Project saveProject1 = projectRepository.save(project);
+            Project saveProject1 = projectRepository.saveAndFlush(project);
 
             // 포지션 세팅
             Position position1 = Position.builder()
@@ -418,8 +418,8 @@ class ProjectParticipateControllerTest {
                     .name("testPosition2")
                     .build();
 
-            Position savePosition1 = positionRepository.save(position1);
-            Position savePosition2 = positionRepository.save(position2);
+            Position savePosition1 = positionRepository.saveAndFlush(position1);
+            Position savePosition2 = positionRepository.saveAndFlush(position2);
 
             // 프로젝트 포지션 세팅
             ProjectPosition projectPosition1 = ProjectPosition.builder()
@@ -437,8 +437,8 @@ class ProjectParticipateControllerTest {
                     .state(false)
                     .creator(false)
                     .build();
-            ProjectPosition saveProjectPosition1 = projectPositionRepository.save(projectPosition1);
-            ProjectPosition saveProjectPosition2 = projectPositionRepository.save(projectPosition2);
+            ProjectPosition saveProjectPosition1 = projectPositionRepository.saveAndFlush(projectPosition1);
+            ProjectPosition saveProjectPosition2 = projectPositionRepository.saveAndFlush(projectPosition2);
 
             // 기술스택 세팅
             TechnicalStack technicalStack1 = TechnicalStack.builder()
@@ -448,8 +448,8 @@ class ProjectParticipateControllerTest {
                     .name("testTechnicalStack2")
                     .build();
 
-            technicalStackRepository.save(technicalStack1);
-            technicalStackRepository.save(technicalStack2);
+            technicalStackRepository.saveAndFlush(technicalStack1);
+            technicalStackRepository.saveAndFlush(technicalStack2);
 
             // 프로젝트 신청 세팅
             ProjectParticipateRequest projectParticipateRequest1 = ProjectParticipateRequest.builder()
@@ -466,8 +466,8 @@ class ProjectParticipateControllerTest {
                     .motive("testMotive2")
                     .build();
 
-            ProjectParticipateRequest saveProjectParticipateRequest1 = projectParticipateRequestRepository.save(projectParticipateRequest1);
-            ProjectParticipateRequest saveProjectParticipateRequest2 = projectParticipateRequestRepository.save(projectParticipateRequest2);
+            ProjectParticipateRequest saveProjectParticipateRequest1 = projectParticipateRequestRepository.saveAndFlush(projectParticipateRequest1);
+            ProjectParticipateRequest saveProjectParticipateRequest2 = projectParticipateRequestRepository.saveAndFlush(projectParticipateRequest2);
 
             // 프로젝트 신청 기술 스택 세팅
             ParticipateRequestTechnicalStack participateRequestTechnicalStack1 = ParticipateRequestTechnicalStack.builder()

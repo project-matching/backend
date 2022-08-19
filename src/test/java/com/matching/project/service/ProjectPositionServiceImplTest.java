@@ -106,7 +106,7 @@ class ProjectPositionServiceImplTest {
             projectPositionList.add(projectPosition1);
 
             given(projectPositionRepository.findUserAndProjectFetchJoinByProjectPositionNo(any())).willReturn(Optional.of(projectPosition1));
-            given(projectPositionRepository.findProjectAndPositionAndUserUsingFetchJoinByProject(any())).willReturn(projectPositionList);
+            given(projectPositionRepository.findProjectAndPositionAndUserUsingFetchJoinByProject(any())).willReturn(Optional.of(projectPositionList));
 
             // when
             Long result = null;
@@ -158,8 +158,8 @@ class ProjectPositionServiceImplTest {
             });
 
             // then
-            assertEquals(customException.getErrorCode().getHttpStatus().name(), ErrorCode.PROJECT_POSITION_NO_SUCH_ELEMENT_EXCEPTION.getHttpStatus().name());
-            assertEquals(customException.getErrorCode().getDetail(), ErrorCode.PROJECT_POSITION_NO_SUCH_ELEMENT_EXCEPTION.getDetail());
+            assertEquals(customException.getErrorCode().getHttpStatus().name(), ErrorCode.NOT_FIND_PROJECT_POSITION_EXCEPTION.getHttpStatus().name());
+            assertEquals(customException.getErrorCode().getDetail(), ErrorCode.NOT_FIND_PROJECT_POSITION_EXCEPTION.getDetail());
         }
         
         @Test
@@ -415,8 +415,8 @@ class ProjectPositionServiceImplTest {
             });
 
             // then
-            assertEquals(customException.getErrorCode().getHttpStatus().name(), ErrorCode.PROJECT_POSITION_NO_SUCH_ELEMENT_EXCEPTION.getHttpStatus().name());
-            assertEquals(customException.getErrorCode().getDetail(), ErrorCode.PROJECT_POSITION_NO_SUCH_ELEMENT_EXCEPTION.getDetail());
+            assertEquals(customException.getErrorCode().getHttpStatus().name(), ErrorCode.NOT_FIND_PROJECT_POSITION_EXCEPTION.getHttpStatus().name());
+            assertEquals(customException.getErrorCode().getDetail(), ErrorCode.NOT_FIND_PROJECT_POSITION_EXCEPTION.getDetail());
         }
 
         @Test

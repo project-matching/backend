@@ -105,7 +105,7 @@ class ProjectPositionRepositoryTest {
         projectPositionRepository.save(projectPosition2);
 
         // when
-        List<ProjectPosition> projectPositionList = projectPositionRepository.findProjectAndPositionAndUserUsingFetchJoinByProject(project1);
+        List<ProjectPosition> projectPositionList = projectPositionRepository.findProjectAndPositionAndUserUsingFetchJoinByProject(project1).get();
 
         // then
         assertEquals(projectPositionList.get(0).getProject(), saveProject1);
@@ -281,7 +281,7 @@ class ProjectPositionRepositoryTest {
             ProjectPosition saveProjectPosition1 = projectPositionRepository.save(projectPosition1);
 
             // when
-            ProjectPosition projectPosition = projectPositionRepository.findUserAndProjectFetchJoinByProjectPositionNo(saveProjectPosition1.getNo()).orElseThrow(() -> new CustomException(ErrorCode.PROJECT_POSITION_NO_SUCH_ELEMENT_EXCEPTION));
+            ProjectPosition projectPosition = projectPositionRepository.findUserAndProjectFetchJoinByProjectPositionNo(saveProjectPosition1.getNo()).orElseThrow(() -> new CustomException(ErrorCode.NOT_FIND_PROJECT_POSITION_EXCEPTION));
 
             // then
             assertEquals(projectPosition.getNo(), saveProjectPosition1.getNo());

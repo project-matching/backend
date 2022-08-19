@@ -18,7 +18,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -51,12 +50,13 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public SliceDto<CommentDto> commentList(Long projectNo, Long commentNo, Pageable pageable) {
         Optional<Project> optionalProject = projectRepository.findById(projectNo);
-        optionalProject.orElseThrow(() -> new CustomException(ErrorCode.NOT_FIND_PROJECT_NO_EXCEPTION));
+        optionalProject.orElseThrow(() -> new CustomException(ErrorCode.NOT_FIND_PROJECT_EXCEPTION));
 
         if (commentNo == null)
             commentNo = Long.MAX_VALUE;
 
-        Slice<Comment> commentPage = commentRepository.findByProjectOrderByNoDescUsingPaging(optionalProject.get(), commentNo, pageable);
+        Slice<Comment> commentPage = commentRepository.findByProjectOrderByNoDescUsingPaging(optionalProject.get(), commentNo, pageable)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FIND_COMMENT_EXCEPTION));
 
         SliceDto<CommentDto> dto = SliceDto.<CommentDto>builder()
                 .content(commentPage.stream().
@@ -70,10 +70,10 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public Comment commentRegister(Long projectNo, String content) {
         User user = userRepository.findById(getAuthenticatedUser().getNo())
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FIND_USER_NO_EXCEPTION));
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FIND_USER_EXCEPTION));
 
         Optional<Project> optionalProject = projectRepository.findById(projectNo);
-        optionalProject.orElseThrow(() -> new CustomException(ErrorCode.NOT_FIND_PROJECT_NO_EXCEPTION));
+        optionalProject.orElseThrow(() -> new CustomException(ErrorCode.NOT_FIND_PROJECT_EXCEPTION));
 
         Comment comment = Comment.builder()
                 .user(user)
@@ -91,10 +91,10 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public Comment commentUpdate(Long commentNo, String content) {
         User user = userRepository.findById(getAuthenticatedUser().getNo())
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FIND_USER_NO_EXCEPTION));
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FIND_USER_EXCEPTION));
 
         Optional<Comment> optionalComment = commentRepository.findById(commentNo);
-        optionalComment.orElseThrow(() -> new CustomException(ErrorCode.NOT_FIND_COMMENT_NO_EXCEPTION));
+        optionalComment.orElseThrow(() -> new CustomException(ErrorCode.NOT_FIND_COMMENT_EXCEPTION));
 
         // Comment Valid Check
         commentValidCheck(user, optionalComment.get());
@@ -109,10 +109,10 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public void commentDelete(Long commentNo) {
         User user = userRepository.findById(getAuthenticatedUser().getNo())
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FIND_USER_NO_EXCEPTION));
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FIND_USER_EXCEPTION));
 
         Optional<Comment> optionalComment = commentRepository.findById(commentNo);
-        optionalComment.orElseThrow(() -> new CustomException(ErrorCode.NOT_FIND_COMMENT_NO_EXCEPTION));
+        optionalComment.orElseThrow(() -> new CustomException(ErrorCode.NOT_FIND_COMMENT_EXCEPTION));
 
         // Comment Valid Check
         commentValidCheck(user, optionalComment.get());

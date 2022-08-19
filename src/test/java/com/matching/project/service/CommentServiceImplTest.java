@@ -7,6 +7,7 @@ import com.matching.project.entity.Comment;
 import com.matching.project.entity.Project;
 import com.matching.project.entity.User;
 import com.matching.project.error.CustomException;
+import com.matching.project.error.ErrorCode;
 import com.matching.project.repository.CommentRepository;
 import com.matching.project.repository.ProjectRepository;
 import com.matching.project.repository.UserRepository;
@@ -102,7 +103,7 @@ class CommentServiceImplTest {
             Slice<Comment> comments = new SliceImpl<>(commentList.subList(start, end), pageable, hasNext);
 
             given(commentRepository.findByProjectOrderByNoDescUsingPaging(project, commentNo, pageable))
-                    .willReturn(comments);
+                    .willReturn(Optional.of(comments));
 
             //when
             SliceDto<CommentDto> commentDtoList = commentService.commentList(projectNo, commentNo, pageable);
@@ -151,7 +152,7 @@ class CommentServiceImplTest {
             });
 
             //then
-            assertThat(e.getErrorCode().getDetail()).isEqualTo("Not Find Project No");
+            assertThat(e.getErrorCode().getDetail()).isEqualTo(ErrorCode.NOT_FIND_PROJECT_EXCEPTION.getDetail());
 
         }
     }
@@ -238,7 +239,7 @@ class CommentServiceImplTest {
             });
 
             //then
-            assertThat(e.getErrorCode().getDetail()).isEqualTo("Not Find Project No");
+            assertThat(e.getErrorCode().getDetail()).isEqualTo(ErrorCode.NOT_FIND_PROJECT_EXCEPTION.getDetail());
 
         }
 
@@ -321,7 +322,7 @@ class CommentServiceImplTest {
             });
 
             //then
-            assertThat(e.getErrorCode().getDetail()).isEqualTo("Not Find Comment No");
+            assertThat(e.getErrorCode().getDetail()).isEqualTo(ErrorCode.NOT_FIND_COMMENT_EXCEPTION.getDetail());
         }
 
 
@@ -453,7 +454,7 @@ class CommentServiceImplTest {
             });
 
             //given
-            assertThat(e.getErrorCode().getDetail()).isEqualTo("Not Find Comment No");
+            assertThat(e.getErrorCode().getDetail()).isEqualTo(ErrorCode.NOT_FIND_COMMENT_EXCEPTION.getDetail());
         }
 
         @DisplayName("실패 : 허용되지 않은 사용자가 접근")

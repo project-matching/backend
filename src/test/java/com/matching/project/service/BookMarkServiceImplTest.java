@@ -287,7 +287,7 @@ class BookMarkServiceImplTest {
             int end = (start + pageable.getPageSize()) > projectSimpleDtoList.size() ? projectSimpleDtoList.size() : (start + pageable.getPageSize());
             Page<ProjectSimpleDto> projectPage = new PageImpl<>(projectSimpleDtoList.subList(start, end), pageable, projectSimpleDtoList.size());
 
-            given(projectRepository.findBookMarkProject(any(Pageable.class), any(Long.class), any(User.class))).willReturn(projectPage);
+            given(projectRepository.findBookMarkProject(any(Pageable.class), any(Long.class), any(User.class))).willReturn(Optional.of(projectPage));
 
             SliceDto<ProjectSimpleDto> result = null;
 

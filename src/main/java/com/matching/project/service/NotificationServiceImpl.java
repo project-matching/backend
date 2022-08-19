@@ -3,7 +3,6 @@ package com.matching.project.service;
 import com.matching.project.dto.SliceDto;
 import com.matching.project.dto.enumerate.Type;
 import com.matching.project.dto.notification.NotificationDto;
-import com.matching.project.dto.notification.NotificationSendRequestDto;
 import com.matching.project.dto.notification.NotificationSimpleInfoDto;
 import com.matching.project.entity.Notification;
 import com.matching.project.entity.User;
@@ -17,12 +16,8 @@ import org.springframework.data.domain.Slice;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.transaction.Transactional;
-import javax.validation.Valid;
-import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -71,13 +66,14 @@ public class NotificationServiceImpl implements NotificationService {
     @Override
     public SliceDto<NotificationSimpleInfoDto> notificationList(Long notificationNo, Pageable pageable) {
         User user = userRepository.findById(getAuthenticatedUser().getNo())
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FIND_USER_NO_EXCEPTION));
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FIND_USER_EXCEPTION));
 
         if (notificationNo == null)
             notificationNo = Long.MAX_VALUE;
         
         // 공지사항도 같이 조회하기 위해서 User가 null인 경우도 조회
-        Slice<Notification> notificationList = notificationRepository.findByUserOrUserIsNullOrderByNoDescUsingPaging(user, notificationNo, pageable);
+        Slice<Notification> notificationList = notificationRepository.findByUserOrUserIsNullOrderByNoDescUsingPaging(user, notificationNo, pageable)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FIND_NOTIFICATION_EXCEPTION));
 
         return SliceDto.<NotificationSimpleInfoDto>builder()
                 .content(notificationList.getContent().stream().map(notification -> NotificationSimpleInfoDto.builder()
@@ -96,7 +92,7 @@ public class NotificationServiceImpl implements NotificationService {
     @Override
     public NotificationDto notificationInfo(Long notificationNo) {
         Optional<Notification> optionalNotification = notificationRepository.findByNoWithUserUsingLeftFetchJoin(notificationNo);
-        optionalNotification.orElseThrow(() -> new CustomException(ErrorCode.NOT_FIND_NOTIFICATION_NO_EXCEPTION));
+        optionalNotification.orElseThrow(() -> new CustomException(ErrorCode.NOT_FIND_NOTIFICATION_EXCEPTION));
 
         // Valid Check
         if (optionalNotification.get().getUser() != null) {

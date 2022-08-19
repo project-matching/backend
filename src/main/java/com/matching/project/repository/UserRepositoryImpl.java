@@ -20,7 +20,7 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
 
-    public Slice<User> findByNoOrderByNoDescUsingQueryDsl(Long userNo, UserFilterDto userFilterDto, Pageable pageable) {
+    public Optional<Slice<User>> findByNoOrderByNoDescUsingQueryDsl(Long userNo, UserFilterDto userFilterDto, Pageable pageable) {
         QUser user = QUser.user;
         BooleanBuilder builder = new BooleanBuilder();
 
@@ -50,7 +50,7 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
             hasNext = true;
         }
 
-        return new SliceImpl<>(fetch, pageable, hasNext);
+        return Optional.of(new SliceImpl<>(fetch, pageable, hasNext));
     }
 
 }

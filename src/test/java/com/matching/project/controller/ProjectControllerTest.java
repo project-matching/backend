@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.matching.project.config.JpaConfig;
 import com.matching.project.dto.ResponseDto;
 import com.matching.project.dto.common.TokenDto;
 import com.matching.project.dto.enumerate.OAuth;
@@ -24,7 +23,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -33,7 +31,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.Type;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -1823,9 +1820,9 @@ class ProjectControllerTest {
             resultActions
                     .andDo(print())
                     .andExpect(header().string("Content-type", "application/json"))
-                    .andExpect(jsonPath("$.error.error").value(ErrorCode.PROJECT_NO_SUCH_ELEMENT_EXCEPTION.getHttpStatus().name()))
-                    .andExpect(jsonPath("$.error.code").value(ErrorCode.PROJECT_NO_SUCH_ELEMENT_EXCEPTION.name()))
-                    .andExpect(jsonPath("$.error.message[0]").value(ErrorCode.PROJECT_NO_SUCH_ELEMENT_EXCEPTION.getDetail()))
+                    .andExpect(jsonPath("$.error.error").value(ErrorCode.NOT_FIND_PROJECT_EXCEPTION.getHttpStatus().name()))
+                    .andExpect(jsonPath("$.error.code").value(ErrorCode.NOT_FIND_PROJECT_EXCEPTION.name()))
+                    .andExpect(jsonPath("$.error.message[0]").value(ErrorCode.NOT_FIND_PROJECT_EXCEPTION.getDetail()))
                     .andExpect(jsonPath("$.data").value(false))
                     .andExpect(status().is5xxServerError());
         }
@@ -2173,8 +2170,8 @@ class ProjectControllerTest {
                     .andExpect(status().isOk());
 
             Project project = projectRepository.findById(saveProject1.getNo()).get();
-            List<ProjectPosition> projectPositionList = projectPositionRepository.findProjectAndPositionAndUserUsingFetchJoinByProject(project);
-            List<ProjectTechnicalStack> technicalStackList = projectTechnicalStackRepository.findTechnicalStackAndProjectUsingFetchJoin(project);
+            List<ProjectPosition> projectPositionList = projectPositionRepository.findProjectAndPositionAndUserUsingFetchJoinByProject(project).get();
+            List<ProjectTechnicalStack> technicalStackList = projectTechnicalStackRepository.findTechnicalStackAndProjectUsingFetchJoin(project).get();
 
             assertEquals(project.getName(), projectUpdateRequestDto.getName());
             assertEquals(project.getStartDate().toString(), projectUpdateRequestDto.getStartDate());

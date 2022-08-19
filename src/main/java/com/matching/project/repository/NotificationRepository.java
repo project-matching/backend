@@ -22,7 +22,7 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
             "left join fetch n.user u " +
             "where (u = :user or u IS NULL) " +
             "and n.no <= :notificationNo order by n.no desc")
-    Slice<Notification> findByUserOrUserIsNullOrderByNoDescUsingPaging(@Param("user") User user,
+    Optional<Slice<Notification>> findByUserOrUserIsNullOrderByNoDescUsingPaging(@Param("user") User user,
                                                                        @Param("notificationNo") Long notificationNo,
                                                                        Pageable pageable);
 }

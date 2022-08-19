@@ -49,7 +49,7 @@ class ImageRepositoryTest {
         nos.add(saveImage1.getNo());
         nos.add(saveImage2.getNo());
 
-        List<Image> imageList = imageRepository.findByNoIn(nos);
+        List<Image> imageList = imageRepository.findByNoIn(nos).get();
 
         // then
         assertEquals(imageList.get(0), saveImage1);
