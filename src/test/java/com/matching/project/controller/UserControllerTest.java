@@ -389,29 +389,21 @@ public class UserControllerTest {
             String nName = "updateTest";
             String nSex = "W";
             String nPosition = "BACKEND";
-            List<String> nTechnicalStackList = new ArrayList<>();
-            nTechnicalStackList.add("Spring");
-            nTechnicalStackList.add("React");
-            nTechnicalStackList.add("JPA");
+            String nTechnicalStackList = "Spring, React, JPA";
             String nGithub = "updateGithub";
             String nSelfIntroduction = "updateSelfIntroduction";
 
-            UserUpdateRequestDto requestDto = UserUpdateRequestDto.builder()
-                    .name(nName)
-                    .sex(nSex)
-                    .position(nPosition)
-                    .technicalStackList(nTechnicalStackList)
-                    .github(nGithub)
-                    .selfIntroduction(nSelfIntroduction)
-                    .build();
-
             MockMultipartFile image = new MockMultipartFile("image", "image.jpeg", MediaType.IMAGE_JPEG_VALUE, "".getBytes(StandardCharsets.UTF_8));
-            MockMultipartFile data = new MockMultipartFile("data", "", MediaType.APPLICATION_JSON_VALUE, new ObjectMapper().writeValueAsString(requestDto).getBytes());
 
             //when
             ResultActions resultActions = mvc.perform(multipart("/v1/user")
                             .file(image)
-                            .file(data)
+                            .param("name", nName)
+                            .param("sex", nSex)
+                            .param("position", nPosition)
+                            .param("technicalStackList", nTechnicalStackList.toString())
+                            .param("github", nGithub)
+                            .param("selfIntroduction", nSelfIntroduction)
                     .with(requestProcessor -> {
                         requestProcessor.setMethod("PATCH");
                         return requestProcessor;
@@ -430,9 +422,9 @@ public class UserControllerTest {
             assertThat(resUser.getGithub()).isEqualTo(nGithub);
             assertThat(resUser.getSelfIntroduction()).isEqualTo(nSelfIntroduction);
             List<UserTechnicalStack> ust = userTechnicalStackRepository.findUserTechnicalStacksByUser(resUser.getNo());
-            for (int i = 0; i < ust.size(); i++) {
-                assertThat(ust.get(i).getTechnicalStack().getName()).isEqualTo(nTechnicalStackList.get(i));
-            }
+            assertThat(ust.get(0).getTechnicalStack().getName()).isEqualTo("Spring");
+            assertThat(ust.get(1).getTechnicalStack().getName()).isEqualTo("React");
+            assertThat(ust.get(2).getTechnicalStack().getName()).isEqualTo("JPA");
 
         }
 
