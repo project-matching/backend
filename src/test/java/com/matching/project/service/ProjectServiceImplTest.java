@@ -74,6 +74,9 @@ class ProjectServiceImplTest {
     @Mock
     EntityManager entityManager;
 
+    @Mock
+    NotificationService notificationService;
+
     @InjectMocks
     ProjectServiceImpl projectService;
 
@@ -1410,7 +1413,7 @@ class ProjectServiceImplTest {
             projectTechnicalStackList.add(projectTechnicalStack2);
 
             given(projectRepository.findById(any())).willReturn(Optional.of(project1));
-            given(projectPositionRepository.findProjectAndPositionAndUserUsingFetchJoinByProjectNo(any())).willReturn(projectPositionList);
+            given(projectPositionRepository.findProjectAndPositionAndUserUsingFetchJoinByProject(any())).willReturn(projectPositionList);
             given(projectTechnicalStackRepository.findTechnicalStackAndProjectUsingFetchJoin(any())).willReturn(projectTechnicalStackList);
 
             // when
@@ -1426,7 +1429,7 @@ class ProjectServiceImplTest {
 
             // then
             verify(projectRepository).findById(any());
-            verify(projectPositionRepository).findProjectAndPositionAndUserUsingFetchJoinByProjectNo(any());
+            verify(projectPositionRepository).findProjectAndPositionAndUserUsingFetchJoinByProject(any());
             verify(projectTechnicalStackRepository).findTechnicalStackAndProjectUsingFetchJoin(any());
 
             assertEquals(projectDto.getProjectNo(), project1.getNo());
@@ -1546,7 +1549,7 @@ class ProjectServiceImplTest {
             projectTechnicalStackList.add(projectTechnicalStack2);
 
             given(projectRepository.findById(any())).willReturn(Optional.of(project1));
-            given(projectPositionRepository.findProjectAndPositionAndUserUsingFetchJoinByProjectNo(any())).willReturn(projectPositionList);
+            given(projectPositionRepository.findProjectAndPositionAndUserUsingFetchJoinByProject(any())).willReturn(projectPositionList);
             given(projectTechnicalStackRepository.findTechnicalStackAndProjectUsingFetchJoin(any())).willReturn(projectTechnicalStackList);
             given(bookMarkRepository.existBookMark(any(User.class), any(Project.class))).willReturn(true);
             // when
@@ -1562,7 +1565,7 @@ class ProjectServiceImplTest {
 
             // then
             verify(projectRepository).findById(any());
-            verify(projectPositionRepository).findProjectAndPositionAndUserUsingFetchJoinByProjectNo(any());
+            verify(projectPositionRepository).findProjectAndPositionAndUserUsingFetchJoinByProject(any());
             verify(projectTechnicalStackRepository).findTechnicalStackAndProjectUsingFetchJoin(any());
 
             assertEquals(projectDto.getProjectNo(), project1.getNo());
@@ -1695,7 +1698,7 @@ class ProjectServiceImplTest {
             given(projectRepository.findById(any())).willReturn(Optional.of(project1));
             given(positionRepository.findAll()).willReturn(positionList);
             given(technicalStackRepository.findAll()).willReturn(technicalStackList);
-            given(projectPositionRepository.findProjectAndPositionAndUserUsingFetchJoinByProjectNo(any())).willReturn(projectPositionList);
+            given(projectPositionRepository.findProjectAndPositionAndUserUsingFetchJoinByProject(any())).willReturn(projectPositionList);
             given(projectTechnicalStackRepository.findTechnicalStackAndProjectUsingFetchJoin(any())).willReturn(projectTechnicalStackList);
 
             // when
@@ -1713,7 +1716,7 @@ class ProjectServiceImplTest {
             verify(projectRepository).findById(any());
             verify(positionRepository).findAll();
             verify(technicalStackRepository).findAll();
-            verify(projectPositionRepository).findProjectAndPositionAndUserUsingFetchJoinByProjectNo(any());
+            verify(projectPositionRepository).findProjectAndPositionAndUserUsingFetchJoinByProject(any());
             verify(projectTechnicalStackRepository).findTechnicalStackAndProjectUsingFetchJoin(any());
 
             // 프로젝트
@@ -1895,6 +1898,70 @@ class ProjectServiceImplTest {
                     .position(null)
                     .build();
 
+            User user2 = User.builder()
+                    .no(2L)
+                    .name("testUser2")
+                    .sex("M")
+                    .email("testEmail2")
+                    .password("testPassword2")
+                    .github("testGithub2")
+                    .block(false)
+                    .blockReason(null)
+                    .permission(Role.ROLE_USER)
+                    .oauthCategory(OAuth.NORMAL)
+                    .email_auth(false)
+                    .imageNo(0L)
+                    .position(null)
+                    .build();
+
+            LocalDate startDate = LocalDate.of(2022, 06, 24);
+            LocalDate endDate = LocalDate.of(2022, 06, 28);
+
+            // 프로젝트 객체
+            Project project1 = Project.builder()
+                    .no(1L)
+                    .name("testName1")
+                    .createUserName("user1")
+                    .startDate(startDate)
+                    .endDate(endDate)
+                    .state(true)
+                    .introduction("testIntroduction1")
+                    .maxPeople(10)
+                    .currentPeople(4)
+                    .viewCount(10)
+                    .commentCount(10)
+                    .build();
+
+            // 포지션 세팅
+            Position position1 = Position.builder()
+                    .no(1L)
+                    .name("testPosition1")
+                    .build();
+
+            // 프로젝트 포지션 세팅
+            List<ProjectPosition> projectPositionList = new ArrayList<>();
+            ProjectPosition projectPosition1 = ProjectPosition.builder()
+                    .no(1L)
+                    .state(false)
+                    .project(project1)
+                    .position(position1)
+                    .user(user1)
+                    .creator(false)
+                    .build();
+            ProjectPosition projectPosition2 = ProjectPosition.builder()
+                    .no(2L)
+                    .state(false)
+                    .project(project1)
+                    .position(position1)
+                    .user(user2)
+                    .creator(false)
+                    .build();
+
+            projectPositionList.add(projectPosition1);
+            projectPositionList.add(projectPosition2);
+
+            given(projectRepository.findById(any())).willReturn(Optional.of(project1));
+            given(projectPositionRepository.findProjectAndPositionAndUserUsingFetchJoinByProject(any())).willReturn(projectPositionList);
             given(projectRepository.existUserProjectByUser(any(Long.class), any(Long.class))).willReturn(true);
 
             // when
@@ -1908,6 +1975,8 @@ class ProjectServiceImplTest {
             }
 
             // then
+            verify(projectRepository).findById(any());
+            verify(projectPositionRepository).findProjectAndPositionAndUserUsingFetchJoinByProject(any());
             verify(projectRepository).existUserProjectByUser(any(Long.class), any(Long.class));
             verify(participateRequestTechnicalStackRepository).deleteByProjectNo(any());
             verify(projectParticipateRequestRepository).deleteByProjectNo(any());

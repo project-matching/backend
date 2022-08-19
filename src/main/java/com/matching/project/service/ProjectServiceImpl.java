@@ -3,6 +3,7 @@ package com.matching.project.service;
 import com.matching.project.dto.SliceDto;
 import com.matching.project.dto.comment.CommentDto;
 import com.matching.project.dto.enumerate.Role;
+import com.matching.project.dto.enumerate.Type;
 import com.matching.project.dto.project.*;
 import com.matching.project.dto.projectposition.ProjectPositionAddDto;
 import com.matching.project.dto.projectposition.ProjectPositionDeleteDto;
@@ -49,6 +50,7 @@ public class ProjectServiceImpl implements ProjectService {
     private final ParticipateRequestTechnicalStackRepository participateRequestTechnicalStackRepository;
     private final ProjectParticipateRequestRepository projectParticipateRequestRepository;
     private final EntityManager entityManager;
+    private final NotificationService notificationService;
 
     private void positionValidation(List<Position> positionList, List<String> positionNameList) throws Exception{
         List<Position> filterPositionList = positionList.stream().filter(position -> positionNameList.contains(position.getName())).collect(Collectors.toList());
@@ -180,7 +182,7 @@ public class ProjectServiceImpl implements ProjectService {
                 .collect(Collectors.toList());
 
         // 프로젝트 포지션 조회
-        List<ProjectPositionUpdateFormDto> projectPositionUpdateFormDtoList = projectPositionRepository.findProjectAndPositionAndUserUsingFetchJoinByProjectNo(project).stream()
+        List<ProjectPositionUpdateFormDto> projectPositionUpdateFormDtoList = projectPositionRepository.findProjectAndPositionAndUserUsingFetchJoinByProject(project).stream()
                 .map(projectPosition -> new ProjectPositionUpdateFormDto(
                         projectPosition.getNo(),
                         projectPosition.getPosition().getNo(),
@@ -261,7 +263,7 @@ public class ProjectServiceImpl implements ProjectService {
         Project project = projectRepository.findById(projectNo).orElseThrow(() -> new CustomException(ErrorCode.PROJECT_NO_SUCH_ELEMENT_EXCEPTION));
 
         // 포지션 조회
-        List<ProjectPositionDetailDto> projectPositionDetailDtoList = projectPositionRepository.findProjectAndPositionAndUserUsingFetchJoinByProjectNo(project).stream()
+        List<ProjectPositionDetailDto> projectPositionDetailDtoList = projectPositionRepository.findProjectAndPositionAndUserUsingFetchJoinByProject(project).stream()
                 .map(projectPosition -> new ProjectPositionDetailDto(
                         projectPosition.getNo(),
                         projectPosition.getPosition().getName(),
@@ -387,6 +389,12 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public boolean projectDelete(Long projectNo) throws Exception {
+        // 프로젝트 조회
+        Project project = projectRepository.findById(projectNo).orElseThrow(() -> new CustomException(ErrorCode.PROJECT_NO_SUCH_ELEMENT_EXCEPTION));
+
+        // 참여한 프로젝트 포지션 유저 조회
+        List<ProjectPosition> projectPositionList = projectPositionRepository.findProjectAndPositionAndUserUsingFetchJoinByProject(project);
+
         // 자신이 만든 프로젝트인지 판단
         if (!isRegisterProjectUser(projectNo)) {
             throw new CustomException(ErrorCode.PROJECT_NOT_REGISTER_USER);
@@ -414,6 +422,14 @@ public class ProjectServiceImpl implements ProjectService {
 
         entityManager.flush();
         entityManager.clear();
+        
+        // 알림
+        for (ProjectPosition projectPosition : projectPositionList) {
+            if (projectPosition.getUser() != null) {
+                notificationService.sendNotification(Type.PROJECT_DELETE, projectPosition.getUser().getEmail(),"[프로젝트 삭제] " + project.getName(), project.getName() + "이 삭제되었습니다.");
+            }
+        }
+
         return true;
     }
 

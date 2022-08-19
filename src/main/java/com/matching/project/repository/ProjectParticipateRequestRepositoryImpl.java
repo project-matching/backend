@@ -144,8 +144,8 @@ public class ProjectParticipateRequestRepositoryImpl implements ProjectParticipa
         return queryFactory
                 .selectFrom(projectParticipateRequest)
                 .join(projectParticipateRequest.user, user)
-                .join(projectParticipateRequest.projectPosition.project, project)
                 .join(projectParticipateRequest.projectPosition, projectPosition)
+                .join(projectPosition.project, project)
                 .where(projectParticipateRequest.no.eq(no))
                 .fetchOne();
     }

@@ -4,16 +4,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.matching.project.dto.common.TokenDto;
 import com.matching.project.dto.enumerate.OAuth;
 import com.matching.project.dto.enumerate.Role;
-import com.matching.project.entity.Position;
-import com.matching.project.entity.Project;
-import com.matching.project.entity.ProjectPosition;
-import com.matching.project.entity.User;
+import com.matching.project.dto.enumerate.Type;
+import com.matching.project.entity.*;
 import com.matching.project.error.CustomException;
 import com.matching.project.error.ErrorCode;
-import com.matching.project.repository.PositionRepository;
-import com.matching.project.repository.ProjectPositionRepository;
-import com.matching.project.repository.ProjectRepository;
-import com.matching.project.repository.UserRepository;
+import com.matching.project.repository.*;
 import com.matching.project.service.JwtTokenService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -27,7 +22,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -57,15 +52,18 @@ class ProjectPositionControllerTest {
     @Autowired
     JwtTokenService jwtTokenService;
 
+    @Autowired
+    NotificationRepository notificationRepository;
+
     // 프로젝트, 유저 저장
-    User saveUser() {
+    User saveUser(Long no) {
         User user1 = User.builder()
-                .name("userName1")
+                .name("userName" + no)
                 .sex("M")
-                .email("wkemrm12@naver.com")
-                .password("testPassword")
-                .github("testGithub")
-                .selfIntroduction("testSelfIntroduction")
+                .email("testEmail" + no)
+                .password("testPassword" + no)
+                .github("testGithub" + no)
+                .selfIntroduction("testSelfIntroduction" + no)
                 .block(false)
                 .blockReason(null)
                 .permission(Role.ROLE_USER)
@@ -86,7 +84,8 @@ class ProjectPositionControllerTest {
         public void success() throws Exception {
             // given
             // 유저 세팅
-            User saveUser = saveUser();
+            User saveUser1 = saveUser(1L);
+            User saveUser2 = saveUser(2L);
 
             LocalDate startDate = LocalDate.of(2022, 06, 24);
             LocalDate endDate = LocalDate.of(2022, 06, 28);
@@ -117,13 +116,22 @@ class ProjectPositionControllerTest {
                     .state(true)
                     .project(saveProject1)
                     .position(savePosition1)
-                    .user(saveUser)
+                    .user(saveUser1)
+                    .creator(false)
+                    .build();
+
+            ProjectPosition projectPosition2 = ProjectPosition.builder()
+                    .state(true)
+                    .project(saveProject1)
+                    .position(savePosition1)
+                    .user(saveUser2)
                     .creator(false)
                     .build();
             ProjectPosition saveProjectPosition1 = projectPositionRepository.save(projectPosition1);
+            ProjectPosition saveProjectPosition2 = projectPositionRepository.save(projectPosition2);
 
             // when
-            String token = jwtTokenService.createToken(new TokenDto(saveUser.getEmail()));
+            String token = jwtTokenService.createToken(new TokenDto(saveUser1.getEmail()));
             ResultActions resultActions = mvc.perform(delete("/v1/projectposition/" + saveProjectPosition1.getNo() + "/withdrawal")
                     .header("Authorization", "Bearer " + token)
                     .contentType(MediaType.APPLICATION_JSON_VALUE));
@@ -133,8 +141,15 @@ class ProjectPositionControllerTest {
                     .andExpect(jsonPath("$.data").value(saveProjectPosition1.getNo()))
                     .andExpect(status().isOk());
 
-            ProjectPosition projectPosition = projectPositionRepository.findUserFetchJoinByProjectPositionNo(saveProjectPosition1.getNo()).orElseThrow(() -> new CustomException(ErrorCode.PROJECT_POSITION_NO_SUCH_ELEMENT_EXCEPTION));
+            ProjectPosition projectPosition = projectPositionRepository.findUserAndProjectFetchJoinByProjectPositionNo(saveProjectPosition1.getNo()).orElseThrow(() -> new CustomException(ErrorCode.PROJECT_POSITION_NO_SUCH_ELEMENT_EXCEPTION));
+            List<Notification> notificationList = notificationRepository.findAll();
             assertEquals(projectPosition.getUser(), null);
+
+            assertEquals(notificationList.size(), 1);
+            assertEquals(notificationList.get(0).getType(), Type.PROJECT_POSITION_WITHDRAW);
+            assertEquals(notificationList.get(0).getTitle(), "[프로젝트 탈퇴] " + saveProject1.getName());
+            assertEquals(notificationList.get(0).getContent(), saveUser1.getName() + "이 " + saveProject1.getName() + " 프로젝트에서 탈퇴했습니다.\n"
+                    + "현재 남은 참여자 : " + saveUser2.getName());
         }
 
         @Test
@@ -158,7 +173,7 @@ class ProjectPositionControllerTest {
         public void success() throws Exception {
             // given
             // 유저 세팅
-            User saveUser = saveUser();
+            User saveUser1 = saveUser(1L);
 
             LocalDate startDate = LocalDate.of(2022, 06, 24);
             LocalDate endDate = LocalDate.of(2022, 06, 28);
@@ -174,7 +189,7 @@ class ProjectPositionControllerTest {
                     .maxPeople(10)
                     .currentPeople(4)
                     .viewCount(10)
-                    .user(saveUser)
+                    .user(saveUser1)
                     .commentCount(10)
                     .build();
             Project saveProject1 = projectRepository.save(project1);
@@ -190,13 +205,13 @@ class ProjectPositionControllerTest {
                     .state(true)
                     .project(saveProject1)
                     .position(savePosition1)
-                    .user(saveUser)
+                    .user(saveUser1)
                     .creator(false)
                     .build();
             ProjectPosition saveProjectPosition1 = projectPositionRepository.save(projectPosition1);
 
             // when
-            String token = jwtTokenService.createToken(new TokenDto(saveUser.getEmail()));
+            String token = jwtTokenService.createToken(new TokenDto(saveUser1.getEmail()));
 
             ResultActions resultActions = mvc.perform(delete("/v1/projectposition/" + saveProjectPosition1.getNo() + "/expulsion")
                     .header("Authorization", "Bearer " + token)
@@ -208,8 +223,14 @@ class ProjectPositionControllerTest {
                     .andExpect(jsonPath("$.data").value(true))
                     .andExpect(status().isOk());
 
-            ProjectPosition projectPosition = projectPositionRepository.findUserFetchJoinByProjectPositionNo(saveProjectPosition1.getNo()).orElseThrow(() -> new CustomException(ErrorCode.PROJECT_POSITION_NO_SUCH_ELEMENT_EXCEPTION));
+            ProjectPosition projectPosition = projectPositionRepository.findUserAndProjectFetchJoinByProjectPositionNo(saveProjectPosition1.getNo()).orElseThrow(() -> new CustomException(ErrorCode.PROJECT_POSITION_NO_SUCH_ELEMENT_EXCEPTION));
+            List<Notification> notificationList = notificationRepository.findAll();
             assertEquals(projectPosition.getUser(), null);
+
+            assertEquals(notificationList.size(), 1);
+            assertEquals(notificationList.get(0).getType(), Type.PROJECT_POSITION_EXPULSION);
+            assertEquals(notificationList.get(0).getTitle(), "[프로젝트 추방] " + saveProject1.getName());
+            assertEquals(notificationList.get(0).getContent(), saveProject1.getName() +" 프로젝트에서 추방당하셨습니다.");
         }
 
         @Test

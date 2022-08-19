@@ -53,6 +53,9 @@ class ProjectParticipateRequestServiceImplTest {
     @Mock
     ParticipateRequestTechnicalStackRepository participateRequestTechnicalStackRepository;
 
+    @Mock
+    NotificationService notificationService;
+
     @InjectMocks
     ProjectParticipateRequestServiceImpl projectParticipateRequestService;
 
@@ -83,6 +86,22 @@ class ProjectParticipateRequestServiceImplTest {
                     .position(null)
                     .build();
 
+            User user2 = User.builder()
+                    .no(2L)
+                    .name("testUser2")
+                    .sex("M")
+                    .email("testEmail2")
+                    .password("testPassword2")
+                    .github("testGithub2")
+                    .block(false)
+                    .blockReason(null)
+                    .permission(Role.ROLE_USER)
+                    .oauthCategory(OAuth.NORMAL)
+                    .email_auth(false)
+                    .imageNo(0L)
+                    .position(null)
+                    .build();
+
             // 프로젝트 세팅
             Project project1 = Project.builder()
                     .no(1L)
@@ -96,6 +115,7 @@ class ProjectParticipateRequestServiceImplTest {
                     .currentPeople(1)
                     .viewCount(0)
                     .commentCount(0)
+                    .user(user2)
                     .build();
 
             // 포지션 세팅
@@ -154,6 +174,7 @@ class ProjectParticipateRequestServiceImplTest {
             given(technicalStackRepository.findByNameIn(any())).willReturn(technicalStackList);
             given(participateRequestTechnicalStackRepository.save(any())).willReturn(participateRequestTechnicalStack1)
                     .willReturn(participateRequestTechnicalStack2);
+            given(projectRepository.findProjectWithUserUsingFetchJoinByProjectNo(any())).willReturn(project1);
 
             // when
             List<String> technicalStackRequestList = new ArrayList<>();
@@ -179,6 +200,8 @@ class ProjectParticipateRequestServiceImplTest {
             verify(projectParticipateRequestRepository).save(any());
             verify(technicalStackRepository).findByNameIn(any());
             verify(participateRequestTechnicalStackRepository, times(2)).save(any());
+            verify(projectRepository, times(1)).findProjectWithUserUsingFetchJoinByProjectNo(any());
+            verify(notificationService, times(1)).sendNotification(any(), any(), any(), any());
 
             assertEquals(result, true);
         }
