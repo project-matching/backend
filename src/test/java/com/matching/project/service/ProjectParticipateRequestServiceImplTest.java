@@ -9,7 +9,6 @@ import com.matching.project.entity.*;
 import com.matching.project.error.CustomException;
 import com.matching.project.error.ErrorCode;
 import com.matching.project.repository.*;
-import org.assertj.core.api.BDDAssumptions;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -25,7 +24,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -171,10 +169,10 @@ class ProjectParticipateRequestServiceImplTest {
 
             given(projectPositionRepository.findById(any())).willReturn(Optional.of(projectPosition1));
             given(projectParticipateRequestRepository.save(any())).willReturn(projectParticipateRequest1);
-            given(technicalStackRepository.findByNameIn(any())).willReturn(technicalStackList);
+            given(technicalStackRepository.findByNameIn(any())).willReturn(Optional.of(technicalStackList));
             given(participateRequestTechnicalStackRepository.save(any())).willReturn(participateRequestTechnicalStack1)
                     .willReturn(participateRequestTechnicalStack2);
-            given(projectRepository.findProjectWithUserUsingFetchJoinByProjectNo(any())).willReturn(project1);
+            given(projectRepository.findProjectWithUserUsingFetchJoinByProjectNo(any())).willReturn(Optional.of(project1));
 
             // when
             List<String> technicalStackRequestList = new ArrayList<>();
@@ -298,7 +296,7 @@ class ProjectParticipateRequestServiceImplTest {
 
             given(projectPositionRepository.findById(any())).willReturn(Optional.of(projectPosition1));
             given(projectParticipateRequestRepository.save(any())).willReturn(projectParticipateRequest1);
-            given(technicalStackRepository.findByNameIn(any())).willReturn(technicalStackList);
+            given(technicalStackRepository.findByNameIn(any())).willReturn(Optional.of(technicalStackList));
 
             // when
             List<String> technicalStackRequestList = new ArrayList<>();
@@ -321,8 +319,8 @@ class ProjectParticipateRequestServiceImplTest {
             verify(projectParticipateRequestRepository).save(any());
             verify(technicalStackRepository).findByNameIn(any());
 
-            assertEquals(e.getErrorCode().getHttpStatus(), ErrorCode.TECHNICAL_STACK_NOT_FOUND.getHttpStatus());
-            assertEquals(e.getErrorCode().getDetail(),ErrorCode.TECHNICAL_STACK_NOT_FOUND.getDetail());
+            assertEquals(e.getErrorCode().getHttpStatus(), ErrorCode.NOT_FIND_TECHNICAL_STACK_EXCEPTION.getHttpStatus());
+            assertEquals(e.getErrorCode().getDetail(),ErrorCode.NOT_FIND_TECHNICAL_STACK_EXCEPTION.getDetail());
         }
 
         @Test
@@ -495,8 +493,8 @@ class ProjectParticipateRequestServiceImplTest {
             int end = (start + pageable.getPageSize()) > projectParticipateFormResponseDtoList.size() ? projectParticipateFormResponseDtoList.size() : (start + pageable.getPageSize());
             Page<ProjectParticipateFormResponseDto> projectParticipateFormResponseDtoPage = new PageImpl<>(projectParticipateFormResponseDtoList.subList(start, end), pageable, projectParticipateFormResponseDtoList.size());
 
-            given(projectRepository.findProjectWithUserUsingFetchJoinByProjectNo(any())).willReturn(project1);
-            given(projectParticipateRequestRepository.findProjectParticipateRequestByProjectNo(any(), any(), any())).willReturn(projectParticipateFormResponseDtoPage);
+            given(projectRepository.findProjectWithUserUsingFetchJoinByProjectNo(any())).willReturn(Optional.of(project1));
+            given(projectParticipateRequestRepository.findProjectParticipateRequestByProjectNo(any(), any(), any())).willReturn(Optional.of(projectParticipateFormResponseDtoPage));
 
             // when
             // 권한 추가
@@ -564,7 +562,7 @@ class ProjectParticipateRequestServiceImplTest {
                     .commentCount(0)
                     .build();
 
-            given(projectRepository.findProjectWithUserUsingFetchJoinByProjectNo(any())).willReturn(project1);
+            given(projectRepository.findProjectWithUserUsingFetchJoinByProjectNo(any())).willReturn(Optional.of(project1));
 
             // when
             // 권한 추가
@@ -661,7 +659,7 @@ class ProjectParticipateRequestServiceImplTest {
                     .github("testGitHub1")
                     .build();
 
-            given(projectParticipateRequestRepository.findProjectPositionAndUserAndProjectFetchJoinByNo(any())).willReturn(projectParticipateRequest1);
+            given(projectParticipateRequestRepository.findProjectPositionAndUserAndProjectFetchJoinByNo(any())).willReturn(Optional.of(projectParticipateRequest1));
             given(projectParticipateRequestRepository.deleteByNo(any())).willReturn(projectParticipateRequest1.getNo());
             given(projectPositionRepository.findById(any())).willReturn(Optional.ofNullable(projectPosition1));
 
@@ -757,7 +755,7 @@ class ProjectParticipateRequestServiceImplTest {
                     .github("testGitHub1")
                     .build();
 
-            given(projectParticipateRequestRepository.findProjectPositionAndUserAndProjectFetchJoinByNo(any())).willReturn(projectParticipateRequest1);
+            given(projectParticipateRequestRepository.findProjectPositionAndUserAndProjectFetchJoinByNo(any())).willReturn(Optional.of(projectParticipateRequest1));
 
             // when
             // 권한 추가
@@ -851,7 +849,7 @@ class ProjectParticipateRequestServiceImplTest {
                     .github("testGitHub1")
                     .build();
 
-            given(projectParticipateRequestRepository.findProjectPositionAndUserAndProjectFetchJoinByNo(any())).willReturn(projectParticipateRequest1);
+            given(projectParticipateRequestRepository.findProjectPositionAndUserAndProjectFetchJoinByNo(any())).willReturn(Optional.of(projectParticipateRequest1));
             given(projectParticipateRequestRepository.deleteByNo(any())).willReturn(projectParticipateRequest1.getNo());
 
             // when
@@ -945,7 +943,7 @@ class ProjectParticipateRequestServiceImplTest {
                     .github("testGitHub1")
                     .build();
 
-            given(projectParticipateRequestRepository.findProjectPositionAndUserAndProjectFetchJoinByNo(any())).willReturn(projectParticipateRequest1);
+            given(projectParticipateRequestRepository.findProjectPositionAndUserAndProjectFetchJoinByNo(any())).willReturn(Optional.of(projectParticipateRequest1));
 
             // when
             // 권한 추가

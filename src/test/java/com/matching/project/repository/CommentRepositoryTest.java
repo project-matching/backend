@@ -112,7 +112,7 @@ class CommentRepositoryTest {
         Pageable pageable = PageRequest.of(0, 2);
 
         //then;
-        Slice<Comment> commentList = commentRepository.findByProjectOrderByNoDescUsingPaging(project, Long.MAX_VALUE, pageable);
+        Slice<Comment> commentList = commentRepository.findByProjectOrderByNoDescUsingPaging(project, Long.MAX_VALUE, pageable).get();
 
         //when
         assertThat(commentList.getContent().size()).isEqualTo(2);

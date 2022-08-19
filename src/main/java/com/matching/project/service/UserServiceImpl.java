@@ -10,7 +10,6 @@ import com.matching.project.error.ErrorCode;
 import com.matching.project.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.security.core.Authentication;
@@ -93,7 +92,7 @@ public class UserServiceImpl implements UserService{
     @Override
     public UserInfoResponseDto getUserInfo() {
         User user = userRepository.findByNoWithPositionUsingLeftFetchJoin(getAuthenticatedUser().getNo())
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FIND_USER_NO_EXCEPTION));
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FIND_USER_EXCEPTION));
 
         // Image
         String imageUrl = imageService.getImageUrl(user.getImageNo());
@@ -104,7 +103,9 @@ public class UserServiceImpl implements UserService{
             posision = user.getPosition().getName();
 
         // TechnicalStack
-        List<UserTechnicalStack> userTechnicalStackList = userTechnicalStackRepository.findUserTechnicalStacksByUser(user.getNo());
+        List<UserTechnicalStack> userTechnicalStackList = userTechnicalStackRepository.findUserTechnicalStacksByUser(user.getNo())
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FIND_USER_TECHNICAL_STACK_EXCEPTION));
+
         List<TechnicalStackDto> technicalStackDtoList = new ArrayList<>();
         for (int i = 0; i < userTechnicalStackList.size() && i < 3 ; i++) {
             TechnicalStack technicalStack = userTechnicalStackList.get(i).getTechnicalStack();
@@ -143,7 +144,8 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public SliceDto<UserSimpleInfoDto> userInfoList(Long UserNo, UserFilterDto userFilterDto, Pageable pageable) {
-        Slice<User> users = userRepositoryCustom.findByNoOrderByNoDescUsingQueryDsl(UserNo, userFilterDto, pageable);
+        Slice<User> users = userRepositoryCustom.findByNoOrderByNoDescUsingQueryDsl(UserNo, userFilterDto, pageable)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FIND_USER_EXCEPTION));
         SliceDto<UserSimpleInfoDto> dto = SliceDto.<UserSimpleInfoDto>builder()
                 .content(users.get().map(user -> UserSimpleInfoDto.builder()
                                 .userNo(user.getNo())
@@ -162,7 +164,7 @@ public class UserServiceImpl implements UserService{
     @Override
     public User userPasswordUpdate(PasswordUpdateRequestDto dto) {
         User user = userRepository.findById(getAuthenticatedUser().getNo())
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FIND_USER_NO_EXCEPTION));
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FIND_USER_EXCEPTION));
 
         if (user.getOauthCategory() == OAuth.NORMAL) {
             if (!passwordEncoder.matches(dto.getOldPassword(), user.getPassword()))
@@ -177,7 +179,7 @@ public class UserServiceImpl implements UserService{
     @Override
     public UserProfileInfoResponseDto userProfileInfo() {
         User user = userRepository.findByNoWithPositionUsingLeftFetchJoin(getAuthenticatedUser().getNo())
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FIND_USER_NO_EXCEPTION));
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FIND_USER_EXCEPTION));
 
         // Image
         String imageUrl = imageService.getImageUrl(user.getImageNo());
@@ -188,7 +190,9 @@ public class UserServiceImpl implements UserService{
             posision = user.getPosition().getName();
 
         // TechnicalStack
-        List<UserTechnicalStack> userTechnicalStackList = userTechnicalStackRepository.findUserTechnicalStacksByUser(user.getNo());
+        List<UserTechnicalStack> userTechnicalStackList = userTechnicalStackRepository.findUserTechnicalStacksByUser(user.getNo())
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FIND_USER_TECHNICAL_STACK_EXCEPTION));
+
         UserProfileInfoResponseDto dto = UserProfileInfoResponseDto.builder()
                 .image(imageUrl)
                 .name(user.getName())
@@ -210,7 +214,7 @@ public class UserServiceImpl implements UserService{
     @Override
     public User userUpdate(UserUpdateRequestDto dto, MultipartFile file) {
         User user = userRepository.findById(getAuthenticatedUser().getNo())
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FIND_USER_NO_EXCEPTION));
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FIND_USER_EXCEPTION));
 
         // Get Entity
         Position position = getPositionForSave(dto.getPosition());
@@ -249,7 +253,7 @@ public class UserServiceImpl implements UserService{
     @Override
     public User userSignOut() {
         User user = userRepository.findById(getAuthenticatedUser().getNo())
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FIND_USER_NO_EXCEPTION));
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FIND_USER_EXCEPTION));
 
         if (user.isWithdrawal())
             throw new CustomException(ErrorCode.USER_ALREADY_WITHDRAWAL_EXCEPTION);
@@ -264,7 +268,7 @@ public class UserServiceImpl implements UserService{
     @Override
     public User userBlock(Long no, String reason) {
         Optional<User> optionalUser = userRepository.findById(no);
-        optionalUser.orElseThrow(() -> new CustomException(ErrorCode.NOT_FIND_USER_NO_EXCEPTION));
+        optionalUser.orElseThrow(() -> new CustomException(ErrorCode.NOT_FIND_USER_EXCEPTION));
         if (optionalUser.get().isBlock())
             throw new CustomException(ErrorCode.USER_ALREADY_BLOCKED_EXCEPTION);
         optionalUser.get().userBlock(reason);
@@ -275,7 +279,7 @@ public class UserServiceImpl implements UserService{
     @Override
     public User userUnBlock(Long no) {
         Optional<User> optionalUser = userRepository.findById(no);
-        optionalUser.orElseThrow(() -> new CustomException(ErrorCode.NOT_FIND_USER_NO_EXCEPTION));
+        optionalUser.orElseThrow(() -> new CustomException(ErrorCode.NOT_FIND_USER_EXCEPTION));
         if (!optionalUser.get().isBlock())
             throw new CustomException(ErrorCode.USER_ALREADY_UNBLOCKED_EXCEPTION);
         optionalUser.get().userUnBlock();

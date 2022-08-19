@@ -16,8 +16,10 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
+import javax.swing.text.html.Option;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.matching.project.entity.QParticipateRequestTechnicalStack.participateRequestTechnicalStack;
@@ -55,7 +57,7 @@ public class ProjectParticipateRequestRepositoryImpl implements ProjectParticipa
     
     // 신청한 프로젝트 페이지 조회
     @Override
-    public Slice<ProjectParticipateFormResponseDto> findProjectParticipateRequestByProjectNo(Long projectNo, Long projectParticipateRequestNo, Pageable pageable) throws Exception {
+    public Optional<Slice<ProjectParticipateFormResponseDto>> findProjectParticipateRequestByProjectNo(Long projectNo, Long projectParticipateRequestNo, Pageable pageable) throws Exception {
         // projectParticipateRequest ManyToOne 조인
         List<ProjectParticipateFormResponseDto> projectParticipateFormResponseDtoList =
                 queryFactory.select(Projections.constructor(ProjectParticipateFormResponseDto.class,
@@ -66,7 +68,7 @@ public class ProjectParticipateRequestRepositoryImpl implements ProjectParticipa
                 ))
                 .from(projectParticipateRequest)
                 .join(projectParticipateRequest.projectPosition, projectPosition)
-                .join(projectParticipateRequest.projectPosition.position, position)
+                .join(projectPosition.position, position)
                 .join(projectParticipateRequest.user, user)
                 .join(projectPosition.project, project)
                 .where(
@@ -101,7 +103,7 @@ public class ProjectParticipateRequestRepositoryImpl implements ProjectParticipa
             hasNext = true;
         }
 
-        return new SliceImpl<>(projectParticipateFormResponseDtoList, pageable, hasNext);
+        return Optional.of(new SliceImpl<>(projectParticipateFormResponseDtoList, pageable, hasNext));
     }
     
     // ProjectParticipateRequestNo 가져오기
@@ -140,14 +142,16 @@ public class ProjectParticipateRequestRepositoryImpl implements ProjectParticipa
     
     // User, projectPosition join 메소드
     @Override
-    public ProjectParticipateRequest findProjectPositionAndUserAndProjectFetchJoinByNo(Long no) throws Exception {
-        return queryFactory
-                .selectFrom(projectParticipateRequest)
-                .join(projectParticipateRequest.user, user)
-                .join(projectParticipateRequest.projectPosition, projectPosition)
+    public Optional<ProjectParticipateRequest> findProjectPositionAndUserAndProjectFetchJoinByNo(Long no) throws Exception {
+        ProjectParticipateRequest projectParticipateRequest = queryFactory
+                .selectFrom(QProjectParticipateRequest.projectParticipateRequest)
+                .join(QProjectParticipateRequest.projectParticipateRequest.user, user)
+                .join(QProjectParticipateRequest.projectParticipateRequest.projectPosition, projectPosition)
                 .join(projectPosition.project, project)
-                .where(projectParticipateRequest.no.eq(no))
+                .where(QProjectParticipateRequest.projectParticipateRequest.no.eq(no))
                 .fetchOne();
+
+        return Optional.of(projectParticipateRequest);
     }
     
     // no로 projectParticipateRequest 삭제하는 메소드

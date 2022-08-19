@@ -91,7 +91,7 @@ class UserTechnicalStackRepositoryTest {
         userTechnicalStackRepository.save(ust3);
 
         //when
-        List<UserTechnicalStack> userTechnicalStackList = userTechnicalStackRepository.findUserTechnicalStacksByUser(user1.getNo());
+        List<UserTechnicalStack> userTechnicalStackList = userTechnicalStackRepository.findUserTechnicalStacksByUser(user1.getNo()).get();
 
         //then
         assertThat(userTechnicalStackList.size()).isEqualTo(2);

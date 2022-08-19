@@ -27,7 +27,7 @@ public class ProjectPositionServiceImpl implements ProjectPositionService{
 
     @Override
     public Long projectPositionWithdraw(Long projectPositionNo) throws Exception {
-        ProjectPosition projectPosition = projectPositionRepository.findUserAndProjectFetchJoinByProjectPositionNo(projectPositionNo).orElseThrow(() -> new CustomException(ErrorCode.PROJECT_POSITION_NO_SUCH_ELEMENT_EXCEPTION));
+        ProjectPosition projectPosition = projectPositionRepository.findUserAndProjectFetchJoinByProjectPositionNo(projectPositionNo).orElseThrow(() -> new CustomException(ErrorCode.NOT_FIND_PROJECT_POSITION_EXCEPTION));
 
         // 프로젝트 포지션에 유저가 없는 경우
         if (projectPosition.getUser() == null) {
@@ -47,7 +47,8 @@ public class ProjectPositionServiceImpl implements ProjectPositionService{
         entityManager.clear();
 
         // 알림
-        List<ProjectPosition> projectPositionList = projectPositionRepository.findProjectAndPositionAndUserUsingFetchJoinByProject(projectPosition.getProject());
+        List<ProjectPosition> projectPositionList = projectPositionRepository.findProjectAndPositionAndUserUsingFetchJoinByProject(projectPosition.getProject())
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FIND_PROJECT_POSITION_EXCEPTION));
 
         // 알림 내용 생성
         String remainingParticipants  = "현재 남은 참여자 : ";
@@ -76,7 +77,7 @@ public class ProjectPositionServiceImpl implements ProjectPositionService{
 
     @Override
     public boolean projectPositionExpulsion(Long projectPositionNo, String reason) throws Exception {
-        ProjectPosition projectPosition = projectPositionRepository.findUserAndProjectFetchJoinByProjectPositionNo(projectPositionNo).orElseThrow(() -> new CustomException(ErrorCode.PROJECT_POSITION_NO_SUCH_ELEMENT_EXCEPTION));
+        ProjectPosition projectPosition = projectPositionRepository.findUserAndProjectFetchJoinByProjectPositionNo(projectPositionNo).orElseThrow(() -> new CustomException(ErrorCode.NOT_FIND_PROJECT_POSITION_EXCEPTION));
 
         // 자신이 만든 프로젝트인지 판단
         if (!isRegisterProjectUser(projectPosition.getProject().getNo())) {

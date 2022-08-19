@@ -429,7 +429,8 @@ public class UserControllerTest {
             assertThat(resUser.getPosition().getName()).isEqualTo(nPosition);
             assertThat(resUser.getGithub()).isEqualTo(nGithub);
             assertThat(resUser.getSelfIntroduction()).isEqualTo(nSelfIntroduction);
-            List<UserTechnicalStack> ust = userTechnicalStackRepository.findUserTechnicalStacksByUser(resUser.getNo());
+            List<UserTechnicalStack> ust = userTechnicalStackRepository.findUserTechnicalStacksByUser(resUser.getNo()).get();
+
             for (int i = 0; i < ust.size(); i++) {
                 assertThat(ust.get(i).getTechnicalStack().getName()).isEqualTo(nTechnicalStackList.get(i));
             }

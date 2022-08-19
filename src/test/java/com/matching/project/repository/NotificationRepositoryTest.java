@@ -139,7 +139,7 @@ class NotificationRepositoryTest {
         Pageable pageable = PageRequest.of(0, 2);
 
         //when
-        Slice<Notification> notificationList = notificationRepository.findByUserOrUserIsNullOrderByNoDescUsingPaging(user2, notification4.getNo(), pageable);
+        Slice<Notification> notificationList = notificationRepository.findByUserOrUserIsNullOrderByNoDescUsingPaging(user2, notification4.getNo(), pageable).get();
 
         //then
         assertThat(notificationList.getContent().size()).isEqualTo(2);

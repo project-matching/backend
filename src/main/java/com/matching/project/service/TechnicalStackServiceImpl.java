@@ -35,7 +35,9 @@ public class TechnicalStackServiceImpl implements TechnicalStackService {
         // 기술스택과 연결된 이미지 조회
         List<Long> technicalStackImageNoList = technicalStackList.stream()
                 .map(technicalStack -> technicalStack.getImageNo()).collect(Collectors.toList());
-        Map<Long, Image> imageMap = imageRepository.findByNoIn(technicalStackImageNoList).stream()
+        Map<Long, Image> imageMap = imageRepository.findByNoIn(technicalStackImageNoList)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FIND_IMAGE_EXCEPTION))
+                .stream()
                 .collect(Collectors.toMap(image -> image.getNo(), image -> image));
 
         // 이미지 매칭
@@ -74,7 +76,7 @@ public class TechnicalStackServiceImpl implements TechnicalStackService {
     @Override
     public boolean technicalStackUpdate(Long technicalStackNo, TechnicalStackUpdateRequestDto technicalStackUpdateRequestDto, MultipartFile image) throws Exception {
         // 기술 스택 조회
-        TechnicalStack technicalStack = technicalStackRepository.findById(technicalStackNo).orElseThrow(() -> new CustomException(ErrorCode.TECHNICAL_STACK_NOT_FOUND));
+        TechnicalStack technicalStack = technicalStackRepository.findById(technicalStackNo).orElseThrow(() -> new CustomException(ErrorCode.NOT_FIND_TECHNICAL_STACK_EXCEPTION));
 
         // 이미지 삭제
         imageService.imageDelete(technicalStack.getImageNo());

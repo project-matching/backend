@@ -42,7 +42,7 @@ class PositionRepositoryTest {
         noList.add(savePosition1.getNo());
         noList.add(savePosition2.getNo());
         noList.add(savePosition3.getNo());
-        List<Position> findPositionList = positionRepository.findByNoIn(noList);
+        List<Position> findPositionList = positionRepository.findByNoIn(noList).get();
 
         // then
         assertEquals(findPositionList.size(), 3);

@@ -210,7 +210,7 @@ class ProjectParticipateRequestRepositoryTest {
 
         Slice<ProjectParticipateFormResponseDto> projectParticipateFormResponseDtoSlice = null;
         try {
-            projectParticipateFormResponseDtoSlice = projectParticipateRequestRepository.findProjectParticipateRequestByProjectNo(saveProject1.getNo(), Long.MAX_VALUE, pageable);
+            projectParticipateFormResponseDtoSlice = projectParticipateRequestRepository.findProjectParticipateRequestByProjectNo(saveProject1.getNo(), Long.MAX_VALUE, pageable).get();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -330,7 +330,7 @@ class ProjectParticipateRequestRepositoryTest {
         // when
         ProjectParticipateRequest projectParticipateRequest = null;
         try {
-            projectParticipateRequest = projectParticipateRequestRepository.findProjectPositionAndUserAndProjectFetchJoinByNo(saveProjectParticipateRequest1.getNo());
+            projectParticipateRequest = projectParticipateRequestRepository.findProjectPositionAndUserAndProjectFetchJoinByNo(saveProjectParticipateRequest1.getNo()).get();
         } catch (Exception e) {
             e.printStackTrace();
         }

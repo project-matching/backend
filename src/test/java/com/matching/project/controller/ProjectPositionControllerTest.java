@@ -141,7 +141,7 @@ class ProjectPositionControllerTest {
                     .andExpect(jsonPath("$.data").value(saveProjectPosition1.getNo()))
                     .andExpect(status().isOk());
 
-            ProjectPosition projectPosition = projectPositionRepository.findUserAndProjectFetchJoinByProjectPositionNo(saveProjectPosition1.getNo()).orElseThrow(() -> new CustomException(ErrorCode.PROJECT_POSITION_NO_SUCH_ELEMENT_EXCEPTION));
+            ProjectPosition projectPosition = projectPositionRepository.findUserAndProjectFetchJoinByProjectPositionNo(saveProjectPosition1.getNo()).orElseThrow(() -> new CustomException(ErrorCode.NOT_FIND_PROJECT_POSITION_EXCEPTION));
             List<Notification> notificationList = notificationRepository.findAll();
             assertEquals(projectPosition.getUser(), null);
 
@@ -223,7 +223,7 @@ class ProjectPositionControllerTest {
                     .andExpect(jsonPath("$.data").value(true))
                     .andExpect(status().isOk());
 
-            ProjectPosition projectPosition = projectPositionRepository.findUserAndProjectFetchJoinByProjectPositionNo(saveProjectPosition1.getNo()).orElseThrow(() -> new CustomException(ErrorCode.PROJECT_POSITION_NO_SUCH_ELEMENT_EXCEPTION));
+            ProjectPosition projectPosition = projectPositionRepository.findUserAndProjectFetchJoinByProjectPositionNo(saveProjectPosition1.getNo()).orElseThrow(() -> new CustomException(ErrorCode.NOT_FIND_PROJECT_POSITION_EXCEPTION));
             List<Notification> notificationList = notificationRepository.findAll();
             assertEquals(projectPosition.getUser(), null);
 

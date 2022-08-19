@@ -11,15 +11,16 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface CommentRepository extends JpaRepository<Comment, Long> {
     @Query("select c from Comment c " +
             "join fetch c.user u " +
             "join fetch c.project p " +
             "where p = :project and c.no <= :commentNo order by c.no desc")
-    Slice<Comment> findByProjectOrderByNoDescUsingPaging(@Param("project") Project project,
-                                                         @Param("commentNo") Long commentNo,
-                                                         Pageable pageable);
+    Optional<Slice<Comment>> findByProjectOrderByNoDescUsingPaging(@Param("project") Project project,
+                                                                  @Param("commentNo") Long commentNo,
+                                                                  Pageable pageable);
 
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("delete from Comment c where c.project.no = :projectNo")

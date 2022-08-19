@@ -98,7 +98,7 @@ class TechnicalStackServiceImplTest {
             imageList.add(image3);
 
             given(technicalStackRepository.findAll()).willReturn(technicalStackList);
-            given(imageRepository.findByNoIn(any())).willReturn(imageList);
+            given(imageRepository.findByNoIn(any())).willReturn(Optional.of(imageList));
 
             // when
             List<TechnicalStackRegisterFormResponseDto> technicalStackRegisterFormResponseDtoList = null;

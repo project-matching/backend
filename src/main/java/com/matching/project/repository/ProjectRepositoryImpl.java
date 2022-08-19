@@ -19,10 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.matching.project.entity.QBookMark.bookMark;
@@ -77,7 +74,7 @@ public class ProjectRepositoryImpl implements ProjectRepositoryCustom {
     
     // 모집 상태 검색하는 메소드
     @Override
-    public Slice<ProjectSimpleDto> findProjectByStatus(Pageable pageable, Long projectNo, boolean state, ProjectSearchRequestDto projectSearchRequestDto){
+    public Optional<Slice<ProjectSimpleDto>> findProjectByStatus(Pageable pageable, Long projectNo, boolean state, ProjectSearchRequestDto projectSearchRequestDto){
         List<ProjectSimpleDto> projectSimpleDtoList = queryFactory.select(Projections.constructor(ProjectSimpleDto.class,
                         project.no,
                         project.name,
@@ -104,12 +101,12 @@ public class ProjectRepositoryImpl implements ProjectRepositoryCustom {
             hasNext = true;
         }
 
-        return new SliceImpl<>(projectSimpleDtoList, pageable, hasNext);
+        return Optional.of(new SliceImpl<>(projectSimpleDtoList, pageable, hasNext));
     }
     
     // 유저가 등록한 프로젝트 조회(모집중, 모집완료 포함)
     @Override
-    public Slice<ProjectSimpleDto> findUserProject(Pageable pageable, Long projectNo, User user) {
+    public Optional<Slice<ProjectSimpleDto>> findUserProject(Pageable pageable, Long projectNo, User user) {
         List<ProjectSimpleDto> projectSimpleDtoList = queryFactory.select(Projections.constructor(ProjectSimpleDto.class,
                         project.no,
                         project.name,
@@ -137,12 +134,12 @@ public class ProjectRepositoryImpl implements ProjectRepositoryCustom {
             hasNext = true;
         }
 
-        return new SliceImpl<>(projectSimpleDtoList, pageable, hasNext);
+        return Optional.of(new SliceImpl<>(projectSimpleDtoList, pageable, hasNext));
     }
     
     // 유저가 참여중인 프로젝트 조회
     @Override
-    public Slice<ProjectSimpleDto> findParticipateProject(Pageable pageable, Long projectNo, User user) {
+    public Optional<Slice<ProjectSimpleDto>> findParticipateProject(Pageable pageable, Long projectNo, User user) {
         
         // 유저가 참여한 프로젝트를 중복제거한 상태로 가져오는 서브쿼리
         JPQLQuery<Long> subQuery = JPAExpressions.selectDistinct(project.no)
@@ -178,12 +175,12 @@ public class ProjectRepositoryImpl implements ProjectRepositoryCustom {
             hasNext = true;
         }
 
-        return new SliceImpl<>(projectSimpleDtoList, pageable, hasNext);
+        return Optional.of(new SliceImpl<>(projectSimpleDtoList, pageable, hasNext));
     }
 
     // 유저가 신청중인 프로젝트 조회
     @Override
-    public Slice<ProjectSimpleDto> findParticipateRequestProject(Pageable pageable, Long projectNo, User user) {
+    public Optional<Slice<ProjectSimpleDto>> findParticipateRequestProject(Pageable pageable, Long projectNo, User user) {
         // 신청중인 프로젝트 no를 중복제거한 상태로 가져오는 서브쿼리
         JPQLQuery<Long> subQuery = JPAExpressions.selectDistinct(project.no)
                 .from(projectParticipateRequest)
@@ -219,11 +216,11 @@ public class ProjectRepositoryImpl implements ProjectRepositoryCustom {
             hasNext = true;
         }
 
-        return new SliceImpl<>(projectSimpleDtoList, pageable, hasNext);
+        return Optional.of(new SliceImpl<>(projectSimpleDtoList, pageable, hasNext));
     }
 
     @Override
-    public Slice<ProjectSimpleDto> findBookMarkProject(Pageable pageable, Long projectNo, User user) {
+    public Optional<Slice<ProjectSimpleDto>> findBookMarkProject(Pageable pageable, Long projectNo, User user) {
         JPQLQuery<Long> subQuery = JPAExpressions.selectDistinct(bookMark.project.no)
                 .from(bookMark)
                 .join(bookMark.user, QUser.user)
@@ -260,7 +257,7 @@ public class ProjectRepositoryImpl implements ProjectRepositoryCustom {
             hasNext = true;
         }
 
-        return new SliceImpl<>(projectSimpleDtoList, pageable, hasNext);
+        return Optional.of(new SliceImpl<>(projectSimpleDtoList, pageable, hasNext));
     }
 
     // 프로젝트 연관 조회 메소드(프로젝트 포지션, 프로젝트 기술스택)
@@ -289,11 +286,13 @@ public class ProjectRepositoryImpl implements ProjectRepositoryCustom {
     
     // 프로젝트, 유저 join 조회
     @Override
-    public Project findProjectWithUserUsingFetchJoinByProjectNo(Long projectNo) {
-        return queryFactory.selectFrom(QProject.project)
+    public Optional<Project> findProjectWithUserUsingFetchJoinByProjectNo(Long projectNo) {
+        Project project = queryFactory.selectFrom(QProject.project)
                 .join(QProject.project.user)
                 .where(QProject.project.no.eq(projectNo))
                 .fetchOne();
+
+        return Optional.of(project);
     }
 
     private BooleanExpression underProjectNo(Long projectNo) {
