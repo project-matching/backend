@@ -207,7 +207,7 @@ class ProjectRepositoryTest {
         // 모집 중이고, 삭제되지 않은 프로젝트 탐색
         Slice<ProjectSimpleDto> projectSimpleDtoSlice = null;
         try {
-            projectSimpleDtoSlice = projectRepository.findProjectByStatus(pageable, Long.MAX_VALUE,true, new ProjectSearchRequestDto(ProjectFilter.PROJECT_NAME_AND_CONTENT, null));
+            projectSimpleDtoSlice = projectRepository.findProjectByStatus(pageable, Long.MAX_VALUE,true, new ProjectSearchRequestDto(ProjectFilter.PROJECT_NAME_AND_CONTENT, null)).get();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -412,7 +412,7 @@ class ProjectRepositoryTest {
         // 모집 중이고, 삭제되지 않은 프로젝트 중 Name2을 포함하고있는 리스트 탐색
         Slice<ProjectSimpleDto> projectSimpleDtoSlice = null;
         try {
-            projectSimpleDtoSlice = projectRepository.findProjectByStatus(pageable, Long.MAX_VALUE, true, new ProjectSearchRequestDto(ProjectFilter.PROJECT_NAME_AND_CONTENT, "Name2"));
+            projectSimpleDtoSlice = projectRepository.findProjectByStatus(pageable, Long.MAX_VALUE, true, new ProjectSearchRequestDto(ProjectFilter.PROJECT_NAME_AND_CONTENT, "Name2")).get();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -614,7 +614,7 @@ class ProjectRepositoryTest {
         // 유저가 만든, 삭제되지 않은 프로젝트 탐색
         Slice<ProjectSimpleDto> projectSimpleDtoSlice = null;
         try {
-            projectSimpleDtoSlice = projectRepository.findUserProject(pageable, Long.MAX_VALUE, saveUser1);
+            projectSimpleDtoSlice = projectRepository.findUserProject(pageable, Long.MAX_VALUE, saveUser1).get();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -836,7 +836,7 @@ class ProjectRepositoryTest {
         // 참여중인 프로젝트 조회
         Slice<ProjectSimpleDto> projectSimpleDtoSlice = null;
         try {
-            projectSimpleDtoSlice = projectRepository.findParticipateProject(pageable, Long.MAX_VALUE, saveUser1);
+            projectSimpleDtoSlice = projectRepository.findParticipateProject(pageable, Long.MAX_VALUE, saveUser1).get();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -1061,7 +1061,7 @@ class ProjectRepositoryTest {
         // 참여중인 프로젝트 조회
         Slice<ProjectSimpleDto> projectSimpleDtoSlice = null;
         try {
-            projectSimpleDtoSlice = projectRepository.findParticipateProject(pageable, Long.MAX_VALUE, saveUser1);
+            projectSimpleDtoSlice = projectRepository.findParticipateProject(pageable, Long.MAX_VALUE, saveUser1).get();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -1301,7 +1301,7 @@ class ProjectRepositoryTest {
         // 참여중인 프로젝트 조회
         Slice<ProjectSimpleDto> projectSimpleDtoSlice = null;
         try {
-            projectSimpleDtoSlice = projectRepository.findParticipateRequestProject(pageable, Long.MAX_VALUE, saveUser1);
+            projectSimpleDtoSlice = projectRepository.findParticipateRequestProject(pageable, Long.MAX_VALUE, saveUser1).get();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -1557,7 +1557,7 @@ class ProjectRepositoryTest {
         // 참여중인 프로젝트 조회
         Slice<ProjectSimpleDto> projectSimpleDtoSlice = null;
         try {
-            projectSimpleDtoSlice = projectRepository.findParticipateRequestProject(pageable, Long.MAX_VALUE, saveUser1);
+            projectSimpleDtoSlice = projectRepository.findParticipateRequestProject(pageable, Long.MAX_VALUE, saveUser1).get();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -1793,7 +1793,7 @@ class ProjectRepositoryTest {
         // 참여중인 프로젝트 조회
         Slice<ProjectSimpleDto> projectSimpleDtoSlice = null;
         try {
-            projectSimpleDtoSlice = projectRepository.findBookMarkProject(pageable, Long.MAX_VALUE, saveUser1);
+            projectSimpleDtoSlice = projectRepository.findBookMarkProject(pageable, Long.MAX_VALUE, saveUser1).get();
         } catch (Exception e) {
             e.printStackTrace();
         }

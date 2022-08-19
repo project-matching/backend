@@ -10,13 +10,10 @@ import com.matching.project.error.CustomException;
 import com.matching.project.error.ErrorCode;
 import com.matching.project.repository.ProjectPositionRepository;
 import com.matching.project.repository.ProjectRepository;
-import com.matching.project.repository.UserRepository;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.BDDMockito;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -26,13 +23,14 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import javax.persistence.EntityManager;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class ProjectPositionServiceImplTest {
@@ -44,6 +42,9 @@ class ProjectPositionServiceImplTest {
 
     @Mock
     EntityManager entityManager;
+
+    @Mock
+    NotificationService notificationService;
 
     @InjectMocks
     ProjectPositionServiceImpl projectPositionService;
@@ -93,6 +94,7 @@ class ProjectPositionServiceImplTest {
                     .name("testPosition1")
                     .build();
 
+            List<ProjectPosition> projectPositionList = new ArrayList<>();
             ProjectPosition projectPosition1 = ProjectPosition.builder()
                     .no(1L)
                     .state(true)
@@ -101,8 +103,10 @@ class ProjectPositionServiceImplTest {
                     .user(user1)
                     .creator(false)
                     .build();
+            projectPositionList.add(projectPosition1);
 
-            given(projectPositionRepository.findUserFetchJoinByProjectPositionNo(any())).willReturn(Optional.of(projectPosition1));
+            given(projectPositionRepository.findUserAndProjectFetchJoinByProjectPositionNo(any())).willReturn(Optional.of(projectPosition1));
+            given(projectPositionRepository.findProjectAndPositionAndUserUsingFetchJoinByProject(any())).willReturn(Optional.of(projectPositionList));
 
             // when
             Long result = null;
@@ -117,6 +121,9 @@ class ProjectPositionServiceImplTest {
             }
 
             // then
+            verify(projectPositionRepository).findUserAndProjectFetchJoinByProjectPositionNo(any());
+            verify(projectPositionRepository).findProjectAndPositionAndUserUsingFetchJoinByProject(any());
+
             assertEquals(result, projectPosition1.getNo());
         }
 
@@ -140,7 +147,7 @@ class ProjectPositionServiceImplTest {
                     .position(null)
                     .build();
 
-            given(projectPositionRepository.findUserFetchJoinByProjectPositionNo(any())).willReturn(Optional.empty());
+            given(projectPositionRepository.findUserAndProjectFetchJoinByProjectPositionNo(any())).willReturn(Optional.empty());
 
             // when
             UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(user1, "", user1.getAuthorities());
@@ -151,8 +158,8 @@ class ProjectPositionServiceImplTest {
             });
 
             // then
-            assertEquals(customException.getErrorCode().getHttpStatus().name(), ErrorCode.PROJECT_POSITION_NO_SUCH_ELEMENT_EXCEPTION.getHttpStatus().name());
-            assertEquals(customException.getErrorCode().getDetail(), ErrorCode.PROJECT_POSITION_NO_SUCH_ELEMENT_EXCEPTION.getDetail());
+            assertEquals(customException.getErrorCode().getHttpStatus().name(), ErrorCode.NOT_FIND_PROJECT_POSITION_EXCEPTION.getHttpStatus().name());
+            assertEquals(customException.getErrorCode().getDetail(), ErrorCode.NOT_FIND_PROJECT_POSITION_EXCEPTION.getDetail());
         }
         
         @Test
@@ -206,7 +213,7 @@ class ProjectPositionServiceImplTest {
                     .creator(false)
                     .build();
 
-            given(projectPositionRepository.findUserFetchJoinByProjectPositionNo(any())).willReturn(Optional.of(projectPosition1));
+            given(projectPositionRepository.findUserAndProjectFetchJoinByProjectPositionNo(any())).willReturn(Optional.of(projectPosition1));
 
             // when
             UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(user1, "", user1.getAuthorities());
@@ -288,7 +295,7 @@ class ProjectPositionServiceImplTest {
                     .creator(false)
                     .build();
 
-            given(projectPositionRepository.findUserFetchJoinByProjectPositionNo(any())).willReturn(Optional.of(projectPosition1));
+            given(projectPositionRepository.findUserAndProjectFetchJoinByProjectPositionNo(any())).willReturn(Optional.of(projectPosition1));
 
             // when
             UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(user1, "", user1.getAuthorities());
@@ -359,7 +366,7 @@ class ProjectPositionServiceImplTest {
                     .creator(false)
                     .build();
 
-            given(projectPositionRepository.findUserFetchJoinByProjectPositionNo(any())).willReturn(Optional.of(projectPosition1));
+            given(projectPositionRepository.findUserAndProjectFetchJoinByProjectPositionNo(any())).willReturn(Optional.of(projectPosition1));
             given(projectRepository.existUserProjectByUser(any(Long.class), any(Long.class))).willReturn(true);
 
             // when
@@ -397,7 +404,7 @@ class ProjectPositionServiceImplTest {
                     .position(null)
                     .build();
 
-            given(projectPositionRepository.findUserFetchJoinByProjectPositionNo(any())).willReturn(Optional.empty());
+            given(projectPositionRepository.findUserAndProjectFetchJoinByProjectPositionNo(any())).willReturn(Optional.empty());
 
             // when
             UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(user1, "", user1.getAuthorities());
@@ -408,8 +415,8 @@ class ProjectPositionServiceImplTest {
             });
 
             // then
-            assertEquals(customException.getErrorCode().getHttpStatus().name(), ErrorCode.PROJECT_POSITION_NO_SUCH_ELEMENT_EXCEPTION.getHttpStatus().name());
-            assertEquals(customException.getErrorCode().getDetail(), ErrorCode.PROJECT_POSITION_NO_SUCH_ELEMENT_EXCEPTION.getDetail());
+            assertEquals(customException.getErrorCode().getHttpStatus().name(), ErrorCode.NOT_FIND_PROJECT_POSITION_EXCEPTION.getHttpStatus().name());
+            assertEquals(customException.getErrorCode().getDetail(), ErrorCode.NOT_FIND_PROJECT_POSITION_EXCEPTION.getDetail());
         }
 
         @Test
@@ -464,7 +471,7 @@ class ProjectPositionServiceImplTest {
                     .creator(false)
                     .build();
 
-            given(projectPositionRepository.findUserFetchJoinByProjectPositionNo(any())).willReturn(Optional.of(projectPosition1));
+            given(projectPositionRepository.findUserAndProjectFetchJoinByProjectPositionNo(any())).willReturn(Optional.of(projectPosition1));
             given(projectRepository.existUserProjectByUser(any(Long.class), any(Long.class))).willReturn(true);
 
             // when
@@ -532,7 +539,7 @@ class ProjectPositionServiceImplTest {
                     .creator(false)
                     .build();
 
-            given(projectPositionRepository.findUserFetchJoinByProjectPositionNo(any())).willReturn(Optional.of(projectPosition1));
+            given(projectPositionRepository.findUserAndProjectFetchJoinByProjectPositionNo(any())).willReturn(Optional.of(projectPosition1));
             given(projectRepository.existUserProjectByUser(any(Long.class), any(Long.class))).willReturn(false);
 
             // when

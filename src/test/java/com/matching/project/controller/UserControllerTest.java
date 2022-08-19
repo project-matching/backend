@@ -425,7 +425,6 @@ public class UserControllerTest {
             assertThat(ust.get(0).getTechnicalStack().getName()).isEqualTo("Spring");
             assertThat(ust.get(1).getTechnicalStack().getName()).isEqualTo("React");
             assertThat(ust.get(2).getTechnicalStack().getName()).isEqualTo("JPA");
-
         }
 
         @DisplayName("실패")

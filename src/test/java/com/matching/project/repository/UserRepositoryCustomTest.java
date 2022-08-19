@@ -78,7 +78,7 @@ class UserRepositoryCustomTest {
         Pageable pageable = PageRequest.of(0, 2);
 
         //when
-        Slice<User> users = userRepositoryCustom.findByNoOrderByNoDescUsingQueryDsl(Long.MAX_VALUE, userFilterDto, pageable);
+        Slice<User> users = userRepositoryCustom.findByNoOrderByNoDescUsingQueryDsl(Long.MAX_VALUE, userFilterDto, pageable).get();
 
         //then
         assertThat(users.getContent().size()).isEqualTo(2);

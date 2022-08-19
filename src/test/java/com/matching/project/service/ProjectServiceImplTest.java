@@ -24,13 +24,11 @@ import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.EntityManager;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -73,6 +71,9 @@ class ProjectServiceImplTest {
 
     @Mock
     EntityManager entityManager;
+
+    @Mock
+    NotificationService notificationService;
 
     @InjectMocks
     ProjectServiceImpl projectService;
@@ -219,9 +220,9 @@ class ProjectServiceImplTest {
                     .build();
 
             given(projectRepository.save(any())).willReturn(project1);
-            given(positionRepository.findByNoIn(any())).willReturn(positionList);
+            given(positionRepository.findByNoIn(any())).willReturn(Optional.of(positionList));
             given(projectPositionRepository.save(any())).willReturn(projectPosition1).willReturn(projectPosition2);
-            given(technicalStackRepository.findByNoIn(any())).willReturn(technicalStackList);
+            given(technicalStackRepository.findByNoIn(any())).willReturn(Optional.of(technicalStackList));
             given(projectTechnicalStackRepository.save(any())).willReturn(projectTechnicalStack1).willReturn(projectTechnicalStack2);
 
             // when
@@ -375,7 +376,7 @@ class ProjectServiceImplTest {
             int end = (start + pageable.getPageSize()) > projectSimpleDtoList.size() ? projectSimpleDtoList.size() : (start + pageable.getPageSize());
             Page<ProjectSimpleDto> projectPage = new PageImpl<>(projectSimpleDtoList.subList(start, end), pageable, projectSimpleDtoList.size());
 
-            given(projectRepository.findProjectByStatus(any(Pageable.class), any(Long.class), any(Boolean.class), any())).willReturn(projectPage);
+            given(projectRepository.findProjectByStatus(any(Pageable.class), any(Long.class), any(Boolean.class), any())).willReturn(Optional.of(projectPage));
 
 
             SliceDto<ProjectSimpleDto> result = null;
@@ -588,8 +589,8 @@ class ProjectServiceImplTest {
             int end = (start + pageable.getPageSize()) > projectSimpleDtoList.size() ? projectSimpleDtoList.size() : (start + pageable.getPageSize());
             Page<ProjectSimpleDto> projectPage = new PageImpl<>(projectSimpleDtoList.subList(start, end), pageable, projectSimpleDtoList.size());
 
-            given(projectRepository.findProjectByStatus(any(Pageable.class), any(Long.class), any(Boolean.class), any())).willReturn(projectPage);
-            given(bookMarkRepository.findByUserNo(any())).willReturn(bookMarkList);
+            given(projectRepository.findProjectByStatus(any(Pageable.class), any(Long.class), any(Boolean.class), any())).willReturn(Optional.of(projectPage));
+            given(bookMarkRepository.findByUserNo(any())).willReturn(Optional.of(bookMarkList));
 
             SliceDto<ProjectSimpleDto> result = null;
 
@@ -806,8 +807,8 @@ class ProjectServiceImplTest {
             int end = (start + pageable.getPageSize()) > projectSimpleDtoList.size() ? projectSimpleDtoList.size() : (start + pageable.getPageSize());
             Page<ProjectSimpleDto> projectPage = new PageImpl<>(projectSimpleDtoList.subList(start, end), pageable, projectSimpleDtoList.size());
 
-            given(projectRepository.findUserProject(any(Pageable.class), any(Long.class), any(User.class))).willReturn(projectPage);
-            given(bookMarkRepository.findByUserNo(any())).willReturn(bookMarkList);
+            given(projectRepository.findUserProject(any(Pageable.class), any(Long.class), any(User.class))).willReturn(Optional.of(projectPage));
+            given(bookMarkRepository.findByUserNo(any())).willReturn(Optional.of(bookMarkList));
 
             // when
             SliceDto<ProjectSimpleDto> result = null;
@@ -1026,8 +1027,8 @@ class ProjectServiceImplTest {
             int end = (start + pageable.getPageSize()) > projectSimpleDtoList.size() ? projectSimpleDtoList.size() : (start + pageable.getPageSize());
             Page<ProjectSimpleDto> projectPage = new PageImpl<>(projectSimpleDtoList.subList(start, end), pageable, projectSimpleDtoList.size());
 
-            given(projectRepository.findParticipateProject(any(Pageable.class), any(Long.class), any(User.class))).willReturn(projectPage);
-            given(bookMarkRepository.findByUserNo(any())).willReturn(bookMarkList);
+            given(projectRepository.findParticipateProject(any(Pageable.class), any(Long.class), any(User.class))).willReturn(Optional.of(projectPage));
+            given(bookMarkRepository.findByUserNo(any())).willReturn(Optional.of(bookMarkList));
 
             // when
             SliceDto<ProjectSimpleDto> result = null;
@@ -1246,8 +1247,8 @@ class ProjectServiceImplTest {
             int end = (start + pageable.getPageSize()) > projectSimpleDtoList.size() ? projectSimpleDtoList.size() : (start + pageable.getPageSize());
             Page<ProjectSimpleDto> projectPage = new PageImpl<>(projectSimpleDtoList.subList(start, end), pageable, projectSimpleDtoList.size());
 
-            given(projectRepository.findParticipateRequestProject(any(Pageable.class), any(Long.class), any(User.class))).willReturn(projectPage);
-            given(bookMarkRepository.findByUserNo(any())).willReturn(bookMarkList);
+            given(projectRepository.findParticipateRequestProject(any(Pageable.class), any(Long.class), any(User.class))).willReturn(Optional.of(projectPage));
+            given(bookMarkRepository.findByUserNo(any())).willReturn(Optional.of(bookMarkList));
 
             // when
             SliceDto<ProjectSimpleDto> result = null;
@@ -1410,8 +1411,8 @@ class ProjectServiceImplTest {
             projectTechnicalStackList.add(projectTechnicalStack2);
 
             given(projectRepository.findById(any())).willReturn(Optional.of(project1));
-            given(projectPositionRepository.findProjectAndPositionAndUserUsingFetchJoinByProjectNo(any())).willReturn(projectPositionList);
-            given(projectTechnicalStackRepository.findTechnicalStackAndProjectUsingFetchJoin(any())).willReturn(projectTechnicalStackList);
+            given(projectPositionRepository.findProjectAndPositionAndUserUsingFetchJoinByProject(any())).willReturn(Optional.of(projectPositionList));
+            given(projectTechnicalStackRepository.findTechnicalStackAndProjectUsingFetchJoin(any())).willReturn(Optional.of(projectTechnicalStackList));
 
             // when
             Authentication auth = new AnonymousAuthenticationToken("key", "principle", Arrays.asList(new SimpleGrantedAuthority(Role.ROLE_ANONYMOUS.toString())));
@@ -1426,7 +1427,7 @@ class ProjectServiceImplTest {
 
             // then
             verify(projectRepository).findById(any());
-            verify(projectPositionRepository).findProjectAndPositionAndUserUsingFetchJoinByProjectNo(any());
+            verify(projectPositionRepository).findProjectAndPositionAndUserUsingFetchJoinByProject(any());
             verify(projectTechnicalStackRepository).findTechnicalStackAndProjectUsingFetchJoin(any());
 
             assertEquals(projectDto.getProjectNo(), project1.getNo());
@@ -1546,8 +1547,8 @@ class ProjectServiceImplTest {
             projectTechnicalStackList.add(projectTechnicalStack2);
 
             given(projectRepository.findById(any())).willReturn(Optional.of(project1));
-            given(projectPositionRepository.findProjectAndPositionAndUserUsingFetchJoinByProjectNo(any())).willReturn(projectPositionList);
-            given(projectTechnicalStackRepository.findTechnicalStackAndProjectUsingFetchJoin(any())).willReturn(projectTechnicalStackList);
+            given(projectPositionRepository.findProjectAndPositionAndUserUsingFetchJoinByProject(any())).willReturn(Optional.of(projectPositionList));
+            given(projectTechnicalStackRepository.findTechnicalStackAndProjectUsingFetchJoin(any())).willReturn(Optional.of(projectTechnicalStackList));
             given(bookMarkRepository.existBookMark(any(User.class), any(Project.class))).willReturn(true);
             // when
             UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(user1, "", user1.getAuthorities());
@@ -1562,7 +1563,7 @@ class ProjectServiceImplTest {
 
             // then
             verify(projectRepository).findById(any());
-            verify(projectPositionRepository).findProjectAndPositionAndUserUsingFetchJoinByProjectNo(any());
+            verify(projectPositionRepository).findProjectAndPositionAndUserUsingFetchJoinByProject(any());
             verify(projectTechnicalStackRepository).findTechnicalStackAndProjectUsingFetchJoin(any());
 
             assertEquals(projectDto.getProjectNo(), project1.getNo());
@@ -1695,8 +1696,8 @@ class ProjectServiceImplTest {
             given(projectRepository.findById(any())).willReturn(Optional.of(project1));
             given(positionRepository.findAll()).willReturn(positionList);
             given(technicalStackRepository.findAll()).willReturn(technicalStackList);
-            given(projectPositionRepository.findProjectAndPositionAndUserUsingFetchJoinByProjectNo(any())).willReturn(projectPositionList);
-            given(projectTechnicalStackRepository.findTechnicalStackAndProjectUsingFetchJoin(any())).willReturn(projectTechnicalStackList);
+            given(projectPositionRepository.findProjectAndPositionAndUserUsingFetchJoinByProject(any())).willReturn(Optional.of(projectPositionList));
+            given(projectTechnicalStackRepository.findTechnicalStackAndProjectUsingFetchJoin(any())).willReturn(Optional.of(projectTechnicalStackList));
 
             // when
             ProjectUpdateFormResponseDto projectUpdateFormResponseDto = null;
@@ -1713,7 +1714,7 @@ class ProjectServiceImplTest {
             verify(projectRepository).findById(any());
             verify(positionRepository).findAll();
             verify(technicalStackRepository).findAll();
-            verify(projectPositionRepository).findProjectAndPositionAndUserUsingFetchJoinByProjectNo(any());
+            verify(projectPositionRepository).findProjectAndPositionAndUserUsingFetchJoinByProject(any());
             verify(projectTechnicalStackRepository).findTechnicalStackAndProjectUsingFetchJoin(any());
 
             // 프로젝트
@@ -1755,7 +1756,7 @@ class ProjectServiceImplTest {
         @DisplayName("실패 : 해당 프로젝트를 못 찾았을 경우")
         public void fail1() {
             // given
-            given(projectRepository.findById(any())).willThrow(new CustomException(ErrorCode.PROJECT_NO_SUCH_ELEMENT_EXCEPTION));
+            given(projectRepository.findById(any())).willThrow(new CustomException(ErrorCode.NOT_FIND_PROJECT_EXCEPTION));
 
             // when
             CustomException e = Assertions.assertThrows(CustomException.class, () -> {
@@ -1763,8 +1764,8 @@ class ProjectServiceImplTest {
             });
 
             // then
-            assertEquals(e.getErrorCode().getHttpStatus(),ErrorCode.PROJECT_NO_SUCH_ELEMENT_EXCEPTION.getHttpStatus());
-            assertEquals(e.getErrorCode().getDetail(),ErrorCode.PROJECT_NO_SUCH_ELEMENT_EXCEPTION.getDetail());
+            assertEquals(e.getErrorCode().getHttpStatus(),ErrorCode.NOT_FIND_PROJECT_EXCEPTION.getHttpStatus());
+            assertEquals(e.getErrorCode().getDetail(),ErrorCode.NOT_FIND_PROJECT_EXCEPTION.getDetail());
         }
     }
 
@@ -1842,9 +1843,9 @@ class ProjectServiceImplTest {
 
             given(projectRepository.existUserProjectByUser(any(Long.class), any(Long.class))).willReturn(true);
             given(projectRepository.findById(any())).willReturn(Optional.of(project1));
-            given(positionRepository.findByNoIn(any())).willReturn(positionList);
+            given(positionRepository.findByNoIn(any())).willReturn(Optional.of(positionList));
             given(projectPositionRepository.saveAndFlush(any())).willReturn(projectPosition1).willReturn(projectPosition2);
-            given(technicalStackRepository.findByNoIn(any())).willReturn(technicalStackList);
+            given(technicalStackRepository.findByNoIn(any())).willReturn(Optional.of(technicalStackList));
             given(projectTechnicalStackRepository.saveAndFlush(any())).willReturn(projectTechnicalStack1).willReturn(projectTechnicalStack2);
 
             // when
@@ -1895,6 +1896,70 @@ class ProjectServiceImplTest {
                     .position(null)
                     .build();
 
+            User user2 = User.builder()
+                    .no(2L)
+                    .name("testUser2")
+                    .sex("M")
+                    .email("testEmail2")
+                    .password("testPassword2")
+                    .github("testGithub2")
+                    .block(false)
+                    .blockReason(null)
+                    .permission(Role.ROLE_USER)
+                    .oauthCategory(OAuth.NORMAL)
+                    .email_auth(false)
+                    .imageNo(0L)
+                    .position(null)
+                    .build();
+
+            LocalDate startDate = LocalDate.of(2022, 06, 24);
+            LocalDate endDate = LocalDate.of(2022, 06, 28);
+
+            // 프로젝트 객체
+            Project project1 = Project.builder()
+                    .no(1L)
+                    .name("testName1")
+                    .createUserName("user1")
+                    .startDate(startDate)
+                    .endDate(endDate)
+                    .state(true)
+                    .introduction("testIntroduction1")
+                    .maxPeople(10)
+                    .currentPeople(4)
+                    .viewCount(10)
+                    .commentCount(10)
+                    .build();
+
+            // 포지션 세팅
+            Position position1 = Position.builder()
+                    .no(1L)
+                    .name("testPosition1")
+                    .build();
+
+            // 프로젝트 포지션 세팅
+            List<ProjectPosition> projectPositionList = new ArrayList<>();
+            ProjectPosition projectPosition1 = ProjectPosition.builder()
+                    .no(1L)
+                    .state(false)
+                    .project(project1)
+                    .position(position1)
+                    .user(user1)
+                    .creator(false)
+                    .build();
+            ProjectPosition projectPosition2 = ProjectPosition.builder()
+                    .no(2L)
+                    .state(false)
+                    .project(project1)
+                    .position(position1)
+                    .user(user2)
+                    .creator(false)
+                    .build();
+
+            projectPositionList.add(projectPosition1);
+            projectPositionList.add(projectPosition2);
+
+            given(projectRepository.findById(any())).willReturn(Optional.of(project1));
+            given(projectPositionRepository.findProjectAndPositionAndUserUsingFetchJoinByProject(any())).willReturn(Optional.of(projectPositionList));
             given(projectRepository.existUserProjectByUser(any(Long.class), any(Long.class))).willReturn(true);
 
             // when
@@ -1908,6 +1973,8 @@ class ProjectServiceImplTest {
             }
 
             // then
+            verify(projectRepository).findById(any());
+            verify(projectPositionRepository).findProjectAndPositionAndUserUsingFetchJoinByProject(any());
             verify(projectRepository).existUserProjectByUser(any(Long.class), any(Long.class));
             verify(participateRequestTechnicalStackRepository).deleteByProjectNo(any());
             verify(projectParticipateRequestRepository).deleteByProjectNo(any());

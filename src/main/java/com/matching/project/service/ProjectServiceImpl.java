@@ -1,13 +1,13 @@
 package com.matching.project.service;
 
 import com.matching.project.dto.SliceDto;
-import com.matching.project.dto.comment.CommentDto;
 import com.matching.project.dto.enumerate.Role;
+import com.matching.project.dto.enumerate.Type;
 import com.matching.project.dto.project.*;
 import com.matching.project.dto.projectposition.ProjectPositionAddDto;
-import com.matching.project.dto.projectposition.ProjectPositionDeleteDto;
 import com.matching.project.dto.projectposition.ProjectPositionRegisterDto;
 import com.matching.project.dto.projectposition.ProjectPositionUpdateFormDto;
+import com.matching.project.dto.user.ProjectRegisterUserDto;
 import com.matching.project.dto.user.ProjectUpdateFormUserDto;
 import com.matching.project.dto.user.UserDto;
 import com.matching.project.entity.*;
@@ -15,13 +15,9 @@ import com.matching.project.error.CustomException;
 import com.matching.project.error.ErrorCode;
 import com.matching.project.repository.*;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -32,7 +28,6 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 @Transactional
@@ -49,6 +44,7 @@ public class ProjectServiceImpl implements ProjectService {
     private final ParticipateRequestTechnicalStackRepository participateRequestTechnicalStackRepository;
     private final ProjectParticipateRequestRepository projectParticipateRequestRepository;
     private final EntityManager entityManager;
+    private final NotificationService notificationService;
 
     private void positionValidation(List<Position> positionList, List<String> positionNameList) throws Exception{
         List<Position> filterPositionList = positionList.stream().filter(position -> positionNameList.contains(position.getName())).collect(Collectors.toList());
@@ -93,11 +89,14 @@ public class ProjectServiceImpl implements ProjectService {
 
         List<Long> positionNoList = projectPositionRegisterDtoList.stream()
                 .map(projectPositionRegisterDto -> projectPositionRegisterDto.getPositionNo()).collect(Collectors.toList());
-        List<Position> positionList = positionRepository.findByNoIn(positionNoList);
+        List<Position> positionList = positionRepository.findByNoIn(positionNoList)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FIND_POSITION_EXCEPTION));
 
         for (ProjectPositionRegisterDto projectPositionRegisterDto : projectPositionRegisterDtoList) {
             ProjectPosition projectPosition = null;
-            if (projectPositionRegisterDto.getProjectRegisterUserDto() != null) {
+            ProjectRegisterUserDto projectRegisterUserDto = projectPositionRegisterDto.getProjectRegisterUserDto();
+
+            if (projectRegisterUserDto != null && projectRegisterUserDto.getNo() != null) {
                 projectPosition = ProjectPosition.builder()
                         .state(true)
                         .position(positionList.stream().filter(position -> position.getNo().equals(projectPositionRegisterDto.getPositionNo())).findAny().orElseThrow())
@@ -118,7 +117,8 @@ public class ProjectServiceImpl implements ProjectService {
 
         // 프로젝트 기술스택 저장
         List<Long> projectTechnicalStackNoList = projectRegisterRequestDto.getProjectTechnicalStackList();
-        List<TechnicalStack> technicalStackList = technicalStackRepository.findByNoIn(projectTechnicalStackNoList);
+        List<TechnicalStack> technicalStackList = technicalStackRepository.findByNoIn(projectTechnicalStackNoList)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FIND_TECHNICAL_STACK_EXCEPTION));
         for (Long no : projectTechnicalStackNoList) {
             ProjectTechnicalStack projectTechnicalStack = ProjectTechnicalStack.builder()
                     .technicalStack(technicalStackList.stream().filter(technicalStack -> technicalStack.getNo().equals(no)).findAny().orElseThrow())
@@ -133,7 +133,8 @@ public class ProjectServiceImpl implements ProjectService {
     // 프로젝트 조회
     @Override
     public SliceDto<ProjectSimpleDto> findProjectList(Long projectNo, boolean state, ProjectSearchRequestDto projectSearchRequestDto, Pageable pageable) throws Exception {
-        Slice<ProjectSimpleDto> projectSimpleDtoSlice = projectRepository.findProjectByStatus(pageable, projectNo != null ? projectNo : Long.MAX_VALUE, state, projectSearchRequestDto);
+        Slice<ProjectSimpleDto> projectSimpleDtoSlice = projectRepository.findProjectByStatus(pageable, projectNo != null ? projectNo : Long.MAX_VALUE, state, projectSearchRequestDto)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FIND_PROJECT_EXCEPTION));
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
@@ -155,7 +156,8 @@ public class ProjectServiceImpl implements ProjectService {
         User user = getUser();
         
         // 유저가 등록한 프로젝트 조회
-        Slice<ProjectSimpleDto> projectSimpleDtoSlice = projectRepository.findUserProject(pageable, projectNo != null ? projectNo : Long.MAX_VALUE, user);
+        Slice<ProjectSimpleDto> projectSimpleDtoSlice = projectRepository.findUserProject(pageable, projectNo != null ? projectNo : Long.MAX_VALUE, user)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FIND_PROJECT_EXCEPTION));
 
         // 유저 즐겨찾기 조회
         findBookMark(projectSimpleDtoSlice.getContent(), user);
@@ -167,7 +169,7 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public ProjectUpdateFormResponseDto getProjectUpdateForm(Long projectNo) throws Exception {
         // 프로젝트 조회
-        Project project = projectRepository.findById(projectNo).orElseThrow(() -> new CustomException(ErrorCode.PROJECT_NO_SUCH_ELEMENT_EXCEPTION));
+        Project project = projectRepository.findById(projectNo).orElseThrow(() -> new CustomException(ErrorCode.NOT_FIND_PROJECT_EXCEPTION));
 
         // 포지션 조회
         List<PositionUpdateFormDto> positionUpdateFormDtoList = positionRepository.findAll().stream()
@@ -180,7 +182,9 @@ public class ProjectServiceImpl implements ProjectService {
                 .collect(Collectors.toList());
 
         // 프로젝트 포지션 조회
-        List<ProjectPositionUpdateFormDto> projectPositionUpdateFormDtoList = projectPositionRepository.findProjectAndPositionAndUserUsingFetchJoinByProjectNo(project).stream()
+        List<ProjectPositionUpdateFormDto> projectPositionUpdateFormDtoList = projectPositionRepository.findProjectAndPositionAndUserUsingFetchJoinByProject(project)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FIND_PROJECT_POSITION_EXCEPTION))
+                .stream()
                 .map(projectPosition -> new ProjectPositionUpdateFormDto(
                         projectPosition.getNo(),
                         projectPosition.getPosition().getNo(),
@@ -189,7 +193,9 @@ public class ProjectServiceImpl implements ProjectService {
                 )).collect(Collectors.toList());
 
         // 프로젝트 기술스택 조회
-        List<String> projectTechnicalStackList = projectTechnicalStackRepository.findTechnicalStackAndProjectUsingFetchJoin(project).stream()
+        List<String> projectTechnicalStackList = projectTechnicalStackRepository.findTechnicalStackAndProjectUsingFetchJoin(project)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FIND_PROJECT_TECHNICAL_STACK_EXCEPTION))
+                .stream()
                 .map(projectTechnicalStack -> projectTechnicalStack.getTechnicalStack().getName())
                 .collect(Collectors.toList());
 
@@ -216,7 +222,8 @@ public class ProjectServiceImpl implements ProjectService {
         User user = getUser();
 
         // 유저가 등록한 프로젝트 조회
-        Slice<ProjectSimpleDto> projectSimpleDtoSlice = projectRepository.findParticipateProject(pageable, projectNo != null ? projectNo : Long.MAX_VALUE, user);
+        Slice<ProjectSimpleDto> projectSimpleDtoSlice = projectRepository.findParticipateProject(pageable, projectNo != null ? projectNo : Long.MAX_VALUE, user)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FIND_PROJECT_EXCEPTION));
         
         // 유저 즐겨찾기 조회
         findBookMark(projectSimpleDtoSlice.getContent(), user);
@@ -231,7 +238,8 @@ public class ProjectServiceImpl implements ProjectService {
         User user = getUser();
 
         // 유저가 등록한 프로젝트 조회
-        Slice<ProjectSimpleDto> projectSimpleDtoSlice = projectRepository.findParticipateRequestProject(pageable, projectNo != null ? projectNo : Long.MAX_VALUE, user);
+        Slice<ProjectSimpleDto> projectSimpleDtoSlice = projectRepository.findParticipateRequestProject(pageable, projectNo != null ? projectNo : Long.MAX_VALUE, user)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FIND_PROJECT_EXCEPTION));
 
         // 유저 즐겨찾기 조회
         findBookMark(projectSimpleDtoSlice.getContent(), user);
@@ -241,7 +249,8 @@ public class ProjectServiceImpl implements ProjectService {
     
     // 유저 즐겨찾기 조회
     private void findBookMark(List<ProjectSimpleDto> projectSimpleDtoList, User user) {
-        List<Long> bookMarkList = bookMarkRepository.findByUserNo(user.getNo()).stream().map(bookMark -> bookMark.getProject().getNo()).collect(Collectors.toList());
+        List<Long> bookMarkList = bookMarkRepository.findByUserNo(user.getNo()).orElseThrow(() -> new CustomException(ErrorCode.NOT_FIND_BOOKMARK_EXCEPTION))
+                .stream().map(bookMark -> bookMark.getProject().getNo()).collect(Collectors.toList());
         for (ProjectSimpleDto projectSimpleDto : projectSimpleDtoList) {
             projectSimpleDto.setBookMark(bookMarkList.contains(projectSimpleDto.getProjectNo()));
         }
@@ -258,10 +267,12 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public ProjectDto getProjectDetail(Long projectNo) {
         // 프로젝트 조회
-        Project project = projectRepository.findById(projectNo).orElseThrow(() -> new CustomException(ErrorCode.PROJECT_NO_SUCH_ELEMENT_EXCEPTION));
+        Project project = projectRepository.findById(projectNo).orElseThrow(() -> new CustomException(ErrorCode.NOT_FIND_PROJECT_EXCEPTION));
 
         // 포지션 조회
-        List<ProjectPositionDetailDto> projectPositionDetailDtoList = projectPositionRepository.findProjectAndPositionAndUserUsingFetchJoinByProjectNo(project).stream()
+        List<ProjectPositionDetailDto> projectPositionDetailDtoList = projectPositionRepository.findProjectAndPositionAndUserUsingFetchJoinByProject(project)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FIND_PROJECT_POSITION_EXCEPTION))
+                .stream()
                 .map(projectPosition -> new ProjectPositionDetailDto(
                         projectPosition.getNo(),
                         projectPosition.getPosition().getName(),
@@ -271,7 +282,9 @@ public class ProjectServiceImpl implements ProjectService {
                 )).collect(Collectors.toList());
 
         // 기술 스택 조회
-        List<String> technicalStackList = projectTechnicalStackRepository.findTechnicalStackAndProjectUsingFetchJoin(project).stream()
+        List<String> technicalStackList = projectTechnicalStackRepository.findTechnicalStackAndProjectUsingFetchJoin(project)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FIND_PROJECT_TECHNICAL_STACK_EXCEPTION))
+                .stream()
                 .map(projectTechnicalStack -> projectTechnicalStack.getTechnicalStack().getName())
                 .collect(Collectors.toList());
 
@@ -324,7 +337,7 @@ public class ProjectServiceImpl implements ProjectService {
             throw new CustomException(ErrorCode.PROJECT_NOT_REGISTER_USER);
         }
 
-        Project project = projectRepository.findById(projectNo).orElseThrow(() -> new CustomException(ErrorCode.PROJECT_NO_SUCH_ELEMENT_EXCEPTION));
+        Project project = projectRepository.findById(projectNo).orElseThrow(() -> new CustomException(ErrorCode.NOT_FIND_PROJECT_EXCEPTION));
         LocalDate startDate = LocalDate.parse(projectUpdateRequestDto.getStartDate(), DateTimeFormatter.ISO_DATE);
         LocalDate endDate = LocalDate.parse(projectUpdateRequestDto.getEndDate(), DateTimeFormatter.ISO_DATE);
 
@@ -345,7 +358,9 @@ public class ProjectServiceImpl implements ProjectService {
             List<Long> positionNos = projectUpdateRequestDto.getProjectPositionAddDtoList().stream()
                     .map(projectPositionAddDto -> projectPositionAddDto.getPositionNo()).distinct().collect(Collectors.toList());
 
-            Map<Long, Position> positionMap = positionRepository.findByNoIn(positionNos).stream()
+            Map<Long, Position> positionMap = positionRepository.findByNoIn(positionNos)
+                    .orElseThrow(() -> new CustomException(ErrorCode.NOT_FIND_POSITION_EXCEPTION))
+                    .stream()
                     .collect(Collectors.toMap(Position::getNo, position -> position));
 
             for (ProjectPositionAddDto projectPositionAddDto : projectUpdateRequestDto.getProjectPositionAddDtoList()) {
@@ -369,7 +384,9 @@ public class ProjectServiceImpl implements ProjectService {
 
         // 기술스택 추가
         if (projectUpdateRequestDto.getProjectTechnicalStackNoList() != null) {
-            List<TechnicalStack> technicalStackList = technicalStackRepository.findByNoIn(projectUpdateRequestDto.getProjectTechnicalStackNoList()).stream()
+            List<TechnicalStack> technicalStackList = technicalStackRepository.findByNoIn(projectUpdateRequestDto.getProjectTechnicalStackNoList())
+                    .orElseThrow(() -> new CustomException(ErrorCode.NOT_FIND_TECHNICAL_STACK_EXCEPTION))
+                    .stream()
                     .collect(Collectors.toList());
             for (TechnicalStack technicalStack : technicalStackList) {
                 ProjectTechnicalStack projectTechnicalStack = ProjectTechnicalStack.builder()
@@ -387,6 +404,13 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public boolean projectDelete(Long projectNo) throws Exception {
+        // 프로젝트 조회
+        Project project = projectRepository.findById(projectNo).orElseThrow(() -> new CustomException(ErrorCode.NOT_FIND_PROJECT_EXCEPTION));
+
+        // 참여한 프로젝트 포지션 유저 조회
+        List<ProjectPosition> projectPositionList = projectPositionRepository.findProjectAndPositionAndUserUsingFetchJoinByProject(project)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FIND_PROJECT_POSITION_EXCEPTION));;
+
         // 자신이 만든 프로젝트인지 판단
         if (!isRegisterProjectUser(projectNo)) {
             throw new CustomException(ErrorCode.PROJECT_NOT_REGISTER_USER);
@@ -414,6 +438,14 @@ public class ProjectServiceImpl implements ProjectService {
 
         entityManager.flush();
         entityManager.clear();
+        
+        // 알림
+        for (ProjectPosition projectPosition : projectPositionList) {
+            if (projectPosition.getUser() != null) {
+                notificationService.sendNotification(Type.PROJECT_DELETE, projectPosition.getUser().getEmail(),"[프로젝트 삭제] " + project.getName(), project.getName() + "이 삭제되었습니다.");
+            }
+        }
+
         return true;
     }
 

@@ -43,7 +43,7 @@ class TechnicalStackRepositoryTest {
         noList.add(saveTechnicalStack1.getNo());
         noList.add(saveTechnicalStack2.getNo());
         noList.add(saveTechnicalStack3.getNo());
-        List<TechnicalStack> findTechnicalStackList = technicalStackRepository.findByNoIn(noList);
+        List<TechnicalStack> findTechnicalStackList = technicalStackRepository.findByNoIn(noList).get();
 
         // then
         assertEquals(findTechnicalStackList.size(), 3);
@@ -73,7 +73,7 @@ class TechnicalStackRepositoryTest {
         List<String> names = new ArrayList<>();
         names.add("testTechnicalStack1");
 
-        List<TechnicalStack> technicalStackList = technicalStackRepository.findByNameIn(names);
+        List<TechnicalStack> technicalStackList = technicalStackRepository.findByNameIn(names).get();
 
         // then
         assertEquals(technicalStackList.size(), 1);

@@ -19,7 +19,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -106,7 +105,7 @@ class ProjectPositionRepositoryTest {
         projectPositionRepository.save(projectPosition2);
 
         // when
-        List<ProjectPosition> projectPositionList = projectPositionRepository.findProjectAndPositionAndUserUsingFetchJoinByProjectNo(project1);
+        List<ProjectPosition> projectPositionList = projectPositionRepository.findProjectAndPositionAndUserUsingFetchJoinByProject(project1).get();
 
         // then
         assertEquals(projectPositionList.get(0).getProject(), saveProject1);
@@ -244,8 +243,8 @@ class ProjectPositionRepositoryTest {
     }
 
     @Nested
-    @DisplayName("유저 조인 프로젝트포지션 번호 조건 조회")
-    class testFindUserFetchJoinByProjectPositionNo {
+    @DisplayName("유저 조인 프로젝트 조인 프로젝트포지션 번호 조건 조회")
+    class testFindUserAndProjectFetchJoinByProjectPositionNo {
         @Test
         @DisplayName("성공 테스트")
         public void testSuccess() {
@@ -282,7 +281,7 @@ class ProjectPositionRepositoryTest {
             ProjectPosition saveProjectPosition1 = projectPositionRepository.save(projectPosition1);
 
             // when
-            ProjectPosition projectPosition = projectPositionRepository.findUserFetchJoinByProjectPositionNo(saveProjectPosition1.getNo()).orElseThrow(() -> new CustomException(ErrorCode.PROJECT_POSITION_NO_SUCH_ELEMENT_EXCEPTION));
+            ProjectPosition projectPosition = projectPositionRepository.findUserAndProjectFetchJoinByProjectPositionNo(saveProjectPosition1.getNo()).orElseThrow(() -> new CustomException(ErrorCode.NOT_FIND_PROJECT_POSITION_EXCEPTION));
 
             // then
             assertEquals(projectPosition.getNo(), saveProjectPosition1.getNo());

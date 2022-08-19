@@ -10,16 +10,12 @@ import com.matching.project.error.ErrorCode;
 import com.matching.project.repository.BookMarkRepository;
 import com.matching.project.repository.ProjectRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @Transactional
@@ -31,7 +27,7 @@ public class BookMarkServiceImpl implements BookMarkService{
     @Override
     public boolean bookMarkRegister(Long projectNo) throws Exception {
         User user = getUser();
-        Project project = projectRepository.findById(projectNo).orElseThrow(() -> new CustomException(ErrorCode.PROJECT_NO_SUCH_ELEMENT_EXCEPTION));
+        Project project = projectRepository.findById(projectNo).orElseThrow(() -> new CustomException(ErrorCode.NOT_FIND_PROJECT_EXCEPTION));
 
         BookMark bookMark = BookMark
                 .builder()
@@ -45,7 +41,8 @@ public class BookMarkServiceImpl implements BookMarkService{
 
     @Override
     public SliceDto<ProjectSimpleDto> findBookMarkProject(Long projectNo, Pageable pageable) throws Exception {
-        Slice<ProjectSimpleDto> projectSimpleDtoSlice = projectRepository.findBookMarkProject(pageable, projectNo, getUser());
+        Slice<ProjectSimpleDto> projectSimpleDtoSlice = projectRepository.findBookMarkProject(pageable, projectNo, getUser())
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FIND_PROJECT_EXCEPTION));
 
         return new SliceDto<>(projectSimpleDtoSlice.getContent(), projectSimpleDtoSlice.isLast());
     }

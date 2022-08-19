@@ -5,7 +5,9 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.matching.project.dto.common.TokenDto;
 import com.matching.project.dto.enumerate.OAuth;
 import com.matching.project.dto.enumerate.Role;
+import com.matching.project.dto.enumerate.Type;
 import com.matching.project.dto.project.ProjectParticipateRequestDto;
+import com.matching.project.dto.projectparticipate.ProjectParticipateRefusalRequestDto;
 import com.matching.project.entity.*;
 import com.matching.project.error.ErrorCode;
 import com.matching.project.repository.*;
@@ -21,6 +23,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -64,12 +67,35 @@ class ProjectParticipateControllerTest {
     @Autowired
     ParticipateRequestTechnicalStackRepository participateRequestTechnicalStackRepository;
 
+    @Autowired
+    NotificationRepository notificationRepository;
+
     // 프로젝트, 유저 저장
     User saveUser() {
         User user1 = User.builder()
                 .name("userName1")
                 .sex("M")
                 .email("wkemrm12@naver.com")
+                .password("testPassword")
+                .github("testGithub")
+                .selfIntroduction("testSelfIntroduction")
+                .block(false)
+                .blockReason(null)
+                .permission(Role.ROLE_USER)
+                .oauthCategory(OAuth.NORMAL)
+                .email_auth(false)
+                .imageNo(0L)
+                .position(null)
+                .build();
+
+        return userRepository.save(user1);
+    }
+
+    User saveProjectUser() {
+        User user1 = User.builder()
+                .name("userName2")
+                .sex("M")
+                .email("wkemrm123@naver.com")
                 .password("testPassword")
                 .github("testGithub")
                 .selfIntroduction("testSelfIntroduction")
@@ -94,7 +120,7 @@ class ProjectParticipateControllerTest {
             // given
             // 유저 세팅
             User saveUser = saveUser();
-
+            User saveProjectUser = saveProjectUser();
             // 프로젝트 세팅
             LocalDate startDate = LocalDate.of(2022, 06, 24);
             LocalDate endDate = LocalDate.of(2022, 06, 28);
@@ -110,6 +136,7 @@ class ProjectParticipateControllerTest {
                     .currentPeople(4)
                     .viewCount(10)
                     .commentCount(10)
+                    .user(saveProjectUser)
                     .build();
             Project saveProject1 = projectRepository.save(project);
 
@@ -178,15 +205,21 @@ class ProjectParticipateControllerTest {
             // DB 검증
             List<ProjectParticipateRequest> projectParticipateRequestList = projectParticipateRequestRepository.findAll();
             List<ParticipateRequestTechnicalStack> participateRequestTechnicalStackList = participateRequestTechnicalStackRepository.findAll();
+            List<Notification> notificationList = notificationRepository.findAll();
 
-            assertEquals(projectParticipateRequestList.get(0).getProjectPosition(), saveProjectPosition1);
-            assertEquals(projectParticipateRequestList.get(0).getUser(), saveUser);
+            assertEquals(projectParticipateRequestList.get(0).getProjectPosition().getNo(), saveProjectPosition1.getNo());
+            assertEquals(projectParticipateRequestList.get(0).getUser().getNo(), saveUser.getNo());
             assertEquals(projectParticipateRequestList.get(0).getGithub(), projectParticipateRequestDto.getGitHub());
             assertEquals(projectParticipateRequestList.get(0).getMotive(), projectParticipateRequestDto.getMotive());
 
-            assertEquals(participateRequestTechnicalStackList.get(0).getProjectParticipateRequest(), projectParticipateRequestList.get(0));
+            assertEquals(participateRequestTechnicalStackList.get(0).getProjectParticipateRequest().getNo(), projectParticipateRequestList.get(0).getNo());
             assertEquals(participateRequestTechnicalStackList.get(0).getTechnicalStack().getName(), projectParticipateRequestDto.getTechnicalStackList().get(0));
             assertEquals(participateRequestTechnicalStackList.get(1).getTechnicalStack().getName(), projectParticipateRequestDto.getTechnicalStackList().get(1));
+
+            assertEquals(notificationList.size(), 1);
+            assertEquals(notificationList.get(0).getType(), Type.PROJECT_PARTICIPATION_REQUEST);
+            assertEquals(notificationList.get(0).getTitle(), "[프로젝트 참가 신청] " + saveProject1.getName());
+            assertEquals(notificationList.get(0).getContent(), saveUser.getName() + "님이 " + saveProject1.getName() + "에 참가 신청했습니다.");
         }
 
         @Test
@@ -322,7 +355,7 @@ class ProjectParticipateControllerTest {
                     .imageNo(0L)
                     .position(null)
                     .build();
-            User saveUser1 = userRepository.save(user1);
+            User saveUser1 = userRepository.saveAndFlush(user1);
 
             User user2 = User.builder()
                     .name("userName2")
@@ -339,7 +372,7 @@ class ProjectParticipateControllerTest {
                     .imageNo(0L)
                     .position(null)
                     .build();
-            User saveUser2 = userRepository.save(user2);
+            User saveUser2 = userRepository.saveAndFlush(user2);
 
             User user3 = User.builder()
                     .name("userName3")
@@ -356,7 +389,7 @@ class ProjectParticipateControllerTest {
                     .imageNo(0L)
                     .position(null)
                     .build();
-            User saveUser3 = userRepository.save(user3);
+            User saveUser3 = userRepository.saveAndFlush(user3);
 
             // 프로젝트 세팅
             LocalDate startDate = LocalDate.of(2022, 06, 24);
@@ -375,7 +408,7 @@ class ProjectParticipateControllerTest {
                     .commentCount(10)
                     .user(saveUser1)
                     .build();
-            Project saveProject1 = projectRepository.save(project);
+            Project saveProject1 = projectRepository.saveAndFlush(project);
 
             // 포지션 세팅
             Position position1 = Position.builder()
@@ -385,8 +418,8 @@ class ProjectParticipateControllerTest {
                     .name("testPosition2")
                     .build();
 
-            Position savePosition1 = positionRepository.save(position1);
-            Position savePosition2 = positionRepository.save(position2);
+            Position savePosition1 = positionRepository.saveAndFlush(position1);
+            Position savePosition2 = positionRepository.saveAndFlush(position2);
 
             // 프로젝트 포지션 세팅
             ProjectPosition projectPosition1 = ProjectPosition.builder()
@@ -404,8 +437,8 @@ class ProjectParticipateControllerTest {
                     .state(false)
                     .creator(false)
                     .build();
-            ProjectPosition saveProjectPosition1 = projectPositionRepository.save(projectPosition1);
-            ProjectPosition saveProjectPosition2 = projectPositionRepository.save(projectPosition2);
+            ProjectPosition saveProjectPosition1 = projectPositionRepository.saveAndFlush(projectPosition1);
+            ProjectPosition saveProjectPosition2 = projectPositionRepository.saveAndFlush(projectPosition2);
 
             // 기술스택 세팅
             TechnicalStack technicalStack1 = TechnicalStack.builder()
@@ -415,8 +448,8 @@ class ProjectParticipateControllerTest {
                     .name("testTechnicalStack2")
                     .build();
 
-            technicalStackRepository.save(technicalStack1);
-            technicalStackRepository.save(technicalStack2);
+            technicalStackRepository.saveAndFlush(technicalStack1);
+            technicalStackRepository.saveAndFlush(technicalStack2);
 
             // 프로젝트 신청 세팅
             ProjectParticipateRequest projectParticipateRequest1 = ProjectParticipateRequest.builder()
@@ -433,8 +466,8 @@ class ProjectParticipateControllerTest {
                     .motive("testMotive2")
                     .build();
 
-            ProjectParticipateRequest saveProjectParticipateRequest1 = projectParticipateRequestRepository.save(projectParticipateRequest1);
-            ProjectParticipateRequest saveProjectParticipateRequest2 = projectParticipateRequestRepository.save(projectParticipateRequest2);
+            ProjectParticipateRequest saveProjectParticipateRequest1 = projectParticipateRequestRepository.saveAndFlush(projectParticipateRequest1);
+            ProjectParticipateRequest saveProjectParticipateRequest2 = projectParticipateRequestRepository.saveAndFlush(projectParticipateRequest2);
 
             // 프로젝트 신청 기술 스택 세팅
             ParticipateRequestTechnicalStack participateRequestTechnicalStack1 = ParticipateRequestTechnicalStack.builder()
@@ -975,6 +1008,7 @@ class ProjectParticipateControllerTest {
             List<ParticipateRequestTechnicalStack> participateRequestTechnicalStackRepositoryAll = participateRequestTechnicalStackRepository.findAll();
             Optional<ProjectParticipateRequest> projectParticipateRequest = projectParticipateRequestRepository.findById(saveProjectParticipateRequest1.getNo());
             ProjectPosition afterProjectPosition = projectPositionRepository.findById(saveProjectParticipateRequest1.getProjectPosition().getNo()).get();
+            List<Notification> notificationList = notificationRepository.findAll();
 
             assertEquals(afterProjectPosition.getUser().getNo(), saveUser2.getNo());
             assertEquals(afterProjectPosition.getUser().getName(), saveUser2.getName());
@@ -990,6 +1024,11 @@ class ProjectParticipateControllerTest {
             assertEquals(afterProjectPosition.getUser().isEmail_auth(), saveUser2.isEmail_auth());
             assertEquals(afterProjectPosition.getUser().getImageNo(), saveUser2.getImageNo());
             assertEquals(afterProjectPosition.getUser().getPosition(), saveUser2.getPosition());
+
+            assertEquals(notificationList.size(), 1);
+            assertEquals(notificationList.get(0).getType(), Type.PROJECT_PARTICIPATION_SUCCESS);
+            assertEquals(notificationList.get(0).getTitle(), "[프로젝트 신청 수락] " + saveProject1.getName());
+            assertEquals(notificationList.get(0).getContent(), saveProject1.getName() + " 프로젝트에 참가 완료되었습니다.");
 
             assertEquals(projectParticipateRequest.isEmpty(), true);
             assertEquals(participateRequestTechnicalStackRepositoryAll.size(), 0);
@@ -1276,10 +1315,10 @@ class ProjectParticipateControllerTest {
 
             // when
             String token = jwtTokenService.createToken(new TokenDto(saveUser1.getEmail()));
-
+            ProjectParticipateRefusalRequestDto projectParticipateRefusalRequestDto = new ProjectParticipateRefusalRequestDto("testReason");
             ResultActions resultActions = mvc.perform(post("/v1/participate/" + saveProjectParticipateRequest1.getNo() + "/refusal").contentType(MediaType.APPLICATION_JSON)
                     .header("Authorization", "Bearer " + token)
-                    .content(new ObjectMapper().registerModule(new JavaTimeModule()).writeValueAsString("testReason")));
+                    .content(new ObjectMapper().registerModule(new JavaTimeModule()).writeValueAsString(projectParticipateRefusalRequestDto)));
 
             // then
             resultActions
@@ -1291,6 +1330,13 @@ class ProjectParticipateControllerTest {
 
             List<ParticipateRequestTechnicalStack> participateRequestTechnicalStackRepositoryAll = participateRequestTechnicalStackRepository.findAll();
             Optional<ProjectParticipateRequest> projectParticipateRequest = projectParticipateRequestRepository.findById(saveProjectParticipateRequest1.getNo());
+            List<Notification> notificationList = notificationRepository.findAll();
+
+            assertEquals(notificationList.size(), 1);
+            assertEquals(notificationList.get(0).getType(), Type.PROJECT_PARTICIPATION_REFUSE);
+            assertEquals(notificationList.get(0).getTitle(), "[프로젝트 신청 거절] " + saveProject1.getName());
+            assertEquals(notificationList.get(0).getContent(), saveProject1.getName() + " 프로젝트에 참가 신청이 거절되었습니다.\n"
+                    + "거부사유 : " + projectParticipateRefusalRequestDto.getReason());
 
             assertEquals(projectParticipateRequest.isEmpty(), true);
             assertEquals(participateRequestTechnicalStackRepositoryAll.size(), 0);

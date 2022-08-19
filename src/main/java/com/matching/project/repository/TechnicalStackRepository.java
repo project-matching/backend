@@ -11,9 +11,10 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Collection;
+import java.util.Optional;
 
 public interface TechnicalStackRepository extends JpaRepository<TechnicalStack, Long> {
-    public List<TechnicalStack> findByNoIn(Collection<Long> noList);
+    public Optional<List<TechnicalStack>> findByNoIn(Collection<Long> noList);
 
-    public List<TechnicalStack> findByNameIn(Collection<String> nameList);
+    public Optional<List<TechnicalStack>> findByNameIn(Collection<String> nameList);
 }

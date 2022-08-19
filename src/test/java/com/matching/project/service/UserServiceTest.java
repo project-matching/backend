@@ -8,6 +8,7 @@ import com.matching.project.dto.enumerate.UserFilter;
 import com.matching.project.dto.user.*;
 import com.matching.project.entity.*;
 import com.matching.project.error.CustomException;
+import com.matching.project.error.ErrorCode;
 import com.matching.project.repository.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -245,7 +246,7 @@ class UserServiceTest {
             });
 
             //then
-            assertThat(e.getErrorCode().getDetail()).isEqualTo("Not Find User No");
+            assertThat(e.getErrorCode().getDetail()).isEqualTo(ErrorCode.NOT_FIND_USER_EXCEPTION.getDetail());
         }
 
     }
@@ -313,7 +314,7 @@ class UserServiceTest {
             });
 
             //then
-            assertThat(e.getErrorCode().getDetail()).isEqualTo("Not Find User No");
+            assertThat(e.getErrorCode().getDetail()).isEqualTo(ErrorCode.NOT_FIND_USER_EXCEPTION.getDetail());
         }
 
     }
@@ -412,7 +413,7 @@ class UserServiceTest {
             given(positionRepository.findAllByName(newPosition)).willReturn(Optional.ofNullable(p));
             given(technicalStackRepository.findAll()).willReturn(technicalStacks);
             given(imageService.imageUpload(file, 56, 56)).willReturn(imageNo);
-            given(userTechnicalStackRepository.findUserTechnicalStacksByUser(no)).willReturn(userTechnicalStackList);
+            given(userTechnicalStackRepository.findUserTechnicalStacksByUser(no)).willReturn(Optional.of(userTechnicalStackList));
             given(userRepository.findById(user.get().getNo())).willReturn(user);
 
             //when
@@ -577,7 +578,7 @@ class UserServiceTest {
 
             UserFilterDto userFilterDto = UserFilterDto.builder().userFilter(UserFilter.NAME).content("테스터").build();
 
-            given(userRepositoryCustom.findByNoOrderByNoDescUsingQueryDsl(UserNo, userFilterDto, pageable)).willReturn(users);
+            given(userRepositoryCustom.findByNoOrderByNoDescUsingQueryDsl(UserNo, userFilterDto, pageable)).willReturn(Optional.of(users));
 
             //when
             SliceDto<UserSimpleInfoDto> dtoList = userService.userInfoList(UserNo, userFilterDto, pageable);
@@ -655,7 +656,7 @@ class UserServiceTest {
             userTechnicalStackList.add(UserTechnicalStack.builder().no(1L).user(user.get()).technicalStack(technicalStack2).build());
 
             given(imageService.getImageUrl(user.get().getImageNo())).willReturn(profile.getUrl());
-            given(userTechnicalStackRepository.findUserTechnicalStacksByUser(no)).willReturn(userTechnicalStackList);
+            given(userTechnicalStackRepository.findUserTechnicalStacksByUser(no)).willReturn(Optional.of(userTechnicalStackList));
             given(imageService.getImageUrl(2L)).willReturn(tech2.getUrl());
             given(userRepository.findByNoWithPositionUsingLeftFetchJoin(user.get().getNo())).willReturn(user);
 

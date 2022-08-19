@@ -181,7 +181,7 @@ class NotificationServiceImplTest {
             Slice<Notification> notifications = new SliceImpl<>(notificationList.subList(start, end), pageable, hasNext);
 
             given(notificationRepository.findByUserOrUserIsNullOrderByNoDescUsingPaging(user, notificationNo, pageable))
-                    .willReturn(notifications);
+                    .willReturn(Optional.of(notifications));
             given(userRepository.findById(user.getNo())).willReturn(Optional.ofNullable(user));
 
             //when
