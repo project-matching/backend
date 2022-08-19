@@ -27,9 +27,10 @@ public class TechnicalStackController {
         return ResponseEntity.ok(new ResponseDto<>(null, technicalStackService.findTechnicalStackRegisterForm()));
     }
 
-    @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
-    @ApiOperation(value = "기술스택 추가")
-    public ResponseEntity<ResponseDto<Boolean>> technicalStackRegister(@RequestPart("data") @Valid TechnicalStackRegisterRequestDto technicalStackRegisterDto, @RequestPart(value = "image", required = false) MultipartFile image) throws Exception {
+    @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    @ApiOperation(value = "기술스택 추가", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ResponseDto<Boolean>> technicalStackRegister(@Valid TechnicalStackRegisterRequestDto technicalStackRegisterDto,
+                                                                       @RequestPart(value = "image", required = false) MultipartFile image) throws Exception {
         return ResponseEntity.ok(new ResponseDto<>(null, technicalStackService.technicalStackRegister(technicalStackRegisterDto.getTechnicalStackName(), image)));
     }
 

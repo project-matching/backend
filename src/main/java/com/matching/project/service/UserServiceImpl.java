@@ -222,7 +222,7 @@ public class UserServiceImpl implements UserService{
 
         // Delete existing images & New Image Upload
         Long imageNo = null;
-        if (!file.isEmpty()) {
+        if (file != null && !file.isEmpty()) {
             // Delete existing images
             if (user.getImageNo() != null)
                 imageService.imageDelete(user.getImageNo());

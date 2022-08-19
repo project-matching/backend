@@ -22,6 +22,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -90,11 +91,10 @@ public class UserController {
         return ResponseEntity.ok(new ResponseDto<>(null, userProfileInfoResponseDto));
     }
 
-    @PatchMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
-    @ApiOperation(value = "개인정보 변경")
-    public ResponseEntity<ResponseDto<Boolean>> userProfileUpdate(
-            @RequestPart("data") @Valid UserUpdateRequestDto userUpdateRequestDto,
-            @RequestPart("image") MultipartFile file) {
+    @PatchMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    @ApiOperation(value = "개인정보 변경", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ResponseDto<Boolean>> userProfileUpdate(@Valid UserUpdateRequestDto userUpdateRequestDto,
+                                                                  @RequestPart(value = "image", required = false) MultipartFile file) {
         User user = userService.userUpdate(userUpdateRequestDto, file);
         return ResponseEntity.ok(new ResponseDto<>(null, true));
     }

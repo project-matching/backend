@@ -210,15 +210,14 @@ class TechnicalStackControllerTest {
             User saveAdminUser1 = userRepository.save(adminUser1);
 
             // when
-            TechnicalStackRegisterRequestDto technicalStackRegisterDto = new TechnicalStackRegisterRequestDto("technicalStackName");
+            String technicalStackName = "Spring";
             MockMultipartFile image = new MockMultipartFile("image", "image.jpeg", MediaType.IMAGE_JPEG_VALUE, "".getBytes(StandardCharsets.UTF_8));
-            MockMultipartFile data = new MockMultipartFile("data", "", MediaType.APPLICATION_JSON_VALUE, new ObjectMapper().writeValueAsString(technicalStackRegisterDto).getBytes());
 
             String token = jwtTokenService.createToken(new TokenDto(saveAdminUser1.getEmail()));
 
             ResultActions resultActions = mvc.perform(multipart("/v1/technicalStack")
                     .file(image)
-                    .file(data)
+                    .param("technicalStackName", technicalStackName)
                     .with(requestProcessor -> {
                         requestProcessor.setMethod("POST");
                         return requestProcessor;
@@ -235,7 +234,7 @@ class TechnicalStackControllerTest {
 
             List<TechnicalStack> technicalStackList = technicalStackRepository.findAll();
 
-            assertEquals(technicalStackList.get(0).getName(), technicalStackRegisterDto.getTechnicalStackName());
+            assertEquals(technicalStackList.get(0).getName(), technicalStackName);
             assertEquals(technicalStackList.get(0).getImageNo(), null);
         }
 
