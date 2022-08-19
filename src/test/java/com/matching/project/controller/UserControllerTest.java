@@ -421,10 +421,10 @@ public class UserControllerTest {
             assertThat(resUser.getPosition().getName()).isEqualTo(nPosition);
             assertThat(resUser.getGithub()).isEqualTo(nGithub);
             assertThat(resUser.getSelfIntroduction()).isEqualTo(nSelfIntroduction);
-            List<UserTechnicalStack> ust = userTechnicalStackRepository.findUserTechnicalStacksByUser(resUser.getNo());
-            assertThat(ust.get(0).getTechnicalStack().getName()).isEqualTo("Spring");
-            assertThat(ust.get(1).getTechnicalStack().getName()).isEqualTo("React");
-            assertThat(ust.get(2).getTechnicalStack().getName()).isEqualTo("JPA");
+            Optional<List<UserTechnicalStack>> ust = userTechnicalStackRepository.findUserTechnicalStacksByUser(resUser.getNo());
+            assertThat(ust.get().get(0).getTechnicalStack().getName()).isEqualTo("Spring");
+            assertThat(ust.get().get(1).getTechnicalStack().getName()).isEqualTo("React");
+            assertThat(ust.get().get(2).getTechnicalStack().getName()).isEqualTo("JPA");
         }
 
         @DisplayName("실패")
