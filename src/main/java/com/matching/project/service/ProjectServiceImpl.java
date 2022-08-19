@@ -9,6 +9,7 @@ import com.matching.project.dto.projectposition.ProjectPositionAddDto;
 import com.matching.project.dto.projectposition.ProjectPositionDeleteDto;
 import com.matching.project.dto.projectposition.ProjectPositionRegisterDto;
 import com.matching.project.dto.projectposition.ProjectPositionUpdateFormDto;
+import com.matching.project.dto.user.ProjectRegisterUserDto;
 import com.matching.project.dto.user.ProjectUpdateFormUserDto;
 import com.matching.project.dto.user.UserDto;
 import com.matching.project.entity.*;
@@ -99,7 +100,9 @@ public class ProjectServiceImpl implements ProjectService {
 
         for (ProjectPositionRegisterDto projectPositionRegisterDto : projectPositionRegisterDtoList) {
             ProjectPosition projectPosition = null;
-            if (projectPositionRegisterDto.getProjectRegisterUserDto() != null) {
+            ProjectRegisterUserDto projectRegisterUserDto = projectPositionRegisterDto.getProjectRegisterUserDto();
+
+            if (projectRegisterUserDto != null && projectRegisterUserDto.getNo() != null) {
                 projectPosition = ProjectPosition.builder()
                         .state(true)
                         .position(positionList.stream().filter(position -> position.getNo().equals(projectPositionRegisterDto.getPositionNo())).findAny().orElseThrow())
