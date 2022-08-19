@@ -11,6 +11,7 @@ import com.matching.project.dto.user.*;
 import com.matching.project.entity.*;
 import com.matching.project.repository.*;
 import com.matching.project.service.EmailService;
+import com.matching.project.service.ImageService;
 import com.matching.project.service.JwtTokenService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -68,6 +69,9 @@ public class UserControllerTest {
 
     @Autowired
     ImageRepository imageRepository;
+
+    @Autowired
+    ImageService imageService;;
 
     @Autowired
     EmailService emailService;
@@ -505,12 +509,15 @@ public class UserControllerTest {
             resultActions.andDo(print())
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.data.content.[0].userNo").value(user4.getNo()))
+                    .andExpect(jsonPath("$.data.content.[0].image").value(imageService.getImageUrl(user4.getImageNo())))
                     .andExpect(jsonPath("$.data.content.[0].name").value(user4.getName()))
                     .andExpect(jsonPath("$.data.content.[0].email").value(user4.getEmail()))
                     .andExpect(jsonPath("$.data.content.[1].userNo").value(user3.getNo()))
+                    .andExpect(jsonPath("$.data.content.[1].image").value(imageService.getImageUrl(user3.getImageNo())))
                     .andExpect(jsonPath("$.data.content.[1].name").value(user3.getName()))
                     .andExpect(jsonPath("$.data.content.[1].email").value(user3.getEmail()))
                     .andExpect(jsonPath("$.data.content.[2].userNo").value(user2.getNo()))
+                    .andExpect(jsonPath("$.data.content.[2].image").value(imageService.getImageUrl(user2.getImageNo())))
                     .andExpect(jsonPath("$.data.content.[2].name").value(user2.getName()))
                     .andExpect(jsonPath("$.data.content.[2].email").value(user2.getEmail()))
                     .andExpect(jsonPath("$.data.last").value(false));

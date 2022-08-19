@@ -21,22 +21,8 @@ import java.util.stream.Collectors;
 public class PositionServiceImpl implements PositionService {
     private final PositionRepository positionRepository;
 
-    private User getAuthenticatedUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Object principal = authentication.getPrincipal();
-
-        User user = null;
-        if (principal instanceof User)
-            user = (User)principal;
-        else
-            throw new CustomException(ErrorCode.GET_USER_AUTHENTICATION_EXCEPTION);
-        return user;
-    }
-
     @Override
     public List<PositionRegisterFormResponseDto> positionList() {
-        User user = getAuthenticatedUser();
-
         List<Position> positionList = positionRepository.findAll();
         return positionList.stream()
                 .map(PositionRegisterFormResponseDto::toPositionRegisterFormResponseDto)
@@ -45,8 +31,6 @@ public class PositionServiceImpl implements PositionService {
 
     @Override
     public Position positionRegister(String positionName) {
-        User user = getAuthenticatedUser();
-
         Optional<Position> optionalPosition = positionRepository.findAllByName(positionName);
         if (optionalPosition.isPresent())
             throw new CustomException(ErrorCode.ALREADY_REGISTERED_POSITION_EXCEPTION);
@@ -62,8 +46,6 @@ public class PositionServiceImpl implements PositionService {
     @Override
     @Transactional
     public Position positionUpdate(Long positionNo, String updatePositionName) {
-        User user = getAuthenticatedUser();
-
         Optional<Position> optionalPosition = positionRepository.findById(positionNo);
         if (optionalPosition.isEmpty())
             throw new CustomException(ErrorCode.UNREGISTERED_POSITION_EXCEPTION);

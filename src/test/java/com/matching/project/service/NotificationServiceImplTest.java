@@ -182,6 +182,7 @@ class NotificationServiceImplTest {
 
             given(notificationRepository.findByUserOrUserIsNullOrderByNoDescUsingPaging(user, notificationNo, pageable))
                     .willReturn(notifications);
+            given(userRepository.findById(user.getNo())).willReturn(Optional.ofNullable(user));
 
             //when
             SliceDto<NotificationSimpleInfoDto> dtos = notificationService.notificationList(notificationNo, pageable);
