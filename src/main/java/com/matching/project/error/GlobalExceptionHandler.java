@@ -141,6 +141,15 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return ErrorResponse.toResponseEntity(errorCode);
     }
 
+    @ExceptionHandler(value = {IllegalArgumentException.class})
+    protected ResponseEntity handleIllegalArgumentException(IllegalArgumentException e) {
+        HttpServletRequest httpServletRequest =
+                ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+        ErrorCode errorCode = ErrorCode.ILLEGAL_ARGUMENT_EXCEPTION;
+        log.error("IllegalArgumentException : {} {}:{} ({}) -> {}", httpServletRequest.getMethod(), httpServletRequest.getRemoteHost(), httpServletRequest.getRemotePort(), errorCode.getHttpStatus().value(), errorCode.getDetail());
+        return ErrorResponse.toResponseEntity(errorCode);
+    }
+
     @ExceptionHandler(value = {CustomException.class})
     protected ResponseEntity handleCustomException(CustomException e) {
         ErrorCode errorCode = e.getErrorCode();
