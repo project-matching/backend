@@ -150,6 +150,15 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return ErrorResponse.toResponseEntity(errorCode);
     }
 
+    @ExceptionHandler(value = {ClassCastException.class})
+    protected ResponseEntity handleClassCastException(ClassCastException e) {
+        HttpServletRequest httpServletRequest =
+                ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+        ErrorCode errorCode = ErrorCode.CLASS_CAST_EXCEPTION;
+        log.error("ClassCastException : {} {}:{} ({}) -> {}", httpServletRequest.getMethod(), httpServletRequest.getRemoteHost(), httpServletRequest.getRemotePort(), errorCode.getHttpStatus().value(), errorCode.getDetail());
+        return ErrorResponse.toResponseEntity(errorCode);
+    }
+
     @ExceptionHandler(value = {CustomException.class})
     protected ResponseEntity handleCustomException(CustomException e) {
         ErrorCode errorCode = e.getErrorCode();

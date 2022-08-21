@@ -28,6 +28,7 @@ public enum ErrorCode {
     NULL_POINTER_EXCEPTION(INTERNAL_SERVER_ERROR, "NullPointerException"),
     ARRAY_INDEX_OUT_OF_BOUNDS_EXCEPTION(INTERNAL_SERVER_ERROR, "ArrayIndexOutOfBoundsException"),
     ILLEGAL_ARGUMENT_EXCEPTION(INTERNAL_SERVER_ERROR, "IllegalArgumentException"),
+    CLASS_CAST_EXCEPTION(INTERNAL_SERVER_ERROR, "ClassCastException"),
 
     //Common
     INCORRECT_PASSWORD_EXCEPTION(INTERNAL_SERVER_ERROR, "This is an incorrect password"),
