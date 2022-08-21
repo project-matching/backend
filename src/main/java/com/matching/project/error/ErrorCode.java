@@ -9,16 +9,6 @@ import static org.springframework.http.HttpStatus.*;
 @Getter
 @AllArgsConstructor
 public enum ErrorCode {
-    //SQLException
-    DATA_ACCESS_EXCEPTION(INTERNAL_SERVER_ERROR, "DataAccessException"),
-    BAD_SQL_GRAMMAR_EXCEPTION(INTERNAL_SERVER_ERROR, "BadSqlException"),
-    INVALID_RESULT_SET_ACCESS_EXCEPTION(INTERNAL_SERVER_ERROR, "InvalidResultSetAccessException"),
-    DUPLICATE_KEY_EXCEPTION(INTERNAL_SERVER_ERROR, "DuplicateKeyException"),
-    DATA_INTEGRITY_VIOLATION_EXCEPTION(INTERNAL_SERVER_ERROR, "DataIntegrityViolationException"),
-    DATA_ACCESS_RESOURCE_FAILURE_EXCEPTION(INTERNAL_SERVER_ERROR, "DataAccessResourceFailureException"),
-    CANNOT_ACQUIRE_LOCK_EXCEPTION(INTERNAL_SERVER_ERROR, "CannotAcquireLockException"),
-    DEADLOCK_LOSER_DATA_ACCESS_EXCEPTION(INTERNAL_SERVER_ERROR, "DeadlockLoserDataAccessException"),
-    CANNOT_SERIALIZE_TRANSACTION_EXCEPTION(INTERNAL_SERVER_ERROR, "CannotSerializeTransactionException"),
 
     METHOD_ARGUMENT_EXCEPTION(BAD_REQUEST, "잘못된 REQUEST 인자입니다."),
     BIND_EXCEPTION(BAD_REQUEST, "바인딩이 실패하였습니다."),

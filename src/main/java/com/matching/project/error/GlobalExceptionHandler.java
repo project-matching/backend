@@ -3,14 +3,11 @@ package com.matching.project.error;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.ConversionNotSupportedException;
 import org.springframework.beans.TypeMismatchException;
-import org.springframework.dao.*;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.converter.HttpMessageNotWritableException;
-import org.springframework.jdbc.BadSqlGrammarException;
-import org.springframework.jdbc.InvalidResultSetAccessException;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.HttpMediaTypeNotAcceptableException;
@@ -34,7 +31,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolationException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.sql.SQLException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -71,49 +67,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
         log.error("BindError : {} {}:{} ({}) -> {}", httpServletRequest.getMethod(), httpServletRequest.getRemoteHost(), httpServletRequest.getRemotePort(), ErrorCode.METHOD_ARGUMENT_EXCEPTION.getHttpStatus().value(), valid );
         return ErrorResponse.toResponseEntity(ErrorCode.BIND_EXCEPTION ,ex.getBindingResult());
-    }
-
-    @ExceptionHandler(value = {DataAccessException.class})
-    protected ResponseEntity handleDataAccessException(DataAccessException e) {
-        HttpServletRequest httpServletRequest =
-                ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
-        if (e instanceof BadSqlGrammarException) {
-            SQLException se = ((BadSqlGrammarException) e).getSQLException();
-            log.error("BadSqlGrammarException : {} {}:{} ({}) -> {}", httpServletRequest.getMethod(), httpServletRequest.getRemoteHost(), httpServletRequest.getRemotePort(), ErrorCode.METHOD_ARGUMENT_EXCEPTION.getHttpStatus().value(), se.getMessage() );
-            return ErrorResponse.toResponseEntity(ErrorCode.BAD_SQL_GRAMMAR_EXCEPTION);
-        }
-        else if (e instanceof InvalidResultSetAccessException) {
-            SQLException se = ((InvalidResultSetAccessException) e).getSQLException();
-            log.error("InvalidResultSetAccessException : {} {}:{} ({}) -> {}", httpServletRequest.getMethod(), httpServletRequest.getRemoteHost(), httpServletRequest.getRemotePort(), ErrorCode.METHOD_ARGUMENT_EXCEPTION.getHttpStatus().value(), se.getMessage() );
-            return ErrorResponse.toResponseEntity(ErrorCode.INVALID_RESULT_SET_ACCESS_EXCEPTION);
-        }
-        else if (e instanceof DuplicateKeyException) {
-            log.error("InvalidResultSetAccessException : {} {}:{} ({}) -> {}", httpServletRequest.getMethod(), httpServletRequest.getRemoteHost(), httpServletRequest.getRemotePort(), ErrorCode.METHOD_ARGUMENT_EXCEPTION.getHttpStatus().value(), e.getMessage() );
-            return ErrorResponse.toResponseEntity(ErrorCode.DUPLICATE_KEY_EXCEPTION);
-        }
-        else if (e instanceof DataIntegrityViolationException) {
-            log.error("DataIntegrityViolationException : {} {}:{} ({}) -> {}", httpServletRequest.getMethod(), httpServletRequest.getRemoteHost(), httpServletRequest.getRemotePort(), ErrorCode.METHOD_ARGUMENT_EXCEPTION.getHttpStatus().value(), e.getMessage() );
-            return ErrorResponse.toResponseEntity(ErrorCode.DATA_INTEGRITY_VIOLATION_EXCEPTION);
-        }
-        else if (e instanceof DataAccessResourceFailureException) {
-            log.error("DataAccessResourceFailureException : {} {}:{} ({}) -> {}", httpServletRequest.getMethod(), httpServletRequest.getRemoteHost(), httpServletRequest.getRemotePort(), ErrorCode.METHOD_ARGUMENT_EXCEPTION.getHttpStatus().value(), e.getMessage() );
-            return ErrorResponse.toResponseEntity(ErrorCode.DATA_ACCESS_RESOURCE_FAILURE_EXCEPTION);
-        }
-        else if (e instanceof CannotAcquireLockException) {
-            log.error("CannotAcquireLockException : {} {}:{} ({}) -> {}", httpServletRequest.getMethod(), httpServletRequest.getRemoteHost(), httpServletRequest.getRemotePort(), ErrorCode.METHOD_ARGUMENT_EXCEPTION.getHttpStatus().value(), e.getMessage() );
-            return ErrorResponse.toResponseEntity(ErrorCode.CANNOT_ACQUIRE_LOCK_EXCEPTION);
-        }
-        else if (e instanceof DeadlockLoserDataAccessException) {
-            log.error("DeadlockLoserDataAccessException : {} {}:{} ({}) -> {}", httpServletRequest.getMethod(), httpServletRequest.getRemoteHost(), httpServletRequest.getRemotePort(), ErrorCode.METHOD_ARGUMENT_EXCEPTION.getHttpStatus().value(), e.getMessage() );
-            return ErrorResponse.toResponseEntity(ErrorCode.DEADLOCK_LOSER_DATA_ACCESS_EXCEPTION);
-        }
-        else if (e instanceof CannotSerializeTransactionException) {
-            log.error("CannotSerializeTransactionException : {} {}:{} ({}) -> {}", httpServletRequest.getMethod(), httpServletRequest.getRemoteHost(), httpServletRequest.getRemotePort(), ErrorCode.METHOD_ARGUMENT_EXCEPTION.getHttpStatus().value(), e.getMessage() );
-            return ErrorResponse.toResponseEntity(ErrorCode.CANNOT_SERIALIZE_TRANSACTION_EXCEPTION);
-        } else {
-            log.error("DataAccessException : {} {}:{} ({}) -> {}", httpServletRequest.getMethod(), httpServletRequest.getRemoteHost(), httpServletRequest.getRemotePort(), ErrorCode.METHOD_ARGUMENT_EXCEPTION.getHttpStatus().value(), e.getMessage() );
-            return ErrorResponse.toResponseEntity(ErrorCode.DATA_ACCESS_EXCEPTION);
-        }
     }
 
     @ExceptionHandler(value = {CustomException.class})
