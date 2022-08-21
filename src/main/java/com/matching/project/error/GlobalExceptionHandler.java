@@ -116,6 +116,14 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         }
     }
 
+    @ExceptionHandler(value = {NullPointerException.class})
+    protected ResponseEntity handleCustomException(NullPointerException e) {
+        HttpServletRequest httpServletRequest =
+                ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+        log.error("NullPointerException : {} {}:{} ({}) -> {}", httpServletRequest.getMethod(), httpServletRequest.getRemoteHost(), httpServletRequest.getRemotePort(), ErrorCode.NULL_POINTER_EXCEPTION.getHttpStatus().value(), e.getMessage() );
+        return ErrorResponse.toResponseEntity(ErrorCode.NULL_POINTER_EXCEPTION);
+    }
+
     @ExceptionHandler(value = {CustomException.class})
     protected ResponseEntity handleCustomException(CustomException e) {
         ErrorCode errorCode = e.getErrorCode();

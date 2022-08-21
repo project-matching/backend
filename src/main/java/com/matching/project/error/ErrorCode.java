@@ -23,6 +23,7 @@ public enum ErrorCode {
     METHOD_ARGUMENT_EXCEPTION(BAD_REQUEST, "잘못된 REQUEST 인자입니다."),
     BIND_EXCEPTION(BAD_REQUEST, "바인딩이 실패하였습니다."),
     POSITION_NO_SUCH_ELEMENT_EXCEPTION(INTERNAL_SERVER_ERROR, "잘못된 포지션"),
+    NULL_POINTER_EXCEPTION(INTERNAL_SERVER_ERROR, "NullPointerException"),
 
     //Common
     INCORRECT_PASSWORD_EXCEPTION(INTERNAL_SERVER_ERROR, "This is an incorrect password"),
