@@ -73,6 +73,16 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return ErrorResponse.toResponseEntity(ErrorCode.BIND_EXCEPTION ,ex.getBindingResult());
     }
 
+    /**
+     * BadSqlGrammarException : 잘못된 SQL문법일 경우 예외
+     * InvalidResultSetAccessException : 잘못된 방식으로 ResultSet에 액세스한 경우 예외
+     * DuplicateKeyException : 이미 사용된 키를 사용하여 추가하려고할 경우 예외
+     * DataIntegrityViolationException : 잘못된 데이터가 바인딩될 경우 예외
+     * DataAccessResourceFailureException : 리소스가 완전히 실패할 경우 예외
+     * CannotAcquireLockException : Lock을 얻지 못해 발생하는 예외
+     * DeadlockLoserDataAccessException : 현재 프로세스가 교착 상태여서 실패할 경우 발생하는 예외
+     * CannotSerializeTransactionException : 트랙잭션을 완료하지 못할경우 예외
+     */
     @ExceptionHandler(value = {DataAccessException.class})
     protected ResponseEntity handleDataAccessException(DataAccessException e) {
         HttpServletRequest httpServletRequest =
@@ -123,6 +133,9 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         }
     }
 
+    /**
+     * NullPointerException : Null인 값을 호출할 경우 발생하는 예외
+     */
     @ExceptionHandler(value = {NullPointerException.class})
     protected ResponseEntity handleNullPointerException(NullPointerException e) {
         HttpServletRequest httpServletRequest =
@@ -132,6 +145,9 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return ErrorResponse.toResponseEntity(errorCode);
     }
 
+    /**
+     * ArrayIndexOutOfBoundsException : 배열의 크기보다 크거나 음수 인덱스에 대한 요청이 있는 경우 발생하는 예외
+     */
     @ExceptionHandler(value = {ArrayIndexOutOfBoundsException.class})
     protected ResponseEntity handleArrayIndexOutOfBoundsException(ArrayIndexOutOfBoundsException e) {
         HttpServletRequest httpServletRequest =
@@ -141,6 +157,9 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return ErrorResponse.toResponseEntity(errorCode);
     }
 
+    /**
+     * IllegalArgumentException : 적합하지 않거나 적절하지 못한 인자를 메소드에 넘겨주었을 때 발생하는 예외
+     */
     @ExceptionHandler(value = {IllegalArgumentException.class})
     protected ResponseEntity handleIllegalArgumentException(IllegalArgumentException e) {
         HttpServletRequest httpServletRequest =
@@ -150,6 +169,9 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return ErrorResponse.toResponseEntity(errorCode);
     }
 
+    /**
+     * ClassCastException : 코드가 하위 유형이 아닌 유형에 대한 참조를 캐스팅하려고 시도할 경우 발생하는 예외
+     */
     @ExceptionHandler(value = {ClassCastException.class})
     protected ResponseEntity handleClassCastException(ClassCastException e) {
         HttpServletRequest httpServletRequest =
