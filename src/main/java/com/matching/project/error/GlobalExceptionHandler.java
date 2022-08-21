@@ -78,50 +78,58 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         HttpServletRequest httpServletRequest =
                 ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
         if (e instanceof BadSqlGrammarException) {
-            SQLException se = ((BadSqlGrammarException) e).getSQLException();
-            log.error("BadSqlGrammarException : {} {}:{} ({}) -> {}", httpServletRequest.getMethod(), httpServletRequest.getRemoteHost(), httpServletRequest.getRemotePort(), ErrorCode.BAD_SQL_GRAMMAR_EXCEPTION.getHttpStatus().value(), se.getMessage() );
-            return ErrorResponse.toResponseEntity(ErrorCode.BAD_SQL_GRAMMAR_EXCEPTION);
+            ErrorCode errorCode = ErrorCode.BAD_SQL_GRAMMAR_EXCEPTION;
+            log.error("BadSqlGrammarException : {} {}:{} ({}) -> {}", httpServletRequest.getMethod(), httpServletRequest.getRemoteHost(), httpServletRequest.getRemotePort(), errorCode.getHttpStatus().value(), errorCode.getDetail());
+            return ErrorResponse.toResponseEntity(errorCode);
         }
         else if (e instanceof InvalidResultSetAccessException) {
-            SQLException se = ((InvalidResultSetAccessException) e).getSQLException();
-            log.error("InvalidResultSetAccessException : {} {}:{} ({}) -> {}", httpServletRequest.getMethod(), httpServletRequest.getRemoteHost(), httpServletRequest.getRemotePort(), ErrorCode.INVALID_RESULT_SET_ACCESS_EXCEPTION.getHttpStatus().value(), se.getMessage() );
-            return ErrorResponse.toResponseEntity(ErrorCode.INVALID_RESULT_SET_ACCESS_EXCEPTION);
+            ErrorCode errorCode = ErrorCode.INVALID_RESULT_SET_ACCESS_EXCEPTION;
+            log.error("InvalidResultSetAccessException : {} {}:{} ({}) -> {}", httpServletRequest.getMethod(), httpServletRequest.getRemoteHost(), httpServletRequest.getRemotePort(), errorCode.getHttpStatus().value(), errorCode.getDetail());
+            return ErrorResponse.toResponseEntity(errorCode);
         }
         else if (e instanceof DuplicateKeyException) {
-            log.error("InvalidResultSetAccessException : {} {}:{} ({}) -> {}", httpServletRequest.getMethod(), httpServletRequest.getRemoteHost(), httpServletRequest.getRemotePort(), ErrorCode.DUPLICATE_KEY_EXCEPTION.getHttpStatus().value(), e.getMessage() );
-            return ErrorResponse.toResponseEntity(ErrorCode.DUPLICATE_KEY_EXCEPTION);
+            ErrorCode errorCode = ErrorCode.DUPLICATE_KEY_EXCEPTION;
+            log.error("InvalidResultSetAccessException : {} {}:{} ({}) -> {}", httpServletRequest.getMethod(), httpServletRequest.getRemoteHost(), httpServletRequest.getRemotePort(), errorCode.getHttpStatus().value(), errorCode.getDetail());
+            return ErrorResponse.toResponseEntity(errorCode);
         }
         else if (e instanceof DataIntegrityViolationException) {
-            log.error("DataIntegrityViolationException : {} {}:{} ({}) -> {}", httpServletRequest.getMethod(), httpServletRequest.getRemoteHost(), httpServletRequest.getRemotePort(), ErrorCode.DATA_INTEGRITY_VIOLATION_EXCEPTION.getHttpStatus().value(), e.getMessage() );
-            return ErrorResponse.toResponseEntity(ErrorCode.DATA_INTEGRITY_VIOLATION_EXCEPTION);
+            ErrorCode errorCode = ErrorCode.DATA_INTEGRITY_VIOLATION_EXCEPTION;
+            log.error("DataIntegrityViolationException : {} {}:{} ({}) -> {}", httpServletRequest.getMethod(), httpServletRequest.getRemoteHost(), httpServletRequest.getRemotePort(), errorCode.getHttpStatus().value(), errorCode.getDetail());
+            return ErrorResponse.toResponseEntity(errorCode);
         }
         else if (e instanceof DataAccessResourceFailureException) {
-            log.error("DataAccessResourceFailureException : {} {}:{} ({}) -> {}", httpServletRequest.getMethod(), httpServletRequest.getRemoteHost(), httpServletRequest.getRemotePort(), ErrorCode.DATA_ACCESS_RESOURCE_FAILURE_EXCEPTION.getHttpStatus().value(), e.getMessage() );
-            return ErrorResponse.toResponseEntity(ErrorCode.DATA_ACCESS_RESOURCE_FAILURE_EXCEPTION);
+            ErrorCode errorCode = ErrorCode.DATA_ACCESS_RESOURCE_FAILURE_EXCEPTION;
+            log.error("DataAccessResourceFailureException : {} {}:{} ({}) -> {}", httpServletRequest.getMethod(), httpServletRequest.getRemoteHost(), httpServletRequest.getRemotePort(), errorCode.getHttpStatus().value(), errorCode.getDetail());
+            return ErrorResponse.toResponseEntity(errorCode);
         }
         else if (e instanceof CannotAcquireLockException) {
-            log.error("CannotAcquireLockException : {} {}:{} ({}) -> {}", httpServletRequest.getMethod(), httpServletRequest.getRemoteHost(), httpServletRequest.getRemotePort(), ErrorCode.CANNOT_ACQUIRE_LOCK_EXCEPTION.getHttpStatus().value(), e.getMessage() );
-            return ErrorResponse.toResponseEntity(ErrorCode.CANNOT_ACQUIRE_LOCK_EXCEPTION);
+            ErrorCode errorCode = ErrorCode.CANNOT_ACQUIRE_LOCK_EXCEPTION;
+            log.error("CannotAcquireLockException : {} {}:{} ({}) -> {}", httpServletRequest.getMethod(), httpServletRequest.getRemoteHost(), httpServletRequest.getRemotePort(), errorCode.getHttpStatus().value(), errorCode.getDetail());
+            return ErrorResponse.toResponseEntity(errorCode);
         }
         else if (e instanceof DeadlockLoserDataAccessException) {
-            log.error("DeadlockLoserDataAccessException : {} {}:{} ({}) -> {}", httpServletRequest.getMethod(), httpServletRequest.getRemoteHost(), httpServletRequest.getRemotePort(), ErrorCode.DEADLOCK_LOSER_DATA_ACCESS_EXCEPTION.getHttpStatus().value(), e.getMessage() );
-            return ErrorResponse.toResponseEntity(ErrorCode.DEADLOCK_LOSER_DATA_ACCESS_EXCEPTION);
+            ErrorCode errorCode = ErrorCode.DEADLOCK_LOSER_DATA_ACCESS_EXCEPTION;
+            log.error("DeadlockLoserDataAccessException : {} {}:{} ({}) -> {}", httpServletRequest.getMethod(), httpServletRequest.getRemoteHost(), httpServletRequest.getRemotePort(), errorCode.getHttpStatus().value(), errorCode.getDetail());
+            return ErrorResponse.toResponseEntity(errorCode);
         }
         else if (e instanceof CannotSerializeTransactionException) {
-            log.error("CannotSerializeTransactionException : {} {}:{} ({}) -> {}", httpServletRequest.getMethod(), httpServletRequest.getRemoteHost(), httpServletRequest.getRemotePort(), ErrorCode.CANNOT_SERIALIZE_TRANSACTION_EXCEPTION.getHttpStatus().value(), e.getMessage() );
-            return ErrorResponse.toResponseEntity(ErrorCode.CANNOT_SERIALIZE_TRANSACTION_EXCEPTION);
+            ErrorCode errorCode = ErrorCode.CANNOT_SERIALIZE_TRANSACTION_EXCEPTION;
+            log.error("CannotSerializeTransactionException : {} {}:{} ({}) -> {}", httpServletRequest.getMethod(), httpServletRequest.getRemoteHost(), httpServletRequest.getRemotePort(), errorCode.getHttpStatus().value(), errorCode.getDetail());
+            return ErrorResponse.toResponseEntity(errorCode);
         } else {
-            log.error("DataAccessException : {} {}:{} ({}) -> {}", httpServletRequest.getMethod(), httpServletRequest.getRemoteHost(), httpServletRequest.getRemotePort(), ErrorCode.DATA_ACCESS_EXCEPTION.getHttpStatus().value(), e.getMessage() );
-            return ErrorResponse.toResponseEntity(ErrorCode.DATA_ACCESS_EXCEPTION);
+            ErrorCode errorCode = ErrorCode.DATA_ACCESS_EXCEPTION;
+            log.error("DataAccessException : {} {}:{} ({}) -> {}", httpServletRequest.getMethod(), httpServletRequest.getRemoteHost(), httpServletRequest.getRemotePort(), errorCode.getHttpStatus().value(), errorCode.getDetail());
+            return ErrorResponse.toResponseEntity(errorCode);
         }
     }
 
     @ExceptionHandler(value = {NullPointerException.class})
-    protected ResponseEntity handleCustomException(NullPointerException e) {
+    protected ResponseEntity handleNullPointerException(NullPointerException e) {
         HttpServletRequest httpServletRequest =
                 ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
-        log.error("NullPointerException : {} {}:{} ({}) -> {}", httpServletRequest.getMethod(), httpServletRequest.getRemoteHost(), httpServletRequest.getRemotePort(), ErrorCode.NULL_POINTER_EXCEPTION.getHttpStatus().value(), e.getMessage() );
-        return ErrorResponse.toResponseEntity(ErrorCode.NULL_POINTER_EXCEPTION);
+        ErrorCode errorCode = ErrorCode.NULL_POINTER_EXCEPTION;
+        log.error("NullPointerException : {} {}:{} ({}) -> {}", httpServletRequest.getMethod(), httpServletRequest.getRemoteHost(), httpServletRequest.getRemotePort(), errorCode.getHttpStatus().value(), errorCode.getDetail());
+        return ErrorResponse.toResponseEntity(errorCode);
     }
 
     @ExceptionHandler(value = {CustomException.class})
