@@ -69,7 +69,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                                 + fieldError.getField() + " : " + fieldError.getDefaultMessage())
                 .collect(Collectors.toList());
 
-        log.error("BindError : {} {}:{} ({}) -> {}", httpServletRequest.getMethod(), httpServletRequest.getRemoteHost(), httpServletRequest.getRemotePort(), ErrorCode.METHOD_ARGUMENT_EXCEPTION.getHttpStatus().value(), valid );
+        log.error("BindError : {} {}:{} ({}) -> {}", httpServletRequest.getMethod(), httpServletRequest.getRemoteHost(), httpServletRequest.getRemotePort(), ErrorCode.BIND_EXCEPTION.getHttpStatus().value(), valid );
         return ErrorResponse.toResponseEntity(ErrorCode.BIND_EXCEPTION ,ex.getBindingResult());
     }
 
@@ -99,7 +99,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         }
         else if (e instanceof DuplicateKeyException) {
             ErrorCode errorCode = ErrorCode.DUPLICATE_KEY_EXCEPTION;
-            log.error("InvalidResultSetAccessException : {} {}:{} ({}) -> {}", httpServletRequest.getMethod(), httpServletRequest.getRemoteHost(), httpServletRequest.getRemotePort(), errorCode.getHttpStatus().value(), errorCode.getDetail());
+            log.error("DuplicateKeyException : {} {}:{} ({}) -> {}", httpServletRequest.getMethod(), httpServletRequest.getRemoteHost(), httpServletRequest.getRemotePort(), errorCode.getHttpStatus().value(), errorCode.getDetail());
             return ErrorResponse.toResponseEntity(errorCode);
         }
         else if (e instanceof DataIntegrityViolationException) {
