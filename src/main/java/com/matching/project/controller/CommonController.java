@@ -3,6 +3,8 @@ package com.matching.project.controller;
 import com.matching.project.dto.ResponseDto;
 import com.matching.project.dto.common.*;
 import com.matching.project.dto.enumerate.EmailAuthPurpose;
+import com.matching.project.dto.token.TokenClaimsDto;
+import com.matching.project.dto.token.TokenDto;
 import com.matching.project.entity.EmailAuth;
 import com.matching.project.entity.User;
 import com.matching.project.service.CommonService;
@@ -14,7 +16,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -32,13 +33,12 @@ public class CommonController {
     // 일반 로그인
     @PostMapping("/login")
     @ApiOperation(value = "일반 로그인")
-    public ResponseEntity<ResponseDto<String>> normalLogin(@RequestBody @Valid NormalLoginRequestDto dto) {
+    public ResponseEntity<ResponseDto<TokenDto>> normalLogin(@RequestBody @Valid NormalLoginRequestDto dto) {
         User user = commonService.normalLogin(dto);
-        TokenDto tokenDto = TokenDto.builder()
+        TokenClaimsDto tokenClaimsDto = TokenClaimsDto.builder()
                 .email(user.getEmail())
                 .build();
-        String jwtAccessToken = jwtTokenService.createToken(tokenDto);
-        return ResponseEntity.ok().body(new ResponseDto<>(null, jwtAccessToken));
+        return ResponseEntity.ok().body(new ResponseDto<>(null, jwtTokenService.createToken(tokenClaimsDto)));
     }
 
     // 소셜 로그인
@@ -61,14 +61,13 @@ public class CommonController {
 
     @PatchMapping("/password/confirm")
     @ApiOperation(value = "비밀번호 초기화 페이지")
-    public ResponseEntity<ResponseDto<String>> passwordInit(@RequestBody @Valid PasswordInitRequestDto dto) {
+    public ResponseEntity<ResponseDto<TokenDto>> passwordInit(@RequestBody @Valid PasswordInitRequestDto dto) {
         User user = emailService.checkPasswordInitEmail(dto, EmailAuthPurpose.PASSWORD_INIT);
 
         // Jwt Token Create
-        TokenDto tokenDto = TokenDto.builder()
+        TokenClaimsDto tokenClaimsDto = TokenClaimsDto.builder()
                 .email(user.getEmail())
                 .build();
-        String jwtAccessToken = jwtTokenService.createToken(tokenDto);
-        return ResponseEntity.ok().body(new ResponseDto<>(null, jwtAccessToken));
+        return ResponseEntity.ok().body(new ResponseDto<>(null, jwtTokenService.createToken(tokenClaimsDto)));
     }
 }

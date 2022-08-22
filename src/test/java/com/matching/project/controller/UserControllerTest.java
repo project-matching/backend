@@ -1,12 +1,10 @@
 package com.matching.project.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.matching.project.dto.common.NormalLoginRequestDto;
-import com.matching.project.dto.common.TokenDto;
+import com.matching.project.dto.token.TokenClaimsDto;
 import com.matching.project.dto.enumerate.EmailAuthPurpose;
 import com.matching.project.dto.enumerate.OAuth;
 import com.matching.project.dto.enumerate.Role;
-import com.matching.project.dto.enumerate.UserFilter;
 import com.matching.project.dto.user.*;
 import com.matching.project.entity.*;
 import com.matching.project.repository.*;
@@ -16,30 +14,21 @@ import com.matching.project.service.JwtTokenService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.web.JsonPath;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.mock.web.MockPart;
-import org.springframework.security.core.token.TokenService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
-import javax.validation.constraints.Email;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -140,7 +129,7 @@ public class UserControllerTest {
     }
 
     String getToken(User user) {
-        return jwtTokenService.createToken(TokenDto.builder().email(user.getEmail()).build());
+        return jwtTokenService.createToken(TokenClaimsDto.builder().email(user.getEmail()).build());
     }
 
     void savePosition() {

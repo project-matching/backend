@@ -1,4 +1,4 @@
-package com.matching.project.dto.common;
+package com.matching.project.dto.token;
 
 import lombok.*;
 
@@ -8,5 +8,6 @@ import lombok.*;
 @Setter
 @Getter
 public class TokenDto {
-    String email;
+    String accessToken;
+    String refreshToken;
 }

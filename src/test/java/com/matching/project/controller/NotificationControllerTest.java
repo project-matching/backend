@@ -1,16 +1,14 @@
 package com.matching.project.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.matching.project.dto.common.TokenDto;
+import com.matching.project.dto.token.TokenClaimsDto;
 import com.matching.project.dto.enumerate.OAuth;
 import com.matching.project.dto.enumerate.Role;
 import com.matching.project.dto.enumerate.Type;
 import com.matching.project.dto.notification.NotificationSendRequestDto;
-import com.matching.project.dto.user.UserBlockRequestDto;
 import com.matching.project.entity.Notification;
 import com.matching.project.entity.User;
 import com.matching.project.repository.NotificationRepository;
-import com.matching.project.repository.PositionRepository;
 import com.matching.project.repository.UserRepository;
 import com.matching.project.service.JwtTokenService;
 import com.matching.project.service.NotificationService;
@@ -29,7 +27,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -98,7 +95,7 @@ public class NotificationControllerTest {
     }
 
     String getToken(User user) {
-        return jwtTokenService.createToken(TokenDto.builder().email(user.getEmail()).build());
+        return jwtTokenService.createToken(TokenClaimsDto.builder().email(user.getEmail()).build());
     }
 
     List<Notification> saveNotification(User user1, User user2) {

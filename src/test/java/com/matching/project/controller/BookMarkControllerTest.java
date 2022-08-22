@@ -1,6 +1,6 @@
 package com.matching.project.controller;
 
-import com.matching.project.dto.common.TokenDto;
+import com.matching.project.dto.token.TokenClaimsDto;
 import com.matching.project.dto.enumerate.OAuth;
 import com.matching.project.dto.enumerate.Role;
 import com.matching.project.entity.*;
@@ -105,7 +105,7 @@ class BookMarkControllerTest {
             Project saveProject1 = projectRepository.save(project1);
 
             // when
-            String token = jwtTokenService.createToken(new TokenDto(saveUser1.getEmail()));
+            String token = jwtTokenService.createToken(new TokenClaimsDto(saveUser1.getEmail()));
 
             ResultActions resultActions = mvc.perform(post("/v1/bookmark/" + saveProject1.getNo()).contentType(MediaType.APPLICATION_JSON)
                             .header("Authorization", "Bearer " + token));
@@ -287,7 +287,7 @@ class BookMarkControllerTest {
             bookMarkRepository.save(bookMark1);
 
             // when
-            String token = jwtTokenService.createToken(new TokenDto(saveUser1.getEmail()));
+            String token = jwtTokenService.createToken(new TokenClaimsDto(saveUser1.getEmail()));
 
             ResultActions resultActions = mvc.perform(get("/v1/bookmark?size=5&sortBy=createdDate,desc")
                     .contentType(MediaType.APPLICATION_JSON)
@@ -494,7 +494,7 @@ class BookMarkControllerTest {
             bookMarkRepository.save(bookMark2);
 
             // when
-            String token = jwtTokenService.createToken(new TokenDto(saveUser1.getEmail()));
+            String token = jwtTokenService.createToken(new TokenClaimsDto(saveUser1.getEmail()));
 
             ResultActions resultActions = mvc.perform(get("/v1/bookmark?size=5&sortBy=createdDate,desc&projectNo=" + saveProject3.getNo())
                     .contentType(MediaType.APPLICATION_JSON)
@@ -596,7 +596,7 @@ class BookMarkControllerTest {
             bookMarkRepository.save(bookMark1);
 
             // when
-            String token = jwtTokenService.createToken(new TokenDto(saveUser1.getEmail()));
+            String token = jwtTokenService.createToken(new TokenClaimsDto(saveUser1.getEmail()));
 
             ResultActions resultActions = mvc.perform(delete("/v1/bookmark/" + saveProject1.getNo()).contentType(MediaType.APPLICATION_JSON)
                             .header("Authorization", "Bearer " + token));

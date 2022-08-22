@@ -1,10 +1,6 @@
 package com.matching.project.service;
 
 import com.matching.project.dto.common.NormalLoginRequestDto;
-import com.matching.project.dto.common.TokenDto;
-import com.matching.project.dto.enumerate.OAuth;
-import com.matching.project.dto.enumerate.Role;
-import com.matching.project.entity.Position;
 import com.matching.project.entity.User;
 import com.matching.project.error.CustomException;
 import com.matching.project.error.ErrorCode;
@@ -14,13 +10,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

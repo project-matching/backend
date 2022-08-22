@@ -1,7 +1,6 @@
 package com.matching.project.service;
 
 import com.matching.project.dto.common.NormalLoginRequestDto;
-import com.matching.project.dto.common.TokenDto;
 import com.matching.project.entity.User;
 
 import com.matching.project.error.CustomException;

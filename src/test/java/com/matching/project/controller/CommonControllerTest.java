@@ -3,12 +3,10 @@ package com.matching.project.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.matching.project.dto.common.NormalLoginRequestDto;
 import com.matching.project.dto.common.PasswordInitRequestDto;
-import com.matching.project.dto.common.TokenDto;
+import com.matching.project.dto.token.TokenClaimsDto;
 import com.matching.project.dto.enumerate.EmailAuthPurpose;
 import com.matching.project.dto.enumerate.OAuth;
 import com.matching.project.dto.enumerate.Role;
-import com.matching.project.dto.user.PasswordUpdateRequestDto;
-import com.matching.project.dto.user.SignUpRequestDto;
 import com.matching.project.entity.EmailAuth;
 import com.matching.project.entity.User;
 import com.matching.project.repository.*;
@@ -18,14 +16,11 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.core.annotation.Order;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -73,7 +68,7 @@ public class CommonControllerTest {
     }
 
     String getToken(User user) {
-        return jwtTokenService.createToken(TokenDto.builder().email(user.getEmail()).build());
+        return jwtTokenService.createToken(TokenClaimsDto.builder().email(user.getEmail()).build());
     }
 
 

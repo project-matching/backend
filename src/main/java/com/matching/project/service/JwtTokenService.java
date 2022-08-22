@@ -1,6 +1,7 @@
 package com.matching.project.service;
 
-import com.matching.project.dto.common.TokenDto;
+import com.matching.project.dto.token.TokenClaimsDto;
+import com.matching.project.dto.token.TokenDto;
 import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,7 +29,8 @@ public class JwtTokenService {
     }
 
     // 토큰 유효시간 설정
-    private long accessTokenPeriod = 1000L * 60L * 60L * 24L; // 1일
+    private long accessTokenPeriod = 1000L * 60L * 60L * 2L; // 2시간
+    private long refreshTokenPeriod = 1000L * 60L * 60L * 24L * 7; // 7일
 
     // 객체 초기화, secretKey를 Base64로 인코딩한다.
     @PostConstruct
@@ -37,7 +39,7 @@ public class JwtTokenService {
     }
 
     // JWT 토큰 생성
-    public String createToken(TokenDto tokenDto) {
+    public TokenDto createToken(TokenClaimsDto tokenClaimsDto) {
         //Header
         Map<String, Object> headers = new HashMap<>();
         headers.put("typ", "JWT");
@@ -45,17 +47,25 @@ public class JwtTokenService {
 
         //Claims(=payload)
         Claims claims = Jwts.claims();
-        claims.put("email", tokenDto.getEmail());
+        claims.put("email", tokenClaimsDto.getEmail());
 
         Date now = new Date();
-        String jwtAccessToken = Jwts.builder().setHeader(headers)
-                .setClaims(claims)
-                .setSubject("user-auth")
-                .setIssuedAt(now)
-                .setExpiration(new Date(now.getTime() + accessTokenPeriod))
-                .signWith(SignatureAlgorithm.HS256, secretKey)
-                .compact();
-        return jwtAccessToken;
+        return TokenDto.builder()
+                .accessToken(Jwts.builder().setHeader(headers)
+                        .setClaims(claims)
+                        .setSubject("user-auth")
+                        .setIssuedAt(now)
+                        .setExpiration(new Date(now.getTime() + accessTokenPeriod))
+                        .signWith(SignatureAlgorithm.HS256, secretKey)
+                        .compact())
+                .refreshToken(Jwts.builder().setHeader(headers)
+                        .setClaims(claims)
+                        .setSubject("user-auth")
+                        .setIssuedAt(now)
+                        .setExpiration(new Date(now.getTime() + refreshTokenPeriod))
+                        .signWith(SignatureAlgorithm.HS256, secretKey)
+                        .compact())
+                .build();
     }
 
     // 인증 성공시 SecurityContextHolder에 저장할 Authentication 객체 생성

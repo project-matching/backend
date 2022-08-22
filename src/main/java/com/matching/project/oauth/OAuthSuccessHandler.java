@@ -1,9 +1,7 @@
 package com.matching.project.oauth;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.matching.project.dto.common.TokenDto;
-import com.matching.project.entity.User;
-import com.matching.project.repository.UserRepository;
+import com.matching.project.dto.token.TokenClaimsDto;
+import com.matching.project.dto.token.TokenDto;
 import com.matching.project.service.JwtTokenService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,7 +9,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -39,15 +36,16 @@ public class OAuthSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
             email = Integer.toString((Integer)attributes.get("id")); //Git
 
 
-        TokenDto tokenDto = TokenDto.builder()
+        TokenClaimsDto tokenClaimsDto = TokenClaimsDto.builder()
                 .email(email)
                 .build();
 
         log.info("OAuth JWT Token Create");
-        String token = jwtTokenService.createToken(tokenDto);
-        log.info("{}", token);
+        TokenDto tokens = jwtTokenService.createToken(tokenClaimsDto);
+        log.info("{}", tokens);
 
         // api 리다이렉트에는 로그인 인증 후 jwt 토큰을 보낼 URI(react)가 설정되어야함.
-        getRedirectStrategy().sendRedirect(request, response, "http://localhost:3000/auth/success?token="+ token);
+        getRedirectStrategy().sendRedirect(request, response, "http://localhost:3000/auth/success?access=" + tokens.getAccessToken()
+                + "&refresh=" + tokens.getRefreshToken());
     }
 }
