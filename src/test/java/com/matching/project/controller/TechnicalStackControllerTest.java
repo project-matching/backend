@@ -139,10 +139,11 @@ class TechnicalStackControllerTest {
         }
 
         @Test
-        @DisplayName("실패 : 권한이 유저인 경우")
+        @DisplayName("성공 : 권한이 유저인 경우")
         public void fail1() throws Exception {
             // given
-            User user1 = User.builder()
+            // 유저 세팅
+            User adminUser1 = User.builder()
                     .name("userName1")
                     .sex("M")
                     .email("wkemrm12@naver.com")
@@ -157,10 +158,47 @@ class TechnicalStackControllerTest {
                     .imageNo(0L)
                     .position(null)
                     .build();
-            User saveUser1 = userRepository.save(user1);
+            User saveAdminUser1 = userRepository.save(adminUser1);
+
+            // 이미지 세팅
+            Image image1 = Image.builder()
+                    .logicalName("testLogicalName1")
+                    .physicalName("testPhysicalName1")
+                    .url("testUrl1")
+                    .build();
+            Image image2 = Image.builder()
+                    .logicalName("testLogicalName2")
+                    .physicalName("testPhysicalName2")
+                    .url("testUrl2")
+                    .build();
+            Image image3 = Image.builder()
+                    .logicalName("testLogicalName3")
+                    .physicalName("testPhysicalName3")
+                    .url("testUrl3")
+                    .build();
+            Image saveImage1 = imageRepository.save(image1);
+            Image saveImage2 = imageRepository.save(image2);
+            Image saveImage3 = imageRepository.save(image3);
+
+            // 기술스택 세팅
+            TechnicalStack technicalStack1 = TechnicalStack.builder()
+                    .name("testTechnicalStack1")
+                    .imageNo(saveImage1.getNo())
+                    .build();
+            TechnicalStack technicalStack2 = TechnicalStack.builder()
+                    .name("testTechnicalStack2")
+                    .imageNo(saveImage2.getNo())
+                    .build();
+            TechnicalStack technicalStack3 = TechnicalStack.builder()
+                    .name("testTechnicalStack3")
+                    .imageNo(saveImage3.getNo())
+                    .build();
+            TechnicalStack saveTechnicalStack1 = technicalStackRepository.save(technicalStack1);
+            TechnicalStack saveTechnicalStack2 = technicalStackRepository.save(technicalStack2);
+            TechnicalStack saveTechnicalStack3 = technicalStackRepository.save(technicalStack3);
 
             // when
-            String token = jwtTokenService.createToken(new TokenDto(saveUser1.getEmail()));
+            String token = jwtTokenService.createToken(new TokenDto(saveAdminUser1.getEmail()));
 
             ResultActions resultActions = mvc.perform(get("/v1/technicalStack").contentType(MediaType.APPLICATION_JSON)
                     .header("Authorization", "Bearer " + token));
@@ -168,7 +206,17 @@ class TechnicalStackControllerTest {
             // then
             resultActions
                     .andDo(print())
-                    .andExpect(status().is4xxClientError());
+                    .andExpect(header().string("Content-type", "application/json"))
+                    .andExpect(jsonPath("$.data[0].technicalStackNo").value(saveTechnicalStack1.getNo()))
+                    .andExpect(jsonPath("$.data[0].technicalStackName").value(saveTechnicalStack1.getName()))
+                    .andExpect(jsonPath("$.data[0].image").value(saveImage1.getUrl()))
+                    .andExpect(jsonPath("$.data[1].technicalStackNo").value(saveTechnicalStack2.getNo()))
+                    .andExpect(jsonPath("$.data[1].technicalStackName").value(saveTechnicalStack2.getName()))
+                    .andExpect(jsonPath("$.data[1].image").value(saveImage2.getUrl()))
+                    .andExpect(jsonPath("$.data[2].technicalStackNo").value(saveTechnicalStack3.getNo()))
+                    .andExpect(jsonPath("$.data[2].technicalStackName").value(saveTechnicalStack3.getName()))
+                    .andExpect(jsonPath("$.data[2].image").value(saveImage3.getUrl()))
+                    .andExpect(status().isOk());
         }
 
         @Test

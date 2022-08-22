@@ -124,7 +124,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.GET,"/v1/bookmark").hasAnyRole("USER", "ADMIN")
 
                 //TechnicalStackController
-                .antMatchers(HttpMethod.GET,"/v1/technicalStack").hasRole("ADMIN")
+                .antMatchers(HttpMethod.GET,"/v1/technicalStack").hasAnyRole("USER", "ADMIN")
                 .antMatchers(HttpMethod.POST,"/v1/technicalStack").hasRole("ADMIN")
                 .antMatchers(HttpMethod.PUT,"/v1/technicalStack/*").hasRole("ADMIN")
 
