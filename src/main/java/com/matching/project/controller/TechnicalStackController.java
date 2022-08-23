@@ -34,9 +34,9 @@ public class TechnicalStackController {
         return ResponseEntity.ok(new ResponseDto<>(null, technicalStackService.technicalStackRegister(technicalStackRegisterDto.getTechnicalStackName(), image)));
     }
 
-    @PutMapping(value = "/{technicalStackNo}", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
-    @ApiOperation(value = "기술스택 수정 (수정 완료)")
-    public ResponseEntity<ResponseDto<Boolean>> technicalStackUpdate(@PathVariable Long technicalStackNo, @RequestPart("data") @Valid TechnicalStackUpdateRequestDto technicalStackUpdateRequestDto, @RequestPart(value = "image", required = false) MultipartFile image) throws Exception{
+    @PutMapping(value = "/{technicalStackNo}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    @ApiOperation(value = "기술스택 수정 (수정 완료)", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ResponseDto<Boolean>> technicalStackUpdate(@PathVariable Long technicalStackNo, @Valid TechnicalStackUpdateRequestDto technicalStackUpdateRequestDto, @RequestPart(value = "image", required = false) MultipartFile image) throws Exception{
         return ResponseEntity.ok(new ResponseDto<>(null, technicalStackService.technicalStackUpdate(technicalStackNo, technicalStackUpdateRequestDto, image)));
     }
 }
