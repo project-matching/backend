@@ -1,5 +1,6 @@
 package com.matching.project.repository;
 
+import com.matching.project.entity.User;
 import com.matching.project.entity.Comment;
 import com.matching.project.entity.Project;
 import org.springframework.data.domain.Page;
@@ -25,4 +26,6 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("delete from Comment c where c.project.no = :projectNo")
     public void deleteByProjectNo(@Param("projectNo") Long projectNo);
+
+    Optional<List<Comment>> findByUser(User user);
 }

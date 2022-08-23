@@ -48,6 +48,9 @@ class UserServiceTest {
     private UserRepositoryCustom userRepositoryCustom;
 
     @Mock
+    private ProjectRepository projectRepository;
+
+    @Mock
     private PositionRepository positionRepository;
 
     @Mock
@@ -55,6 +58,12 @@ class UserServiceTest {
 
     @Mock
     private UserTechnicalStackRepository userTechnicalStackRepository;
+
+    @Mock
+    private NotificationRepository notificationRepository;
+
+    @Mock
+    private CommentRepository commentRepository;
 
     @Mock
     private ImageService imageService;
@@ -324,7 +333,7 @@ class UserServiceTest {
     class SignOut {
         @DisplayName("성공")
         @Test
-        public void success() {
+        public void success() throws Exception {
             //given
             Long no = 3L;
             String name = "테스터";
@@ -342,6 +351,8 @@ class UserServiceTest {
             SecurityContext context = SecurityContextHolder.getContext();
             context.setAuthentication(new UsernamePasswordAuthenticationToken(user.get(), user.get().getEmail(), user.get().getAuthorities()));
             given(userRepository.findById(user.get().getNo())).willReturn(user);
+            given(projectRepository.findByUser(user.get())).willReturn(Optional.empty());
+            given(commentRepository.findByUser(user.get())).willReturn(Optional.empty());
 
             //when
             User resUser = userService.userSignOut();
@@ -349,6 +360,10 @@ class UserServiceTest {
             //then
             assertThat(resUser.isWithdrawal()).isTrue();
             assertThat(resUser.getWithdrawalTime()).isNotNull();
+
+            //verify
+            verify(userTechnicalStackRepository, times(1)).deleteAllByUser(user.get());
+            verify(notificationRepository, times(1)).deleteAllByUser(user.get());
         }
     }
 
