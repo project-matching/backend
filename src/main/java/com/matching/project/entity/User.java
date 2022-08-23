@@ -86,6 +86,16 @@ public class User extends BaseTimeEntity implements UserDetails {
         this.withdrawalTime = LocalDateTime.now();
     }
 
+    public void deleteInfo() {
+        this.name = "None";
+        this.sex = "N";
+        this.email = "None";
+        this.password = "None";
+        this.github = null;
+        this.selfIntroduction = null;
+    }
+
+
     public void userBlock(String blockReason) {
         this.block = true;
         this.blockReason = blockReason;
