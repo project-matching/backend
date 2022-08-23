@@ -83,7 +83,18 @@ public enum ErrorCode {
     NOT_FIND_BOOKMARK_EXCEPTION(INTERNAL_SERVER_ERROR, "Not Find BookMark"),
 
     //ProjectParticipateRequest
-    NOT_FIND_PROJECT_PARTICIPATE_REQUEST_EXCEPTION(INTERNAL_SERVER_ERROR, "Not Find ProjectParticipateRequest")
+    NOT_FIND_PROJECT_PARTICIPATE_REQUEST_EXCEPTION(INTERNAL_SERVER_ERROR, "Not Find ProjectParticipateRequest"),
+
+    //Token
+    EXPIRED_JWT_ACCESS_TOKEN_EXCEPTION(UNAUTHORIZED, "Jwt Access Token Expired"),
+    EXPIRED_JWT_REFRESH_TOKEN_EXCEPTION(UNAUTHORIZED, "Jwt Refresh Token Expired"),
+    DESTROY_JWT_TOKEN_EXCEPTION(UNAUTHORIZED, "Destroyed Jwt Token"),
+    NOT_VALID_JWT_TOKEN_EXCEPTION(UNAUTHORIZED, "Jwt Token verify Error"),
+    NOT_FIND_JWT_REFRESH_TOKEN_EXCEPTION(UNAUTHORIZED,"Not find jwt refresh token Error"),
+    CANNOT_USE_REFRESH_TOKEN_FOR_AUTHENTICATION(UNAUTHORIZED,"Refresh tokens cannot be used for authentication"),
+
+    //JSON Parse
+    INVALID_JSON_PARSE(INTERNAL_SERVER_ERROR, "Invalid JSON Parse"),
     ;
 
 

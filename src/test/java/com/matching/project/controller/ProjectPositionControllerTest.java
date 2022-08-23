@@ -131,7 +131,7 @@ class ProjectPositionControllerTest {
             ProjectPosition saveProjectPosition2 = projectPositionRepository.save(projectPosition2);
 
             // when
-            String token = jwtTokenService.createToken(new TokenClaimsDto(saveUser1.getEmail()));
+            String token = jwtTokenService.createToken(new TokenClaimsDto(saveUser1.getEmail())).getAccess();
             ResultActions resultActions = mvc.perform(delete("/v1/projectposition/" + saveProjectPosition1.getNo() + "/withdrawal")
                     .header("Authorization", "Bearer " + token)
                     .contentType(MediaType.APPLICATION_JSON_VALUE));
@@ -211,7 +211,7 @@ class ProjectPositionControllerTest {
             ProjectPosition saveProjectPosition1 = projectPositionRepository.save(projectPosition1);
 
             // when
-            String token = jwtTokenService.createToken(new TokenClaimsDto(saveUser1.getEmail()));
+            String token = jwtTokenService.createToken(new TokenClaimsDto(saveUser1.getEmail())).getAccess();
 
             ResultActions resultActions = mvc.perform(delete("/v1/projectposition/" + saveProjectPosition1.getNo() + "/expulsion")
                     .header("Authorization", "Bearer " + token)

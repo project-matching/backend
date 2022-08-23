@@ -57,10 +57,17 @@ public class UserController {
     @PostMapping("/confirm")
     public ResponseEntity<ResponseDto<TokenDto>> confirmEmail(@RequestBody @Valid EmailAuthRequestDto dto) {
         User user = emailService.checkConfirmEmail(dto, EmailAuthPurpose.EMAIL_AUTHENTICATION);
+
+        // Jwt Token Create
         TokenClaimsDto tokenClaimsDto = TokenClaimsDto.builder()
                 .email(user.getEmail())
                 .build();
-        return ResponseEntity.ok().body(new ResponseDto<>(null, jwtTokenService.createToken(tokenClaimsDto)));
+        TokenDto tokenDto = jwtTokenService.createToken(tokenClaimsDto);
+
+        // refresh Token save
+        jwtTokenService.setRefreshToken(user.getEmail(), tokenDto.getRefresh());
+
+        return ResponseEntity.ok().body(new ResponseDto<>(null, tokenDto));
     }
 
     @ApiOperation(value = "이메일 재발송 (회원가입)")

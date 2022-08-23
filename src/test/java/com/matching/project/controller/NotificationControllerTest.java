@@ -6,6 +6,7 @@ import com.matching.project.dto.enumerate.OAuth;
 import com.matching.project.dto.enumerate.Role;
 import com.matching.project.dto.enumerate.Type;
 import com.matching.project.dto.notification.NotificationSendRequestDto;
+import com.matching.project.dto.token.TokenDto;
 import com.matching.project.entity.Notification;
 import com.matching.project.entity.User;
 import com.matching.project.repository.NotificationRepository;
@@ -94,7 +95,7 @@ public class NotificationControllerTest {
         return userRepository.save(user);
     }
 
-    String getToken(User user) {
+    TokenDto getToken(User user) {
         return jwtTokenService.createToken(TokenClaimsDto.builder().email(user.getEmail()).build());
     }
 
@@ -114,7 +115,7 @@ public class NotificationControllerTest {
         void success() throws Exception {
             //given
             User user = saveAdmin();
-            String token = getToken(user);
+            String token = getToken(user).getAccess();
 
             NotificationSendRequestDto requestDto = NotificationSendRequestDto.builder()
                     .title("title")
@@ -162,7 +163,7 @@ public class NotificationControllerTest {
         void fail2() throws Exception {
             //given
             User user = saveUser();
-            String token = getToken(user);
+            String token = getToken(user).getAccess();
 
             NotificationSendRequestDto requestDto = NotificationSendRequestDto.builder()
                     .title("title")
@@ -191,7 +192,7 @@ public class NotificationControllerTest {
             //given
             User user1 = saveUser();
             User user2 = saveAdmin();
-            String token = getToken(user1);
+            String token = getToken(user1).getAccess();
             List<Notification> n = saveNotification(user1, user2);
 
             //when
@@ -234,7 +235,7 @@ public class NotificationControllerTest {
             //given
             User user1 = saveUser();
             User user2 = saveAdmin();
-            String token = getToken(user1);
+            String token = getToken(user1).getAccess();
             List<Notification> n = saveNotification(user1, user2);
 
             //when

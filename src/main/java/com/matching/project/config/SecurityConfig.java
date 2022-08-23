@@ -132,6 +132,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.DELETE, "/v1/projectposition/*/withdrawal").hasAnyRole("USER", "ADMIN")
                 .antMatchers(HttpMethod.DELETE, "/v1/projectposition/*/expulsion").hasAnyRole("USER", "ADMIN")
 
+                //Token
+                .antMatchers(HttpMethod.POST, "/v1/user/token/reissue").hasAnyRole("ANONYMOUS")
+
                 //AnyRequest
                 .anyRequest().permitAll()
 

@@ -8,6 +8,6 @@ import lombok.*;
 @Setter
 @Getter
 public class TokenDto {
-    String accessToken;
-    String refreshToken;
+    String access;
+    String refresh;
 }

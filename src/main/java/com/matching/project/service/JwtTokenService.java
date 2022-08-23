@@ -1,7 +1,11 @@
 package com.matching.project.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.matching.project.dto.token.TokenClaimsDto;
 import com.matching.project.dto.token.TokenDto;
+import com.matching.project.dto.token.TokenReissueRequestDto;
+import com.matching.project.error.CustomException;
+import com.matching.project.error.ErrorCode;
 import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +24,7 @@ import java.util.*;
 @Component
 public class JwtTokenService {
     private final CustomUserDetailsService customUserDetailsService;
+    private final RedisService redisService;
 
     @Value("${key.jwt.secret}")
     private String secretKey;
@@ -30,7 +35,10 @@ public class JwtTokenService {
 
     // 토큰 유효시간 설정
     private long accessTokenPeriod = 1000L * 60L * 60L * 2L; // 2시간
-    private long refreshTokenPeriod = 1000L * 60L * 60L * 24L * 7; // 7일
+    private long refreshTokenPeriod = 1000L * 60L * 60L * 24L * 7L; // 7일
+
+    //private long accessTokenPeriod = 1000L * 15L; // 15초
+    //private long refreshTokenPeriod = 1000L * 60L * 1L; // 1분
 
     // 객체 초기화, secretKey를 Base64로 인코딩한다.
     @PostConstruct
@@ -51,14 +59,14 @@ public class JwtTokenService {
 
         Date now = new Date();
         return TokenDto.builder()
-                .accessToken(Jwts.builder().setHeader(headers)
+                .access(Jwts.builder().setHeader(headers)
                         .setClaims(claims)
                         .setSubject("user-auth")
                         .setIssuedAt(now)
                         .setExpiration(new Date(now.getTime() + accessTokenPeriod))
                         .signWith(SignatureAlgorithm.HS256, secretKey)
                         .compact())
-                .refreshToken(Jwts.builder().setHeader(headers)
+                .refresh(Jwts.builder().setHeader(headers)
                         .setClaims(claims)
                         .setSubject("user-auth")
                         .setIssuedAt(now)
@@ -85,20 +93,71 @@ public class JwtTokenService {
     }
 
     // 토큰의 유효성 + 만료일자 확인
-    public boolean verifyToken(String token) {
+    public CustomException verifyToken(String token) {
+        CustomException cs = null;
         try {
-            Jws<Claims> claims = Jwts.parser()
-                    .setSigningKey(secretKey)
-                    .parseClaimsJws(token);
-            return claims.getBody()
-                    .getExpiration()
-                    .after(new Date());
+            Jws<Claims> claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
+            claims.getBody().getExpiration().after(new Date());
         } catch (ExpiredJwtException e) {
-            log.warn("Jwt Token Expired");
-            return false;
+            cs = new CustomException(ErrorCode.EXPIRED_JWT_ACCESS_TOKEN_EXCEPTION);
         } catch (Exception e) {
-            log.warn("Jwt Token verify Error");
-            return false;
+            cs = new CustomException(ErrorCode.NOT_VALID_JWT_TOKEN_EXCEPTION);
         }
+        return cs;
     }
+
+    // access 토큰 재발급
+    public String accessTokenReissue(TokenReissueRequestDto dto) {
+        // 기존 access 토큰이 블랙리스트에 있는지 확인
+        if (!hasBlackListKey(dto.getAccess()))
+            setBlackList(dto.getAccess());
+
+        // refresh 토큰이 유효한지 확인
+        CustomException cs = verifyToken(dto.getRefresh());
+        String email = null;
+        if (cs == null) {
+            email = getUserEmail(dto.getRefresh());
+            if (!hasRefreshToken(email)) {
+                throw new CustomException(ErrorCode.NOT_FIND_JWT_REFRESH_TOKEN_EXCEPTION);
+            }
+        }
+        else {
+            if (cs.getErrorCode() == ErrorCode.EXPIRED_JWT_ACCESS_TOKEN_EXCEPTION) {
+                throw new CustomException(ErrorCode.EXPIRED_JWT_REFRESH_TOKEN_EXCEPTION);
+            } else {
+                throw cs;
+            }
+        }
+        // access 토큰 재발급
+        TokenClaimsDto tokenClaimsDto = TokenClaimsDto.builder()
+                .email(email)
+                .build();
+        TokenDto tokenDto = createToken(tokenClaimsDto);
+        return tokenDto.getAccess();
+    }
+
+    public void setRefreshToken(String email, String refreshToken){
+        int timeout =  Math.toIntExact(refreshTokenPeriod) / (1000 * 60);
+        redisService.set(email, refreshToken, timeout);
+        log.info("{} : refresh token save", email);
+    }
+
+    public String getRefreshToken(String email) {
+        return redisService.get(email, String.class);
+    }
+
+    public void deleteRefreshToken(String email) {
+        redisService.delete(email);
+    }
+
+    public boolean hasRefreshToken(String email) {return redisService.hasKey(email); }
+
+    public void setBlackList(String key){
+        redisService.set(key, "access_token");
+    }
+
+    public boolean hasBlackListKey(String key) {
+        return redisService.hasKey(key);
+    }
+
 }

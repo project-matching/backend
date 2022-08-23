@@ -117,7 +117,7 @@ public class CommentControllerTest {
     }
 
     String getToken(User user) {
-        return jwtTokenService.createToken(TokenClaimsDto.builder().email(user.getEmail()).build());
+        return jwtTokenService.createToken(TokenClaimsDto.builder().email(user.getEmail()).build()).getAccess();
     }
 
     @Nested

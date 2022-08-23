@@ -36,16 +36,21 @@ public class OAuthSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
             email = Integer.toString((Integer)attributes.get("id")); //Git
 
 
+        // Jwt Token Create
+        log.info("OAuth JWT Token Create");
         TokenClaimsDto tokenClaimsDto = TokenClaimsDto.builder()
                 .email(email)
                 .build();
 
-        log.info("OAuth JWT Token Create");
         TokenDto tokens = jwtTokenService.createToken(tokenClaimsDto);
+
+        // refresh Token save
+        jwtTokenService.setRefreshToken(email, tokens.getRefresh());
+
         log.info("{}", tokens);
 
         // api 리다이렉트에는 로그인 인증 후 jwt 토큰을 보낼 URI(react)가 설정되어야함.
-        getRedirectStrategy().sendRedirect(request, response, "http://localhost:3000/auth/success?access=" + tokens.getAccessToken()
-                + "&refresh=" + tokens.getRefreshToken());
+        getRedirectStrategy().sendRedirect(request, response, "http://localhost:3000/auth/success?access=" + tokens.getAccess()
+                + "&refresh=" + tokens.getRefresh());
     }
 }

@@ -6,6 +6,8 @@ import com.matching.project.entity.User;
 import com.matching.project.error.CustomException;
 import com.matching.project.error.ErrorCode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +16,19 @@ import org.springframework.stereotype.Service;
 public class CommonServiceImpl implements CommonService {
     private final CustomUserDetailsService customUserDetailsService;
     private final PasswordEncoder passwordEncoder;
+    private final JwtTokenService jwtTokenService;
+
+    private User getAuthenticatedUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Object principal = authentication.getPrincipal();
+
+        User user = null;
+        if (principal instanceof User)
+            user = (User)principal;
+        else
+            throw new CustomException(ErrorCode.GET_USER_AUTHENTICATION_EXCEPTION);
+        return user;
+    }
 
     @Override
     public User normalLogin(NormalLoginRequestDto normalLoginRequestDto) {
@@ -27,5 +42,19 @@ public class CommonServiceImpl implements CommonService {
         else if (!user.isEmail_auth())
             throw new CustomException(ErrorCode.UNSIGNED_EMAIL_EXCEPTION);
         return user;
+    }
+
+    @Override
+    public void userLogout(String accessToken) {
+        User user = getAuthenticatedUser();
+
+        // Refresh Token 제거
+        jwtTokenService.deleteRefreshToken(user.getEmail());
+
+        // Access Token Black List 추가
+        jwtTokenService.setBlackList(accessToken);
+
+        // SecurityContextHolder 에서 Context 제거
+        SecurityContextHolder.clearContext();
     }
 }

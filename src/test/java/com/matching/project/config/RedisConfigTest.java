@@ -3,17 +3,12 @@ package com.matching.project.config;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.matching.project.dto.user.UserDto;
 import com.matching.project.service.RedisService;
-import org.aspectj.lang.annotation.After;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.concurrent.TimeUnit;
 
@@ -67,10 +62,10 @@ public class RedisConfigTest {
         //given
         String key = "10295710928313";
         UserDto objectValue = new UserDto(1L, "insertObjectTest", true);
-        redisService.putRedis(key, objectValue);
+        redisService.set(key, objectValue);
 
         //when
-        UserDto result = redisService.getRedisValue(key, UserDto.class);
+        UserDto result = redisService.get(key, UserDto.class);
 
         //then
         assertThat(result.getNo()).isEqualTo(objectValue.getNo());

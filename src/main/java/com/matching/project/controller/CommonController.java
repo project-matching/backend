@@ -5,6 +5,8 @@ import com.matching.project.dto.common.*;
 import com.matching.project.dto.enumerate.EmailAuthPurpose;
 import com.matching.project.dto.token.TokenClaimsDto;
 import com.matching.project.dto.token.TokenDto;
+import com.matching.project.dto.token.TokenReissueRequestDto;
+import com.matching.project.dto.token.TokenReissueResponseDto;
 import com.matching.project.entity.EmailAuth;
 import com.matching.project.entity.User;
 import com.matching.project.service.CommonService;
@@ -13,9 +15,7 @@ import com.matching.project.service.JwtTokenService;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -35,20 +35,26 @@ public class CommonController {
     @ApiOperation(value = "일반 로그인")
     public ResponseEntity<ResponseDto<TokenDto>> normalLogin(@RequestBody @Valid NormalLoginRequestDto dto) {
         User user = commonService.normalLogin(dto);
+
+        // Jwt Token Create
         TokenClaimsDto tokenClaimsDto = TokenClaimsDto.builder()
                 .email(user.getEmail())
                 .build();
-        return ResponseEntity.ok().body(new ResponseDto<>(null, jwtTokenService.createToken(tokenClaimsDto)));
+        TokenDto tokenDto = jwtTokenService.createToken(tokenClaimsDto);
+
+        // refresh Token save
+        jwtTokenService.setRefreshToken(user.getEmail(), tokenDto.getRefresh());
+
+        return ResponseEntity.ok().body(new ResponseDto<>(null, tokenDto));
     }
 
     // 소셜 로그인
     @GetMapping("/logout")
-    @ApiOperation(value = "로그아웃 (추후 수정 필요)")
-    public ResponseEntity<String> logout() {
-        //프론트에서 저장된 jwt 토큰 제거도 필요
-        SecurityContextHolder.clearContext();
-        ResponseDto<String> response = ResponseDto.<String>builder().data("Success Logout").build();
-        return new ResponseEntity(response, HttpStatus.OK);
+    @ApiOperation(value = "로그아웃")
+    public ResponseEntity<ResponseDto<Boolean>> logout(@RequestHeader(value = "Authorization") String authorization) {
+        String accessToken = authorization.replaceAll("^Bearer( )*", "");
+        commonService.userLogout(accessToken);
+        return ResponseEntity.ok(new ResponseDto<Boolean>(null, true));
     }
 
     @PostMapping("/password/init")
@@ -68,6 +74,23 @@ public class CommonController {
         TokenClaimsDto tokenClaimsDto = TokenClaimsDto.builder()
                 .email(user.getEmail())
                 .build();
-        return ResponseEntity.ok().body(new ResponseDto<>(null, jwtTokenService.createToken(tokenClaimsDto)));
+        TokenDto tokenDto = jwtTokenService.createToken(tokenClaimsDto);
+
+        // refresh Token save
+        jwtTokenService.setRefreshToken(user.getEmail(), tokenDto.getRefresh());
+
+        return ResponseEntity.ok().body(new ResponseDto<>(null, tokenDto));
+    }
+
+    @PostMapping("/token/reissue")
+    @ApiOperation(value = "JWT 토큰 재발급 요청")
+    public ResponseEntity<ResponseDto<TokenReissueResponseDto>> jwtAccessTokenReissue(@RequestBody @Valid TokenReissueRequestDto dto) {
+
+        // Jwt Access Token Reissue
+        TokenReissueResponseDto tokenReissueResponseDto = TokenReissueResponseDto.builder()
+                .access(jwtTokenService.accessTokenReissue(dto))
+                .build();
+
+        return ResponseEntity.ok().body(new ResponseDto<>(null, tokenReissueResponseDto));
     }
 }

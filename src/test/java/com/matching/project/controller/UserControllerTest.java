@@ -129,7 +129,7 @@ public class UserControllerTest {
     }
 
     String getToken(User user) {
-        return jwtTokenService.createToken(TokenClaimsDto.builder().email(user.getEmail()).build());
+        return jwtTokenService.createToken(TokenClaimsDto.builder().email(user.getEmail()).build()).getAccess();
     }
 
     void savePosition() {
