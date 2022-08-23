@@ -258,7 +258,7 @@ class TechnicalStackControllerTest {
             User saveAdminUser1 = userRepository.save(adminUser1);
 
             // when
-            String technicalStackName = "Spring";
+            String technicalStackName = "testTechnicalStackName";
             MockMultipartFile image = new MockMultipartFile("image", "image.jpeg", MediaType.IMAGE_JPEG_VALUE, "".getBytes(StandardCharsets.UTF_8));
 
             String token = jwtTokenService.createToken(new TokenDto(saveAdminUser1.getEmail()));
@@ -290,13 +290,12 @@ class TechnicalStackControllerTest {
         @DisplayName("실패 : 비로그인 유저")
         public void fail1() throws Exception {
             // when
-            TechnicalStackRegisterRequestDto technicalStackRegisterDto = new TechnicalStackRegisterRequestDto("technicalStackName");
+            String technicalStackName = "testTechnicalStackName";
             MockMultipartFile image = new MockMultipartFile("image", "image.jpeg", MediaType.IMAGE_JPEG_VALUE, "".getBytes(StandardCharsets.UTF_8));
-            MockMultipartFile data = new MockMultipartFile("data", "", MediaType.APPLICATION_JSON_VALUE, new ObjectMapper().writeValueAsString(technicalStackRegisterDto).getBytes());
 
             ResultActions resultActions = mvc.perform(multipart("/v1/technicalStack")
                     .file(image)
-                    .file(data)
+                    .param("technicalStackName", technicalStackName)
                     .with(requestProcessor -> {
                         requestProcessor.setMethod("POST");
                         return requestProcessor;
@@ -333,15 +332,14 @@ class TechnicalStackControllerTest {
             User saveUser1 = userRepository.save(user1);
 
             // when
-            TechnicalStackRegisterRequestDto technicalStackRegisterDto = new TechnicalStackRegisterRequestDto("technicalStackName");
+            String technicalStackName = "testTechnicalStackName";
             MockMultipartFile image = new MockMultipartFile("image", "image.jpeg", MediaType.IMAGE_JPEG_VALUE, "".getBytes(StandardCharsets.UTF_8));
-            MockMultipartFile data = new MockMultipartFile("data", "", MediaType.APPLICATION_JSON_VALUE, new ObjectMapper().writeValueAsString(technicalStackRegisterDto).getBytes());
 
             String token = jwtTokenService.createToken(new TokenDto(saveUser1.getEmail()));
 
             ResultActions resultActions = mvc.perform(multipart("/v1/technicalStack")
                     .file(image)
-                    .file(data)
+                    .param("technicalStackName", technicalStackName)
                     .with(requestProcessor -> {
                         requestProcessor.setMethod("POST");
                         return requestProcessor;
@@ -379,17 +377,133 @@ class TechnicalStackControllerTest {
             User saveAdminUser1 = userRepository.save(adminUser1);
 
             // when
-            TechnicalStackRegisterRequestDto technicalStackRegisterDto = new TechnicalStackRegisterRequestDto(null);
+            String technicalStackName = null;
             MockMultipartFile image = new MockMultipartFile("image", "image.jpeg", MediaType.IMAGE_JPEG_VALUE, "".getBytes(StandardCharsets.UTF_8));
-            MockMultipartFile data = new MockMultipartFile("data", "", MediaType.APPLICATION_JSON_VALUE, new ObjectMapper().writeValueAsString(technicalStackRegisterDto).getBytes());
 
             String token = jwtTokenService.createToken(new TokenDto(saveAdminUser1.getEmail()));
 
             ResultActions resultActions = mvc.perform(multipart("/v1/technicalStack")
                     .file(image)
-                    .file(data)
+                    .param("technicalStackName", technicalStackName)
                     .with(requestProcessor -> {
                         requestProcessor.setMethod("POST");
+                        return requestProcessor;
+                    })
+                    .header("Authorization", "Bearer " + token)
+                    .contentType(MediaType.MULTIPART_FORM_DATA)
+            );
+
+            // then
+            resultActions
+                    .andDo(print())
+                    .andExpect(status().isBadRequest());
+        }
+    }
+
+    @Nested
+    @DisplayName("기술스택 수정")
+    class technicalStackUpdate {
+        @Test
+        @DisplayName("실패 : 비로그인 유저")
+        public void fail1() throws Exception {
+            // when
+            String technicalStackName = "testTechnicalStackName";
+            MockMultipartFile image = new MockMultipartFile("image", "image.jpeg", MediaType.IMAGE_JPEG_VALUE, "".getBytes(StandardCharsets.UTF_8));
+
+            ResultActions resultActions = mvc.perform(multipart("/v1/technicalStack/1")
+                    .file(image)
+                    .param("technicalStackName", technicalStackName)
+                    .with(requestProcessor -> {
+                        requestProcessor.setMethod("PUT");
+                        return requestProcessor;
+                    })
+                    .contentType(MediaType.MULTIPART_FORM_DATA)
+            );
+
+            // then
+            resultActions
+                    .andDo(print())
+                    .andExpect(status().isUnauthorized());
+        }
+
+        @Test
+        @DisplayName("실패 : 어드민이 아닌 경우")
+        public void fail2() throws Exception {
+            // given
+            // 유저 세팅
+            User user1 = User.builder()
+                    .name("userName1")
+                    .sex("M")
+                    .email("wkemrm12@naver.com")
+                    .password("testPassword")
+                    .github("testGithub")
+                    .selfIntroduction("testSelfIntroduction")
+                    .block(false)
+                    .blockReason(null)
+                    .permission(Role.ROLE_USER)
+                    .oauthCategory(OAuth.NORMAL)
+                    .email_auth(false)
+                    .imageNo(0L)
+                    .position(null)
+                    .build();
+            User saveUser1 = userRepository.save(user1);
+
+            // when
+            String technicalStackName = "testTechnicalStackName";
+            MockMultipartFile image = new MockMultipartFile("image", "image.jpeg", MediaType.IMAGE_JPEG_VALUE, "".getBytes(StandardCharsets.UTF_8));
+
+            String token = jwtTokenService.createToken(new TokenDto(saveUser1.getEmail()));
+
+            ResultActions resultActions = mvc.perform(multipart("/v1/technicalStack/1")
+                    .file(image)
+                    .param("technicalStackName", technicalStackName)
+                    .with(requestProcessor -> {
+                        requestProcessor.setMethod("PUT");
+                        return requestProcessor;
+                    })
+                    .header("Authorization", "Bearer " + token)
+                    .contentType(MediaType.MULTIPART_FORM_DATA)
+            );
+
+            // then
+            resultActions
+                    .andDo(print())
+                    .andExpect(status().isForbidden());
+        }
+
+        @Test
+        @DisplayName("실패 : 기술 스택 이름이 null일 경우")
+        public void fail3() throws Exception {
+            // given
+            // 어드민 세팅
+            User adminUser1 = User.builder()
+                    .name("userName1")
+                    .sex("M")
+                    .email("wkemrm12@naver.com")
+                    .password("testPassword")
+                    .github("testGithub")
+                    .selfIntroduction("testSelfIntroduction")
+                    .block(false)
+                    .blockReason(null)
+                    .permission(Role.ROLE_ADMIN)
+                    .oauthCategory(OAuth.NORMAL)
+                    .email_auth(false)
+                    .imageNo(0L)
+                    .position(null)
+                    .build();
+            User saveAdminUser1 = userRepository.save(adminUser1);
+
+            // when
+            String technicalStackName = null;
+            MockMultipartFile image = new MockMultipartFile("image", "image.jpeg", MediaType.IMAGE_JPEG_VALUE, "".getBytes(StandardCharsets.UTF_8));
+
+            String token = jwtTokenService.createToken(new TokenDto(saveAdminUser1.getEmail()));
+
+            ResultActions resultActions = mvc.perform(multipart("/v1/technicalStack/1")
+                    .file(image)
+                    .param("technicalStackName", technicalStackName)
+                    .with(requestProcessor -> {
+                        requestProcessor.setMethod("PUT");
                         return requestProcessor;
                     })
                     .header("Authorization", "Bearer " + token)
