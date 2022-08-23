@@ -32,9 +32,13 @@ public class UserServiceImpl implements UserService{
     private final PositionRepository positionRepository;
     private final TechnicalStackRepository technicalStackRepository;
     private final UserTechnicalStackRepository userTechnicalStackRepository;
+    private final ProjectRepository projectRepository;
     private final PasswordEncoder passwordEncoder;
+    private final ProjectService projectService;
     private final ImageRepository imageRepository;
     private final ImageService imageService;
+    private final NotificationRepository notificationRepository;
+    private final CommentRepository commentRepository;
 
     //임시
     private User getAuthenticatedUser() {
@@ -251,15 +255,39 @@ public class UserServiceImpl implements UserService{
 
     @Transactional
     @Override
-    public User userSignOut() {
+    public User userSignOut() throws Exception {
         User user = userRepository.findById(getAuthenticatedUser().getNo())
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FIND_USER_EXCEPTION));
+
+        // 기존 유저가 속해 있던 모든 프로젝트, 북마크, 알림, 프로젝트 포지션, 프로젝트 신청, 프로젝트 신청 기술스택을 삭제
+        // 회원 탈퇴시 자신이 만든 프로젝트에 속한 유저들에게 알림이 필요하다.
+        Optional<List<Project>> optionalProjects = projectRepository.findByUser(user);
+        if (optionalProjects.isPresent()) {
+            for (Project project: optionalProjects.get()) {
+                projectService.projectDelete(project.getNo());
+            }
+        }
+
+        // 유저 기술 스택 삭제
+        userTechnicalStackRepository.deleteAllByUser(user);
+
+        // 알림 삭제 삭제
+        notificationRepository.deleteAllByUser(user);
+
+        // 기존 댓글 조회를 할때 탈퇴한 유저의 댓글은 user의 fk를 null로 바꾸고 프론트에서 null일 경우 탈퇴한 유저라고 표시한다.
+        Optional<List<Comment>> comments = commentRepository.findByUser(user);
+        if (comments.isPresent()) {
+            for (Comment comment : comments.get()) {
+                comment.updateUser(null);
+            }
+        }
 
         if (user.isWithdrawal())
             throw new CustomException(ErrorCode.USER_ALREADY_WITHDRAWAL_EXCEPTION);
 
         // User SignOut
         user.userWithdrawal();
+        userRepository.save(user); // 임시
 
         return user;
     }

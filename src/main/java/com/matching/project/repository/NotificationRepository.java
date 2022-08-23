@@ -25,4 +25,6 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
     Optional<Slice<Notification>> findByUserOrUserIsNullOrderByNoDescUsingPaging(@Param("user") User user,
                                                                        @Param("notificationNo") Long notificationNo,
                                                                        Pageable pageable);
+
+    void deleteAllByUser(User user);
 }
