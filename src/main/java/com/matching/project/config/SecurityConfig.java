@@ -10,6 +10,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -35,6 +37,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
+    @Bean
+    RoleHierarchy roleHierarchy() {
+        RoleHierarchyImpl roleHierarchy = new RoleHierarchyImpl();
+        roleHierarchy.setHierarchy("ROLE_ADMIN > ROLE_USER > ROLE_ANONYMOUS");
+        return roleHierarchy;
+    }
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
 
@@ -59,78 +69,78 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
 
                 //ProjectController
-                .antMatchers(HttpMethod.POST, "/v1/project").hasAnyRole("USER", "ADMIN")
-                .antMatchers(HttpMethod.GET,"/v1/project/create").hasAnyRole("USER", "ADMIN")
+                .antMatchers(HttpMethod.POST, "/v1/project").hasRole("USER")
+                .antMatchers(HttpMethod.GET,"/v1/project/create").hasRole("USER")
                 .antMatchers(HttpMethod.GET,"/v1/project/recruitment/**")
-                    .hasAnyRole("USER", "ADMIN", "ANONYMOUS")
+                    .hasRole("ANONYMOUS")
                 .antMatchers(HttpMethod.GET, "/v1/project/participate")
-                .hasAnyRole("USER", "ADMIN")
+                .hasRole("USER")
                 .antMatchers(HttpMethod.GET, "/v1/project/application")
-                .hasAnyRole("USER", "ADMIN")
+                .hasRole("USER")
                 .antMatchers(HttpMethod.GET, "/v1/project/create/self")
-                .hasAnyRole("USER", "ADMIN")
+                .hasRole("USER")
                 .antMatchers(HttpMethod.GET, "/v1/project/**/update")
-                .hasAnyRole("USER", "ADMIN")
+                .hasRole("USER")
                 .antMatchers(HttpMethod.GET, "/v1/project/create")
-                .hasAnyRole("USER", "ADMIN")
+                .hasRole("USER")
                 .antMatchers(HttpMethod.GET, "/v1/project/*")
-                .hasAnyRole("USER", "ADMIN", "ANONYMOUS")
+                .hasRole("ANONYMOUS")
                 .antMatchers(HttpMethod.PATCH,"/v1/project/*")
-                .hasAnyRole("USER", "ADMIN")
+                .hasRole("USER")
                 .antMatchers(HttpMethod.DELETE,"/v1/project/*")
-                .hasAnyRole("USER", "ADMIN")
+                .hasRole("USER")
 
                 //CommonController
-                .antMatchers("/v1/common/logout").hasAnyRole("USER", "ADMIN")
+                .antMatchers("/v1/common/logout").hasRole("USER")
                 .antMatchers("/v1/common/**").anonymous()
 
                 //UserController
-                .antMatchers("/v1/user/list", "/v1/user/block/**", "/v1/user/unblock/**").hasAnyRole("ADMIN")
+                .antMatchers("/v1/user/list", "/v1/user/block/**", "/v1/user/unblock/**").hasRole("ADMIN")
                 .antMatchers(HttpMethod.POST, "/v1/user").anonymous()
-                .antMatchers(HttpMethod.GET,"/v1/user").hasAnyRole("USER", "ADMIN")
-                .antMatchers(HttpMethod.PATCH,"/v1/user").hasAnyRole("USER", "ADMIN")
-                .antMatchers(HttpMethod.DELETE,"/v1/user").hasAnyRole("USER", "ADMIN")
-                .antMatchers("/v1/user/info", "/v1/user/password").hasAnyRole("USER", "ADMIN")
+                .antMatchers(HttpMethod.GET,"/v1/user").hasRole("USER")
+                .antMatchers(HttpMethod.PATCH,"/v1/user").hasRole("USER")
+                .antMatchers(HttpMethod.DELETE,"/v1/user").hasRole("USER")
+                .antMatchers("/v1/user/info", "/v1/user/password").hasRole("USER")
 
                 //CommentController
-                .antMatchers(HttpMethod.POST,"/v1/comment/**").hasAnyRole("USER", "ADMIN")
-                .antMatchers(HttpMethod.GET,"/v1/comment/**").hasAnyRole("USER", "ADMIN", "ANONYMOUS")
-                .antMatchers(HttpMethod.PATCH,"/v1/comment/**").hasAnyRole("USER", "ADMIN")
-                .antMatchers(HttpMethod.DELETE,"/v1/comment/**").hasAnyRole("USER", "ADMIN")
+                .antMatchers(HttpMethod.POST,"/v1/comment/**").hasRole("USER")
+                .antMatchers(HttpMethod.GET,"/v1/comment/**").hasRole("ANONYMOUS")
+                .antMatchers(HttpMethod.PATCH,"/v1/comment/**").hasRole("USER")
+                .antMatchers(HttpMethod.DELETE,"/v1/comment/**").hasRole("USER")
 
                 //PositionController
-                .antMatchers(HttpMethod.POST,"/v1/position").hasAnyRole("ADMIN")
-                .antMatchers(HttpMethod.GET,"/v1/position").hasAnyRole("USER", "ADMIN")
-                .antMatchers(HttpMethod.PUT,"/v1/position/**").hasAnyRole("ADMIN")
+                .antMatchers(HttpMethod.POST,"/v1/position").hasRole("ADMIN")
+                .antMatchers(HttpMethod.GET,"/v1/position").hasRole("USER")
+                .antMatchers(HttpMethod.PUT,"/v1/position/**").hasRole("ADMIN")
 
                 //NotificationController
-                .antMatchers(HttpMethod.POST,"/v1/notification").hasAnyRole("ADMIN")
-                .antMatchers(HttpMethod.GET,"/v1/notification").hasAnyRole("USER", "ADMIN")
-                .antMatchers(HttpMethod.GET,"/v1/notification/**").hasAnyRole("USER", "ADMIN")
+                .antMatchers(HttpMethod.POST,"/v1/notification").hasRole("ADMIN")
+                .antMatchers(HttpMethod.GET,"/v1/notification").hasRole("USER")
+                .antMatchers(HttpMethod.GET,"/v1/notification/**").hasRole("USER")
 
                 //ProjectController
-                .antMatchers("/v1/project/recruitment/*").hasAnyRole("USER", "ADMIN", "ANONYMOUS")
-                .antMatchers("/v1/project/recruitment/complete/*").hasAnyRole("USER", "ADMIN", "ANONYMOUS")
+                .antMatchers("/v1/project/recruitment/*").hasRole("ANONYMOUS")
+                .antMatchers("/v1/project/recruitment/complete/*").hasRole("ANONYMOUS")
 
                 //ProjectParticipateController
-                .antMatchers("/v1/participate").hasAnyRole("USER", "ADMIN")
-                .antMatchers("/v1/participate/*/permit").hasAnyRole("USER", "ADMIN")
-                .antMatchers("/v1/participate/*/refusal").hasAnyRole("USER", "ADMIN")
-                .antMatchers(HttpMethod.GET,"/v1/participate/*").hasAnyRole("USER", "ADMIN")
+                .antMatchers("/v1/participate").hasRole("USER")
+                .antMatchers("/v1/participate/*/permit").hasRole("USER")
+                .antMatchers("/v1/participate/*/refusal").hasRole("USER")
+                .antMatchers(HttpMethod.GET,"/v1/participate/*").hasRole("USER")
 
                 //BookMarkController
-                .antMatchers(HttpMethod.POST,"/v1/bookmark/*").hasAnyRole("USER", "ADMIN")
-                .antMatchers(HttpMethod.DELETE,"/v1/bookmark/*").hasAnyRole("USER", "ADMIN")
-                .antMatchers(HttpMethod.GET,"/v1/bookmark").hasAnyRole("USER", "ADMIN")
+                .antMatchers(HttpMethod.POST,"/v1/bookmark/*").hasRole("USER")
+                .antMatchers(HttpMethod.DELETE,"/v1/bookmark/*").hasRole("USER")
+                .antMatchers(HttpMethod.GET,"/v1/bookmark").hasRole("USER")
 
                 //TechnicalStackController
-                .antMatchers(HttpMethod.GET,"/v1/technicalStack").hasAnyRole("USER", "ADMIN")
+                .antMatchers(HttpMethod.GET,"/v1/technicalStack").hasRole("USER")
                 .antMatchers(HttpMethod.POST,"/v1/technicalStack").hasRole("ADMIN")
                 .antMatchers(HttpMethod.PUT,"/v1/technicalStack/*").hasRole("ADMIN")
 
                 //ProjectPositionController
-                .antMatchers(HttpMethod.DELETE, "/v1/projectposition/*/withdrawal").hasAnyRole("USER", "ADMIN")
-                .antMatchers(HttpMethod.DELETE, "/v1/projectposition/*/expulsion").hasAnyRole("USER", "ADMIN")
+                .antMatchers(HttpMethod.DELETE, "/v1/projectposition/*/withdrawal").hasRole("USER")
+                .antMatchers(HttpMethod.DELETE, "/v1/projectposition/*/expulsion").hasRole("USER")
 
                 //AnyRequest
                 .anyRequest().permitAll()
