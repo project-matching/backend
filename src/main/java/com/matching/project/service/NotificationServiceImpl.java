@@ -77,7 +77,7 @@ public class NotificationServiceImpl implements NotificationService {
 
         return SliceDto.<NotificationSimpleInfoDto>builder()
                 .content(notificationList.getContent().stream().map(notification -> NotificationSimpleInfoDto.builder()
-                                .no(notification.getNo())
+                                .notificationNo(notification.getNo())
                                 .type(notification.getType())
                                 .title(notification.getTitle())
                                 .read(notification.isRead())

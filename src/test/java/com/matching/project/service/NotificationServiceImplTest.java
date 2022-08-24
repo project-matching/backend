@@ -5,13 +5,11 @@ import com.matching.project.dto.enumerate.Role;
 import com.matching.project.dto.enumerate.Type;
 import com.matching.project.dto.notification.NotificationDto;
 import com.matching.project.dto.notification.NotificationSimpleInfoDto;
-import com.matching.project.entity.Comment;
 import com.matching.project.entity.Notification;
 import com.matching.project.entity.User;
 import com.matching.project.error.CustomException;
 import com.matching.project.repository.NotificationRepository;
 import com.matching.project.repository.UserRepository;
-import org.aspectj.weaver.ast.Not;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -28,10 +26,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
@@ -189,11 +185,11 @@ class NotificationServiceImplTest {
 
             //then
             assertThat(dtos.getContent().size()).isEqualTo(3);
-            assertThat(dtos.getContent().get(0).getNo()).isEqualTo(Integer.toUnsignedLong(3));
+            assertThat(dtos.getContent().get(0).getNotificationNo()).isEqualTo(Integer.toUnsignedLong(3));
             assertThat(dtos.getContent().get(0).getTitle()).isEqualTo("title" + 3);
-            assertThat(dtos.getContent().get(1).getNo()).isEqualTo(Integer.toUnsignedLong(4));
+            assertThat(dtos.getContent().get(1).getNotificationNo()).isEqualTo(Integer.toUnsignedLong(4));
             assertThat(dtos.getContent().get(1).getTitle()).isEqualTo("title" + 4);
-            assertThat(dtos.getContent().get(2).getNo()).isEqualTo(Integer.toUnsignedLong(5));
+            assertThat(dtos.getContent().get(2).getNotificationNo()).isEqualTo(Integer.toUnsignedLong(5));
             assertThat(dtos.getContent().get(2).getTitle()).isEqualTo("title" + 5);
             assertThat(dtos.isLast()).isFalse();
 

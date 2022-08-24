@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @Builder
 @Data
 public class NotificationSimpleInfoDto {
-    private Long no;
+    private Long notificationNo;
     private Type type;
     private String title;
     private boolean read;

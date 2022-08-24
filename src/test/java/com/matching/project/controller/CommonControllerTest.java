@@ -97,24 +97,24 @@ public class CommonControllerTest {
         }
     }
 
-    @Nested
-    @DisplayName("로그아웃")
-    class logout {
-        @DisplayName("성공")
-        @Test
-        void success() throws Exception {
-            //given
-            User user = saveUser();
-            String token = getToken(user);
-            //when
-            ResultActions resultActions = mvc.perform(get("/v1/common/logout")
-                    .header("Authorization", "Bearer " + token));
-
-            //then
-            resultActions.andDo(print())
-                    .andExpect(status().isOk());
-        }
-    }
+//    @Nested
+//    @DisplayName("로그아웃")
+//    class logout {
+//        @DisplayName("성공")
+//        @Test
+//        void success() throws Exception {
+//            //given
+//            User user = saveUser();
+//            String token = getToken(user);
+//            //when
+//            ResultActions resultActions = mvc.perform(get("/v1/common/logout")
+//                    .header("Authorization", "Bearer " + token));
+//
+//            //then
+//            resultActions.andDo(print())
+//                    .andExpect(status().isOk());
+//        }
+//    }
 
     @Nested
     @DisplayName("비밀번호 초기화")
