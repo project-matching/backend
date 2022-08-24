@@ -9,12 +9,14 @@ pipeline {
     }
     stages {
         stage('backend test') {
-            sh "pwd"
-            echo "빌드 실행 권한 추가"
-            sh "chmod +x gradlew"
-            sh "./gradlew clean"
-            echo "테스트"
-            sh "./gradlew test"
+            steps {
+                sh "pwd"
+                echo "빌드 실행 권한 추가"
+                sh "chmod +x gradlew"
+                sh "./gradlew clean"
+                echo "테스트"
+                sh "./gradlew test"
+            }
         }
 
         stage('backend build') {
