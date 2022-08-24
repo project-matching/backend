@@ -1,10 +1,7 @@
 package com.matching.project.service;
 
 import com.matching.project.dto.common.NormalLoginRequestDto;
-import com.matching.project.dto.common.TokenDto;
-import com.matching.project.dto.enumerate.OAuth;
 import com.matching.project.dto.enumerate.Role;
-import com.matching.project.entity.Position;
 import com.matching.project.entity.User;
 import com.matching.project.error.CustomException;
 import com.matching.project.error.ErrorCode;
@@ -14,18 +11,19 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class CommonServiceImplTest {
@@ -212,6 +210,43 @@ class CommonServiceImplTest {
 
             //then
             assertThat(e.getErrorCode().getDetail()).isEqualTo("This is withdrawal User ID");
+        }
+    }
+
+    @Nested
+    @DisplayName("로그아웃")
+    class Logout {
+
+        @DisplayName("성공")
+        @Test
+        void success() {
+            //given
+            Long no = 2L;
+            String name = "테스터";
+            String email = "leeworld9@gmail.com";
+
+            Optional<User> user = Optional.of(User.builder()
+                    .no(no)
+                    .name(name)
+                    .email(email)
+                    .permission(Role.ROLE_USER)
+                    .build()
+            );
+
+            SecurityContext context = SecurityContextHolder.getContext();
+            context.setAuthentication(new UsernamePasswordAuthenticationToken(user.get(), user.get().getEmail(), user.get().getAuthorities()));
+
+            String accessToken = "askldfjl2kj3lrkjasld";
+
+            //when
+            commonService.userLogout(accessToken);
+
+            //then
+            //None
+
+            //verify
+            verify(jwtTokenService,times(1)).deleteRefreshToken(user.get().getEmail());
+            verify(jwtTokenService, times(1)).setBlackList(accessToken);
         }
     }
 }

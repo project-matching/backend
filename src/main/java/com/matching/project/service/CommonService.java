@@ -6,4 +6,5 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 
 public interface CommonService{
     User normalLogin(NormalLoginRequestDto normalLoginRequestDto);
+    void userLogout(String accessToken);
 }

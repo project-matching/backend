@@ -1,11 +1,9 @@
 package com.matching.project.oauth;
 
-import com.matching.project.dto.common.TokenDto;
 import com.matching.project.entity.User;
 import com.matching.project.error.CustomException;
 import com.matching.project.error.ErrorCode;
 import com.matching.project.repository.UserRepository;
-import com.matching.project.service.JwtTokenService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -17,7 +15,6 @@ import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.http.HttpSession;
 import java.util.Collections;
 
 @RequiredArgsConstructor

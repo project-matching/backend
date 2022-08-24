@@ -1,4 +1,4 @@
-package com.matching.project.dto.common;
+package com.matching.project.dto.token;
 
 import lombok.*;
 
@@ -7,6 +7,6 @@ import lombok.*;
 @AllArgsConstructor
 @Setter
 @Getter
-public class TokenDto {
+public class TokenClaimsDto {
     String email;
 }

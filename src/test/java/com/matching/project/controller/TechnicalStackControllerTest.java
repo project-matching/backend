@@ -1,11 +1,10 @@
 package com.matching.project.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.matching.project.dto.common.TokenDto;
+import com.matching.project.dto.token.TokenClaimsDto;
 import com.matching.project.dto.enumerate.OAuth;
 import com.matching.project.dto.enumerate.Role;
 import com.matching.project.dto.technicalstack.TechnicalStackRegisterRequestDto;
-import com.matching.project.dto.technicalstack.TechnicalStackUpdateRequestDto;
 import com.matching.project.entity.Image;
 import com.matching.project.entity.TechnicalStack;
 import com.matching.project.entity.User;
@@ -117,7 +116,7 @@ class TechnicalStackControllerTest {
             TechnicalStack saveTechnicalStack3 = technicalStackRepository.save(technicalStack3);
 
             // when
-            String token = jwtTokenService.createToken(new TokenDto(saveAdminUser1.getEmail()));
+            String token = jwtTokenService.createToken(new TokenClaimsDto(saveAdminUser1.getEmail())).getAccess();
 
             ResultActions resultActions = mvc.perform(get("/v1/technicalStack").contentType(MediaType.APPLICATION_JSON)
                     .header("Authorization", "Bearer " + token));
@@ -198,7 +197,7 @@ class TechnicalStackControllerTest {
             TechnicalStack saveTechnicalStack3 = technicalStackRepository.save(technicalStack3);
 
             // when
-            String token = jwtTokenService.createToken(new TokenDto(saveAdminUser1.getEmail()));
+            String token = jwtTokenService.createToken(new TokenClaimsDto(saveUser1.getEmail())).getAccess();
 
             ResultActions resultActions = mvc.perform(get("/v1/technicalStack").contentType(MediaType.APPLICATION_JSON)
                     .header("Authorization", "Bearer " + token));
@@ -261,7 +260,7 @@ class TechnicalStackControllerTest {
             String technicalStackName = "testTechnicalStackName";
             MockMultipartFile image = new MockMultipartFile("image", "image.jpeg", MediaType.IMAGE_JPEG_VALUE, "".getBytes(StandardCharsets.UTF_8));
 
-            String token = jwtTokenService.createToken(new TokenDto(saveAdminUser1.getEmail()));
+            String token = jwtTokenService.createToken(new TokenClaimsDto(saveAdminUser1.getEmail())).getAccess();
 
             ResultActions resultActions = mvc.perform(multipart("/v1/technicalStack")
                     .file(image)
@@ -335,7 +334,7 @@ class TechnicalStackControllerTest {
             String technicalStackName = "testTechnicalStackName";
             MockMultipartFile image = new MockMultipartFile("image", "image.jpeg", MediaType.IMAGE_JPEG_VALUE, "".getBytes(StandardCharsets.UTF_8));
 
-            String token = jwtTokenService.createToken(new TokenDto(saveUser1.getEmail()));
+            String token = jwtTokenService.createToken(new TokenClaimsDto(saveUser1.getEmail())).getAccess();
 
             ResultActions resultActions = mvc.perform(multipart("/v1/technicalStack")
                     .file(image)
@@ -380,7 +379,7 @@ class TechnicalStackControllerTest {
             String technicalStackName = null;
             MockMultipartFile image = new MockMultipartFile("image", "image.jpeg", MediaType.IMAGE_JPEG_VALUE, "".getBytes(StandardCharsets.UTF_8));
 
-            String token = jwtTokenService.createToken(new TokenDto(saveAdminUser1.getEmail()));
+            String token = jwtTokenService.createToken(new TokenClaimsDto(saveAdminUser1.getEmail())).getAccess();
 
             ResultActions resultActions = mvc.perform(multipart("/v1/technicalStack")
                     .file(image)

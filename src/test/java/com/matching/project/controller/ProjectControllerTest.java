@@ -5,7 +5,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.matching.project.dto.ResponseDto;
-import com.matching.project.dto.common.TokenDto;
+import com.matching.project.dto.token.TokenClaimsDto;
 import com.matching.project.dto.enumerate.OAuth;
 import com.matching.project.dto.enumerate.Role;
 import com.matching.project.dto.project.ProjectRegisterRequestDto;
@@ -232,7 +232,7 @@ class ProjectControllerTest {
             technicalStackRepository.save(technicalStack2);
 
             // when
-            String token = jwtTokenService.createToken(new TokenDto(saveUser.getEmail()));
+            String token = jwtTokenService.createToken(new TokenClaimsDto(saveUser.getEmail())).getAccess();
 
             ResultActions resultActions = mvc.perform(get("/v1/project/create").contentType(MediaType.APPLICATION_JSON)
                             .header("Authorization", "Bearer " + token));
@@ -319,7 +319,7 @@ class ProjectControllerTest {
                     .build();
 
             // when
-            String token = jwtTokenService.createToken(new TokenDto(saveUser.getEmail()));
+            String token = jwtTokenService.createToken(new TokenClaimsDto(saveUser.getEmail())).getAccess();
 
             ResultActions resultActions = mvc.perform(post("/v1/project").contentType(MediaType.APPLICATION_JSON)
                             .header("Authorization", "Bearer " + token)
@@ -391,7 +391,7 @@ class ProjectControllerTest {
                     .build();
 
             // when
-            String token = jwtTokenService.createToken(new TokenDto(saveUser.getEmail()));
+            String token = jwtTokenService.createToken(new TokenClaimsDto(saveUser.getEmail())).getAccess();
 
             ResultActions resultActions = mvc.perform(post("/v1/project").contentType(MediaType.APPLICATION_JSON)
                     .header("Authorization", "Bearer " + token)
@@ -545,7 +545,7 @@ class ProjectControllerTest {
             saveBookMark(saveUser, saveRecruitmentProject.get(1));
 
             // when
-            String token = jwtTokenService.createToken(new TokenDto(saveUser.getEmail()));
+            String token = jwtTokenService.createToken(new TokenClaimsDto(saveUser.getEmail())).getAccess();
 
             ResultActions resultActions = mvc.perform(get("/v1/project/recruitment?size=5&sortBy=createdDate,desc")
                             .contentType(MediaType.APPLICATION_JSON)
@@ -639,7 +639,7 @@ class ProjectControllerTest {
             saveBookMark(saveUser, saveRecruitmentProject.get(1));
 
             // when
-            String token = jwtTokenService.createToken(new TokenDto(saveUser.getEmail()));
+            String token = jwtTokenService.createToken(new TokenClaimsDto(saveUser.getEmail())).getAccess();
 
             ResultActions resultActions = mvc.perform(get("/v1/project/recruitment?size=5&sortBy=createdDate,desc&projectNo=" + saveRecruitmentProject.get(3).getNo())
                     .contentType(MediaType.APPLICATION_JSON)
@@ -822,7 +822,7 @@ class ProjectControllerTest {
             saveBookMark(saveUser, saveRecruitmentCompleteProject.get(1));
 
             // when
-            String token = jwtTokenService.createToken(new TokenDto(saveUser.getEmail()));
+            String token = jwtTokenService.createToken(new TokenClaimsDto(saveUser.getEmail())).getAccess();
 
             ResultActions resultActions = mvc.perform(get("/v1/project/recruitment/complete?size=5&sortBy=createdDate,desc")
                             .contentType(MediaType.APPLICATION_JSON)
@@ -917,7 +917,7 @@ class ProjectControllerTest {
             saveBookMark(saveUser, saveRecruitmentCompleteProject.get(1));
 
             // when
-            String token = jwtTokenService.createToken(new TokenDto(saveUser.getEmail()));
+            String token = jwtTokenService.createToken(new TokenClaimsDto(saveUser.getEmail())).getAccess();
 
             ResultActions resultActions = mvc.perform(get("/v1/project/recruitment/complete?size=5&sortBy=createdDate,desc&projectNo=" + saveRecruitmentCompleteProject.get(3).getNo())
                     .contentType(MediaType.APPLICATION_JSON)
@@ -1009,7 +1009,7 @@ class ProjectControllerTest {
             saveBookMark(saveUser, saveCreateSelfProject.get(0));
 
             // when
-            String token = jwtTokenService.createToken(new TokenDto(saveUser.getEmail()));
+            String token = jwtTokenService.createToken(new TokenClaimsDto(saveUser.getEmail())).getAccess();
 
             ResultActions resultActions = mvc.perform(get("/v1/project/create/self?size=5&sortBy=createdDate,desc")
                             .contentType(MediaType.APPLICATION_JSON)
@@ -1097,7 +1097,7 @@ class ProjectControllerTest {
             saveBookMark(saveUser, saveCreateSelfProject.get(0));
 
             // when
-            String token = jwtTokenService.createToken(new TokenDto(saveUser.getEmail()));
+            String token = jwtTokenService.createToken(new TokenClaimsDto(saveUser.getEmail())).getAccess();
 
             ResultActions resultActions = mvc.perform(get("/v1/project/create/self?size=5&sortBy=createdDate,desc&projectNo=" + saveCreateSelfProject.get(2).getNo())
                     .contentType(MediaType.APPLICATION_JSON)
@@ -1213,7 +1213,7 @@ class ProjectControllerTest {
             saveBookMark(saveUser, saveRecruitmentProjectList.get(0));
 
             // when
-            String token = jwtTokenService.createToken(new TokenDto(saveUser.getEmail()));
+            String token = jwtTokenService.createToken(new TokenClaimsDto(saveUser.getEmail())).getAccess();
 
             ResultActions resultActions = mvc.perform(get("/v1/project/participate?size=5&sortBy=createdDate,desc")
                     .contentType(MediaType.APPLICATION_JSON)
@@ -1317,7 +1317,7 @@ class ProjectControllerTest {
             saveBookMark(saveUser, saveRecruitmentProjectList.get(0));
 
             // when
-            String token = jwtTokenService.createToken(new TokenDto(saveUser.getEmail()));
+            String token = jwtTokenService.createToken(new TokenClaimsDto(saveUser.getEmail())).getAccess();
 
             ResultActions resultActions = mvc.perform(get("/v1/project/participate?size=5&sortBy=createdDate,desc&projectNo=" + saveRecruitmentCompleteProjectList.get(0).getNo())
                     .contentType(MediaType.APPLICATION_JSON)
@@ -1440,7 +1440,7 @@ class ProjectControllerTest {
             projectParticipateRequestRepository.save(projectParticipateRequest2);
 
             // when
-            String token = jwtTokenService.createToken(new TokenDto(saveUser.getEmail()));
+            String token = jwtTokenService.createToken(new TokenClaimsDto(saveUser.getEmail())).getAccess();
 
             ResultActions resultActions = mvc.perform(get("/v1/project/application?size=5&sortBy=createdDate,desc")
                     .contentType(MediaType.APPLICATION_JSON)
@@ -1559,7 +1559,7 @@ class ProjectControllerTest {
             projectParticipateRequestRepository.save(projectParticipateRequest2);
 
             // when
-            String token = jwtTokenService.createToken(new TokenDto(saveUser.getEmail()));
+            String token = jwtTokenService.createToken(new TokenClaimsDto(saveUser.getEmail())).getAccess();
 
             ResultActions resultActions = mvc.perform(get("/v1/project/application?size=5&sortBy=createdDate,desc&projectNo=" + saveRecruitmentCompleteProjectList.get(0).getNo())
                     .contentType(MediaType.APPLICATION_JSON)
@@ -1681,7 +1681,7 @@ class ProjectControllerTest {
             ProjectTechnicalStack saveProjectTechnicalStack2 = projectTechnicalStackRepository.save(projectTechnicalStack2);
 
             // when
-            String token = jwtTokenService.createToken(new TokenDto(saveUser.getEmail()));
+            String token = jwtTokenService.createToken(new TokenClaimsDto(saveUser.getEmail())).getAccess();
 
             ResultActions resultActions = mvc.perform(get("/v1/project/" + saveProject1.getNo() + "/update").contentType(MediaType.APPLICATION_JSON)
                     .header("Authorization", "Bearer " + token));
@@ -1811,7 +1811,7 @@ class ProjectControllerTest {
             ProjectTechnicalStack saveProjectTechnicalStack2 = projectTechnicalStackRepository.save(projectTechnicalStack2);
 
             // when
-            String token = jwtTokenService.createToken(new TokenDto(saveUser.getEmail()));
+            String token = jwtTokenService.createToken(new TokenClaimsDto(saveUser.getEmail())).getAccess();
 
             ResultActions resultActions = mvc.perform(get("/v1/project/" + saveProject1.getNo() + 1 + "/update").contentType(MediaType.APPLICATION_JSON)
                     .header("Authorization", "Bearer " + token));
@@ -2025,7 +2025,7 @@ class ProjectControllerTest {
             bookMarkRepository.save(bookMark);
 
             // when
-            String token = jwtTokenService.createToken(new TokenDto(saveUser.getEmail()));
+            String token = jwtTokenService.createToken(new TokenClaimsDto(saveUser.getEmail())).getAccess();
 
             ResultActions resultActions = mvc.perform(get("/v1/project/" + saveProject1.getNo()).contentType(MediaType.APPLICATION_JSON)
                     .header("Authorization", "Bearer " + token));
@@ -2143,7 +2143,7 @@ class ProjectControllerTest {
             projectTechnicalStackRepository.save(projectTechnicalStack2);
 
             // when
-            String token = jwtTokenService.createToken(new TokenDto(saveUser.getEmail()));
+            String token = jwtTokenService.createToken(new TokenClaimsDto(saveUser.getEmail())).getAccess();
 
             List<ProjectPositionAddDto> projectPositionAddDtoList = new ArrayList<>();
             ProjectPositionAddDto projectPositionAddDto = new ProjectPositionAddDto(savePosition1.getNo(), 2);
@@ -2341,7 +2341,7 @@ class ProjectControllerTest {
             assertEquals(projectParticipateRequestRepository.findAll().size(), 2);
             assertEquals(participateRequestTechnicalStackRepository.findAll().size(), 2);
 
-            String token = jwtTokenService.createToken(new TokenDto(saveUser.getEmail()));
+            String token = jwtTokenService.createToken(new TokenClaimsDto(saveUser.getEmail())).getAccess();
             ResultActions resultActions = mvc.perform(delete("/v1/project/" + saveProject1.getNo()).contentType(MediaType.APPLICATION_JSON)
                     .header("Authorization", "Bearer " + token));
 

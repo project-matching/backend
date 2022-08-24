@@ -2,8 +2,9 @@ package com.matching.project.controller;
 
 import com.matching.project.dto.ResponseDto;
 import com.matching.project.dto.SliceDto;
-import com.matching.project.dto.common.TokenDto;
+import com.matching.project.dto.token.TokenClaimsDto;
 import com.matching.project.dto.enumerate.EmailAuthPurpose;
+import com.matching.project.dto.token.TokenDto;
 import com.matching.project.dto.user.*;
 import com.matching.project.entity.EmailAuth;
 import com.matching.project.entity.User;
@@ -14,21 +15,13 @@ import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -62,13 +55,19 @@ public class UserController {
 
     @ApiOperation(value = "이메일 인증")
     @PostMapping("/confirm")
-    public ResponseEntity<ResponseDto<String>> confirmEmail(@RequestBody @Valid EmailAuthRequestDto dto) {
+    public ResponseEntity<ResponseDto<TokenDto>> confirmEmail(@RequestBody @Valid EmailAuthRequestDto dto) {
         User user = emailService.checkConfirmEmail(dto, EmailAuthPurpose.EMAIL_AUTHENTICATION);
-        TokenDto tokenDto = TokenDto.builder()
+
+        // Jwt Token Create
+        TokenClaimsDto tokenClaimsDto = TokenClaimsDto.builder()
                 .email(user.getEmail())
                 .build();
-        String jwtAccessToken = jwtTokenService.createToken(tokenDto);
-        return ResponseEntity.ok().body(new ResponseDto<>(null, jwtAccessToken));
+        TokenDto tokenDto = jwtTokenService.createToken(tokenClaimsDto);
+
+        // refresh Token save
+        jwtTokenService.setRefreshToken(user.getEmail(), tokenDto.getRefresh());
+
+        return ResponseEntity.ok().body(new ResponseDto<>(null, tokenDto));
     }
 
     @ApiOperation(value = "이메일 재발송 (회원가입)")

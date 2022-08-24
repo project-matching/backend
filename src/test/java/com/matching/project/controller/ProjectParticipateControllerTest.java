@@ -2,7 +2,7 @@ package com.matching.project.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.matching.project.dto.common.TokenDto;
+import com.matching.project.dto.token.TokenClaimsDto;
 import com.matching.project.dto.enumerate.OAuth;
 import com.matching.project.dto.enumerate.Role;
 import com.matching.project.dto.enumerate.Type;
@@ -23,9 +23,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -188,7 +186,7 @@ class ProjectParticipateControllerTest {
 
             ProjectParticipateRequestDto projectParticipateRequestDto = new ProjectParticipateRequestDto(saveProjectPosition1.getNo(), technicalStackRequestList, "testGitHub1", "testMotive");
 
-            String token = jwtTokenService.createToken(new TokenDto(saveUser.getEmail()));
+            String token = jwtTokenService.createToken(new TokenClaimsDto(saveUser.getEmail())).getAccess();
 
             ResultActions resultActions = mvc.perform(post("/v1/participate").contentType(MediaType.APPLICATION_JSON)
                     .header("Authorization", "Bearer " + token)
@@ -307,7 +305,7 @@ class ProjectParticipateControllerTest {
 
             ProjectParticipateRequestDto projectParticipateRequestDto = new ProjectParticipateRequestDto(saveProjectPosition1.getNo(), technicalStackRequestList, "testGitHub1", "testMotive");
 
-            String token = jwtTokenService.createToken(new TokenDto(saveUser.getEmail()));
+            String token = jwtTokenService.createToken(new TokenClaimsDto(saveUser.getEmail())).getAccess();
 
             ResultActions resultActions = mvc.perform(post("/v1/participate").contentType(MediaType.APPLICATION_JSON)
                     .header("Authorization", "Bearer " + token)
@@ -484,7 +482,7 @@ class ProjectParticipateControllerTest {
             ParticipateRequestTechnicalStack saveParticipateRequestTechnicalStack2 = participateRequestTechnicalStackRepository.saveAndFlush(participateRequestTechnicalStack2);
 
             // when
-            String token = jwtTokenService.createToken(new TokenDto(saveUser1.getEmail()));
+            String token = jwtTokenService.createToken(new TokenClaimsDto(saveUser1.getEmail())).getAccess();
 
             ResultActions resultActions = mvc.perform(get("/v1/participate/" + saveProject1.getNo() + "?size=5&sortBy=createdDate,desc").contentType(MediaType.APPLICATION_JSON)
                     .header("Authorization", "Bearer " + token));
@@ -661,7 +659,7 @@ class ProjectParticipateControllerTest {
             ParticipateRequestTechnicalStack saveParticipateRequestTechnicalStack2 = participateRequestTechnicalStackRepository.save(participateRequestTechnicalStack2);
 
             // when
-            String token = jwtTokenService.createToken(new TokenDto(saveUser1.getEmail()));
+            String token = jwtTokenService.createToken(new TokenClaimsDto(saveUser1.getEmail())).getAccess();
 
             ResultActions resultActions = mvc.perform(get("/v1/participate/" + saveProject1.getNo() + "?size=5&sortBy=createdDate,desc&projectParticipateRequestNo=" + saveProjectParticipateRequest2.getNo())
                     .contentType(MediaType.APPLICATION_JSON)
@@ -845,7 +843,7 @@ class ProjectParticipateControllerTest {
             participateRequestTechnicalStackRepository.save(participateRequestTechnicalStack2);
 
             // when
-            String token = jwtTokenService.createToken(new TokenDto(saveUser2.getEmail()));
+            String token = jwtTokenService.createToken(new TokenClaimsDto(saveUser2.getEmail())).getAccess();
 
             ResultActions resultActions = mvc.perform(get("/v1/participate/" + saveProject1.getNo() + "?size=5&sortBy=createdDate,desc").contentType(MediaType.APPLICATION_JSON)
                     .header("Authorization", "Bearer " + token));
@@ -991,7 +989,7 @@ class ProjectParticipateControllerTest {
             // when
             ProjectPosition beforeProjectPosition = projectPositionRepository.findById(saveProjectParticipateRequest1.getProjectPosition().getNo()).get();
             assertEquals(beforeProjectPosition.getUser(), null);
-            String token = jwtTokenService.createToken(new TokenDto(saveUser1.getEmail()));
+            String token = jwtTokenService.createToken(new TokenClaimsDto(saveUser1.getEmail())).getAccess();
 
 
             ResultActions resultActions = mvc.perform(post("/v1/participate/" + saveProjectParticipateRequest1.getNo() + "/permit").contentType(MediaType.APPLICATION_JSON)
@@ -1170,7 +1168,7 @@ class ProjectParticipateControllerTest {
             participateRequestTechnicalStackRepository.save(participateRequestTechnicalStack2);
 
             // when
-            String token = jwtTokenService.createToken(new TokenDto(saveUser2.getEmail()));
+            String token = jwtTokenService.createToken(new TokenClaimsDto(saveUser2.getEmail())).getAccess();
 
             ResultActions resultActions = mvc.perform(post("/v1/participate/" + saveProjectParticipateRequest1.getNo() + "/permit").contentType(MediaType.APPLICATION_JSON)
                     .header("Authorization", "Bearer " + token));
@@ -1314,7 +1312,7 @@ class ProjectParticipateControllerTest {
             participateRequestTechnicalStackRepository.save(participateRequestTechnicalStack2);
 
             // when
-            String token = jwtTokenService.createToken(new TokenDto(saveUser1.getEmail()));
+            String token = jwtTokenService.createToken(new TokenClaimsDto(saveUser1.getEmail())).getAccess();
             ProjectParticipateRefusalRequestDto projectParticipateRefusalRequestDto = new ProjectParticipateRefusalRequestDto("testReason");
             ResultActions resultActions = mvc.perform(post("/v1/participate/" + saveProjectParticipateRequest1.getNo() + "/refusal").contentType(MediaType.APPLICATION_JSON)
                     .header("Authorization", "Bearer " + token)
@@ -1478,7 +1476,7 @@ class ProjectParticipateControllerTest {
             participateRequestTechnicalStackRepository.save(participateRequestTechnicalStack2);
 
             // when
-            String token = jwtTokenService.createToken(new TokenDto(saveUser2.getEmail()));
+            String token = jwtTokenService.createToken(new TokenClaimsDto(saveUser2.getEmail())).getAccess();
 
             ResultActions resultActions = mvc.perform(post("/v1/participate/" + saveProjectParticipateRequest1.getNo() + "/refusal").contentType(MediaType.APPLICATION_JSON)
                     .header("Authorization", "Bearer " + token)
