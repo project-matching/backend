@@ -18,7 +18,7 @@ public interface UserService {
     SliceDto<UserSimpleInfoDto> userInfoList(Long UserNo, UserFilterDto userFilterDto, Pageable pageable);
     User userUpdate(UserUpdateRequestDto userUpdateRequestDto, MultipartFile file);
     User userPasswordUpdate(PasswordUpdateRequestDto passwordUpdateRequestDto);
-    User userSignOut();
+    User userSignOut() throws Exception;
     User userBlock(Long userNo, String reason);
     User userUnBlock(Long userNo);
 }

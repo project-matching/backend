@@ -107,7 +107,7 @@ public class UserController {
 
     @DeleteMapping
     @ApiOperation(value = "회원 탈퇴")
-    public ResponseEntity<ResponseDto<Boolean>> userSingOut() {
+    public ResponseEntity<ResponseDto<Boolean>> userSingOut() throws Exception {
         User user = userService.userSignOut();
         return ResponseEntity.ok(new ResponseDto<>(null, true));
     }

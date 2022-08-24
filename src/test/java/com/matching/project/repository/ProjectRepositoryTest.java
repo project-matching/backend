@@ -231,12 +231,9 @@ class ProjectRepositoryTest {
         assertEquals(projectList.get(0).getRegister(), saveProject2.getCreateUserName());
         assertEquals(projectList.get(0).isBookMark(), false);
 
-        assertEquals(projectList.get(0).getProjectSimplePositionDtoList().get(0).getProjectNo(), saveProjectPosition3.getProject().getNo());
-        assertEquals(projectList.get(0).getProjectSimplePositionDtoList().get(0).getPositionNo(), saveProjectPosition3.getPosition().getNo());
-        assertEquals(projectList.get(0).getProjectSimplePositionDtoList().get(0).getPositionName(), saveProjectPosition3.getPosition().getName());
-        assertEquals(projectList.get(0).getProjectSimplePositionDtoList().get(1).getProjectNo(), saveProjectPosition4.getProject().getNo());
-        assertEquals(projectList.get(0).getProjectSimplePositionDtoList().get(1).getPositionNo(), saveProjectPosition4.getPosition().getNo());
-        assertEquals(projectList.get(0).getProjectSimplePositionDtoList().get(1).getPositionName(), saveProjectPosition4.getPosition().getName());
+        assertEquals(projectList.get(0).getProjectSimplePositionDtoList().get(0).getProjectNo(), saveProjectPosition4.getProject().getNo());
+        assertEquals(projectList.get(0).getProjectSimplePositionDtoList().get(0).getPositionNo(), saveProjectPosition4.getPosition().getNo());
+        assertEquals(projectList.get(0).getProjectSimplePositionDtoList().get(0).getPositionName(), saveProjectPosition4.getPosition().getName());
 
         assertEquals(projectList.get(0).getProjectSimpleTechnicalStackDtoList().get(0).getProjectNo(), saveProjectTechnicalStack3.getProject().getNo());
         assertEquals(projectList.get(0).getProjectSimpleTechnicalStackDtoList().get(0).getTechnicalStackName(), saveProjectTechnicalStack3.getTechnicalStack().getName());
@@ -253,12 +250,9 @@ class ProjectRepositoryTest {
         assertEquals(projectList.get(1).getRegister(), saveProject1.getCreateUserName());
         assertEquals(projectList.get(1).isBookMark(), false);
 
-        assertEquals(projectList.get(1).getProjectSimplePositionDtoList().get(0).getProjectNo(), saveProjectPosition1.getProject().getNo());
-        assertEquals(projectList.get(1).getProjectSimplePositionDtoList().get(0).getPositionNo(), saveProjectPosition1.getPosition().getNo());
-        assertEquals(projectList.get(1).getProjectSimplePositionDtoList().get(0).getPositionName(), saveProjectPosition1.getPosition().getName());
-        assertEquals(projectList.get(1).getProjectSimplePositionDtoList().get(1).getProjectNo(), saveProjectPosition2.getProject().getNo());
-        assertEquals(projectList.get(1).getProjectSimplePositionDtoList().get(1).getPositionNo(), saveProjectPosition2.getPosition().getNo());
-        assertEquals(projectList.get(1).getProjectSimplePositionDtoList().get(1).getPositionName(), saveProjectPosition2.getPosition().getName());
+        assertEquals(projectList.get(1).getProjectSimplePositionDtoList().get(0).getProjectNo(), saveProjectPosition2.getProject().getNo());
+        assertEquals(projectList.get(1).getProjectSimplePositionDtoList().get(0).getPositionNo(), saveProjectPosition2.getPosition().getNo());
+        assertEquals(projectList.get(1).getProjectSimplePositionDtoList().get(0).getPositionName(), saveProjectPosition2.getPosition().getName());
 
         assertEquals(projectList.get(1).getProjectSimpleTechnicalStackDtoList().get(0).getProjectNo(), saveProjectTechnicalStack1.getProject().getNo());
         assertEquals(projectList.get(1).getProjectSimpleTechnicalStackDtoList().get(0).getTechnicalStackName(), saveProjectTechnicalStack1.getTechnicalStack().getName());
@@ -436,12 +430,9 @@ class ProjectRepositoryTest {
         assertEquals(projectList.get(0).getRegister(), saveProject2.getCreateUserName());
         assertEquals(projectList.get(0).isBookMark(), false);
 
-        assertEquals(projectList.get(0).getProjectSimplePositionDtoList().get(0).getProjectNo(), saveProjectPosition3.getProject().getNo());
-        assertEquals(projectList.get(0).getProjectSimplePositionDtoList().get(0).getPositionNo(), saveProjectPosition3.getPosition().getNo());
-        assertEquals(projectList.get(0).getProjectSimplePositionDtoList().get(0).getPositionName(), saveProjectPosition3.getPosition().getName());
-        assertEquals(projectList.get(0).getProjectSimplePositionDtoList().get(1).getProjectNo(), saveProjectPosition4.getProject().getNo());
-        assertEquals(projectList.get(0).getProjectSimplePositionDtoList().get(1).getPositionNo(), saveProjectPosition4.getPosition().getNo());
-        assertEquals(projectList.get(0).getProjectSimplePositionDtoList().get(1).getPositionName(), saveProjectPosition4.getPosition().getName());
+        assertEquals(projectList.get(0).getProjectSimplePositionDtoList().get(0).getProjectNo(), saveProjectPosition4.getProject().getNo());
+        assertEquals(projectList.get(0).getProjectSimplePositionDtoList().get(0).getPositionNo(), saveProjectPosition4.getPosition().getNo());
+        assertEquals(projectList.get(0).getProjectSimplePositionDtoList().get(0).getPositionName(), saveProjectPosition4.getPosition().getName());
 
         assertEquals(projectList.get(0).getProjectSimpleTechnicalStackDtoList().get(0).getProjectNo(), saveProjectTechnicalStack3.getProject().getNo());
         assertEquals(projectList.get(0).getProjectSimpleTechnicalStackDtoList().get(0).getTechnicalStackName(), saveProjectTechnicalStack3.getTechnicalStack().getName());
@@ -638,12 +629,9 @@ class ProjectRepositoryTest {
         assertEquals(projectList.get(0).getRegister(), saveProject2.getCreateUserName());
         assertEquals(projectList.get(0).isBookMark(), false);
 
-        assertEquals(projectList.get(0).getProjectSimplePositionDtoList().get(0).getProjectNo(), saveProjectPosition3.getProject().getNo());
-        assertEquals(projectList.get(0).getProjectSimplePositionDtoList().get(0).getPositionNo(), saveProjectPosition3.getPosition().getNo());
-        assertEquals(projectList.get(0).getProjectSimplePositionDtoList().get(0).getPositionName(), saveProjectPosition3.getPosition().getName());
-        assertEquals(projectList.get(0).getProjectSimplePositionDtoList().get(1).getProjectNo(), saveProjectPosition4.getProject().getNo());
-        assertEquals(projectList.get(0).getProjectSimplePositionDtoList().get(1).getPositionNo(), saveProjectPosition4.getPosition().getNo());
-        assertEquals(projectList.get(0).getProjectSimplePositionDtoList().get(1).getPositionName(), saveProjectPosition4.getPosition().getName());
+        assertEquals(projectList.get(0).getProjectSimplePositionDtoList().get(0).getProjectNo(), saveProjectPosition4.getProject().getNo());
+        assertEquals(projectList.get(0).getProjectSimplePositionDtoList().get(0).getPositionNo(), saveProjectPosition4.getPosition().getNo());
+        assertEquals(projectList.get(0).getProjectSimplePositionDtoList().get(0).getPositionName(), saveProjectPosition4.getPosition().getName());
 
         assertEquals(projectList.get(0).getProjectSimpleTechnicalStackDtoList().get(0).getProjectNo(), saveProjectTechnicalStack3.getProject().getNo());
         assertEquals(projectList.get(0).getProjectSimpleTechnicalStackDtoList().get(0).getTechnicalStackName(), saveProjectTechnicalStack3.getTechnicalStack().getName());
@@ -660,12 +648,9 @@ class ProjectRepositoryTest {
         assertEquals(projectList.get(1).getRegister(), saveProject1.getCreateUserName());
         assertEquals(projectList.get(1).isBookMark(), false);
 
-        assertEquals(projectList.get(1).getProjectSimplePositionDtoList().get(0).getProjectNo(), saveProjectPosition1.getProject().getNo());
-        assertEquals(projectList.get(1).getProjectSimplePositionDtoList().get(0).getPositionNo(), saveProjectPosition1.getPosition().getNo());
-        assertEquals(projectList.get(1).getProjectSimplePositionDtoList().get(0).getPositionName(), saveProjectPosition1.getPosition().getName());
-        assertEquals(projectList.get(1).getProjectSimplePositionDtoList().get(1).getProjectNo(), saveProjectPosition2.getProject().getNo());
-        assertEquals(projectList.get(1).getProjectSimplePositionDtoList().get(1).getPositionNo(), saveProjectPosition2.getPosition().getNo());
-        assertEquals(projectList.get(1).getProjectSimplePositionDtoList().get(1).getPositionName(), saveProjectPosition2.getPosition().getName());
+        assertEquals(projectList.get(1).getProjectSimplePositionDtoList().get(0).getProjectNo(), saveProjectPosition2.getProject().getNo());
+        assertEquals(projectList.get(1).getProjectSimplePositionDtoList().get(0).getPositionNo(), saveProjectPosition2.getPosition().getNo());
+        assertEquals(projectList.get(1).getProjectSimplePositionDtoList().get(0).getPositionName(), saveProjectPosition2.getPosition().getName());
 
         assertEquals(projectList.get(1).getProjectSimpleTechnicalStackDtoList().get(0).getProjectNo(), saveProjectTechnicalStack1.getProject().getNo());
         assertEquals(projectList.get(1).getProjectSimpleTechnicalStackDtoList().get(0).getTechnicalStackName(), saveProjectTechnicalStack1.getTechnicalStack().getName());
@@ -860,12 +845,9 @@ class ProjectRepositoryTest {
         assertEquals(projectList.get(0).getRegister(), saveProject2.getCreateUserName());
         assertEquals(projectList.get(0).isBookMark(), false);
 
-        assertEquals(projectList.get(0).getProjectSimplePositionDtoList().get(0).getProjectNo(), saveProjectPosition3.getProject().getNo());
-        assertEquals(projectList.get(0).getProjectSimplePositionDtoList().get(0).getPositionNo(), saveProjectPosition3.getPosition().getNo());
-        assertEquals(projectList.get(0).getProjectSimplePositionDtoList().get(0).getPositionName(), saveProjectPosition3.getPosition().getName());
-        assertEquals(projectList.get(0).getProjectSimplePositionDtoList().get(1).getProjectNo(), saveProjectPosition4.getProject().getNo());
-        assertEquals(projectList.get(0).getProjectSimplePositionDtoList().get(1).getPositionNo(), saveProjectPosition4.getPosition().getNo());
-        assertEquals(projectList.get(0).getProjectSimplePositionDtoList().get(1).getPositionName(), saveProjectPosition4.getPosition().getName());
+        assertEquals(projectList.get(0).getProjectSimplePositionDtoList().get(0).getProjectNo(), saveProjectPosition4.getProject().getNo());
+        assertEquals(projectList.get(0).getProjectSimplePositionDtoList().get(0).getPositionNo(), saveProjectPosition4.getPosition().getNo());
+        assertEquals(projectList.get(0).getProjectSimplePositionDtoList().get(0).getPositionName(), saveProjectPosition4.getPosition().getName());
 
         assertEquals(projectList.get(0).getProjectSimpleTechnicalStackDtoList().get(0).getProjectNo(), saveProjectTechnicalStack3.getProject().getNo());
         assertEquals(projectList.get(0).getProjectSimpleTechnicalStackDtoList().get(0).getTechnicalStackName(), saveProjectTechnicalStack3.getTechnicalStack().getName());
@@ -882,12 +864,9 @@ class ProjectRepositoryTest {
         assertEquals(projectList.get(1).getRegister(), saveProject1.getCreateUserName());
         assertEquals(projectList.get(1).isBookMark(), false);
 
-        assertEquals(projectList.get(1).getProjectSimplePositionDtoList().get(0).getProjectNo(), saveProjectPosition1.getProject().getNo());
-        assertEquals(projectList.get(1).getProjectSimplePositionDtoList().get(0).getPositionNo(), saveProjectPosition1.getPosition().getNo());
-        assertEquals(projectList.get(1).getProjectSimplePositionDtoList().get(0).getPositionName(), saveProjectPosition1.getPosition().getName());
-        assertEquals(projectList.get(1).getProjectSimplePositionDtoList().get(1).getProjectNo(), saveProjectPosition2.getProject().getNo());
-        assertEquals(projectList.get(1).getProjectSimplePositionDtoList().get(1).getPositionNo(), saveProjectPosition2.getPosition().getNo());
-        assertEquals(projectList.get(1).getProjectSimplePositionDtoList().get(1).getPositionName(), saveProjectPosition2.getPosition().getName());
+        assertEquals(projectList.get(1).getProjectSimplePositionDtoList().get(0).getProjectNo(), saveProjectPosition2.getProject().getNo());
+        assertEquals(projectList.get(1).getProjectSimplePositionDtoList().get(0).getPositionNo(), saveProjectPosition2.getPosition().getNo());
+        assertEquals(projectList.get(1).getProjectSimplePositionDtoList().get(0).getPositionName(), saveProjectPosition2.getPosition().getName());
 
         assertEquals(projectList.get(1).getProjectSimpleTechnicalStackDtoList().get(0).getProjectNo(), saveProjectTechnicalStack1.getProject().getNo());
         assertEquals(projectList.get(1).getProjectSimpleTechnicalStackDtoList().get(0).getTechnicalStackName(), saveProjectTechnicalStack1.getTechnicalStack().getName());
@@ -1085,12 +1064,9 @@ class ProjectRepositoryTest {
         assertEquals(projectList.get(0).getRegister(), saveProject2.getCreateUserName());
         assertEquals(projectList.get(0).isBookMark(), false);
 
-        assertEquals(projectList.get(0).getProjectSimplePositionDtoList().get(0).getProjectNo(), saveProjectPosition3.getProject().getNo());
-        assertEquals(projectList.get(0).getProjectSimplePositionDtoList().get(0).getPositionNo(), saveProjectPosition3.getPosition().getNo());
-        assertEquals(projectList.get(0).getProjectSimplePositionDtoList().get(0).getPositionName(), saveProjectPosition3.getPosition().getName());
-        assertEquals(projectList.get(0).getProjectSimplePositionDtoList().get(1).getProjectNo(), saveProjectPosition4.getProject().getNo());
-        assertEquals(projectList.get(0).getProjectSimplePositionDtoList().get(1).getPositionNo(), saveProjectPosition4.getPosition().getNo());
-        assertEquals(projectList.get(0).getProjectSimplePositionDtoList().get(1).getPositionName(), saveProjectPosition4.getPosition().getName());
+        assertEquals(projectList.get(0).getProjectSimplePositionDtoList().get(0).getProjectNo(), saveProjectPosition4.getProject().getNo());
+        assertEquals(projectList.get(0).getProjectSimplePositionDtoList().get(0).getPositionNo(), saveProjectPosition4.getPosition().getNo());
+        assertEquals(projectList.get(0).getProjectSimplePositionDtoList().get(0).getPositionName(), saveProjectPosition4.getPosition().getName());
 
         assertEquals(projectList.get(0).getProjectSimpleTechnicalStackDtoList().get(0).getProjectNo(), saveProjectTechnicalStack3.getProject().getNo());
         assertEquals(projectList.get(0).getProjectSimpleTechnicalStackDtoList().get(0).getTechnicalStackName(), saveProjectTechnicalStack3.getTechnicalStack().getName());
@@ -1107,12 +1083,9 @@ class ProjectRepositoryTest {
         assertEquals(projectList.get(1).getRegister(), saveProject1.getCreateUserName());
         assertEquals(projectList.get(1).isBookMark(), false);
 
-        assertEquals(projectList.get(1).getProjectSimplePositionDtoList().get(0).getProjectNo(), saveProjectPosition1.getProject().getNo());
-        assertEquals(projectList.get(1).getProjectSimplePositionDtoList().get(0).getPositionNo(), saveProjectPosition1.getPosition().getNo());
-        assertEquals(projectList.get(1).getProjectSimplePositionDtoList().get(0).getPositionName(), saveProjectPosition1.getPosition().getName());
-        assertEquals(projectList.get(1).getProjectSimplePositionDtoList().get(1).getProjectNo(), saveProjectPosition2.getProject().getNo());
-        assertEquals(projectList.get(1).getProjectSimplePositionDtoList().get(1).getPositionNo(), saveProjectPosition2.getPosition().getNo());
-        assertEquals(projectList.get(1).getProjectSimplePositionDtoList().get(1).getPositionName(), saveProjectPosition2.getPosition().getName());
+        assertEquals(projectList.get(1).getProjectSimplePositionDtoList().get(0).getProjectNo(), saveProjectPosition2.getProject().getNo());
+        assertEquals(projectList.get(1).getProjectSimplePositionDtoList().get(0).getPositionNo(), saveProjectPosition2.getPosition().getNo());
+        assertEquals(projectList.get(1).getProjectSimplePositionDtoList().get(0).getPositionName(), saveProjectPosition2.getPosition().getName());
 
         assertEquals(projectList.get(1).getProjectSimpleTechnicalStackDtoList().get(0).getProjectNo(), saveProjectTechnicalStack1.getProject().getNo());
         assertEquals(projectList.get(1).getProjectSimpleTechnicalStackDtoList().get(0).getTechnicalStackName(), saveProjectTechnicalStack1.getTechnicalStack().getName());
@@ -1325,12 +1298,9 @@ class ProjectRepositoryTest {
         assertEquals(projectList.get(0).getRegister(), saveProject2.getCreateUserName());
         assertEquals(projectList.get(0).isBookMark(), false);
 
-        assertEquals(projectList.get(0).getProjectSimplePositionDtoList().get(0).getProjectNo(), saveProjectPosition3.getProject().getNo());
-        assertEquals(projectList.get(0).getProjectSimplePositionDtoList().get(0).getPositionNo(), saveProjectPosition3.getPosition().getNo());
-        assertEquals(projectList.get(0).getProjectSimplePositionDtoList().get(0).getPositionName(), saveProjectPosition3.getPosition().getName());
-        assertEquals(projectList.get(0).getProjectSimplePositionDtoList().get(1).getProjectNo(), saveProjectPosition4.getProject().getNo());
-        assertEquals(projectList.get(0).getProjectSimplePositionDtoList().get(1).getPositionNo(), saveProjectPosition4.getPosition().getNo());
-        assertEquals(projectList.get(0).getProjectSimplePositionDtoList().get(1).getPositionName(), saveProjectPosition4.getPosition().getName());
+        assertEquals(projectList.get(0).getProjectSimplePositionDtoList().get(0).getProjectNo(), saveProjectPosition4.getProject().getNo());
+        assertEquals(projectList.get(0).getProjectSimplePositionDtoList().get(0).getPositionNo(), saveProjectPosition4.getPosition().getNo());
+        assertEquals(projectList.get(0).getProjectSimplePositionDtoList().get(0).getPositionName(), saveProjectPosition4.getPosition().getName());
 
         assertEquals(projectList.get(0).getProjectSimpleTechnicalStackDtoList().get(0).getProjectNo(), saveProjectTechnicalStack3.getProject().getNo());
         assertEquals(projectList.get(0).getProjectSimpleTechnicalStackDtoList().get(0).getTechnicalStackName(), saveProjectTechnicalStack3.getTechnicalStack().getName());
@@ -1347,12 +1317,9 @@ class ProjectRepositoryTest {
         assertEquals(projectList.get(1).getRegister(), saveProject1.getCreateUserName());
         assertEquals(projectList.get(1).isBookMark(), false);
 
-        assertEquals(projectList.get(1).getProjectSimplePositionDtoList().get(0).getProjectNo(), saveProjectPosition1.getProject().getNo());
-        assertEquals(projectList.get(1).getProjectSimplePositionDtoList().get(0).getPositionNo(), saveProjectPosition1.getPosition().getNo());
-        assertEquals(projectList.get(1).getProjectSimplePositionDtoList().get(0).getPositionName(), saveProjectPosition1.getPosition().getName());
-        assertEquals(projectList.get(1).getProjectSimplePositionDtoList().get(1).getProjectNo(), saveProjectPosition2.getProject().getNo());
-        assertEquals(projectList.get(1).getProjectSimplePositionDtoList().get(1).getPositionNo(), saveProjectPosition2.getPosition().getNo());
-        assertEquals(projectList.get(1).getProjectSimplePositionDtoList().get(1).getPositionName(), saveProjectPosition2.getPosition().getName());
+        assertEquals(projectList.get(1).getProjectSimplePositionDtoList().get(0).getProjectNo(), saveProjectPosition2.getProject().getNo());
+        assertEquals(projectList.get(1).getProjectSimplePositionDtoList().get(0).getPositionNo(), saveProjectPosition2.getPosition().getNo());
+        assertEquals(projectList.get(1).getProjectSimplePositionDtoList().get(0).getPositionName(), saveProjectPosition2.getPosition().getName());
 
         assertEquals(projectList.get(1).getProjectSimpleTechnicalStackDtoList().get(0).getProjectNo(), saveProjectTechnicalStack1.getProject().getNo());
         assertEquals(projectList.get(1).getProjectSimpleTechnicalStackDtoList().get(0).getTechnicalStackName(), saveProjectTechnicalStack1.getTechnicalStack().getName());
@@ -1581,12 +1548,9 @@ class ProjectRepositoryTest {
         assertEquals(projectList.get(0).getRegister(), saveProject2.getCreateUserName());
         assertEquals(projectList.get(0).isBookMark(), false);
 
-        assertEquals(projectList.get(0).getProjectSimplePositionDtoList().get(0).getProjectNo(), saveProjectPosition3.getProject().getNo());
-        assertEquals(projectList.get(0).getProjectSimplePositionDtoList().get(0).getPositionNo(), saveProjectPosition3.getPosition().getNo());
-        assertEquals(projectList.get(0).getProjectSimplePositionDtoList().get(0).getPositionName(), saveProjectPosition3.getPosition().getName());
-        assertEquals(projectList.get(0).getProjectSimplePositionDtoList().get(1).getProjectNo(), saveProjectPosition4.getProject().getNo());
-        assertEquals(projectList.get(0).getProjectSimplePositionDtoList().get(1).getPositionNo(), saveProjectPosition4.getPosition().getNo());
-        assertEquals(projectList.get(0).getProjectSimplePositionDtoList().get(1).getPositionName(), saveProjectPosition4.getPosition().getName());
+        assertEquals(projectList.get(0).getProjectSimplePositionDtoList().get(0).getProjectNo(), saveProjectPosition4.getProject().getNo());
+        assertEquals(projectList.get(0).getProjectSimplePositionDtoList().get(0).getPositionNo(), saveProjectPosition4.getPosition().getNo());
+        assertEquals(projectList.get(0).getProjectSimplePositionDtoList().get(0).getPositionName(), saveProjectPosition4.getPosition().getName());
 
         assertEquals(projectList.get(0).getProjectSimpleTechnicalStackDtoList().get(0).getProjectNo(), saveProjectTechnicalStack3.getProject().getNo());
         assertEquals(projectList.get(0).getProjectSimpleTechnicalStackDtoList().get(0).getTechnicalStackName(), saveProjectTechnicalStack3.getTechnicalStack().getName());
@@ -1603,12 +1567,9 @@ class ProjectRepositoryTest {
         assertEquals(projectList.get(1).getRegister(), saveProject1.getCreateUserName());
         assertEquals(projectList.get(1).isBookMark(), false);
 
-        assertEquals(projectList.get(1).getProjectSimplePositionDtoList().get(0).getProjectNo(), saveProjectPosition1.getProject().getNo());
-        assertEquals(projectList.get(1).getProjectSimplePositionDtoList().get(0).getPositionNo(), saveProjectPosition1.getPosition().getNo());
-        assertEquals(projectList.get(1).getProjectSimplePositionDtoList().get(0).getPositionName(), saveProjectPosition1.getPosition().getName());
-        assertEquals(projectList.get(1).getProjectSimplePositionDtoList().get(1).getProjectNo(), saveProjectPosition2.getProject().getNo());
-        assertEquals(projectList.get(1).getProjectSimplePositionDtoList().get(1).getPositionNo(), saveProjectPosition2.getPosition().getNo());
-        assertEquals(projectList.get(1).getProjectSimplePositionDtoList().get(1).getPositionName(), saveProjectPosition2.getPosition().getName());
+        assertEquals(projectList.get(1).getProjectSimplePositionDtoList().get(0).getProjectNo(), saveProjectPosition2.getProject().getNo());
+        assertEquals(projectList.get(1).getProjectSimplePositionDtoList().get(0).getPositionNo(), saveProjectPosition2.getPosition().getNo());
+        assertEquals(projectList.get(1).getProjectSimplePositionDtoList().get(0).getPositionName(), saveProjectPosition2.getPosition().getName());
 
         assertEquals(projectList.get(1).getProjectSimpleTechnicalStackDtoList().get(0).getProjectNo(), saveProjectTechnicalStack1.getProject().getNo());
         assertEquals(projectList.get(1).getProjectSimpleTechnicalStackDtoList().get(0).getTechnicalStackName(), saveProjectTechnicalStack1.getTechnicalStack().getName());
@@ -1817,12 +1778,9 @@ class ProjectRepositoryTest {
         assertEquals(projectList.get(0).getRegister(), saveProject2.getCreateUserName());
         assertEquals(projectList.get(0).isBookMark(), true);
 
-        assertEquals(projectList.get(0).getProjectSimplePositionDtoList().get(0).getProjectNo(), saveProjectPosition3.getProject().getNo());
-        assertEquals(projectList.get(0).getProjectSimplePositionDtoList().get(0).getPositionNo(), saveProjectPosition3.getPosition().getNo());
-        assertEquals(projectList.get(0).getProjectSimplePositionDtoList().get(0).getPositionName(), saveProjectPosition3.getPosition().getName());
-        assertEquals(projectList.get(0).getProjectSimplePositionDtoList().get(1).getProjectNo(), saveProjectPosition4.getProject().getNo());
-        assertEquals(projectList.get(0).getProjectSimplePositionDtoList().get(1).getPositionNo(), saveProjectPosition4.getPosition().getNo());
-        assertEquals(projectList.get(0).getProjectSimplePositionDtoList().get(1).getPositionName(), saveProjectPosition4.getPosition().getName());
+        assertEquals(projectList.get(0).getProjectSimplePositionDtoList().get(0).getProjectNo(), saveProjectPosition4.getProject().getNo());
+        assertEquals(projectList.get(0).getProjectSimplePositionDtoList().get(0).getPositionNo(), saveProjectPosition4.getPosition().getNo());
+        assertEquals(projectList.get(0).getProjectSimplePositionDtoList().get(0).getPositionName(), saveProjectPosition4.getPosition().getName());
 
         assertEquals(projectList.get(0).getProjectSimpleTechnicalStackDtoList().get(0).getProjectNo(), saveProjectTechnicalStack3.getProject().getNo());
         assertEquals(projectList.get(0).getProjectSimpleTechnicalStackDtoList().get(0).getTechnicalStackName(), saveProjectTechnicalStack3.getTechnicalStack().getName());
@@ -1839,12 +1797,9 @@ class ProjectRepositoryTest {
         assertEquals(projectList.get(1).getRegister(), saveProject1.getCreateUserName());
         assertEquals(projectList.get(1).isBookMark(), true);
 
-        assertEquals(projectList.get(1).getProjectSimplePositionDtoList().get(0).getProjectNo(), saveProjectPosition1.getProject().getNo());
-        assertEquals(projectList.get(1).getProjectSimplePositionDtoList().get(0).getPositionNo(), saveProjectPosition1.getPosition().getNo());
-        assertEquals(projectList.get(1).getProjectSimplePositionDtoList().get(0).getPositionName(), saveProjectPosition1.getPosition().getName());
-        assertEquals(projectList.get(1).getProjectSimplePositionDtoList().get(1).getProjectNo(), saveProjectPosition2.getProject().getNo());
-        assertEquals(projectList.get(1).getProjectSimplePositionDtoList().get(1).getPositionNo(), saveProjectPosition2.getPosition().getNo());
-        assertEquals(projectList.get(1).getProjectSimplePositionDtoList().get(1).getPositionName(), saveProjectPosition2.getPosition().getName());
+        assertEquals(projectList.get(1).getProjectSimplePositionDtoList().get(0).getProjectNo(), saveProjectPosition2.getProject().getNo());
+        assertEquals(projectList.get(1).getProjectSimplePositionDtoList().get(0).getPositionNo(), saveProjectPosition2.getPosition().getNo());
+        assertEquals(projectList.get(1).getProjectSimplePositionDtoList().get(0).getPositionName(), saveProjectPosition2.getPosition().getName());
 
         assertEquals(projectList.get(1).getProjectSimpleTechnicalStackDtoList().get(0).getProjectNo(), saveProjectTechnicalStack1.getProject().getNo());
         assertEquals(projectList.get(1).getProjectSimpleTechnicalStackDtoList().get(0).getTechnicalStackName(), saveProjectTechnicalStack1.getTechnicalStack().getName());

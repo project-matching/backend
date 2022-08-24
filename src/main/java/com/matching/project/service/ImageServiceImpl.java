@@ -29,9 +29,6 @@ public class ImageServiceImpl implements ImageService{
     private final AmazonS3Service amazonS3Service;
     private final ImageRepository imageRepository;
 
-    @Value("${image.default.url}")
-    public String defaultImage;
-
     @Override
     public BufferedImage imageResize(InputStream inputStream, int width, int height){
         BufferedImage inputImage = null;
@@ -137,15 +134,7 @@ public class ImageServiceImpl implements ImageService{
         String imageUrl = null;
         if (imageNo != null) {
             Optional<Image> image = imageRepository.findById(imageNo);
-            // 이미지 번호에 맞는 이미지가 존재하지 않는 경우 디폴트 이미지 부여
-            if (image.isEmpty())
-                imageUrl = defaultImage;
-            else
-                imageUrl = image.get().getUrl();
-        }
-        else {
-            // 함수의 매개변수에 null 값이 들어온 경우 디폴트 이미지 부여
-            imageUrl = defaultImage;
+            imageUrl = image.get().getUrl();
         }
         return imageUrl;
     }
