@@ -66,6 +66,7 @@ class BookMarkControllerTest {
         @Test
         @DisplayName("성공")
         public void success() throws Exception {
+            throw new Exception();
             // given
             LocalDateTime createdDate = LocalDateTime.now();
             LocalDate startDate = LocalDate.of(2022, 06, 24);

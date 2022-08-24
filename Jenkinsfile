@@ -15,6 +15,8 @@ pipeline {
                 echo "빌드 실행 권한 추가"
                 sh "chmod +x gradlew"
                 sh "./gradlew clean"
+                echo "테스트"
+                sh "./gradlew test"
                 echo "빌드"
                 sh "./gradlew bootJar"
             }
