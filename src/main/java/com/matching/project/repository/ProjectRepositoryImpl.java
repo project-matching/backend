@@ -361,6 +361,7 @@ public class ProjectRepositoryImpl implements ProjectRepositoryCustom {
                 .join(projectPosition.project, project)
                 .join(projectPosition.position, position)
                 .where(project.no.in(projectNoList))
+                .where(projectPosition.state.eq(false))
                 .fetch();
 
         return projectSimplePositionDtoList.stream()
