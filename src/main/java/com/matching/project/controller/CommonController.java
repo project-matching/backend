@@ -12,6 +12,7 @@ import com.matching.project.entity.User;
 import com.matching.project.service.CommonService;
 import com.matching.project.service.EmailService;
 import com.matching.project.service.JwtTokenService;
+import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +31,6 @@ public class CommonController {
     private final JwtTokenService jwtTokenService;
     private final EmailService emailService;
 
-    // 일반 로그인
     @PostMapping("/login")
     @ApiOperation(value = "일반 로그인")
     public ResponseEntity<ResponseDto<TokenDto>> normalLogin(@RequestBody @Valid NormalLoginRequestDto dto) {
@@ -48,9 +48,9 @@ public class CommonController {
         return ResponseEntity.ok().body(new ResponseDto<>(null, tokenDto));
     }
 
-    // 소셜 로그인
     @GetMapping("/logout")
     @ApiOperation(value = "로그아웃")
+    @ApiImplicitParam(name = "Authorization", value = "Authorization", required = true, dataType = "string", paramType = "header")
     public ResponseEntity<ResponseDto<Boolean>> logout(@RequestHeader(value = "Authorization") String authorization) {
         String accessToken = authorization.replaceAll("^Bearer( )*", "");
         commonService.userLogout(accessToken);

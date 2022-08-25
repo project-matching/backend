@@ -7,6 +7,7 @@ import com.matching.project.dto.notification.NotificationDto;
 import com.matching.project.dto.notification.NotificationSendRequestDto;
 import com.matching.project.dto.notification.NotificationSimpleInfoDto;
 import com.matching.project.service.NotificationService;
+import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -29,6 +30,7 @@ public class NotificationController {
 
     @PostMapping
     @ApiOperation(value = "공지 알림 전송 (관리자)")
+    @ApiImplicitParam(name = "Authorization", value = "Authorization", required = true, dataType = "string", paramType = "header")
     public ResponseEntity<ResponseDto<Boolean>> notificationSend(@RequestBody @Valid NotificationSendRequestDto notificationSendRequestDto) {
         notificationService.sendNotification(Type.NOTICE, null, notificationSendRequestDto.getTitle(), notificationSendRequestDto.getContent());
         return ResponseEntity.ok(new ResponseDto<>(null, true));
@@ -36,6 +38,7 @@ public class NotificationController {
 
     @GetMapping
     @ApiOperation(value = "알림 목록 조회")
+    @ApiImplicitParam(name = "Authorization", value = "Authorization", required = true, dataType = "string", paramType = "header")
     public ResponseEntity<ResponseDto<SliceDto<NotificationSimpleInfoDto>>> notificationList(Long notificationNo,
                                                                                              @PageableDefault(size = 5) Pageable pageable) {
         return ResponseEntity.ok(new ResponseDto<>(null, notificationService.notificationList(notificationNo, pageable)));
@@ -43,6 +46,7 @@ public class NotificationController {
 
     @GetMapping("/{notificationNo}")
     @ApiOperation(value = "알림 상세 조회")
+    @ApiImplicitParam(name = "Authorization", value = "Authorization", required = true, dataType = "string", paramType = "header")
     public ResponseEntity<ResponseDto<NotificationDto>> notificationInfo(@PathVariable Long notificationNo) {
         return ResponseEntity.ok(new ResponseDto<>(null, notificationService.notificationInfo(notificationNo)));
     }
