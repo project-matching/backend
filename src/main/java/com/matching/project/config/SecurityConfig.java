@@ -22,8 +22,14 @@ import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.header.writers.frameoptions.WhiteListedAllowFromStrategy;
 import org.springframework.security.web.header.writers.frameoptions.XFrameOptionsHeaderWriter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 @Configuration
 @RequiredArgsConstructor
@@ -45,6 +51,21 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return roleHierarchy;
     }
 
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOriginPatterns(List.of("http://localhost:3000", "http://ec2-3-37-72-42.ap-northeast-2.compute.amazonaws.com:3000"));
+        configuration.addAllowedHeader("*");
+        configuration.addAllowedMethod("*");
+        configuration.setExposedHeaders(List.of("Authorization", "Access-Control-Allow-Origin" ,"AccessControlAllowOrigin"));
+        configuration.setAllowCredentials(true);
+        configuration.setMaxAge(3600L);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
 
@@ -52,10 +73,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .csrf().disable();
         http
                 .httpBasic().disable()
+                .cors().configurationSource(corsConfigurationSource())
+                .and()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenService),
                         UsernamePasswordAuthenticationFilter.class)
 
