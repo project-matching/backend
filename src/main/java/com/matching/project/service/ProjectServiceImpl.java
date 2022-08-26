@@ -96,7 +96,7 @@ public class ProjectServiceImpl implements ProjectService {
             ProjectPosition projectPosition = null;
             ProjectRegisterUserDto projectRegisterUserDto = projectPositionRegisterDto.getProjectRegisterUserDto();
 
-            if (projectRegisterUserDto != null && projectRegisterUserDto.getNo() != null) {
+            if (projectRegisterUserDto != null && projectRegisterUserDto.getUserNo() != null) {
                 projectPosition = ProjectPosition.builder()
                         .state(true)
                         .position(positionList.stream().filter(position -> position.getNo().equals(projectPositionRegisterDto.getPositionNo())).findAny().orElseThrow())

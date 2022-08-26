@@ -19,7 +19,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.persistence.EntityManager;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -36,6 +35,7 @@ public class UserServiceImpl implements UserService{
     private final ProjectRepository projectRepository;
     private final PasswordEncoder passwordEncoder;
     private final ProjectService projectService;
+    private final ImageRepository imageRepository;
     private final ImageService imageService;
     private final NotificationRepository notificationRepository;
     private final CommentRepository commentRepository;
@@ -137,7 +137,7 @@ public class UserServiceImpl implements UserService{
             throw new CustomException(ErrorCode.DUPLICATE_EMAIL_EXCEPTION);
 
         // Password Encode
-        dto.setEncodePassword(passwordEncoder.encode(dto.getPassword()));
+        dto.encodePassword(passwordEncoder.encode(dto.getPassword()));
 
         // User Save
         User user = dto.toUserEntity(dto);
@@ -237,7 +237,6 @@ public class UserServiceImpl implements UserService{
 
         // User & Position Update
         user.updateUser(dto, position);
-        userRepository.save(user);
 
         // UserTechnicalStacks Delete & Save
         if (userTechnicalStackRepository.findUserTechnicalStacksByUser(user.getNo()) != null)
@@ -251,16 +250,6 @@ public class UserServiceImpl implements UserService{
                 );
             }
         }
-
-        // 이슈 #93 : 유저명이 변경된 경우 프로젝트 'create_user_name' 컬럼이 반영되지 않음
-        // 원인 및 조치 : project 테이블의 'create_user_name' 컬럼은 'user_no' 와 다르게 user 테이블과 연관관계가 없음. 따라서 수동으로 변경해줘야 함.
-        Optional<List<Project>> projects = projectRepository.findByUser(user);
-        if (projects.isPresent()) {
-            for (Project p : projects.get()) {
-                p.setCreateUserName(user.getName());
-            }
-        }
-
         return user;
     }
 
@@ -298,7 +287,7 @@ public class UserServiceImpl implements UserService{
 
         // User SignOut
         user.userWithdrawal();
-        userRepository.save(user);
+        userRepository.save(user); // 임시
 
         return user;
     }

@@ -140,10 +140,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.GET,"/v1/notification").hasRole("USER")
                 .antMatchers(HttpMethod.GET,"/v1/notification/**").hasRole("USER")
 
-                //ProjectController
-                .antMatchers("/v1/project/recruitment/*").hasRole("ANONYMOUS")
-                .antMatchers("/v1/project/recruitment/complete/*").hasRole("ANONYMOUS")
-
                 //ProjectParticipateController
                 .antMatchers("/v1/participate").hasRole("USER")
                 .antMatchers("/v1/participate/*/permit").hasRole("USER")

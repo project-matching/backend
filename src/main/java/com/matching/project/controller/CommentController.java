@@ -6,6 +6,7 @@ import com.matching.project.dto.comment.CommentDto;
 import com.matching.project.dto.comment.CommentRequestDto;
 import com.matching.project.entity.Comment;
 import com.matching.project.service.CommentService;
+import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -27,6 +28,7 @@ public class CommentController {
 
     @PostMapping("/{projectNo}")
     @ApiOperation(value = "댓글 등록")
+    @ApiImplicitParam(name = "Authorization", value = "Authorization", required = true, dataType = "string", paramType = "header")
     public ResponseEntity<ResponseDto<Boolean>> commentRegister(@PathVariable Long projectNo, @RequestBody CommentRequestDto dto) {
         Comment comment = commentService.commentRegister(projectNo, dto.getContent());
         return ResponseEntity.ok(new ResponseDto(null, true));
@@ -43,6 +45,7 @@ public class CommentController {
 
     @PatchMapping("/{commentNo}")
     @ApiOperation(value = "댓글 수정")
+    @ApiImplicitParam(name = "Authorization", value = "Authorization", required = true, dataType = "string", paramType = "header")
     public ResponseEntity<ResponseDto<Boolean>> commentUpdate(@PathVariable Long commentNo, @RequestBody CommentRequestDto dto) {
         Comment comment = commentService.commentUpdate(commentNo, dto.getContent());
         return ResponseEntity.ok(new ResponseDto(null, true));
@@ -50,6 +53,7 @@ public class CommentController {
 
     @DeleteMapping("/{commentNo}")
     @ApiOperation(value = "댓글 삭제")
+    @ApiImplicitParam(name = "Authorization", value = "Authorization", required = true, dataType = "string", paramType = "header")
     public ResponseEntity<ResponseDto<Boolean>> commentDelete(@PathVariable Long commentNo) {
         commentService.commentDelete(commentNo);
         return ResponseEntity.ok(new ResponseDto(null, true));

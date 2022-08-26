@@ -28,7 +28,7 @@ public class SignUpRequestDto {
     @NotBlank
     private String password;
 
-    public void setEncodePassword(String encodePassword) {
+    public void encodePassword(String encodePassword) {
         this.password = encodePassword;
     }
 

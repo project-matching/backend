@@ -8,5 +8,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProjectRegisterUserDto {
-    private Long no;
+    private Long userNo;
 }

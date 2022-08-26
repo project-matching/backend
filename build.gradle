@@ -51,9 +51,12 @@ dependencies {
 	testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.7.3'
 	testImplementation group: 'org.springframework.security', name: 'spring-security-test', version: '5.7.3'
 	implementation 'com.google.code.gson:gson:2.8.7'
+	//querydsl 추가
 	implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
 	implementation "com.querydsl:querydsl-apt:${queryDslVersion}"
+	// spring-data-redis
 	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-redis', version: '2.7.3'
+	//embedded-redis
 	implementation group: 'it.ozimov', name: 'embedded-redis', version: '0.7.2'
 	implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.13.3'
 	implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.13.3'

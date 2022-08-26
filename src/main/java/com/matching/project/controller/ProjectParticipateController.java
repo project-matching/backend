@@ -9,6 +9,7 @@ import com.matching.project.error.CustomException;
 import com.matching.project.error.ErrorCode;
 import com.matching.project.service.ProjectParticipateRequestService;
 import com.matching.project.service.ProjectService;
+import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -32,12 +33,14 @@ public class ProjectParticipateController {
 
     @PostMapping
     @ApiOperation(value = "프로젝트 참가 신청")
+    @ApiImplicitParam(name = "Authorization", value = "Authorization", required = true, dataType = "string", paramType = "header")
     public ResponseEntity<ResponseDto<Boolean>> projectParticipateRequest(@Valid @RequestBody ProjectParticipateRequestDto projectParticipateRequestDto) throws Exception{
         return ResponseEntity.ok(new ResponseDto<Boolean>(null, projectParticipateRequestService.projectParticipateRequestRegister(projectParticipateRequestDto)));
     }
 
     @GetMapping("/{projectNo}")
-    @ApiOperation(value = "프로젝트 신청 관리 페이지 (수정 완료)")
+    @ApiOperation(value = "프로젝트 신청 관리 페이지")
+    @ApiImplicitParam(name = "Authorization", value = "Authorization", required = true, dataType = "string", paramType = "header")
     public ResponseEntity<ResponseDto<SliceDto<ProjectParticipateFormResponseDto>>> projectParticipateManagementForm(@PathVariable Long projectNo, @PageableDefault(size = 5, sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable, @RequestParam(value = "projectParticipateRequestNo", required = false) Long projectParticipateRequestNo) throws Exception{
 
         return ResponseEntity.ok(new ResponseDto<>(null, projectParticipateRequestService.findProjectParticipateManagementForm(projectNo, projectParticipateRequestNo, pageable)));
@@ -45,14 +48,16 @@ public class ProjectParticipateController {
 
     // 프로젝트 참가 허가
     @PostMapping("/{projectParticipateNo}/permit")
-    @ApiOperation(value = "프로젝트 참가 신청 수락 (수정 완료)")
+    @ApiOperation(value = "프로젝트 참가 신청 수락")
+    @ApiImplicitParam(name = "Authorization", value = "Authorization", required = true, dataType = "string", paramType = "header")
     public ResponseEntity<ResponseDto<Boolean>> projectParticipatePermit(@PathVariable Long projectParticipateNo) throws Exception {
         return ResponseEntity.ok(new ResponseDto(null, projectParticipateRequestService.permitProjectParticipate(projectParticipateNo)));
     }
 
     // 프로젝트 참가 거부
     @PostMapping("/{projectParticipateNo}/refusal")
-    @ApiOperation(value = "프로젝트 참가 거부 (수정 완료)")
+    @ApiOperation(value = "프로젝트 참가 거부")
+    @ApiImplicitParam(name = "Authorization", value = "Authorization", required = true, dataType = "string", paramType = "header")
     public ResponseEntity<ResponseDto<Boolean>> projectParticipateRefusal(@PathVariable Long projectParticipateNo, @RequestBody ProjectParticipateRefusalRequestDto projectParticipateRefusalRequestDto) throws Exception{
         return ResponseEntity.ok(new ResponseDto(null, projectParticipateRequestService.refusalProjectParticipate(projectParticipateNo, projectParticipateRefusalRequestDto.getReason())));
     }

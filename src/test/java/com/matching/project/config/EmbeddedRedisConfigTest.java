@@ -5,7 +5,9 @@ import com.matching.project.dto.user.UserDto;
 import com.matching.project.service.RedisService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
@@ -28,7 +30,7 @@ public class EmbeddedRedisConfigTest {
     @Test
     void redisConnectionTest() {
         //given
-        final String key = "10295710928315";
+        final String key = "10295710928313";
         final String value = "connectionTest";
 
         //when
@@ -43,7 +45,7 @@ public class EmbeddedRedisConfigTest {
     @Test
     void redisExpireTest() throws InterruptedException {
         //given
-        final String key = "10295710928315";
+        final String key = "10295710928313";
         final String value = "expireTest";
 
         //when
@@ -61,7 +63,7 @@ public class EmbeddedRedisConfigTest {
     @Test
     void redisInsertObjectTest() throws JsonProcessingException {
         //given
-        String key = "10295710928315";
+        String key = "10295710928313";
         UserDto objectValue = new UserDto(1L, "insertObjectTest", true);
         redisService.set(key, objectValue);
 
