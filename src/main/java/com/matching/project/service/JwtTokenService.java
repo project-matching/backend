@@ -68,6 +68,7 @@ public class JwtTokenService {
                         .setIssuedAt(now)
                         .setExpiration(new Date(now.getTime() + accessTokenPeriod))
                         .signWith(SignatureAlgorithm.HS256, secretKey)
+                        .setId(UUID.randomUUID().toString())
                         .compact())
                 .access_exp(simpleDateFormat.format(new Date(now.getTime() + accessTokenPeriod)))
                 .refresh(Jwts.builder().setHeader(headers)
@@ -76,6 +77,7 @@ public class JwtTokenService {
                         .setIssuedAt(now)
                         .setExpiration(new Date(now.getTime() + refreshTokenPeriod))
                         .signWith(SignatureAlgorithm.HS256, secretKey)
+                        .setId(UUID.randomUUID().toString())
                         .compact())
                 .refresh_exp(simpleDateFormat.format(new Date(now.getTime() + refreshTokenPeriod)))
                 .build();
