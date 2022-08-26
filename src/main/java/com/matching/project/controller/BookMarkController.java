@@ -5,6 +5,7 @@ import com.matching.project.dto.SliceDto;
 import com.matching.project.dto.bookmark.BookMarkDto;
 import com.matching.project.dto.project.ProjectSimpleDto;
 import com.matching.project.service.BookMarkService;
+import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -26,19 +27,22 @@ public class BookMarkController {
     private final BookMarkService bookMarkService;
 
     @PostMapping("/{projectNo}")
-    @ApiOperation(value = "즐겨찾기 추가 (수정 완료)")
+    @ApiOperation(value = "즐겨찾기 추가")
+    @ApiImplicitParam(name = "Authorization", value = "Authorization", required = true, dataType = "string", paramType = "header")
     public ResponseEntity<ResponseDto<Boolean>> bookMarkRegister(@PathVariable Long projectNo) throws Exception {
         return ResponseEntity.ok(new ResponseDto<Boolean>(null, bookMarkService.bookMarkRegister(projectNo)));
     }
 
     @GetMapping
     @ApiOperation(value = "즐겨찾기 프로젝트 목록 조회")
+    @ApiImplicitParam(name = "Authorization", value = "Authorization", required = true, dataType = "string", paramType = "header")
     public ResponseEntity<ResponseDto<SliceDto<ProjectSimpleDto>>> bookMarkList(@PageableDefault(size = 5, sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable, @RequestParam(value = "projectNo", required = false) Long projectNo) throws Exception{
         return ResponseEntity.ok(new ResponseDto<>(null, bookMarkService.findBookMarkProject(projectNo, pageable)));
     }
 
     @DeleteMapping("/{projectNo}")
-    @ApiOperation(value = "즐겨찾기 삭제 (수정 완료)")
+    @ApiOperation(value = "즐겨찾기 삭제")
+    @ApiImplicitParam(name = "Authorization", value = "Authorization", required = true, dataType = "string", paramType = "header")
     public ResponseEntity<ResponseDto<Boolean>> bookMarkDelete(@PathVariable Long projectNo) throws Exception {
         return ResponseEntity.ok(new ResponseDto<Boolean>(null, bookMarkService.bookMarkDelete(projectNo)));
     }

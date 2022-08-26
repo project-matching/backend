@@ -137,7 +137,7 @@ public class UserServiceImpl implements UserService{
             throw new CustomException(ErrorCode.DUPLICATE_EMAIL_EXCEPTION);
 
         // Password Encode
-        dto.setEncodePassword(passwordEncoder.encode(dto.getPassword()));
+        dto.encodePassword(passwordEncoder.encode(dto.getPassword()));
 
         // User Save
         User user = dto.toUserEntity(dto);

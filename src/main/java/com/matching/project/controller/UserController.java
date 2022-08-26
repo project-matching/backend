@@ -11,6 +11,7 @@ import com.matching.project.entity.User;
 import com.matching.project.service.EmailService;
 import com.matching.project.service.JwtTokenService;
 import com.matching.project.service.UserService;
+import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,6 +36,7 @@ public class UserController {
 
     @ApiOperation(value = "유저 정보")
     @GetMapping("/info")
+    @ApiImplicitParam(name = "Authorization", value = "Authorization", required = true, dataType = "string", paramType = "header")
     public ResponseEntity<ResponseDto<UserInfoResponseDto>> userInfo() {
         return ResponseEntity.ok().body(new ResponseDto<>(null, userService.getUserInfo()));
     }
@@ -83,8 +85,8 @@ public class UserController {
     }
 
     @GetMapping
-    @ApiOperation(value = "내 프로필 조회"
-                    ,notes = "loginCategory => [NORMAL, GITHUB, GOOGLE]")
+    @ApiOperation(value = "내 프로필 조회", notes = "loginCategory => [NORMAL, GITHUB, GOOGLE]")
+    @ApiImplicitParam(name = "Authorization", value = "Authorization", required = true, dataType = "string", paramType = "header")
     public ResponseEntity<ResponseDto<UserProfileInfoResponseDto>> userProfile() {
         UserProfileInfoResponseDto userProfileInfoResponseDto = userService.userProfileInfo();
         return ResponseEntity.ok(new ResponseDto<>(null, userProfileInfoResponseDto));
@@ -92,6 +94,7 @@ public class UserController {
 
     @PatchMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     @ApiOperation(value = "개인정보 변경", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @ApiImplicitParam(name = "Authorization", value = "Authorization", required = true, dataType = "string", paramType = "header")
     public ResponseEntity<ResponseDto<Boolean>> userProfileUpdate(@Valid UserUpdateRequestDto userUpdateRequestDto,
                                                                   @RequestPart(value = "image", required = false) MultipartFile file) {
         User user = userService.userUpdate(userUpdateRequestDto, file);
@@ -100,6 +103,7 @@ public class UserController {
 
     @PatchMapping("/password")
     @ApiOperation(value = "비밀번호 변경")
+    @ApiImplicitParam(name = "Authorization", value = "Authorization", required = true, dataType = "string", paramType = "header")
     public ResponseEntity<ResponseDto<Boolean>> userPasswordUpdate(@RequestBody @Valid PasswordUpdateRequestDto passwordUpdateRequestDto) {
         User user = userService.userPasswordUpdate(passwordUpdateRequestDto);
         return ResponseEntity.ok(new ResponseDto<>(null, true));
@@ -107,6 +111,7 @@ public class UserController {
 
     @DeleteMapping
     @ApiOperation(value = "회원 탈퇴")
+    @ApiImplicitParam(name = "Authorization", value = "Authorization", required = true, dataType = "string", paramType = "header")
     public ResponseEntity<ResponseDto<Boolean>> userSingOut() throws Exception {
         User user = userService.userSignOut();
         return ResponseEntity.ok(new ResponseDto<>(null, true));
@@ -114,6 +119,7 @@ public class UserController {
 
     @GetMapping("/list")
     @ApiOperation(value = "회원 목록 조회 (관리자)")
+    @ApiImplicitParam(name = "Authorization", value = "Authorization", required = true, dataType = "string", paramType = "header")
     public ResponseEntity<ResponseDto<SliceDto<UserSimpleInfoDto>> >userInfoList(Long userNo,
                                                               @Valid UserFilterDto userFilterDto,
                                                               @PageableDefault(size = 5) Pageable pageable) {
@@ -123,6 +129,7 @@ public class UserController {
 
     @PatchMapping("/block/{userNo}")
     @ApiOperation(value = "회원 차단 (관리자)")
+    @ApiImplicitParam(name = "Authorization", value = "Authorization", required = true, dataType = "string", paramType = "header")
     public ResponseEntity<ResponseDto<Boolean>> userBlock(@PathVariable Long userNo, @RequestBody UserBlockRequestDto userBlockRequestDto) {
         User user = userService.userBlock(userNo, userBlockRequestDto.getBlockReason());
         return ResponseEntity.ok(new ResponseDto<>(null, true));
@@ -130,6 +137,7 @@ public class UserController {
 
     @PatchMapping("/unblock/{userNo}")
     @ApiOperation(value = "회원 차단 해제 (관리자)")
+    @ApiImplicitParam(name = "Authorization", value = "Authorization", required = true, dataType = "string", paramType = "header")
     public ResponseEntity<ResponseDto<Boolean>> userUnBlock(@PathVariable Long userNo) {
         User user = userService.userUnBlock(userNo);
         return ResponseEntity.ok(new ResponseDto<>(null, true));
