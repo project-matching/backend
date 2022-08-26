@@ -100,9 +100,4 @@ public class Project extends BaseTimeEntity{
         this.endDate = endDate;
         this.introduction = introduction;
     }
-
-    //생성자 이름 변경
-    public void setCreateUserName(String createUserName) {
-        this.createUserName = createUserName;
-    }
 }
