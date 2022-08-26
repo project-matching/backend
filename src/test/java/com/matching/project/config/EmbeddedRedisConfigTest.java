@@ -5,15 +5,19 @@ import com.matching.project.dto.user.UserDto;
 import com.matching.project.service.RedisService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest
+@SpringBootTest(classes = EmbeddedRedisConfig.class)
+@AutoConfigureMockMvc
+@Transactional
 public class EmbeddedRedisConfigTest {
     @Autowired
     RedisTemplate<String, Object> redisTemplate;

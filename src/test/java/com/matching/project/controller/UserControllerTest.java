@@ -1,6 +1,7 @@
 package com.matching.project.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.matching.project.config.EmbeddedRedisConfig;
 import com.matching.project.dto.token.TokenClaimsDto;
 import com.matching.project.dto.enumerate.EmailAuthPurpose;
 import com.matching.project.dto.enumerate.OAuth;
@@ -34,7 +35,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(classes = EmbeddedRedisConfig.class)
 @AutoConfigureMockMvc
 @Transactional
 public class UserControllerTest {

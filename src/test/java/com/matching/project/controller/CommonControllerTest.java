@@ -1,6 +1,7 @@
 package com.matching.project.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.matching.project.config.EmbeddedRedisConfig;
 import com.matching.project.dto.common.NormalLoginRequestDto;
 import com.matching.project.dto.common.PasswordInitRequestDto;
 import com.matching.project.dto.token.TokenClaimsDto;
@@ -27,7 +28,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest
+@SpringBootTest(classes = EmbeddedRedisConfig.class)
 @AutoConfigureMockMvc
 @Transactional
 public class CommonControllerTest {

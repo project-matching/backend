@@ -65,6 +65,7 @@ public class JwtTokenService {
                         .setIssuedAt(now)
                         .setExpiration(new Date(now.getTime() + accessTokenPeriod))
                         .signWith(SignatureAlgorithm.HS256, secretKey)
+                        .setId(UUID.randomUUID().toString())
                         .compact())
                 .refresh(Jwts.builder().setHeader(headers)
                         .setClaims(claims)
@@ -72,6 +73,7 @@ public class JwtTokenService {
                         .setIssuedAt(now)
                         .setExpiration(new Date(now.getTime() + refreshTokenPeriod))
                         .signWith(SignatureAlgorithm.HS256, secretKey)
+                        .setId(UUID.randomUUID().toString())
                         .compact())
                 .build();
     }
