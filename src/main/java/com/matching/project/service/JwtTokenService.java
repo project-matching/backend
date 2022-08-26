@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.matching.project.dto.token.TokenClaimsDto;
 import com.matching.project.dto.token.TokenDto;
 import com.matching.project.dto.token.TokenReissueRequestDto;
+import com.matching.project.dto.token.TokenReissueResponseDto;
 import com.matching.project.error.CustomException;
 import com.matching.project.error.ErrorCode;
 import io.jsonwebtoken.*;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.Base64Utils;
 
 import javax.annotation.PostConstruct;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Slf4j
@@ -58,6 +60,7 @@ public class JwtTokenService {
         claims.put("email", tokenClaimsDto.getEmail());
 
         Date now = new Date();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         return TokenDto.builder()
                 .access(Jwts.builder().setHeader(headers)
                         .setClaims(claims)
@@ -66,6 +69,7 @@ public class JwtTokenService {
                         .setExpiration(new Date(now.getTime() + accessTokenPeriod))
                         .signWith(SignatureAlgorithm.HS256, secretKey)
                         .compact())
+                .access_exp(simpleDateFormat.format(new Date(now.getTime() + accessTokenPeriod)))
                 .refresh(Jwts.builder().setHeader(headers)
                         .setClaims(claims)
                         .setSubject("user-auth")
@@ -73,6 +77,7 @@ public class JwtTokenService {
                         .setExpiration(new Date(now.getTime() + refreshTokenPeriod))
                         .signWith(SignatureAlgorithm.HS256, secretKey)
                         .compact())
+                .refresh_exp(simpleDateFormat.format(new Date(now.getTime() + refreshTokenPeriod)))
                 .build();
     }
 
@@ -107,7 +112,7 @@ public class JwtTokenService {
     }
 
     // access 토큰 재발급
-    public String accessTokenReissue(TokenReissueRequestDto dto) {
+    public TokenReissueResponseDto accessTokenReissue(TokenReissueRequestDto dto) {
         // 기존 access 토큰이 블랙리스트에 있는지 확인
         if (!hasBlackListKey(dto.getAccess()))
             setBlackList(dto.getAccess());
@@ -133,7 +138,10 @@ public class JwtTokenService {
                 .email(email)
                 .build();
         TokenDto tokenDto = createToken(tokenClaimsDto);
-        return tokenDto.getAccess();
+        return TokenReissueResponseDto.builder()
+                .access(tokenDto.getAccess())
+                .access_exp(tokenDto.getAccess_exp())
+                .build();
     }
 
     public void setRefreshToken(String email, String refreshToken){

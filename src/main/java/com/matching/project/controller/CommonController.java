@@ -87,9 +87,7 @@ public class CommonController {
     public ResponseEntity<ResponseDto<TokenReissueResponseDto>> jwtAccessTokenReissue(@RequestBody @Valid TokenReissueRequestDto dto) {
 
         // Jwt Access Token Reissue
-        TokenReissueResponseDto tokenReissueResponseDto = TokenReissueResponseDto.builder()
-                .access(jwtTokenService.accessTokenReissue(dto))
-                .build();
+        TokenReissueResponseDto tokenReissueResponseDto = jwtTokenService.accessTokenReissue(dto);
 
         return ResponseEntity.ok().body(new ResponseDto<>(null, tokenReissueResponseDto));
     }
