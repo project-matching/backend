@@ -50,7 +50,10 @@ public class OAuthSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
         log.info("{}", tokens);
 
         // api 리다이렉트에는 로그인 인증 후 jwt 토큰을 보낼 URI(react)가 설정되어야함.
-        getRedirectStrategy().sendRedirect(request, response, "http://localhost:3000/auth/success?access=" + tokens.getAccess()
-                + "&refresh=" + tokens.getRefresh());
+        getRedirectStrategy().sendRedirect(request, response, "http://localhost:3000/auth/success"
+                + "?access=" + tokens.getAccess()
+                + "&access_exp=" + tokens.getAccess_exp()
+                + "&refresh=" + tokens.getRefresh()
+        );
     }
 }

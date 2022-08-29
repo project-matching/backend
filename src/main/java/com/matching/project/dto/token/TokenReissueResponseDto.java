@@ -11,4 +11,5 @@ import lombok.NoArgsConstructor;
 @Builder
 public class TokenReissueResponseDto {
     String access;
+    String access_exp;
 }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.matching.project.dto.token.TokenClaimsDto;
 import com.matching.project.dto.token.TokenDto;
 import com.matching.project.dto.token.TokenReissueRequestDto;
+import com.matching.project.dto.token.TokenReissueResponseDto;
 import com.matching.project.error.CustomException;
 import com.matching.project.error.ErrorCode;
 import io.jsonwebtoken.*;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.Base64Utils;
 
 import javax.annotation.PostConstruct;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Slf4j
@@ -67,6 +69,7 @@ public class JwtTokenService {
                         .signWith(SignatureAlgorithm.HS256, secretKey)
                         .setId(UUID.randomUUID().toString())
                         .compact())
+                .access_exp(Long.toString((now.getTime() + accessTokenPeriod)/1000L))
                 .refresh(Jwts.builder().setHeader(headers)
                         .setClaims(claims)
                         .setSubject("user-auth")
@@ -109,7 +112,7 @@ public class JwtTokenService {
     }
 
     // access 토큰 재발급
-    public String accessTokenReissue(TokenReissueRequestDto dto) {
+    public TokenReissueResponseDto accessTokenReissue(TokenReissueRequestDto dto) {
         // 기존 access 토큰이 블랙리스트에 있는지 확인
         if (!hasBlackListKey(dto.getAccess()))
             setBlackList(dto.getAccess());
@@ -135,7 +138,10 @@ public class JwtTokenService {
                 .email(email)
                 .build();
         TokenDto tokenDto = createToken(tokenClaimsDto);
-        return tokenDto.getAccess();
+        return TokenReissueResponseDto.builder()
+                .access(tokenDto.getAccess())
+                .access_exp(tokenDto.getAccess_exp())
+                .build();
     }
 
     public void setRefreshToken(String email, String refreshToken){
