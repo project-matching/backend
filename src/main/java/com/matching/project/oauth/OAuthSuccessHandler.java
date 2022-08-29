@@ -54,6 +54,6 @@ public class OAuthSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
                 + "?access=" + tokens.getAccess()
                 + "&access_exp=" + tokens.getAccess_exp()
                 + "&refresh=" + tokens.getRefresh()
-                + "&refresh_exp=" + tokens.getRefresh_exp());
+        );
     }
 }

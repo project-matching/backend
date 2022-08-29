@@ -60,7 +60,6 @@ public class JwtTokenService {
         claims.put("email", tokenClaimsDto.getEmail());
 
         Date now = new Date();
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         return TokenDto.builder()
                 .access(Jwts.builder().setHeader(headers)
                         .setClaims(claims)
@@ -70,7 +69,7 @@ public class JwtTokenService {
                         .signWith(SignatureAlgorithm.HS256, secretKey)
                         .setId(UUID.randomUUID().toString())
                         .compact())
-                .access_exp(simpleDateFormat.format(new Date(now.getTime() + accessTokenPeriod)))
+                .access_exp(Long.toString((now.getTime() + accessTokenPeriod)/1000L))
                 .refresh(Jwts.builder().setHeader(headers)
                         .setClaims(claims)
                         .setSubject("user-auth")
@@ -79,7 +78,6 @@ public class JwtTokenService {
                         .signWith(SignatureAlgorithm.HS256, secretKey)
                         .setId(UUID.randomUUID().toString())
                         .compact())
-                .refresh_exp(simpleDateFormat.format(new Date(now.getTime() + refreshTokenPeriod)))
                 .build();
     }
 

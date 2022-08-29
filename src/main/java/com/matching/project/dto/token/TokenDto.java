@@ -13,5 +13,5 @@ public class TokenDto {
     String access;
     String access_exp;
     String refresh;
-    String refresh_exp;
+    //String refresh_exp;
 }
