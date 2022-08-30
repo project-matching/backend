@@ -1,12 +1,23 @@
 spring:
   profiles:
+    group:
+      local:
+        - local-logging
+      dev:
+        - dev-logging
     active: local
+
+logging:
+  config: classpath:logback/logback.xml
 ---
 
 spring:
-  profiles: local
-
+  config:
+    activate:
+      on-profile: local
 ---
 
 spring:
-  profiles: dev
+  config:
+    activate:
+      on-profile: dev

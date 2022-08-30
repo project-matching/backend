@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<configuration>
+    <property name="logPath"		value="C://logs" />
+    <property name="fileName"		value="test-log" />
+    <property name="consolePattern"	value="%-5level %d{yyyy-MM-dd HH:mm:ss}[%thread] %logger[%method:%line] - %msg%n"/>
+    <property name="filePattern"    value="%-4relative [%thread] %-5level %logger{35} - %msg%n"/>
+    <property name="slackPattern"   value="%d{yyyy-MM-dd HH:mm:ss}:%-3relative][%thread] %-5level %logger{35} - %msg%n"/>
+    <property name="slackHookUri"	value="%%%%%%%%%YOUR SLACK WEBHOOK URI%%%%%%%%%"/>
+
+    <!-- Log Appender Module -->
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>${consolePattern}</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="file" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${logPath}//${fileName}.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${logPath}//LOG_%d{yyyy-MM-dd}_${fileName}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+
+        <encoder>
+            <Pattern>${filePattern}</Pattern>
+        </encoder>
+    </appender>
+
+    <springProfile name="prod-logging">
+        <logger name="root" level="error">
+            <appender-ref ref="console" />
+            <appender-ref ref="file" />
+        </logger>
+    </springProfile>
+
+    <springProfile name="dev-logging">
+        <logger name="root" level="info">
+            <appender-ref ref="console" />
+            <appender-ref ref="file" />
+        </logger>
+    </springProfile>
+
+    <springProfile name="local-logging">
+        <logger name="root" level="info">
+            <appender-ref ref="console" />
+            <appender-ref ref="file" />
+        </logger>
+    </springProfile>
+</configuration>
