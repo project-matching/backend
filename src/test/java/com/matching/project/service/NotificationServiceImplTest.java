@@ -239,7 +239,6 @@ class NotificationServiceImplTest {
             NotificationDto dto = notificationService.notificationInfo(notificationNo);
 
             //then
-            assertThat(dto.getType()).isEqualTo(type);
             assertThat(dto.getTitle()).isEqualTo(title);
             assertThat(dto.getContent()).isEqualTo(content);
         }
