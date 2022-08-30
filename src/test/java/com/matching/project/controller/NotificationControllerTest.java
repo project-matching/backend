@@ -203,7 +203,6 @@ public class NotificationControllerTest {
             //then
             resultActions.andDo(print())
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.data.content.[0].type").value("PROJECT_PARTICIPATION_SUCCESS"))
                     .andExpect(jsonPath("$.data.content.[0].title").value("t3"))
                     .andExpect(jsonPath("$.data.last").value(false));
 

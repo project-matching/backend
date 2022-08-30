@@ -10,7 +10,6 @@ import java.time.LocalDateTime;
 @Data
 public class NotificationSimpleInfoDto {
     private Long notificationNo;
-    private Type type;
     private String title;
     private boolean read;
     private LocalDateTime createDate;

@@ -78,7 +78,6 @@ public class NotificationServiceImpl implements NotificationService {
         return SliceDto.<NotificationSimpleInfoDto>builder()
                 .content(notificationList.getContent().stream().map(notification -> NotificationSimpleInfoDto.builder()
                                 .notificationNo(notification.getNo())
-                                .type(notification.getType())
                                 .title(notification.getTitle())
                                 .read(notification.isRead())
                                 .createDate(notification.getCreatedDate())
@@ -97,7 +96,7 @@ public class NotificationServiceImpl implements NotificationService {
         // Valid Check
         if (optionalNotification.get().getUser() != null) {
             // 받는 사람만 알람에 접근할 수 있어야함. (공지사항 제외)
-            if (optionalNotification.get().getUser().getNo() != getAuthenticatedUser().getNo())
+            if (!optionalNotification.get().getUser().getNo().equals(getAuthenticatedUser().getNo()))
                 throw new CustomException(ErrorCode.UNAUTHORIZED_USER_ACCESS_EXCEPTION);
         }
 
