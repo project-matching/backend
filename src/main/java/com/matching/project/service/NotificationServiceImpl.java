@@ -104,7 +104,6 @@ public class NotificationServiceImpl implements NotificationService {
         optionalNotification.get().readProcessing();
 
         return NotificationDto.builder()
-                .type(optionalNotification.get().getType())
                 .title(optionalNotification.get().getTitle())
                 .content(optionalNotification.get().getContent())
                 .createDate(optionalNotification.get().getCreatedDate())
