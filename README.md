@@ -6,22 +6,44 @@
 
 ## 프로젝트 사용기술
 
-- Spring Boot 2.7.0
+### Backend
+
 - Java 11
-- MariaDB 10.6.7
-- Spring Data Jpa 2.7.0 
+- Spring Boot 2.7.0
+- Spring Security 2.7.3
+- Spring Security Oauth2 2.7.3
+- Spring Data Jpa 2.7.3
+- Spring Data Redis 2.7.3
+- Querydsl 1.0.10
+
 - Gradle 7.4.1
-- Redis 7.0.4
+
+- Junit 5
+
+- Mockito
+
+### DevOps
+
 - AWS EC2
-- AWS S3
 - AWS RDS
+- AWS S3
 - Docker
 - Docker Hub
 - Jenkins
 
+### Database
+
+- MariaDB 10.6.7
+- H2 2.1.214
+
+### Docs
+
+- Swagger2 2.9.2
+
 
 
 ## 프로젝트 구조
+
 <img src = "https://project-matching-s3.s3.ap-northeast-2.amazonaws.com/apidocs/infra.png" width="100%" height="100%">
 
 ## 프로젝트 목표
@@ -32,6 +54,10 @@
 - 젠킨스와 도커를 이용한 CI/CD를 구현하여 자동화된 배포 및 버전관리가 가능한 프로젝트를 구현하는 것이 목표입니다.
 - REST API에 적합한  API를 구현하는 것이 목표입니다.
 - 유지 보수를 위해 객체지향적 설계 및 읽기 좋은 코드를 작성하도록 노력하는 것이 목표입니다.
+- Git Flow 전략을 이용해서 원활한 협업을 진행하는 것이 목표입니다.
+- Git Hub Pull Request를 이용해 팀원들끼리 코드 리뷰를 진행하는 것이 목표입니다.
+
+
 
 ## 프로젝트 문제 해결
 
@@ -58,12 +84,34 @@
 
 
 
+## 화면 정의서(와이어 프레임)
+
+- [와이어프레임 URL](https://www.figma.com/file/oziJXYjB3leZwpyObhXsPx/project-matching?node-id=0%3A1)
+
+
+
+## 테스트 커버리지 결과
+
+## ![TestCoverage](https://project-matching-s3.s3.ap-northeast-2.amazonaws.com/apidocs/coverage.png)
+
+
+
 ## DB ERD
 
 ![ERD](https://project-matching-s3.s3.ap-northeast-2.amazonaws.com/apidocs/erd.png)
 
 
 
-## 화면 정의서(와이어 프레임)
+## 추후 프로젝트 개선사항
 
-- [와이어프레임 URL](https://www.figma.com/file/oziJXYjB3leZwpyObhXsPx/project-matching?node-id=0%3A1)
+- 테스트 커버리지가 높은 프로젝트가 되도록 개선
+- 지속적인 성능 개선
+- 성능 테스트 진행
+- 서버 이중화
+- Jenkins 무중단 배포가 가능하도록 개선
+
+
+
+## 작업 로드맵
+
+- [작업 로드맵](https://tidy-poet-085.notion.site/df5bc7f7c3f6404a862ae5e69e2cb9fe?v=02c2de7724984990ab2d90ac38e8a9b8)
