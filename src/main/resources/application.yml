@@ -5,6 +5,8 @@ spring:
         - local-logging
       dev:
         - dev-logging
+      prod:
+        - prod-logging
     active: local
 
 logging:
@@ -21,3 +23,9 @@ spring:
   config:
     activate:
       on-profile: dev
+---
+
+spring:
+  config:
+    activate:
+      on-profile: prod

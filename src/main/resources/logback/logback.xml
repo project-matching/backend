@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <configuration>
-    <property name="logPath"		value="C://logs" />
+    <property name="logPath"		value="/logs" />
     <property name="fileName"		value="test-log" />
     <property name="consolePattern"	value="%-5level %d{yyyy-MM-dd HH:mm:ss}[%thread] %logger[%method:%line] - %msg%n"/>
     <property name="filePattern"    value="%-4relative [%thread] %-5level %logger{35} - %msg%n"/>
-    <property name="slackPattern"   value="%d{yyyy-MM-dd HH:mm:ss}:%-3relative][%thread] %-5level %logger{35} - %msg%n"/>
-    <property name="slackHookUri"	value="%%%%%%%%%YOUR SLACK WEBHOOK URI%%%%%%%%%"/>
 
     <!-- Log Appender Module -->
     <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
