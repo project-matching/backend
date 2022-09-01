@@ -15,11 +15,8 @@
 - Spring Data Jpa 2.7.3
 - Spring Data Redis 2.7.3
 - Querydsl 1.0.10
-
 - Gradle 7.4.1
-
 - Junit 5
-
 - Mockito
 
 ### DevOps
