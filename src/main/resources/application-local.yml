@@ -49,8 +49,8 @@ spring:
     hibernate:
       ddl-auto: create
   redis:
-    host: leeworld9.ipdisk.co.kr
-    port: 56379
+    host: localhost
+    port: 46379
 
   mvc:
     pathmatch:
