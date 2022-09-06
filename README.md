@@ -64,7 +64,7 @@
 - [S3를 통한 이미지 업로드 해결과정](https://tidy-poet-085.notion.site/S3-c23cc2f2a1a54d0597b5a729e60c95c7)
 - [JWT 해결과정](https://tidy-poet-085.notion.site/JWT-56576768c978491c92945b10b8ec7fd6)
 - [OAuth 2.0 해결과정](https://tidy-poet-085.notion.site/OAuth-2-0-225d4689fd2d47af9c12ccd88d029ea5)
-- [Jasyp을 이용한 암호화](https://tidy-poet-085.notion.site/JASYPT-8219370f128249378dc0103a72c9bf52)
+- [Jasypt을 이용한 암호화](https://tidy-poet-085.notion.site/JASYPT-8219370f128249378dc0103a72c9bf52)
 - [AOP를 이용한 Logging](https://tidy-poet-085.notion.site/AOP-Logging-7047e5474fea44faadb13d2aa666ac41)
 
 
