@@ -602,9 +602,11 @@ class UserServiceTest {
             assertThat(dtoList.getContent().get(0).getUserNo()).isEqualTo(3);
             assertThat(dtoList.getContent().get(0).getName()).isEqualTo("테스터 3");
             assertThat(dtoList.getContent().get(0).getEmail()).isEqualTo("test3@naver.com");
+            assertThat(dtoList.getContent().get(0).getBlock()).isFalse();
             assertThat(dtoList.getContent().get(1).getUserNo()).isEqualTo(4);
             assertThat(dtoList.getContent().get(1).getName()).isEqualTo("테스터 4");
             assertThat(dtoList.getContent().get(1).getEmail()).isEqualTo("test4@naver.com");
+            assertThat(dtoList.getContent().get(1).getBlock()).isFalse();
             assertThat(dtoList.getContent().size()).isEqualTo(size);
             assertThat(dtoList.isLast()).isFalse();
         }

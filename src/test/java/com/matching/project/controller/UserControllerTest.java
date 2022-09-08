@@ -493,14 +493,17 @@ public class UserControllerTest {
                     .andExpect(jsonPath("$.data.content.[0].image").value(imageService.getImageUrl(user4.getImageNo())))
                     .andExpect(jsonPath("$.data.content.[0].name").value(user4.getName()))
                     .andExpect(jsonPath("$.data.content.[0].email").value(user4.getEmail()))
+                    .andExpect(jsonPath("$.data.content.[0].block").value(user4.isBlock()))
                     .andExpect(jsonPath("$.data.content.[1].userNo").value(user3.getNo()))
                     .andExpect(jsonPath("$.data.content.[1].image").value(imageService.getImageUrl(user3.getImageNo())))
                     .andExpect(jsonPath("$.data.content.[1].name").value(user3.getName()))
                     .andExpect(jsonPath("$.data.content.[1].email").value(user3.getEmail()))
+                    .andExpect(jsonPath("$.data.content.[1].block").value(user3.isBlock()))
                     .andExpect(jsonPath("$.data.content.[2].userNo").value(user2.getNo()))
                     .andExpect(jsonPath("$.data.content.[2].image").value(imageService.getImageUrl(user2.getImageNo())))
                     .andExpect(jsonPath("$.data.content.[2].name").value(user2.getName()))
                     .andExpect(jsonPath("$.data.content.[2].email").value(user2.getEmail()))
+                    .andExpect(jsonPath("$.data.content.[2].block").value(user2.isBlock()))
                     .andExpect(jsonPath("$.data.last").value(false));
         }
 

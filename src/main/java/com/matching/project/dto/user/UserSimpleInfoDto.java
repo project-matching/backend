@@ -11,4 +11,5 @@ public class UserSimpleInfoDto {
     private String image;
     private String name;
     private String email;
+    private Boolean block;
 }

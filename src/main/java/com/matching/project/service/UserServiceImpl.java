@@ -156,6 +156,7 @@ public class UserServiceImpl implements UserService{
                                 .name(user.getName())
                                 .email(user.getEmail())
                                 .image(imageService.getImageUrl(user.getImageNo()))
+                                .block(user.isBlock())
                                 .build()
                         )
                         .collect(Collectors.toList()))
