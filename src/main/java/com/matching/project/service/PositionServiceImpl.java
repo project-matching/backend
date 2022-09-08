@@ -46,13 +46,26 @@ public class PositionServiceImpl implements PositionService {
     @Override
     @Transactional
     public Position positionUpdate(Long positionNo, String updatePositionName) {
-        Optional<Position> optionalPosition = positionRepository.findById(positionNo);
-        if (optionalPosition.isEmpty())
+        List<Position> positionList = positionRepository.findAll();
+        int i = 0;
+        int offset = -1;
+        for (; i < positionList.size(); i++) {
+            // 수정할 포지션이 존재 하는 경우, 오프셋 설정
+            if (positionList.get(i).getNo().equals(positionNo))
+                offset = i;
+            // 중복된 걸로 수정하려는 경우
+            if (positionList.get(i).getName().equals(updatePositionName))
+                throw new CustomException(ErrorCode.ALREADY_REGISTERED_POSITION_EXCEPTION);
+
+        }
+
+        // 수정할 포지션이 존재 하지 않는 경우
+        if (offset == -1) {
             throw new CustomException(ErrorCode.UNREGISTERED_POSITION_EXCEPTION);
-        else {
-            Position position = optionalPosition.get();
-            position.updatePositionName(updatePositionName);
-            return position;
+        } else {
+            // 포지션 수정
+            positionList.get(offset).updatePositionName(updatePositionName);
+            return positionList.get(offset);
         }
     }
 }
