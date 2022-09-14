@@ -38,7 +38,7 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
         List<User> fetch = queryFactory
                 .selectFrom(user)
                 .where(
-                        user.no.loe(userNo),
+                        user.no.lt(userNo),
                         filterNameEq(userFilterDto),
                         filterEmailEq(userFilterDto)
                 )

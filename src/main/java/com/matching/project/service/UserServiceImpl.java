@@ -74,15 +74,15 @@ public class UserServiceImpl implements UserService{
     }
 
     public List<TechnicalStack> getTechnicalStacksListForSave(List<String> s) {
-        List<TechnicalStack> saveTechnicalStacksList = new ArrayList<>();
+        //중복 입력 방지를 위해 set 사용
+        Set<TechnicalStack> technicalStackSet = new HashSet<>();
         if (s != null && !s.isEmpty()) {
             List<TechnicalStack> technicalStacks = technicalStackRepository.findAll();
             for (String stack : s) {
-                int i;
-                for (i = 0 ; i < technicalStacks.size() ; i++) {
+                int i = 0;
+                for (; i < technicalStacks.size() ; i++) {
                     if (technicalStacks.get(i).getName().equals(stack)) {
-                        // 중복 허용하지 않으려면 set 으로 바꿔주도록 하자.
-                        saveTechnicalStacksList.add(technicalStacks.get(i));
+                        technicalStackSet.add(technicalStacks.get(i));
                         break ;
                     }
                 }
@@ -90,7 +90,7 @@ public class UserServiceImpl implements UserService{
                     throw new CustomException(ErrorCode.UNREGISTERED_TECHNICAL_STACK_EXCEPTION);
             }
         }
-        return saveTechnicalStacksList;
+        return new ArrayList<>(technicalStackSet);
     }
 
     @Override

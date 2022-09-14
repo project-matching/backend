@@ -146,6 +146,8 @@ class PositionServiceImplTest {
             //then
             assertThat(e.getErrorCode().getDetail()).isEqualTo("Already Registered Position");
         }
+
+
     }
 
     @Nested
@@ -170,25 +172,55 @@ class PositionServiceImplTest {
             SecurityContext context = SecurityContextHolder.getContext();
             context.setAuthentication(new UsernamePasswordAuthenticationToken(user, user.getEmail(), user.getAuthorities()));
 
-            Long positionNo = 1L;
-            String positionName = "test1";
-            Position position = Position.builder()
-                    .no(positionNo)
-                    .name(positionName)
-                    .build();
+            List<Position> positionList = new ArrayList<>();
 
-            given(positionRepository.findById(positionNo)).willReturn(Optional.ofNullable(position));
+            Long targetPositionNo = 1L;
+            String targetPositionName = "test5";
+
+            Long positionNo1 = 1L;
+            String positionName1 = "test1";
+            Position position1 = Position.builder()
+                    .no(positionNo1)
+                    .name(positionName1)
+                    .build();
+            positionList.add(position1);
+
+            Long positionNo2 = 2L;
+            String positionName2 = "test2";
+            Position position2 = Position.builder()
+                    .no(positionNo2)
+                    .name(positionName2)
+                    .build();
+            positionList.add(position2);
+
+            Long positionNo3 = 3L;
+            String positionName3 = "test3";
+            Position position3 = Position.builder()
+                    .no(positionNo3)
+                    .name(positionName3)
+                    .build();
+            positionList.add(position3);
+
+            Long positionNo4 = 4L;
+            String positionName4 = "test4";
+            Position position4 = Position.builder()
+                    .no(positionNo4)
+                    .name(positionName4)
+                    .build();
+            positionList.add(position4);
+
+            given(positionRepository.findAll()).willReturn(positionList);
 
             //when
-            Position resPosition = positionService.positionUpdate(positionNo, positionName);
+            Position resPosition = positionService.positionUpdate(targetPositionNo, targetPositionName);
 
             //then
-            assertThat(resPosition.getName()).isEqualTo(positionName);
+            assertThat(resPosition.getName()).isEqualTo(targetPositionName);
         }
 
         @DisplayName("실패 : 등록되지 않는 포지션을 입력")
         @Test
-        void fail() {
+        void fail1() {
             //given
             Long userNo = 1L;
             String userName = "테스터";
@@ -205,17 +237,119 @@ class PositionServiceImplTest {
             SecurityContext context = SecurityContextHolder.getContext();
             context.setAuthentication(new UsernamePasswordAuthenticationToken(user, user.getEmail(), user.getAuthorities()));
 
-            Long positionNo = 1L;
-            String positionName = "test1";
-            given(positionRepository.findById(positionNo)).willReturn(Optional.empty());
+            List<Position> positionList = new ArrayList<>();
+
+            Long targetPositionNo = 5L;
+            String targetPositionName = "test5";
+
+            Long positionNo1 = 1L;
+            String positionName1 = "test1";
+            Position position1 = Position.builder()
+                    .no(positionNo1)
+                    .name(positionName1)
+                    .build();
+            positionList.add(position1);
+
+            Long positionNo2 = 2L;
+            String positionName2 = "test2";
+            Position position2 = Position.builder()
+                    .no(positionNo2)
+                    .name(positionName2)
+                    .build();
+            positionList.add(position2);
+
+            Long positionNo3 = 3L;
+            String positionName3 = "test3";
+            Position position3 = Position.builder()
+                    .no(positionNo3)
+                    .name(positionName3)
+                    .build();
+            positionList.add(position3);
+
+            Long positionNo4 = 4L;
+            String positionName4 = "test4";
+            Position position4 = Position.builder()
+                    .no(positionNo4)
+                    .name(positionName4)
+                    .build();
+            positionList.add(position4);
+
+            given(positionRepository.findAll()).willReturn(positionList);
 
             //when
             CustomException e = Assertions.assertThrows(CustomException.class, () -> {
-                Position resPosition = positionService.positionUpdate(positionNo, positionName);
+                Position resPosition = positionService.positionUpdate(targetPositionNo, targetPositionName);
             });
 
             //then
             assertThat(e.getErrorCode().getDetail()).isEqualTo("Unregistered Position");
+        }
+
+        @DisplayName("실패 : 이미 등록된 포지션으로 업데이트 시도")
+        @Test
+        void fail2() {
+            //given
+            Long userNo = 1L;
+            String userName = "테스터";
+            String userEmail = "leeworld9@gmail.com";
+            Role userRole = Role.ROLE_ADMIN;
+
+            User user = User.builder()
+                    .no(userNo)
+                    .name(userName)
+                    .email(userEmail)
+                    .permission(userRole)
+                    .build();
+
+            SecurityContext context = SecurityContextHolder.getContext();
+            context.setAuthentication(new UsernamePasswordAuthenticationToken(user, user.getEmail(), user.getAuthorities()));
+
+            List<Position> positionList = new ArrayList<>();
+
+            Long targetPositionNo = 1L;
+            String targetPositionName = "test3";
+
+            Long positionNo1 = 1L;
+            String positionName1 = "test1";
+            Position position1 = Position.builder()
+                    .no(positionNo1)
+                    .name(positionName1)
+                    .build();
+            positionList.add(position1);
+
+            Long positionNo2 = 2L;
+            String positionName2 = "test2";
+            Position position2 = Position.builder()
+                    .no(positionNo2)
+                    .name(positionName2)
+                    .build();
+            positionList.add(position2);
+
+            Long positionNo3 = 3L;
+            String positionName3 = "test3";
+            Position position3 = Position.builder()
+                    .no(positionNo3)
+                    .name(positionName3)
+                    .build();
+            positionList.add(position3);
+
+            Long positionNo4 = 4L;
+            String positionName4 = "test4";
+            Position position4 = Position.builder()
+                    .no(positionNo4)
+                    .name(positionName4)
+                    .build();
+            positionList.add(position4);
+
+            given(positionRepository.findAll()).willReturn(positionList);
+
+            //when
+            CustomException e = Assertions.assertThrows(CustomException.class, () -> {
+                Position resPosition = positionService.positionUpdate(targetPositionNo, targetPositionName);
+            });
+
+            //then
+            assertThat(e.getErrorCode().getDetail()).isEqualTo("Already Registered Position");
         }
     }
 }

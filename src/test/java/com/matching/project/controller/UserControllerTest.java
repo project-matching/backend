@@ -412,9 +412,7 @@ public class UserControllerTest {
             assertThat(resUser.getGithub()).isEqualTo(nGithub);
             assertThat(resUser.getSelfIntroduction()).isEqualTo(nSelfIntroduction);
             Optional<List<UserTechnicalStack>> ust = userTechnicalStackRepository.findUserTechnicalStacksByUser(resUser.getNo());
-            assertThat(ust.get().get(0).getTechnicalStack().getName()).isEqualTo("Spring");
-            assertThat(ust.get().get(1).getTechnicalStack().getName()).isEqualTo("React");
-            assertThat(ust.get().get(2).getTechnicalStack().getName()).isEqualTo("JPA");
+            assertThat(ust.get().size()).isEqualTo(3);
         }
 
         @DisplayName("실패")
