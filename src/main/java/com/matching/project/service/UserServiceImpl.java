@@ -2,6 +2,7 @@ package com.matching.project.service;
 
 import com.matching.project.dto.SliceDto;
 import com.matching.project.dto.enumerate.OAuth;
+import com.matching.project.dto.enumerate.Role;
 import com.matching.project.dto.technicalstack.TechnicalStackDto;
 import com.matching.project.dto.user.*;
 import com.matching.project.entity.*;
@@ -151,14 +152,15 @@ public class UserServiceImpl implements UserService{
         Slice<User> users = userRepositoryCustom.findByNoOrderByNoDescUsingQueryDsl(UserNo, userFilterDto, pageable)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FIND_USER_EXCEPTION));
         SliceDto<UserSimpleInfoDto> dto = SliceDto.<UserSimpleInfoDto>builder()
-                .content(users.get().map(user -> UserSimpleInfoDto.builder()
+                .content(users.get()
+                        .filter(user -> user.getPermission() != Role.ROLE_ADMIN)
+                        .map(user -> UserSimpleInfoDto.builder()
                                 .userNo(user.getNo())
                                 .name(user.getName())
                                 .email(user.getEmail())
                                 .image(imageService.getImageUrl(user.getImageNo()))
                                 .block(user.isBlock())
-                                .build()
-                        )
+                                .build())
                         .collect(Collectors.toList()))
                 .last(users.isLast())
                 .build();
