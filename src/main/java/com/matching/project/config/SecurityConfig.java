@@ -161,7 +161,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.DELETE, "/v1/projectposition/*/expulsion").hasRole("USER")
 
                 //Token
-                .antMatchers(HttpMethod.POST, "/v1/user/token/reissue").hasAnyRole("ANONYMOUS")
+                .antMatchers(HttpMethod.POST, "/v1/user/token/reissue").hasAnyRole("USER")
 
                 //AnyRequest
                 .anyRequest().permitAll()
