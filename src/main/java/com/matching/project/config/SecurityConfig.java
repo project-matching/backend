@@ -54,7 +54,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOriginPatterns(List.of("http://localhost:3000", "http://ec2-3-37-72-42.ap-northeast-2.compute.amazonaws.com:3000"));
+        configuration.setAllowedOriginPatterns(List.of("http://localhost:3000", "http://ec2-3-39-79-163.ap-northeast-2.compute.amazonaws.com:8080"));
         configuration.addAllowedHeader("*");
         configuration.addAllowedMethod("*");
         configuration.setExposedHeaders(List.of("Authorization", "Access-Control-Allow-Origin" ,"AccessControlAllowOrigin"));
