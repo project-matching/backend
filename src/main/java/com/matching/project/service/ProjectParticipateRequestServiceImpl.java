@@ -113,12 +113,6 @@ public class ProjectParticipateRequestServiceImpl implements ProjectParticipateR
 
         // 유저가 만든 프로젝트인지 판단
         isCreatedProject(user, projectParticipateRequest.getProjectPosition().getProject());
-        
-        // 프로젝트 신청 기술스택 삭제
-        participateRequestTechnicalStackRepository.deleteByProjectParticipateNo(projectParticipateRequest.getNo());
-        
-        // 프로젝트 신청 삭제
-        projectParticipateRequestRepository.deleteByNo(projectParticipateRequest.getNo());
 
         // 포지션 유저 업데이트
         ProjectPosition projectPosition = projectPositionRepository.findById(projectParticipateRequest.getProjectPosition().getNo())
@@ -131,6 +125,12 @@ public class ProjectParticipateRequestServiceImpl implements ProjectParticipateR
 
         // 신청한 프로젝트 이름
         String projectName = projectParticipateRequest.getProjectPosition().getProject().getName();
+
+        // 프로젝트 신청 기술스택 삭제
+        participateRequestTechnicalStackRepository.deleteByProjectParticipateNo(projectParticipateRequest.getNo());
+
+        // 프로젝트 신청 삭제
+        projectParticipateRequestRepository.deleteByNo(projectParticipateRequest.getNo());
 
         notificationService.sendNotification(Type.PROJECT_PARTICIPATION_SUCCESS, projectParticipateRequestUserEmail, "[프로젝트 신청 수락] " + projectName, projectName + " 프로젝트에 참가 완료되었습니다.");
         return true;
