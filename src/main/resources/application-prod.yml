@@ -35,7 +35,7 @@ spring:
             clientSecret: ENC(kUbxD1ogPQYKZFf+gfwzgbdxa93O2WJzChRYN4XExZyP2DAGRuRNBChdcgl9EGiThYZq5uqpmG4=)
 
   datasource:
-    url: ENC(ijJF6ccKPFPIydr1qG/KXqRWAOFG6g+7/uRnVs/VFis7WYS9lOd7uCLeV+gTdGbM/L7ic4TsgtuAc/gK5+KkwsQUC/XH8tE3yMzkaPnjxrQPLYa3EfJXjqy1j0v9dtUMja94wdAld41U8HrOnwaifQ5hcesg3cbOV7but30dJmo=)
+    url: ENC(eaF2w0BAJIYmFUVA0MdTpwDoRMOEHraNA8/dAZjW2nZsc+v20AQrKKzdR0ri4bTu+62cJ5mjvxv9lXEtaE/RjB2gCuSbFvNY8/c6l9LxgLigAiPXtDAaxRP+pdKdDB3UZYaY5deH5LjYJxENvQvM88LkpmZk5297jenBJf6w8qg=)
     username: ENC(H1ob3LGdmEA4FVoShs5leA==)
     password: ENC(kNGFnTZ6jeZndmc2zWI+Ed0PV8nynO42chWbaNr1B5o=)
     driver-class-name: org.mariadb.jdbc.Driver
