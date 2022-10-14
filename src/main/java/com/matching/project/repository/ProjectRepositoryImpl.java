@@ -391,7 +391,7 @@ public class ProjectRepositoryImpl implements ProjectRepositoryCustom {
         // 이미지 번호가 있는 경우에는 logicalName 삽입 없을 경우 null 삽입
         List<ProjectSimpleTechnicalStackDto> projectSimplePositionDtoList = projectTechnicalStackList.stream()
                 .map(projectTechnicalStack -> new ProjectSimpleTechnicalStackDto(projectTechnicalStack.getProject().getNo(),
-                        imageMap.containsKey(projectTechnicalStack.getTechnicalStack().getImageNo()) ? imageMap.get(projectTechnicalStack.getTechnicalStack().getImageNo()).getLogicalName() : null,
+                        imageMap.containsKey(projectTechnicalStack.getTechnicalStack().getImageNo()) ? imageMap.get(projectTechnicalStack.getTechnicalStack().getImageNo()).getUrl() : null,
                         projectTechnicalStack.getTechnicalStack().getName()))
                 .collect(Collectors.toList());
         

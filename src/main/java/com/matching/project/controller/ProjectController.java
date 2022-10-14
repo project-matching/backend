@@ -53,7 +53,6 @@ public class ProjectController {
     @ApiOperation(value = "모집중인 프로젝트 목록 조회")
     @ApiImplicitParam(name = "Authorization", value = "Authorization", required = false, dataType = "string", paramType = "header")
     public ResponseEntity<ResponseDto<SliceDto<ProjectSimpleDto>>> projectRecruitingList(@PageableDefault(size = 5, sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable, @RequestParam(value = "projectNo", required = false) Long projectNo, @RequestParam(value = "searchContent", required = false) String searchContent) throws Exception {
-        log.debug("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
         SliceDto<ProjectSimpleDto> projectSimpleDtoList = projectService.findProjectList(projectNo,true, new ProjectSearchRequestDto(ProjectFilter.PROJECT_NAME_AND_CONTENT, searchContent), pageable);
         return ResponseEntity.ok(new ResponseDto<>(null, projectSimpleDtoList));
     }
