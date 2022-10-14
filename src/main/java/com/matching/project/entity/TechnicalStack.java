@@ -29,6 +29,10 @@ public class TechnicalStack extends BaseTimeEntity{
         this.imageNo = imageNo;
     }
 
+    public void updateTechnicalStack(String name) {
+        this.name = name;
+    }
+
     public void changeImageNo(Long imageNo) {
         this.imageNo = imageNo;
     }

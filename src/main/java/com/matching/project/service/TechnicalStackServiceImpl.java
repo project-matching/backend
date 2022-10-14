@@ -78,15 +78,19 @@ public class TechnicalStackServiceImpl implements TechnicalStackService {
         // 기술 스택 조회
         TechnicalStack technicalStack = technicalStackRepository.findById(technicalStackNo).orElseThrow(() -> new CustomException(ErrorCode.NOT_FIND_TECHNICAL_STACK_EXCEPTION));
 
-        // 이미지 삭제
-        imageService.imageDelete(technicalStack.getImageNo());
+        if (image != null && !image.isEmpty()) {
+            // 이미지 삭제
+            imageService.imageDelete(technicalStack.getImageNo());
 
-        // 이미지 변경
-        Long imageNo = imageService.imageUpload(image, 56, 56);
-        
-        // 기술스택 업데이트
-        technicalStack.updateTechnicalStack(technicalStackUpdateRequestDto.getTechnicalStackName(), imageNo);
-        
+            // 이미지 변경
+            Long imageNo = imageService.imageUpload(image, 56, 56);
+
+            // 기술스택 업데이트
+            technicalStack.updateTechnicalStack(technicalStackUpdateRequestDto.getTechnicalStackName(), imageNo);
+        } else {
+            technicalStack.updateTechnicalStack(technicalStackUpdateRequestDto.getTechnicalStackName());
+        }
+
         return true;
     }
 }
