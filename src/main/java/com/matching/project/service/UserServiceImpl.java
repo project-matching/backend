@@ -235,8 +235,8 @@ public class UserServiceImpl implements UserService{
                 imageService.imageDelete(user.getImageNo());
             // New Image Upload
             imageNo = imageService.imageUpload(file, 56, 56);
+            user.setProfileImageNo(imageNo);
         }
-        user.setProfileImageNo(imageNo);
 
         // User & Position Update
         user.updateUser(dto, position);
