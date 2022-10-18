@@ -139,7 +139,7 @@ public class ProjectParticipateRequestRepositoryImpl implements ProjectParticipa
         }
         return projectParticipateRequest.no.lt(projectParticipateRequestNo);
     }
-    
+
     // User, projectPosition join 메소드
     @Override
     public Optional<ProjectParticipateRequest> findProjectPositionAndUserAndProjectFetchJoinByNo(Long no) throws Exception {
@@ -152,6 +152,20 @@ public class ProjectParticipateRequestRepositoryImpl implements ProjectParticipa
                 .fetchOne();
 
         return Optional.of(projectParticipateRequest);
+    }
+
+    // User, projectPosition join ProjectNo로 찾는 메소드
+    @Override
+    public Optional<List<ProjectParticipateRequest>> findProjectPositionAndUserAndProjectFetchJoinByProjectNo(Long projectNo) throws Exception {
+        List<ProjectParticipateRequest> projectParticipateRequestList = queryFactory
+                .selectFrom(projectParticipateRequest)
+                .join(projectParticipateRequest.user, user)
+                .join(projectParticipateRequest.projectPosition, projectPosition)
+                .join(projectPosition.project, project)
+                .where(project.no.eq(projectNo))
+                .fetch();
+
+        return Optional.of(projectParticipateRequestList);
     }
     
     // no로 projectParticipateRequest 삭제하는 메소드

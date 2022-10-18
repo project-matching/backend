@@ -265,7 +265,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
     
     @Override
-    public ProjectDto getProjectDetail(Long projectNo) {
+    public ProjectDto getProjectDetail(Long projectNo) throws Exception{
         // 프로젝트 조회
         Project project = projectRepository.findById(projectNo).orElseThrow(() -> new CustomException(ErrorCode.NOT_FIND_PROJECT_EXCEPTION));
 
@@ -300,6 +300,7 @@ public class ProjectServiceImpl implements ProjectService {
                 .maxPeople(project.getMaxPeople())
                 .bookmark(false)
                 .applicationStatus(false)
+                .participateStatus(false)
                 .build();
         projectDto.setProjectPositionDetailDtoList(projectPositionDetailDtoList);
         projectDto.setTechnicalStackList(technicalStackList);
@@ -317,14 +318,26 @@ public class ProjectServiceImpl implements ProjectService {
             projectDto.setBookmark(bookMark);
 
             // 프로젝트 참여 여부 판단
-            boolean applicationStatus = false;
+            boolean participateStatus = false;
             for (ProjectPositionDetailDto projectPositionDetailDto : projectPositionDetailDtoList) {
                 if (projectPositionDetailDto.getUserDto() != null && projectPositionDetailDto.getUserDto().getNo().equals(user.getNo())) {
+                    participateStatus = true;
+                    break;
+                }
+            }
+            projectDto.setParticipateStatus(participateStatus);
+
+            // 프로젝트 신청 여부 판단
+            boolean applicationStatus = false;
+            List<ProjectParticipateRequest> projectParticipateRequests = projectParticipateRequestRepository.findProjectPositionAndUserAndProjectFetchJoinByProjectNo(projectNo).orElseThrow(() -> new CustomException(ErrorCode.NOT_FIND_PROJECT_PARTICIPATE_REQUEST_EXCEPTION));
+            for (ProjectParticipateRequest projectParticipateRequest : projectParticipateRequests) {
+                if (projectParticipateRequest.getUser().getNo().equals(user.getNo())) {
                     applicationStatus = true;
                     break;
                 }
             }
             projectDto.setApplicationStatus(applicationStatus);
+
         }
 
         return projectDto;
