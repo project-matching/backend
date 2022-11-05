@@ -494,7 +494,7 @@ class ProjectControllerTest {
                     .andExpect(jsonPath("$.data.content[3].projectSimplePositionDtoList[0].positionNo").value(saveProjectPosition1.getPosition().getNo()))
                     .andExpect(jsonPath("$.data.content[3].projectSimplePositionDtoList[0].positionName").value(saveProjectPosition1.getPosition().getName()))
                     .andExpect(jsonPath("$.data.content[3].projectSimpleTechnicalStackDtoList[0].projectNo").value(saveProjectTechnicalStack1.getProject().getNo()))
-                    .andExpect(jsonPath("$.data.content[3].projectSimpleTechnicalStackDtoList[0].image").value(saveImage1.getLogicalName()))
+                    .andExpect(jsonPath("$.data.content[3].projectSimpleTechnicalStackDtoList[0].image").value(saveImage1.getUrl()))
                     .andExpect(jsonPath("$.data.content[3].projectSimpleTechnicalStackDtoList[0].technicalStackName").value(saveProjectTechnicalStack1.getTechnicalStack().getName()))
 
                     .andExpect(jsonPath("$.data.last").value(true))
@@ -588,7 +588,7 @@ class ProjectControllerTest {
                     .andExpect(jsonPath("$.data.content[3].projectSimplePositionDtoList[0].positionNo").value(saveProjectPosition1.getPosition().getNo()))
                     .andExpect(jsonPath("$.data.content[3].projectSimplePositionDtoList[0].positionName").value(saveProjectPosition1.getPosition().getName()))
                     .andExpect(jsonPath("$.data.content[3].projectSimpleTechnicalStackDtoList[0].projectNo").value(saveProjectTechnicalStack1.getProject().getNo()))
-                    .andExpect(jsonPath("$.data.content[3].projectSimpleTechnicalStackDtoList[0].image").value(saveImage1.getLogicalName()))
+                    .andExpect(jsonPath("$.data.content[3].projectSimpleTechnicalStackDtoList[0].image").value(saveImage1.getUrl()))
                     .andExpect(jsonPath("$.data.content[3].projectSimpleTechnicalStackDtoList[0].technicalStackName").value(saveProjectTechnicalStack1.getTechnicalStack().getName()))
 
                     .andExpect(jsonPath("$.data.last").value(true))
@@ -675,7 +675,7 @@ class ProjectControllerTest {
                     .andExpect(jsonPath("$.data.content[2].projectSimplePositionDtoList[0].positionNo").value(saveProjectPosition1.getPosition().getNo()))
                     .andExpect(jsonPath("$.data.content[2].projectSimplePositionDtoList[0].positionName").value(saveProjectPosition1.getPosition().getName()))
                     .andExpect(jsonPath("$.data.content[2].projectSimpleTechnicalStackDtoList[0].projectNo").value(saveProjectTechnicalStack1.getProject().getNo()))
-                    .andExpect(jsonPath("$.data.content[2].projectSimpleTechnicalStackDtoList[0].image").value(saveImage1.getLogicalName()))
+                    .andExpect(jsonPath("$.data.content[2].projectSimpleTechnicalStackDtoList[0].image").value(saveImage1.getUrl()))
                     .andExpect(jsonPath("$.data.content[2].projectSimpleTechnicalStackDtoList[0].technicalStackName").value(saveProjectTechnicalStack1.getTechnicalStack().getName()))
 
                     .andExpect(jsonPath("$.data.last").value(true))
@@ -770,7 +770,7 @@ class ProjectControllerTest {
                     .andExpect(jsonPath("$.data.content[3].projectSimplePositionDtoList[0].positionNo").value(saveProjectPosition1.getPosition().getNo()))
                     .andExpect(jsonPath("$.data.content[3].projectSimplePositionDtoList[0].positionName").value(saveProjectPosition1.getPosition().getName()))
                     .andExpect(jsonPath("$.data.content[3].projectSimpleTechnicalStackDtoList[0].projectNo").value(saveProjectTechnicalStack1.getProject().getNo()))
-                    .andExpect(jsonPath("$.data.content[3].projectSimpleTechnicalStackDtoList[0].image").value(saveImage1.getLogicalName()))
+                    .andExpect(jsonPath("$.data.content[3].projectSimpleTechnicalStackDtoList[0].image").value(saveImage1.getUrl()))
                     .andExpect(jsonPath("$.data.content[3].projectSimpleTechnicalStackDtoList[0].technicalStackName").value(saveProjectTechnicalStack1.getTechnicalStack().getName()))
 
                     .andExpect(jsonPath("$.data.last").value(true))
@@ -865,7 +865,7 @@ class ProjectControllerTest {
                     .andExpect(jsonPath("$.data.content[3].projectSimplePositionDtoList[0].positionNo").value(saveProjectPosition1.getPosition().getNo()))
                     .andExpect(jsonPath("$.data.content[3].projectSimplePositionDtoList[0].positionName").value(saveProjectPosition1.getPosition().getName()))
                     .andExpect(jsonPath("$.data.content[3].projectSimpleTechnicalStackDtoList[0].projectNo").value(saveProjectTechnicalStack1.getProject().getNo()))
-                    .andExpect(jsonPath("$.data.content[3].projectSimpleTechnicalStackDtoList[0].image").value(saveImage1.getLogicalName()))
+                    .andExpect(jsonPath("$.data.content[3].projectSimpleTechnicalStackDtoList[0].image").value(saveImage1.getUrl()))
                     .andExpect(jsonPath("$.data.content[3].projectSimpleTechnicalStackDtoList[0].technicalStackName").value(saveProjectTechnicalStack1.getTechnicalStack().getName()))
 
                     .andExpect(jsonPath("$.data.last").value(true))
@@ -953,7 +953,7 @@ class ProjectControllerTest {
                     .andExpect(jsonPath("$.data.content[2].projectSimplePositionDtoList[0].positionNo").value(saveProjectPosition1.getPosition().getNo()))
                     .andExpect(jsonPath("$.data.content[2].projectSimplePositionDtoList[0].positionName").value(saveProjectPosition1.getPosition().getName()))
                     .andExpect(jsonPath("$.data.content[2].projectSimpleTechnicalStackDtoList[0].projectNo").value(saveProjectTechnicalStack1.getProject().getNo()))
-                    .andExpect(jsonPath("$.data.content[2].projectSimpleTechnicalStackDtoList[0].image").value(saveImage1.getLogicalName()))
+                    .andExpect(jsonPath("$.data.content[2].projectSimpleTechnicalStackDtoList[0].image").value(saveImage1.getUrl()))
                     .andExpect(jsonPath("$.data.content[2].projectSimpleTechnicalStackDtoList[0].technicalStackName").value(saveProjectTechnicalStack1.getTechnicalStack().getName()))
 
                     .andExpect(jsonPath("$.data.last").value(true))
@@ -1045,7 +1045,7 @@ class ProjectControllerTest {
                     .andExpect(jsonPath("$.data.content[2].projectSimplePositionDtoList[0].positionNo").value(saveProjectPosition1.getPosition().getNo()))
                     .andExpect(jsonPath("$.data.content[2].projectSimplePositionDtoList[0].positionName").value(saveProjectPosition1.getPosition().getName()))
                     .andExpect(jsonPath("$.data.content[2].projectSimpleTechnicalStackDtoList[0].projectNo").value(saveProjectTechnicalStack1.getProject().getNo()))
-                    .andExpect(jsonPath("$.data.content[2].projectSimpleTechnicalStackDtoList[0].image").value(saveImage1.getLogicalName()))
+                    .andExpect(jsonPath("$.data.content[2].projectSimpleTechnicalStackDtoList[0].image").value(saveImage1.getUrl()))
                     .andExpect(jsonPath("$.data.content[2].projectSimpleTechnicalStackDtoList[0].technicalStackName").value(saveProjectTechnicalStack1.getTechnicalStack().getName()))
 
                     .andExpect(jsonPath("$.data.last").value(true))
@@ -1127,7 +1127,7 @@ class ProjectControllerTest {
                     .andExpect(jsonPath("$.data.content[1].projectSimplePositionDtoList[0].positionNo").value(saveProjectPosition1.getPosition().getNo()))
                     .andExpect(jsonPath("$.data.content[1].projectSimplePositionDtoList[0].positionName").value(saveProjectPosition1.getPosition().getName()))
                     .andExpect(jsonPath("$.data.content[1].projectSimpleTechnicalStackDtoList[0].projectNo").value(saveProjectTechnicalStack1.getProject().getNo()))
-                    .andExpect(jsonPath("$.data.content[1].projectSimpleTechnicalStackDtoList[0].image").value(saveImage1.getLogicalName()))
+                    .andExpect(jsonPath("$.data.content[1].projectSimpleTechnicalStackDtoList[0].image").value(saveImage1.getUrl()))
                     .andExpect(jsonPath("$.data.content[1].projectSimpleTechnicalStackDtoList[0].technicalStackName").value(saveProjectTechnicalStack1.getTechnicalStack().getName()))
 
                     .andExpect(jsonPath("$.data.last").value(true))
@@ -1235,7 +1235,7 @@ class ProjectControllerTest {
                     .andExpect(jsonPath("$.data.content[0].projectSimplePositionDtoList[0].positionNo").value(saveProjectPosition2.getPosition().getNo()))
                     .andExpect(jsonPath("$.data.content[0].projectSimplePositionDtoList[0].positionName").value(saveProjectPosition2.getPosition().getName()))
                     .andExpect(jsonPath("$.data.content[0].projectSimpleTechnicalStackDtoList[0].projectNo").value(saveProjectTechnicalStack2.getProject().getNo()))
-                    .andExpect(jsonPath("$.data.content[0].projectSimpleTechnicalStackDtoList[0].image").value(saveImage1.getLogicalName()))
+                    .andExpect(jsonPath("$.data.content[0].projectSimpleTechnicalStackDtoList[0].image").value(saveImage1.getUrl()))
                     .andExpect(jsonPath("$.data.content[0].projectSimpleTechnicalStackDtoList[0].technicalStackName").value(saveProjectTechnicalStack2.getTechnicalStack().getName()))
 
                     .andExpect(jsonPath("$.data.content[1].name").value(saveRecruitmentProjectList.get(0).getName()))
@@ -1248,7 +1248,7 @@ class ProjectControllerTest {
                     .andExpect(jsonPath("$.data.content[1].projectSimplePositionDtoList[0].positionNo").value(saveProjectPosition1.getPosition().getNo()))
                     .andExpect(jsonPath("$.data.content[1].projectSimplePositionDtoList[0].positionName").value(saveProjectPosition1.getPosition().getName()))
                     .andExpect(jsonPath("$.data.content[1].projectSimpleTechnicalStackDtoList[0].projectNo").value(saveProjectTechnicalStack1.getProject().getNo()))
-                    .andExpect(jsonPath("$.data.content[1].projectSimpleTechnicalStackDtoList[0].image").value(saveImage1.getLogicalName()))
+                    .andExpect(jsonPath("$.data.content[1].projectSimpleTechnicalStackDtoList[0].image").value(saveImage1.getUrl()))
                     .andExpect(jsonPath("$.data.content[1].projectSimpleTechnicalStackDtoList[0].technicalStackName").value(saveProjectTechnicalStack1.getTechnicalStack().getName()))
 
                     .andExpect(jsonPath("$.data.last").value(true))
@@ -1339,7 +1339,7 @@ class ProjectControllerTest {
                     .andExpect(jsonPath("$.data.content[0].projectSimplePositionDtoList[0].positionNo").value(saveProjectPosition1.getPosition().getNo()))
                     .andExpect(jsonPath("$.data.content[0].projectSimplePositionDtoList[0].positionName").value(saveProjectPosition1.getPosition().getName()))
                     .andExpect(jsonPath("$.data.content[0].projectSimpleTechnicalStackDtoList[0].projectNo").value(saveProjectTechnicalStack1.getProject().getNo()))
-                    .andExpect(jsonPath("$.data.content[0].projectSimpleTechnicalStackDtoList[0].image").value(saveImage1.getLogicalName()))
+                    .andExpect(jsonPath("$.data.content[0].projectSimpleTechnicalStackDtoList[0].image").value(saveImage1.getUrl()))
                     .andExpect(jsonPath("$.data.content[0].projectSimpleTechnicalStackDtoList[0].technicalStackName").value(saveProjectTechnicalStack1.getTechnicalStack().getName()))
 
                     .andExpect(jsonPath("$.data.last").value(true))
@@ -1462,7 +1462,7 @@ class ProjectControllerTest {
                     .andExpect(jsonPath("$.data.content[0].projectSimplePositionDtoList[0].positionNo").value(saveProjectPosition2.getPosition().getNo()))
                     .andExpect(jsonPath("$.data.content[0].projectSimplePositionDtoList[0].positionName").value(saveProjectPosition2.getPosition().getName()))
                     .andExpect(jsonPath("$.data.content[0].projectSimpleTechnicalStackDtoList[0].projectNo").value(saveProjectTechnicalStack2.getProject().getNo()))
-                    .andExpect(jsonPath("$.data.content[0].projectSimpleTechnicalStackDtoList[0].image").value(saveImage1.getLogicalName()))
+                    .andExpect(jsonPath("$.data.content[0].projectSimpleTechnicalStackDtoList[0].image").value(saveImage1.getUrl()))
                     .andExpect(jsonPath("$.data.content[0].projectSimpleTechnicalStackDtoList[0].technicalStackName").value(saveProjectTechnicalStack2.getTechnicalStack().getName()))
 
                     .andExpect(jsonPath("$.data.content[1].name").value(saveRecruitmentProjectList.get(0).getName()))
@@ -1475,7 +1475,7 @@ class ProjectControllerTest {
                     .andExpect(jsonPath("$.data.content[1].projectSimplePositionDtoList[0].positionNo").value(saveProjectPosition1.getPosition().getNo()))
                     .andExpect(jsonPath("$.data.content[1].projectSimplePositionDtoList[0].positionName").value(saveProjectPosition1.getPosition().getName()))
                     .andExpect(jsonPath("$.data.content[1].projectSimpleTechnicalStackDtoList[0].projectNo").value(saveProjectTechnicalStack1.getProject().getNo()))
-                    .andExpect(jsonPath("$.data.content[1].projectSimpleTechnicalStackDtoList[0].image").value(saveImage1.getLogicalName()))
+                    .andExpect(jsonPath("$.data.content[1].projectSimpleTechnicalStackDtoList[0].image").value(saveImage1.getUrl()))
                     .andExpect(jsonPath("$.data.content[1].projectSimpleTechnicalStackDtoList[0].technicalStackName").value(saveProjectTechnicalStack1.getTechnicalStack().getName()))
 
                     .andExpect(jsonPath("$.data.last").value(true))
@@ -1581,7 +1581,7 @@ class ProjectControllerTest {
                     .andExpect(jsonPath("$.data.content[0].projectSimplePositionDtoList[0].positionNo").value(saveProjectPosition1.getPosition().getNo()))
                     .andExpect(jsonPath("$.data.content[0].projectSimplePositionDtoList[0].positionName").value(saveProjectPosition1.getPosition().getName()))
                     .andExpect(jsonPath("$.data.content[0].projectSimpleTechnicalStackDtoList[0].projectNo").value(saveProjectTechnicalStack1.getProject().getNo()))
-                    .andExpect(jsonPath("$.data.content[0].projectSimpleTechnicalStackDtoList[0].image").value(saveImage1.getLogicalName()))
+                    .andExpect(jsonPath("$.data.content[0].projectSimpleTechnicalStackDtoList[0].image").value(saveImage1.getUrl()))
                     .andExpect(jsonPath("$.data.content[0].projectSimpleTechnicalStackDtoList[0].technicalStackName").value(saveProjectTechnicalStack1.getTechnicalStack().getName()))
 
                     .andExpect(jsonPath("$.data.last").value(true))

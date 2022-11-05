@@ -314,10 +314,10 @@ class BookMarkControllerTest {
                     .andExpect(jsonPath("$.data.content[0].projectSimplePositionDtoList[1].positionName").value(saveProjectPosition2.getPosition().getName()))
 
                     .andExpect(jsonPath("$.data.content[0].projectSimpleTechnicalStackDtoList[0].projectNo").value(saveProjectTechnicalStack1.getProject().getNo()))
-                    .andExpect(jsonPath("$.data.content[0].projectSimpleTechnicalStackDtoList[0].image").value(saveImage1.getLogicalName()))
+                    .andExpect(jsonPath("$.data.content[0].projectSimpleTechnicalStackDtoList[0].image").value(saveImage1.getUrl()))
                     .andExpect(jsonPath("$.data.content[0].projectSimpleTechnicalStackDtoList[0].technicalStackName").value(saveProjectTechnicalStack1.getTechnicalStack().getName()))
                     .andExpect(jsonPath("$.data.content[0].projectSimpleTechnicalStackDtoList[1].projectNo").value(saveProjectTechnicalStack2.getProject().getNo()))
-                    .andExpect(jsonPath("$.data.content[0].projectSimpleTechnicalStackDtoList[1].image").value(saveImage1.getLogicalName()))
+                    .andExpect(jsonPath("$.data.content[0].projectSimpleTechnicalStackDtoList[1].image").value(saveImage1.getUrl()))
                     .andExpect(jsonPath("$.data.content[0].projectSimpleTechnicalStackDtoList[1].technicalStackName").value(saveProjectTechnicalStack2.getTechnicalStack().getName()))
 
                     .andExpect(jsonPath("$.data.last").value(true))
@@ -521,10 +521,10 @@ class BookMarkControllerTest {
                     .andExpect(jsonPath("$.data.content[0].projectSimplePositionDtoList[1].positionName").value(saveProjectPosition2.getPosition().getName()))
 
                     .andExpect(jsonPath("$.data.content[0].projectSimpleTechnicalStackDtoList[0].projectNo").value(saveProjectTechnicalStack1.getProject().getNo()))
-                    .andExpect(jsonPath("$.data.content[0].projectSimpleTechnicalStackDtoList[0].image").value(saveImage1.getLogicalName()))
+                    .andExpect(jsonPath("$.data.content[0].projectSimpleTechnicalStackDtoList[0].image").value(saveImage1.getUrl()))
                     .andExpect(jsonPath("$.data.content[0].projectSimpleTechnicalStackDtoList[0].technicalStackName").value(saveProjectTechnicalStack1.getTechnicalStack().getName()))
                     .andExpect(jsonPath("$.data.content[0].projectSimpleTechnicalStackDtoList[1].projectNo").value(saveProjectTechnicalStack2.getProject().getNo()))
-                    .andExpect(jsonPath("$.data.content[0].projectSimpleTechnicalStackDtoList[1].image").value(saveImage1.getLogicalName()))
+                    .andExpect(jsonPath("$.data.content[0].projectSimpleTechnicalStackDtoList[1].image").value(saveImage1.getUrl()))
                     .andExpect(jsonPath("$.data.content[0].projectSimpleTechnicalStackDtoList[1].technicalStackName").value(saveProjectTechnicalStack2.getTechnicalStack().getName()))
 
                     .andExpect(jsonPath("$.data.last").value(true))

@@ -237,7 +237,7 @@ class ProjectRepositoryTest {
 
         assertEquals(projectList.get(0).getProjectSimpleTechnicalStackDtoList().get(0).getProjectNo(), saveProjectTechnicalStack3.getProject().getNo());
         assertEquals(projectList.get(0).getProjectSimpleTechnicalStackDtoList().get(0).getTechnicalStackName(), saveProjectTechnicalStack3.getTechnicalStack().getName());
-        assertEquals(projectList.get(0).getProjectSimpleTechnicalStackDtoList().get(0).getImage(), saveImage1.getLogicalName());
+        assertEquals(projectList.get(0).getProjectSimpleTechnicalStackDtoList().get(0).getImage(), saveImage1.getUrl());
         assertEquals(projectList.get(0).getProjectSimpleTechnicalStackDtoList().get(1).getProjectNo(), saveProjectTechnicalStack4.getProject().getNo());
         assertEquals(projectList.get(0).getProjectSimpleTechnicalStackDtoList().get(1).getTechnicalStackName(), saveProjectTechnicalStack4.getTechnicalStack().getName());
         assertEquals(projectList.get(0).getProjectSimpleTechnicalStackDtoList().get(1).getImage(), null);
@@ -256,7 +256,7 @@ class ProjectRepositoryTest {
 
         assertEquals(projectList.get(1).getProjectSimpleTechnicalStackDtoList().get(0).getProjectNo(), saveProjectTechnicalStack1.getProject().getNo());
         assertEquals(projectList.get(1).getProjectSimpleTechnicalStackDtoList().get(0).getTechnicalStackName(), saveProjectTechnicalStack1.getTechnicalStack().getName());
-        assertEquals(projectList.get(1).getProjectSimpleTechnicalStackDtoList().get(0).getImage(), saveImage1.getLogicalName());
+        assertEquals(projectList.get(1).getProjectSimpleTechnicalStackDtoList().get(0).getImage(), saveImage1.getUrl());
         assertEquals(projectList.get(1).getProjectSimpleTechnicalStackDtoList().get(1).getProjectNo(), saveProjectTechnicalStack2.getProject().getNo());
         assertEquals(projectList.get(1).getProjectSimpleTechnicalStackDtoList().get(1).getTechnicalStackName(), saveProjectTechnicalStack2.getTechnicalStack().getName());
         assertEquals(projectList.get(1).getProjectSimpleTechnicalStackDtoList().get(1).getImage(), null);
@@ -436,7 +436,7 @@ class ProjectRepositoryTest {
 
         assertEquals(projectList.get(0).getProjectSimpleTechnicalStackDtoList().get(0).getProjectNo(), saveProjectTechnicalStack3.getProject().getNo());
         assertEquals(projectList.get(0).getProjectSimpleTechnicalStackDtoList().get(0).getTechnicalStackName(), saveProjectTechnicalStack3.getTechnicalStack().getName());
-        assertEquals(projectList.get(0).getProjectSimpleTechnicalStackDtoList().get(0).getImage(), saveImage1.getLogicalName());
+        assertEquals(projectList.get(0).getProjectSimpleTechnicalStackDtoList().get(0).getImage(), saveImage1.getUrl());
         assertEquals(projectList.get(0).getProjectSimpleTechnicalStackDtoList().get(1).getProjectNo(), saveProjectTechnicalStack4.getProject().getNo());
         assertEquals(projectList.get(0).getProjectSimpleTechnicalStackDtoList().get(1).getTechnicalStackName(), saveProjectTechnicalStack4.getTechnicalStack().getName());
         assertEquals(projectList.get(0).getProjectSimpleTechnicalStackDtoList().get(1).getImage(), null);
@@ -635,7 +635,7 @@ class ProjectRepositoryTest {
 
         assertEquals(projectList.get(0).getProjectSimpleTechnicalStackDtoList().get(0).getProjectNo(), saveProjectTechnicalStack3.getProject().getNo());
         assertEquals(projectList.get(0).getProjectSimpleTechnicalStackDtoList().get(0).getTechnicalStackName(), saveProjectTechnicalStack3.getTechnicalStack().getName());
-        assertEquals(projectList.get(0).getProjectSimpleTechnicalStackDtoList().get(0).getImage(), saveImage1.getLogicalName());
+        assertEquals(projectList.get(0).getProjectSimpleTechnicalStackDtoList().get(0).getImage(), saveImage1.getUrl());
         assertEquals(projectList.get(0).getProjectSimpleTechnicalStackDtoList().get(1).getProjectNo(), saveProjectTechnicalStack4.getProject().getNo());
         assertEquals(projectList.get(0).getProjectSimpleTechnicalStackDtoList().get(1).getTechnicalStackName(), saveProjectTechnicalStack4.getTechnicalStack().getName());
         assertEquals(projectList.get(0).getProjectSimpleTechnicalStackDtoList().get(1).getImage(), null);
@@ -654,7 +654,7 @@ class ProjectRepositoryTest {
 
         assertEquals(projectList.get(1).getProjectSimpleTechnicalStackDtoList().get(0).getProjectNo(), saveProjectTechnicalStack1.getProject().getNo());
         assertEquals(projectList.get(1).getProjectSimpleTechnicalStackDtoList().get(0).getTechnicalStackName(), saveProjectTechnicalStack1.getTechnicalStack().getName());
-        assertEquals(projectList.get(1).getProjectSimpleTechnicalStackDtoList().get(0).getImage(), saveImage1.getLogicalName());
+        assertEquals(projectList.get(1).getProjectSimpleTechnicalStackDtoList().get(0).getImage(), saveImage1.getUrl());
         assertEquals(projectList.get(1).getProjectSimpleTechnicalStackDtoList().get(1).getProjectNo(), saveProjectTechnicalStack2.getProject().getNo());
         assertEquals(projectList.get(1).getProjectSimpleTechnicalStackDtoList().get(1).getTechnicalStackName(), saveProjectTechnicalStack2.getTechnicalStack().getName());
         assertEquals(projectList.get(1).getProjectSimpleTechnicalStackDtoList().get(1).getImage(), null);
@@ -851,7 +851,7 @@ class ProjectRepositoryTest {
 
         assertEquals(projectList.get(0).getProjectSimpleTechnicalStackDtoList().get(0).getProjectNo(), saveProjectTechnicalStack3.getProject().getNo());
         assertEquals(projectList.get(0).getProjectSimpleTechnicalStackDtoList().get(0).getTechnicalStackName(), saveProjectTechnicalStack3.getTechnicalStack().getName());
-        assertEquals(projectList.get(0).getProjectSimpleTechnicalStackDtoList().get(0).getImage(), saveImage1.getLogicalName());
+        assertEquals(projectList.get(0).getProjectSimpleTechnicalStackDtoList().get(0).getImage(), saveImage1.getUrl());
         assertEquals(projectList.get(0).getProjectSimpleTechnicalStackDtoList().get(1).getProjectNo(), saveProjectTechnicalStack4.getProject().getNo());
         assertEquals(projectList.get(0).getProjectSimpleTechnicalStackDtoList().get(1).getTechnicalStackName(), saveProjectTechnicalStack4.getTechnicalStack().getName());
         assertEquals(projectList.get(0).getProjectSimpleTechnicalStackDtoList().get(1).getImage(), null);
@@ -870,7 +870,7 @@ class ProjectRepositoryTest {
 
         assertEquals(projectList.get(1).getProjectSimpleTechnicalStackDtoList().get(0).getProjectNo(), saveProjectTechnicalStack1.getProject().getNo());
         assertEquals(projectList.get(1).getProjectSimpleTechnicalStackDtoList().get(0).getTechnicalStackName(), saveProjectTechnicalStack1.getTechnicalStack().getName());
-        assertEquals(projectList.get(1).getProjectSimpleTechnicalStackDtoList().get(0).getImage(), saveImage1.getLogicalName());
+        assertEquals(projectList.get(1).getProjectSimpleTechnicalStackDtoList().get(0).getImage(), saveImage1.getUrl());
         assertEquals(projectList.get(1).getProjectSimpleTechnicalStackDtoList().get(1).getProjectNo(), saveProjectTechnicalStack2.getProject().getNo());
         assertEquals(projectList.get(1).getProjectSimpleTechnicalStackDtoList().get(1).getTechnicalStackName(), saveProjectTechnicalStack2.getTechnicalStack().getName());
         assertEquals(projectList.get(1).getProjectSimpleTechnicalStackDtoList().get(1).getImage(), null);
@@ -1070,7 +1070,7 @@ class ProjectRepositoryTest {
 
         assertEquals(projectList.get(0).getProjectSimpleTechnicalStackDtoList().get(0).getProjectNo(), saveProjectTechnicalStack3.getProject().getNo());
         assertEquals(projectList.get(0).getProjectSimpleTechnicalStackDtoList().get(0).getTechnicalStackName(), saveProjectTechnicalStack3.getTechnicalStack().getName());
-        assertEquals(projectList.get(0).getProjectSimpleTechnicalStackDtoList().get(0).getImage(), saveImage1.getLogicalName());
+        assertEquals(projectList.get(0).getProjectSimpleTechnicalStackDtoList().get(0).getImage(), saveImage1.getUrl());
         assertEquals(projectList.get(0).getProjectSimpleTechnicalStackDtoList().get(1).getProjectNo(), saveProjectTechnicalStack4.getProject().getNo());
         assertEquals(projectList.get(0).getProjectSimpleTechnicalStackDtoList().get(1).getTechnicalStackName(), saveProjectTechnicalStack4.getTechnicalStack().getName());
         assertEquals(projectList.get(0).getProjectSimpleTechnicalStackDtoList().get(1).getImage(), null);
@@ -1089,7 +1089,7 @@ class ProjectRepositoryTest {
 
         assertEquals(projectList.get(1).getProjectSimpleTechnicalStackDtoList().get(0).getProjectNo(), saveProjectTechnicalStack1.getProject().getNo());
         assertEquals(projectList.get(1).getProjectSimpleTechnicalStackDtoList().get(0).getTechnicalStackName(), saveProjectTechnicalStack1.getTechnicalStack().getName());
-        assertEquals(projectList.get(1).getProjectSimpleTechnicalStackDtoList().get(0).getImage(), saveImage1.getLogicalName());
+        assertEquals(projectList.get(1).getProjectSimpleTechnicalStackDtoList().get(0).getImage(), saveImage1.getUrl());
         assertEquals(projectList.get(1).getProjectSimpleTechnicalStackDtoList().get(1).getProjectNo(), saveProjectTechnicalStack2.getProject().getNo());
         assertEquals(projectList.get(1).getProjectSimpleTechnicalStackDtoList().get(1).getTechnicalStackName(), saveProjectTechnicalStack2.getTechnicalStack().getName());
         assertEquals(projectList.get(1).getProjectSimpleTechnicalStackDtoList().get(1).getImage(), null);
@@ -1304,7 +1304,7 @@ class ProjectRepositoryTest {
 
         assertEquals(projectList.get(0).getProjectSimpleTechnicalStackDtoList().get(0).getProjectNo(), saveProjectTechnicalStack3.getProject().getNo());
         assertEquals(projectList.get(0).getProjectSimpleTechnicalStackDtoList().get(0).getTechnicalStackName(), saveProjectTechnicalStack3.getTechnicalStack().getName());
-        assertEquals(projectList.get(0).getProjectSimpleTechnicalStackDtoList().get(0).getImage(), saveImage1.getLogicalName());
+        assertEquals(projectList.get(0).getProjectSimpleTechnicalStackDtoList().get(0).getImage(), saveImage1.getUrl());
         assertEquals(projectList.get(0).getProjectSimpleTechnicalStackDtoList().get(1).getProjectNo(), saveProjectTechnicalStack4.getProject().getNo());
         assertEquals(projectList.get(0).getProjectSimpleTechnicalStackDtoList().get(1).getTechnicalStackName(), saveProjectTechnicalStack4.getTechnicalStack().getName());
         assertEquals(projectList.get(0).getProjectSimpleTechnicalStackDtoList().get(1).getImage(), null);
@@ -1323,7 +1323,7 @@ class ProjectRepositoryTest {
 
         assertEquals(projectList.get(1).getProjectSimpleTechnicalStackDtoList().get(0).getProjectNo(), saveProjectTechnicalStack1.getProject().getNo());
         assertEquals(projectList.get(1).getProjectSimpleTechnicalStackDtoList().get(0).getTechnicalStackName(), saveProjectTechnicalStack1.getTechnicalStack().getName());
-        assertEquals(projectList.get(1).getProjectSimpleTechnicalStackDtoList().get(0).getImage(), saveImage1.getLogicalName());
+        assertEquals(projectList.get(1).getProjectSimpleTechnicalStackDtoList().get(0).getImage(), saveImage1.getUrl());
         assertEquals(projectList.get(1).getProjectSimpleTechnicalStackDtoList().get(1).getProjectNo(), saveProjectTechnicalStack2.getProject().getNo());
         assertEquals(projectList.get(1).getProjectSimpleTechnicalStackDtoList().get(1).getTechnicalStackName(), saveProjectTechnicalStack2.getTechnicalStack().getName());
         assertEquals(projectList.get(1).getProjectSimpleTechnicalStackDtoList().get(1).getImage(), null);
@@ -1554,7 +1554,7 @@ class ProjectRepositoryTest {
 
         assertEquals(projectList.get(0).getProjectSimpleTechnicalStackDtoList().get(0).getProjectNo(), saveProjectTechnicalStack3.getProject().getNo());
         assertEquals(projectList.get(0).getProjectSimpleTechnicalStackDtoList().get(0).getTechnicalStackName(), saveProjectTechnicalStack3.getTechnicalStack().getName());
-        assertEquals(projectList.get(0).getProjectSimpleTechnicalStackDtoList().get(0).getImage(), saveImage1.getLogicalName());
+        assertEquals(projectList.get(0).getProjectSimpleTechnicalStackDtoList().get(0).getImage(), saveImage1.getUrl());
         assertEquals(projectList.get(0).getProjectSimpleTechnicalStackDtoList().get(1).getProjectNo(), saveProjectTechnicalStack4.getProject().getNo());
         assertEquals(projectList.get(0).getProjectSimpleTechnicalStackDtoList().get(1).getTechnicalStackName(), saveProjectTechnicalStack4.getTechnicalStack().getName());
         assertEquals(projectList.get(0).getProjectSimpleTechnicalStackDtoList().get(1).getImage(), null);
@@ -1573,7 +1573,7 @@ class ProjectRepositoryTest {
 
         assertEquals(projectList.get(1).getProjectSimpleTechnicalStackDtoList().get(0).getProjectNo(), saveProjectTechnicalStack1.getProject().getNo());
         assertEquals(projectList.get(1).getProjectSimpleTechnicalStackDtoList().get(0).getTechnicalStackName(), saveProjectTechnicalStack1.getTechnicalStack().getName());
-        assertEquals(projectList.get(1).getProjectSimpleTechnicalStackDtoList().get(0).getImage(), saveImage1.getLogicalName());
+        assertEquals(projectList.get(1).getProjectSimpleTechnicalStackDtoList().get(0).getImage(), saveImage1.getUrl());
         assertEquals(projectList.get(1).getProjectSimpleTechnicalStackDtoList().get(1).getProjectNo(), saveProjectTechnicalStack2.getProject().getNo());
         assertEquals(projectList.get(1).getProjectSimpleTechnicalStackDtoList().get(1).getTechnicalStackName(), saveProjectTechnicalStack2.getTechnicalStack().getName());
         assertEquals(projectList.get(1).getProjectSimpleTechnicalStackDtoList().get(1).getImage(), null);
@@ -1784,7 +1784,7 @@ class ProjectRepositoryTest {
 
         assertEquals(projectList.get(0).getProjectSimpleTechnicalStackDtoList().get(0).getProjectNo(), saveProjectTechnicalStack3.getProject().getNo());
         assertEquals(projectList.get(0).getProjectSimpleTechnicalStackDtoList().get(0).getTechnicalStackName(), saveProjectTechnicalStack3.getTechnicalStack().getName());
-        assertEquals(projectList.get(0).getProjectSimpleTechnicalStackDtoList().get(0).getImage(), saveImage1.getLogicalName());
+        assertEquals(projectList.get(0).getProjectSimpleTechnicalStackDtoList().get(0).getImage(), saveImage1.getUrl());
         assertEquals(projectList.get(0).getProjectSimpleTechnicalStackDtoList().get(1).getProjectNo(), saveProjectTechnicalStack4.getProject().getNo());
         assertEquals(projectList.get(0).getProjectSimpleTechnicalStackDtoList().get(1).getTechnicalStackName(), saveProjectTechnicalStack4.getTechnicalStack().getName());
         assertEquals(projectList.get(0).getProjectSimpleTechnicalStackDtoList().get(1).getImage(), null);
@@ -1803,7 +1803,7 @@ class ProjectRepositoryTest {
 
         assertEquals(projectList.get(1).getProjectSimpleTechnicalStackDtoList().get(0).getProjectNo(), saveProjectTechnicalStack1.getProject().getNo());
         assertEquals(projectList.get(1).getProjectSimpleTechnicalStackDtoList().get(0).getTechnicalStackName(), saveProjectTechnicalStack1.getTechnicalStack().getName());
-        assertEquals(projectList.get(1).getProjectSimpleTechnicalStackDtoList().get(0).getImage(), saveImage1.getLogicalName());
+        assertEquals(projectList.get(1).getProjectSimpleTechnicalStackDtoList().get(0).getImage(), saveImage1.getUrl());
         assertEquals(projectList.get(1).getProjectSimpleTechnicalStackDtoList().get(1).getProjectNo(), saveProjectTechnicalStack2.getProject().getNo());
         assertEquals(projectList.get(1).getProjectSimpleTechnicalStackDtoList().get(1).getTechnicalStackName(), saveProjectTechnicalStack2.getTechnicalStack().getName());
         assertEquals(projectList.get(1).getProjectSimpleTechnicalStackDtoList().get(1).getImage(), null);
