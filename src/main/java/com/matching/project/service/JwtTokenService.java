@@ -161,7 +161,11 @@ public class JwtTokenService {
     public boolean hasRefreshToken(String email) {return redisService.hasKey(email); }
 
     public void setBlackList(String key){
-        redisService.set(key, "access_token");
+        // access token의 수명을 넘기면 어짜피 접근하지 못하기때문에,
+        // redis 조회간의 속도 향상을 위해 수명 설정
+        // 원래라면 남은 시간을 계산해서 그 만큼만 설정해야하나, 해당 부분은 추후 수정하도록 하자
+        int timeout =  Math.toIntExact(accessTokenPeriod) / (1000 * 60);
+        redisService.set(key, "access_token", timeout);
     }
 
     public boolean hasBlackListKey(String key) {

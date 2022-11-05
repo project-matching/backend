@@ -43,8 +43,10 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
                         User user = (User)auth.getPrincipal();
                         if (user.isWithdrawal()) {
                             log.error("{} : Withdrawal User", user.getEmail());
+                            request.setAttribute("exception", new CustomException(ErrorCode.WITHDRAWAL_EXCEPTION));
                         } else if (user.isBlock()) {
                             log.error("{} : Blocked User", user.getEmail());
+                            request.setAttribute("exception", new CustomException(ErrorCode.BLOCKED_EXCEPTION));
                         } else {
                             // refresh 토큰은 인증용으로 사용할 수 없음. 오로지 발급 용도로만 사용 가능함.
                             if (token.equals(jwtTokenService.getRefreshToken(jwtTokenService.getUserEmail(token)))) {

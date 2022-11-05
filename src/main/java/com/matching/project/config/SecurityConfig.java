@@ -3,13 +3,13 @@ package com.matching.project.config;
 import com.matching.project.error.CustomAccessDeniedHandler;
 import com.matching.project.error.CustomAuthenticationEntryPoint;
 import com.matching.project.oauth.CustomOAuth2UserService;
+import com.matching.project.oauth.OAuthFailHandler;
 import com.matching.project.oauth.OAuthSuccessHandler;
 import com.matching.project.service.JwtTokenService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -18,17 +18,14 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.header.writers.frameoptions.WhiteListedAllowFromStrategy;
 import org.springframework.security.web.header.writers.frameoptions.XFrameOptionsHeaderWriter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.filter.CorsFilter;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 @Configuration
@@ -37,7 +34,8 @@ import java.util.List;
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final JwtTokenService jwtTokenService;
     private final CustomOAuth2UserService customOAuth2UserService;
-    private final OAuthSuccessHandler oAathSuccessHandler;
+    private final OAuthSuccessHandler oAuthSuccessHandler;
+    private final OAuthFailHandler oAuthFailHandler;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -180,7 +178,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     .baseUri("/v1/oauth2/authorization")
                 .and()
                 .loginPage("/")
-                .successHandler(oAathSuccessHandler)
+                .successHandler(oAuthSuccessHandler)
+                .failureHandler(oAuthFailHandler)
                 .userInfoEndpoint()
                 .userService(customOAuth2UserService);
 

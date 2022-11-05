@@ -11,6 +11,7 @@ import com.matching.project.error.ErrorCode;
 import com.matching.project.repository.EmailAuthRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.scheduling.annotation.Async;
@@ -32,10 +33,9 @@ public class EmailServiceImpl implements EmailService {
     private final EmailAuthRepository emailAuthRepository;
     private final CustomUserDetailsService customUserDetailsService;
     private final PasswordEncoder passwordEncoder;
-    private final JwtTokenService jwtTokenService;
 
-    //@Value("${frontend.url}")
-    //private String frontUrl;
+    @Value("${front.url}")
+    private String frontUrl;
 
     public User userValidCheck(String email, EmailAuthPurpose purpose) {
         User user = (User) customUserDetailsService.loadUserByUsername(email);
@@ -106,8 +106,7 @@ public class EmailServiceImpl implements EmailService {
         SimpleMailMessage smm = new SimpleMailMessage();
         smm.setTo(email);
         smm.setSubject("회원가입 이메일 인증");
-        // 임시 -> 프론트 주소로 바뀌여야함.
-        smm.setText("http://localhost:3000/auth/signup?email="+email+"&authToken="+authToken);
+        smm.setText(frontUrl + "/auth/signup?email="+email+"&authToken="+authToken);
 
         javaMailSender.send(smm);
         log.info("회원가입 이메일 전송 to {}", email);
@@ -138,7 +137,7 @@ public class EmailServiceImpl implements EmailService {
         smm.setTo(email);
         smm.setSubject("비밀번호 재발급 요청하기");
         // 임시 -> 프론트 주소로 바뀌여야함.
-        smm.setText("http://localhost:3000/auth/pwd?email="+email+"&authToken="+authToken);
+        smm.setText(frontUrl + "/auth/pwd?email="+email+"&authToken="+authToken);
 
         javaMailSender.send(smm);
         log.info("비밀번호 재발급 요청 to {}", email);

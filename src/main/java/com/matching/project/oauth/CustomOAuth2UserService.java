@@ -11,6 +11,7 @@ import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserServ
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
+import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
@@ -50,10 +51,21 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
                 .orElse(attributes.toEntity());
         log.info(user.toString());
 
-        if (user.isWithdrawal())
-            throw new CustomException(ErrorCode.WITHDRAWAL_EXCEPTION);
-        else if (user.isBlock())
-            throw new CustomException(ErrorCode.BLOCKED_EXCEPTION); // 에러에서 사유도 출력되도록 할 필요가 있음
+        if (user.isWithdrawal()) {
+            log.error("{} : Withdrawal User", user.getEmail());
+            throw new OAuth2AuthenticationException(
+                    new OAuth2Error(ErrorCode.WITHDRAWAL_EXCEPTION.getHttpStatus().toString(),
+                            "withdrawal",
+                            null)
+            );
+        } else if (user.isBlock()) {
+            log.error("{} : Blocked User", user.getEmail());
+            throw new OAuth2AuthenticationException(
+                    new OAuth2Error(ErrorCode.BLOCKED_EXCEPTION.getHttpStatus().toString(),
+                            "block",
+                            null)
+            );
+        }
 
         return userRepository.save(user);
     }

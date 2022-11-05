@@ -5,6 +5,7 @@ import com.matching.project.dto.token.TokenDto;
 import com.matching.project.service.JwtTokenService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
@@ -21,6 +22,9 @@ import java.util.Map;
 @Component
 public class OAuthSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
     private final JwtTokenService jwtTokenService;
+
+    @Value("${front.url}")
+    private String frontUrl;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication)
@@ -50,7 +54,7 @@ public class OAuthSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
         log.info("{}", tokens);
 
         // api 리다이렉트에는 로그인 인증 후 jwt 토큰을 보낼 URI(react)가 설정되어야함.
-        getRedirectStrategy().sendRedirect(request, response, "http://localhost:3000/auth/success"
+        getRedirectStrategy().sendRedirect(request, response, frontUrl + "/auth/success"
                 + "?access=" + tokens.getAccess()
                 + "&access_exp=" + tokens.getAccess_exp()
                 + "&refresh=" + tokens.getRefresh()

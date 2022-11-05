@@ -1,4 +1,7 @@
-server:
+front:
+  url: http://ec2-3-37-7-111.ap-northeast-2.compute.amazonaws.com:3000
+
+erver:
   port: 8080
 
 key:
