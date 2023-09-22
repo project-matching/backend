@@ -41,7 +41,7 @@
 
 ## 프로젝트 구조
 
-<img src = "https://project-matching-s3.s3.ap-northeast-2.amazonaws.com/apidocs/infra.png" width="100%" height="100%">
+![infra](https://leeworld9.github.io/hosting/img/project-matching-backend/infra.png)
 
 ## 프로젝트 목표
 
@@ -77,7 +77,8 @@
 
 ## 프로젝트 API 명세서
 
-- [API 명세서 URL](https://project-matching-s3.s3.ap-northeast-2.amazonaws.com/apidocs/index.html)
+- [API 명세서 URL](https://leeworld9.github.io/hosting/html/project-matching-backend/index.html)
+  (Swagger 서버 미사용으로 인하여, index 파일로 대체)
 
 
 
@@ -89,13 +90,13 @@
 
 ## 테스트 커버리지 결과
 
-## ![TestCoverage](https://project-matching-s3.s3.ap-northeast-2.amazonaws.com/apidocs/coverage.png)
+![TestCoverage](https://leeworld9.github.io/hosting/img/project-matching-backend/coverage.png)
 
 
 
 ## DB ERD
 
-![ERD](https://project-matching-s3.s3.ap-northeast-2.amazonaws.com/apidocs/erd.png)
+![ERD](https://leeworld9.github.io/hosting/img/project-matching-backend/erd.png)
 
 
 
